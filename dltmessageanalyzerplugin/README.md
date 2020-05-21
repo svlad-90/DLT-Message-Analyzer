@@ -32,4 +32,4 @@ and many other features
 
 ## Screenshot:
 
-![Screenshot of DLTMessageAnalyzer plugin](https://github.com/svlad-90/DLTMessageAnalyzer/tree/master/dltmessageanalyzerplugin/DLTMessageAnalyzer_screenshot.png)
+![Screenshot of DLTMessageAnalyzer plugin](./DLTMessageAnalyzer_screenshot.png)
