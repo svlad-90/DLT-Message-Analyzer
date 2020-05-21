@@ -53,7 +53,7 @@ QString DLTMessageAnalyzerPlugin::pluginInterfaceVersion(){
 
 QString DLTMessageAnalyzerPlugin::pluginData() const
 {
-    return QString("You are using DLTMessageAnalyzerPlugin | Version: v.%1 | Author - Vladyslav Goncharuk <VGoncharuk@luxoft.com>").arg(DLT_MESSAGE_ANALYZER_PLUGIN_VERSION);
+    return QString("You are using DLTMessageAnalyzerPlugin | Version: v.%1 | Author - Vladyslav Goncharuk <svlad1990@gmail.com>").arg(DLT_MESSAGE_ANALYZER_PLUGIN_VERSION);
 }
 
 QString DLTMessageAnalyzerPlugin::description()
