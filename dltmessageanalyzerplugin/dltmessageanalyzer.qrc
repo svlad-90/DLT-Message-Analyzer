@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/dltmessageanalyzer">
+        <file>png/bug.png</file>
+        <file>png/manuscript.png</file>
+    </qresource>
+</RCC>
