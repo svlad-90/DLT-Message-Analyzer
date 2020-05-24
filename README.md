@@ -30,6 +30,10 @@ and many other features
 
 ----
 
-## Screenshot:
+## Screenshots:
 
-![Screenshot of DLTMessageAnalyzer plugin](./DLTMessageAnalyzer_screenshot.png)
+![Screenshot of DLTMessageAnalyzer plugin - Search view](./DLTMessageAnalyzer_screenshot_SearchView.png)
+----
+![Screenshot of DLTMessageAnalyzer plugin - Grouped view](./DLTMessageAnalyzer_screenshot_GroupedView.png)
+----
+![Screenshot of DLTMessageAnalyzer plugin - Filters view](./DLTMessageAnalyzer_screenshot_FiltersView.png)
