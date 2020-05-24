@@ -1,4 +1,4 @@
-#Regex name scripting
+# Regex name scripting
 
 DLTMessageAnalyzer plugin supports regex name scripting. It means, that the provided regex name might be considered by the implementation of the plugin and used by it in this or that view.
 
@@ -6,15 +6,15 @@ Currently, the following options are supported.
 
 ----
 
-#Text coloring
+# Text coloring
 
 By default, the plugin will highlight each regex group with some color. Default colors depend on the used user settings. By default, it will be a repetitive gradient consisting of 5 colors:
 
-![Screenshot of gradient coloring syntax](./md/regex_name_scripting/gradient_syntax.png)
+![Screenshot of gradient coloring syntax](./regex_name_scripting/gradient_syntax.png)
 
 User can exchange the gradient settings in the context menu of the "Search view":
 
-![Screenshot of gradient coloring syntax](./md/regex_name_scripting/gradient_settings.png)
+![Screenshot of gradient coloring syntax](./regex_name_scripting/gradient_settings.png)
 
 The default coloring can be overwritten by a regex name script.
 
@@ -22,15 +22,15 @@ Supported syntax options are:
 
 RGB_R_G_B => e.g. RGB_0_0_0 stands for black:
 
-![Screenshot of RGB coloring syntax](./md/regex_name_scripting/rgb_syntax.png)
+![Screenshot of RGB coloring syntax](./regex_name_scripting/rgb_syntax.png)
 
 Color name => e.g. BLACK: . Map of the supported color name is presented in below section
 
-![Screenshot of color name syntax](./md/regex_name_scripting/color_name_syntax.png)
+![Screenshot of color name syntax](./regex_name_scripting/color_name_syntax.png)
 
 Status name => e.g. ERROR:
 
-![Screenshot of status-based coloring syntax](./md/regex_name_scripting/status_syntax.png)
+![Screenshot of status-based coloring syntax](./regex_name_scripting/status_syntax.png)
 
 Supported statuses are:
 {"ok", QColor(0,150,0)},
@@ -39,13 +39,13 @@ Supported statuses are:
 
 Coloring of the nested groups is also supported:
 
-![Screenshot of nested regex groups coloring](./md/regex_name_scripting/nested_groups_coloring.png)
+![Screenshot of nested regex groups coloring](./regex_name_scripting/nested_groups_coloring.png)
 
 All the above parameters are case insensitive.
 
 ----
 
-#Variables
+# Variables
 
 When you are working with a complex regex expression, it is quite complex to find an important part of it in order to change some parameters.
 
@@ -54,36 +54,36 @@ Try to find and change something in uch a big string! It is a quite complex task
 
 To keep things easier, the variable scripting was introduced within the plugin. It does the following thing:
 
-![Screenshot of variables usage](./md/regex_name_scripting/var_example.png)
+![Screenshot of variables usage](./regex_name_scripting/var_example.png)
 
 As you see above, each "VAR_TRACE_SPAM_APP" regex name will be turned into a separate item in the tree view. It allows to build "regex with parameters" and easily exchange the content of your filter:
 
-![Screenshot of variable edit process](./md/regex_name_scripting/var_edit.png)
+![Screenshot of variable edit process](./regex_name_scripting/var_edit.png)
 
 Change in a tree view will be reflected in a final regex.
 
 Also, selection within a tree view will select the corresponding part in the main regex input field:
 
-![Screenshot of variable's selection](./md/regex_name_scripting/var_selection.png)
+![Screenshot of variable's selection](./regex_name_scripting/var_selection.png)
 
 If needed it is possible to switch from visualization of "Variables" to visualization of the whole regex:
 
-![Screenshot of turned on variable's filter](./md/regex_name_scripting/var_filter_variables_on.png)
+![Screenshot of turned on variable's filter](./regex_name_scripting/var_filter_variables_on.png)
 
-![Screenshot of turned off variable's filter](./md/regex_name_scripting/var_filter_variables_off.png)
+![Screenshot of turned off variable's filter](./regex_name_scripting/var_filter_variables_off.png)
 
 All the above parameters are case insensitive.
 
 ----
 
-#AND operator
+# AND operator
 If needed, "color" and "variable" scripting options can be combined together with the help of the "_AND_" operator. This operator is case insensitive, so you can use also "_and_", "_AnD_", etc:
 
-![Screenshot of example of the and operator's usage](./md/regex_name_scripting/var_and_operator.png)
+![Screenshot of example of the and operator's usage](./regex_name_scripting/var_and_operator.png)
 
 ----
 
-#Supported color names
+# Supported color names
 
 Finding! Color names split with "space" will currently not work, as regex name can't contain a space. Names will be replaced with "_" instead of " " in the next plugin's release.
 
