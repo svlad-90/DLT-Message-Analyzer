@@ -30,10 +30,16 @@ and many other features
 
 ----
 
+## Articles
+
+[Link to "regex name scripting" article](./md/regex_name_scripting.md)
+
+----
+
 ## Screenshots:
 
-![Screenshot of DLTMessageAnalyzer plugin - Search view](./DLTMessageAnalyzer_screenshot_SearchView.png)
+![Screenshot of DLTMessageAnalyzer plugin - Search view](./md/DLTMessageAnalyzer_screenshot_SearchView.png)
 ----
-![Screenshot of DLTMessageAnalyzer plugin - Grouped view](./DLTMessageAnalyzer_screenshot_GroupedView.png)
+![Screenshot of DLTMessageAnalyzer plugin - Grouped view](./md/DLTMessageAnalyzer_screenshot_GroupedView.png)
 ----
-![Screenshot of DLTMessageAnalyzer plugin - Filters view](./DLTMessageAnalyzer_screenshot_FilterView.png)
+![Screenshot of DLTMessageAnalyzer plugin - Filters view](./md/DLTMessageAnalyzer_screenshot_FilterView.png)
