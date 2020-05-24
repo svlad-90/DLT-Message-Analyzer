@@ -36,4 +36,4 @@ and many other features
 ----
 ![Screenshot of DLTMessageAnalyzer plugin - Grouped view](./DLTMessageAnalyzer_screenshot_GroupedView.png)
 ----
-![Screenshot of DLTMessageAnalyzer plugin - Filters view](./DLTMessageAnalyzer_screenshot_FiltersView.png)
+![Screenshot of DLTMessageAnalyzer plugin - Filters view](./DLTMessageAnalyzer_screenshot_FilterView.png)
