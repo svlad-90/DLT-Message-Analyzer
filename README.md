@@ -17,12 +17,13 @@ This increadibly increases the speed of the analysis!
 - "Grouped view" functionality, which allows to easily form groups of repetitive messages and check request-response number, trace spam cases, etc.
 - "Search view" functionality. Analogue of the dlt-viewer's search with extended capabilities
 - "Files view", which shows names of analyzed files
-- Advanced highlighting of regex groups (refer to [regex name scripting](./md/regex_name_scripting.md) section)
+- Advanced highlighting of regex groups. Refer to [regex name scripting](./md/regex_name_scripting/regex_name_scripting.md) section
 - Continuous search. The analysis continues to happen while new messages being received from HU 
 - Check of entered regular expressions with providing human-readable errors in case of wrong input
-- In-RAM cache, which makes search dramatically faster
+- In-RAM cache, which makes search dramatically faster. Refer to [in-RAM cache](./md/in_ram_cache/in_ram_cache.md) section
 - Work with multiple regex files. Possibility to copy-paste from one file to the other
-- "Filters view", which allows to quickly get access to defined "key groups" and change their content (refer to [regex name scripting](./md/regex_name_scripting.md) section)
+- "Filters view", which allows to quickly get access to defined "key groups" and change their content. Refer to [regex name scripting](./md/regex_name_scripting/regex_name_scripting.md) section
+
 - Lock of the search between 2 message id-s
 - Debug "console view"
 and many other features
