@@ -15,7 +15,7 @@ In case if file size is bigger than the specified cache limit, only a part of fi
 
 GUI part which describes the status of the cache looks like this:
 
-![Screenshot of in-RAM cache status](./md/in_ram_cache/cache_status.png)
+![Screenshot of in-RAM cache status](./md/cache_status.png)
 
 It shows:
 - whether cache is enabled?
@@ -27,7 +27,7 @@ It shows:
 
 The "in-RAM cache" related settings are located within the following context menu:
 
-![Screenshot of in-RAM cache status](./md/in_ram_cache/context_menu.png)
+![Screenshot of in-RAM cache context menu](./md/context_menu.png)
 
 It allows to:
 - Disable or enable cache
