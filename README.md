@@ -7,28 +7,48 @@ The DLTMessageAnalyzer is a plugin for dlt-viewer SW. It works together with the
 
 It is developed in order to increase the analytical capabilities of the dlt-viewer SW.
 
-Feature-set:
+## Feature-set:
 
-- Search speed ten times faster, than in the original dlt-viewer ( in case of enabled "in-RAM" cache )
+### [In-RAM cache](./md/in_ram_cache/in_ram_cache.md)
+
+- Makes search dramatically faster
+
+### [Grouped view](./md/grouped_view/grouped_view.md)
+
+- Allows you to easily form groups of repetitive messages and check request-response pairs, trace-spam cases, etc.
+
+### [Regex name scripting](./md/regex_name_scripting/regex_name_scripting.md)
+
+- Advanced highlighting of regex groups
+- "Filters view". Allows you to quickly get access to the defined "key varialbe regex groups" and change their content
+- Possibility to copy-paste highlighted content into your emails and bug-tracking systems
+
+### [Patterns view](./md/patterns_view/patterns_view.md)
+
 - Possibility to save regex patterns with the human-readable aliases
 - Possibility to use combinations of the saved regex patterns, which allows to form complex requests without the need to remember the regex expressions.
 This increadibly increases the speed of the trace analysis!
-- This plugin uses the instances of all other available and turned-on decoding plugins, so it cache and analyze the decoded messages
-- [Grouped view](./md/grouped_view/grouped_view.md). It allows you to easily form groups of repetitive messages and check request-response pairs, trace-spam cases, etc.
-- "Search view". Analogue of the dlt-viewer's search with the extended capabilities
-- "Files view". Extension, which shows names of the opened files
-- Advanced highlighting of regex groups ( check [regex name scripting](./md/regex_name_scripting/regex_name_scripting.md) section )
-- Possibility to copy-paste highlighted content into your emails and bug-tracking systems
-- Continuous search. The analysis continues to happen while new messages being received from HU 
-- Check of entered regular expressions with providing human-readable errors in case of wrong input
-- In-RAM cache. Makes search dramatically faster ( check [in-RAM cache](./md/in_ram_cache/in_ram_cache.md) section )
 - Possibility to work with multiple regex configuration files and switch between them. Allows to use other domains knowledge in your analysis
-- "Filters view". Allows you to quickly get access to the defined "key varialbe regex groups" and change their content ( check [regex name scripting](./md/regex_name_scripting/regex_name_scripting.md) section )
-- Lock of the search between 2 message id-s
-- Debug "console view"<br/>
-and many other features
 
-**=> The main goal of this plugin is to fully replace the existing search functionality of the dlt-viewer, making it faster, more readable, intuitive, and efficient for any user.**
+### [Search view](./md/search_view/search_view.md)
+
+- Analogue of the dlt-viewer's search with the extended capabilities
+- Lock of the search between 2 message id-s
+
+### [Files view](./md/files_view/files_view.md)
+
+- Extension, which shows names of the all currently opened DLT files
+
+### [Search](./md/search/search.md)
+
+- Check of entered regular expressions with providing human-readable errors in case of wrong input
+- Continuous search. The analysis continues to happen while new messages being received from HU 
+
+### [Debug console](./md/debug_console/debug_console.md)
+
+- Debug "console view"
+
+and many other features
 
 ----
 
