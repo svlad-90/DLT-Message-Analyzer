@@ -21,14 +21,14 @@ The above screenshot contains an example of "grouped view" for a system journal'
 
 ### Used regex is:
 
-<pre>^(SYS) ([A-Z0-9]{1,4}) [0-9]+/[0-9]+/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+ (?<VAR_SYS_MES_APP>[\w_-]+).*: (?<VAR_SYS_MES_TYPE>[A-Za-z_-]+): \[[\d]+\.[\d]+\](.*)</pre>
+<pre>^(SYS) ([A-Z0-9]{1,4}) [0-9]+/[0-9]+/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+ (?&lt;VAR_SYS_MES_APP&gt;[\w_-]+).*: (?&lt;VAR_SYS_MES_TYPE&gt;[A-Za-z_-]+): \[[\d]+\.[\d]+\](.*)</pre>
 
 ### The grouped view will form the following set of the tree-view groups:
 
 - (SYS) - group for the specific dlt app-id SYS
 - ([A-Z0-9]{1,4}) - sub-group for the ANY dlt context
-- (?<VAR_SYS_MES_APP>[\w_-]+) - sub-group for ANY service name
-- (?<VAR_SYS_MES_TYPE>[A-Za-z_-]+) - sub-group for ANY message type
+- (?&lt;VAR_SYS_MES_APP&gt;[\w_-]+) - sub-group for ANY service name
+- (?&lt;VAR_SYS_MES_TYPE&gt;[A-Za-z_-]+) - sub-group for ANY message type
 - (.*) - sub-group for ANY message
 
 ### The result will be something like this:
@@ -75,15 +75,14 @@ That is quite important in case if you work within a system, which has a trace-s
 
 ### Used regex is:
 
-<pre>^(?<VAR_TRACE_SPAM_APP>[A-Z0-9]{1,4}) (?<VAR_TRACE_SPAM_CONTEXT>[A-Z0-9]{1,4})(?<VAR_TRACE_SPAM_50_CHARS>.{0,50})(?<VAR_TRACE_SPAM_REST_MSG>.*)</pre>
+<pre>^(?&lt;VAR_TRACE_SPAM_APP&gt;[A-Z0-9]{1,4}) (?&lt;VAR_TRACE_SPAM_CONTEXT&gt;[A-Z0-9]{1,4})(?&lt;VAR_TRACE_SPAM_50_CHARS&gt;.{0,50})(?&lt;VAR_TRACE_SPAM_REST_MSG&gt;.*)</pre>
 
 ### The grouped view will form the following set of the tree-view nodes:
 
-- ^(?<VAR_TRACE_SPAM_APP>[A-Z0-9]{1,4}) - group for ANY dlt app-id
-- (?<VAR_TRACE_SPAM_CONTEXT>[A-Z0-9]{1,4}) - sub-group for ANY dlt context
-- (?<VAR_TRACE_SPAM_50_CHARS>.{0,50}) - sub-group for first 50 characters of ANY message
-- (?<VAR_SYS_MES_TYPE>[A-Za-z_-]+) - sub-group for any message type
-- (?<VAR_TRACE_SPAM_REST_MSG>.*) - sub-group for rest of the message
+- ^(?&lt;VAR_TRACE_SPAM_APP&gt;[A-Z0-9]{1,4}) - group for ANY dlt app-id
+- (?&lt;VAR_TRACE_SPAM_CONTEXT&gt;[A-Z0-9]{1,4}) - sub-group for ANY dlt context
+- (?&lt;VAR_TRACE_SPAM_50_CHARS&gt;.{0,50}) - sub-group for first 50 characters of ANY message
+- (?&lt;VAR_TRACE_SPAM_REST_MSG&gt;.*) - sub-group for rest of the message
 
 ### The result will be something like this:
 
@@ -105,5 +104,5 @@ That is quite important in case if you work within a system, which has a trace-s
 |-DLTD | Msg-s : 20 | Msg-s, % : 7.752 | Msg-s/sec, av. : 0 | Payload : 3170 | Payload, % : 6.351 | Payload, b/sec, av. : 0
 |-HATS | Msg-s : 4 | Msg-s, % : 1.550 | Msg-s/sec, av. : 0 | Payload : 652 | Payload, % : 1.306 | Payload, b/sec, av. : 0
   |-HADT | Msg-s : 4 | Msg-s, % : 1.550 | Msg-s/sec, av. : 0 | Payload : 652 | Payload, % : 1.306 | Payload, b/sec, av. : 0</pre>
-
-Above example can help you to analyze and address trace-spam issues for big projects.
+  
+[**Go to the previous page**](../../README.md)

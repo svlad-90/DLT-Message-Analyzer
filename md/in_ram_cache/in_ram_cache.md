@@ -59,3 +59,5 @@ Thus, try to provide the valid input data!
 Extensive custom highlighting & grouping might slow down the search a little bit.
 That impact is observed due to a run-time calculations and sorting.
 Still, even in worst cases processing is done much faster than in usual dlt-viewer's search functionality. 
+
+[**Go to the previous page**](../../README.md)

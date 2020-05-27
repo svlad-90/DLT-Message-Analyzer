@@ -28,13 +28,12 @@ Supported syntax options are:
 
 ![Screenshot of color name syntax](./color_name_syntax.png)
 
-Map of the supported color name is presented in below section
-
 **Status name** => e.g. ERROR:
 
 ![Screenshot of status-based coloring syntax](./status_syntax.png)
 
 Supported statuses are:
+
 {"ok", QColor(0,150,0)},<br/>
 {"warning", QColor(150,150,0)},<br/>
 {"error", QColor(150,0,0)}
@@ -78,7 +77,17 @@ All the above parameters are case insensitive.
 
 ----
 
+Note! Plugin implementation allows you to search within the variables.
+The search mechanism is based on the regex, thus you can apply some non-trivial search logic:
+
+![Screenshot of variables search](./var_search.png)
+
+**This functionality is quite useful when you've formed a regex combination, which consists of several thousands characters and includes dozens of variables.**
+
+----
+
 # AND operator
+
 If needed, "color" and "variable" scripting options can be combined together with the help of the "_AND_" operator. This operator is case insensitive, so you can use also "_and_", "_AnD_", etc:
 
 ![Screenshot of example of the and operator's usage](./var_and_operator.png)
@@ -244,3 +253,5 @@ Finding! Color names split with "space" will currently not work, as regex name c
 {"gainsboro", QColor(220,220,220)},<br/>
 {"white smoke", QColor(245,245,245)},<br/>
 {"white", QColor(255,255,255)}};
+
+[**Go to the previous page**](../../README.md)

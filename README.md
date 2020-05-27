@@ -18,6 +18,7 @@ This increadibly increases the speed of the trace analysis!
 - "Search view". Analogue of the dlt-viewer's search with the extended capabilities
 - "Files view". Extension, which shows names of the opened files
 - Advanced highlighting of regex groups ( check [regex name scripting](./md/regex_name_scripting/regex_name_scripting.md) section )
+- Possibility to copy-paste highlighted content into your emails and bug-tracking systems
 - Continuous search. The analysis continues to happen while new messages being received from HU 
 - Check of entered regular expressions with providing human-readable errors in case of wrong input
 - In-RAM cache. Makes search dramatically faster ( check [in-RAM cache](./md/in_ram_cache/in_ram_cache.md) section )
