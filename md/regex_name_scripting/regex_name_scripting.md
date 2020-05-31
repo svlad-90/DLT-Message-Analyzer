@@ -77,12 +77,12 @@ All the above parameters are case insensitive.
 
 ----
 
-Note! Plugin implementation allows you to search within the variables.
-The search mechanism is based on the regex, thus you can apply some non-trivial search logic:
-
-![Screenshot of variables search](./var_search.png)
-
-**This functionality is quite useful when you've formed a regex combination, which consists of several thousands characters and includes dozens of variables.**
+> **Note!**</br> Plugin implementation allows you to search within the variables.
+> The search mechanism is based on the regex, thus you can apply some non-trivial search logic:
+>
+> ![Screenshot of variables search](./var_search.png)
+>
+> **This functionality is quite useful when you've formed a regex combination, which consists of several thousands characters and includes dozens of variables.**
 
 ----
 

@@ -26,9 +26,10 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 ### [Patterns view](./md/patterns_view/patterns_view.md)
 
 - Possibility to save regex patterns with the human-readable aliases
-- Possibility to use combinations of the saved regex patterns, which allows to form complex requests without the need to remember the regex expressions.
+- Possibility to use combinations of the saved regex patterns, which allows to form complex requests without the need to remember the regex expressions
 This increadibly increases the speed of the trace analysis!
 - Possibility to work with multiple regex configuration files and switch between them. Allows to use other domains knowledge in your analysis
+- Possibility to search patterns by their alias names
 
 ### [Search view](./md/search_view/search_view.md)
 
