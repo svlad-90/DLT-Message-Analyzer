@@ -33,7 +33,7 @@ This increadibly increases the speed of the trace analysis!
 
 ### [Search view](./md/search_view/search_view.md)
 
-- Analogue of the dlt-viewer's search with the extended capabilities
+- Analog of the dlt-viewer's search with the extended capabilities
 - Lock of the search between 2 message id-s
 
 ### [Files view](./md/files_view/files_view.md)
