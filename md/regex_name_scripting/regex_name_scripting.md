@@ -86,6 +86,11 @@ All the above parameters are case insensitive.
 
 ----
 
+> **Note!** Be aware, that the used implementation of the regex engine supports groups with a name size of not more than 32 characters.
+> If you'll use more characters in the name - engine will interpret the regex as invalid one.
+
+----
+
 # AND operator
 
 If needed, "color" and "variable" scripting options can be combined together with the help of the "_AND_" operator. This operator is case insensitive, so you can use also "_and_", "_AnD_", etc:
