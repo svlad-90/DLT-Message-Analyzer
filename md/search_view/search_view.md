@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Search view
 
 Plugin's "search view" is the analog of the dlt-viewer's "Search Results" section, meaning that its main purpose is to represent you the find result entries.

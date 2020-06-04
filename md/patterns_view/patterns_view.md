@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Patterns view
 
 Patterns view is an area, which allows you to manage the saved regex patterns.

@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Regex name scripting
 
 DLTMessageAnalyzer plugin supports regex name scripting. It means, that the provided regex name might be considered by the implementation of the plugin and used by it in this or that view.

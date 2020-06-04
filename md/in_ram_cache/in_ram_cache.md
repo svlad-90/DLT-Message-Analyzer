@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # In-RAM cache
 
 ----

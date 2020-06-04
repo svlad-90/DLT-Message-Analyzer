@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Files view
 
 This view of the plugin shows the list of the DLT files, which are currently opened by the dlt-viewer. 
