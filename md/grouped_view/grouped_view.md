@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Grouped view
 
 The intention of the "grouped view" is to allow to split messages into the groups, based on the "regex groups" syntax. 

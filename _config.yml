@@ -1,0 +1,9 @@
+plugins:
+  - jekyll-relative-links
+  - jekyll-sitemap
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - README.md
+  - CODE_OF_CONDUCT.md

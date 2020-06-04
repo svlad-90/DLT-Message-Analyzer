@@ -1,3 +1,7 @@
+[**Go to the previous page**](../../README.md)
+
+----
+
 # Search
 
 This chapter describes general aspects of the plugin's search functionality.
