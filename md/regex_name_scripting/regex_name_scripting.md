@@ -81,7 +81,9 @@ All the above parameters are case insensitive.
 
 ----
 
-> **Note!**</br> Plugin implementation allows you to search within the variables.
+> **Note!**
+>
+> Plugin implementation allows you to search within the variables.
 > The search mechanism is based on the regex, thus you can apply some non-trivial search logic:
 >
 > ![Screenshot of variables search](./var_search.png)
@@ -90,7 +92,9 @@ All the above parameters are case insensitive.
 
 ----
 
-> **Note!** Be aware, that the used implementation of the regex engine supports groups with a name size of not more than 32 characters.
+> **Note!**
+>
+> Be aware, that the used implementation of the regex engine supports groups with a name size of not more than 32 characters.
 > If you'll use more characters in the name - engine will interpret the regex as invalid one.
 
 ----

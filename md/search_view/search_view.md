@@ -27,7 +27,9 @@ Besides that, you can select the visible columns:
 
 ----
 
->**Note!** Copy operation will consider ONLY visible columns, making it possible to copy ONLY needed amount of information.
+>**Note!**
+>
+> Copy operation will consider ONLY visible columns, making it possible to copy ONLY needed amount of information.
 
 ----
 
@@ -42,7 +44,9 @@ Then copy-paste any found rows into your email:
 
 ----
 
-> **Note!** You can paste highlighted text to any application, which supports representation of colored content, e.g. Word, Excel, Outlook, etc.
+> **Note!**
+>
+> You can paste highlighted text to any application, which supports representation of colored content, e.g. Word, Excel, Outlook, etc.
 > For other text editors, plain text will be pasted.
 
 ----
@@ -54,7 +58,9 @@ It allows you to specify, which range of the message id-s should be considered d
 
 ----
 
-> **Note!** It really helps while you work with huge DLT files.
+> **Note!**
+>
+> It really helps while you work with huge DLT files.
 > E.g. you have 10 Gb DLT file with the 3 hours of tracing, while you are insterested in specific use-case, which took around several minutes.
 
 ----
@@ -71,12 +77,15 @@ There are 3 ways to specify the search range within the plugin's implementation:
 
 - Enter start and end message id-s manually:
 
-![Screenshot of the "Set search range" context menu item](./search_view_set_search_range_context_menu.png)</br></br>
+![Screenshot of the "Set search range" context menu item](./search_view_set_search_range_context_menu.png)
+
 ![Screenshot of the "Set search range" dialog](./search_view_set_search_range_dialog.png)
 
 ----
 
-> **Note!** The dialog, that will appear, will show you the minimum and maximum message id-s, which are available in the loaded DLT file.
+> **Note!**
+>
+> The dialog, that will appear, will show you the minimum and maximum message id-s, which are available in the loaded DLT file.
 
 ----
 
@@ -88,7 +97,8 @@ After the lock is not needed anymore, you can remove it using the following cont
 
 ### Example of the applied "lock search range"
 
-![Screenshot of the "Lock search range" example, before being applied](./search_view_lock_search_range_example_before.png)</br></br>
+![Screenshot of the "Lock search range" example, before being applied](./search_view_lock_search_range_example_before.png)
+
 ![Screenshot of the "Lock search range" example, after being applied](./search_view_lock_search_range_example_after.png)
 
 ----
@@ -98,8 +108,10 @@ After the lock is not needed anymore, you can remove it using the following cont
 A small feature, which allows a search view to mark the timestamp column with bold.
 Nothing special, still it is quite useful when you want to emphasize that time is an important part of the copy-pasted messages:
 
-![Screenshot of the "Mark timestamp with bold" feature, before being applied](./search_view_mark_timestamp_bold_before.png)</br>
-![Screenshot of the "Mark timestamp with bold" context-menu item](./search_view_mark_timestamp_bold_context_menu.png)</br>
+![Screenshot of the "Mark timestamp with bold" feature, before being applied](./search_view_mark_timestamp_bold_before.png)
+
+![Screenshot of the "Mark timestamp with bold" context-menu item](./search_view_mark_timestamp_bold_context_menu.png)
+
 ![Screenshot of the "Mark timestamp with bold" feature, after being applied](./search_view_mark_timestamp_bold_after.png)
 
 ----
