@@ -40,13 +40,17 @@ It allows to:
 
 ----
 
-> **Note!**</br> Actual RAM consumption of the cache is ~X*2.5 from what the status is showing.
+> **Note!**
+>
+> Actual RAM consumption of the cache is ~X*2.5 from what the status is showing.
 > The thing is that the cache size in status is measured as the sum of payloads and headers of all the messages, while the cache itself is stored in a slightly different way.
 > It is one of the TODO-s to minimize this difference.
 
 ----
 
-> **Useful hint!**</br> In case if you are analyzing the huge DLT file, e.g. 10 Gb, it is quite useful to:
+> **Useful hint!**
+>
+> In case if you are analyzing the huge DLT file, e.g. 10 Gb, it is quite useful to:
 > - turn off the cache
 > - use search within the cache at least once to find the range of time in which you are interested
 > - lock the search range to the target area
@@ -55,7 +59,9 @@ It allows to:
 
 ----
 
-> **Note!**</br> Currently plugin does not check the provided cache limit against the actual amount of RAM on the client's machine.
+> **Note!**
+>
+> Currently plugin does not check the provided cache limit against the actual amount of RAM on the client's machine.
 > Thus, try to provide the valid input data!
 
 ----

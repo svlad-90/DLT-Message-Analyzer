@@ -16,12 +16,16 @@ The view preserved the order, in which the fiels were opened.
 
 ----
 
->**Note!** This view is quite useful in case if you need to attach the names of the used DLT files to your analysis.
+>**Note!**
+> 
+>This view is quite useful in case if you need to attach the names of the used DLT files to your analysis.
 >Based on the project's strategy, the analyzed issue might consist of multiple ( up to several dozens ) DLT files, so it is a good manner to specify the one which contains the analyzed use-case.
 
 ----
 
->**Note!** Also, when you work with the multiple DLT files, it is useful to see, in which order the dlt-viewer has parsed them.
+>**Note!**
+>
+>Also, when you work with the multiple DLT files, it is useful to see, in which order the dlt-viewer has parsed them.
 >Wrong import order might ruin the chronology of the analyzed logs and make analysis not possible.
 >The view allows you to check that aspect, as it prints the files in the same order, in which they were parsed.
 

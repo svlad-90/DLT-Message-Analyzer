@@ -51,7 +51,9 @@ Check the result in the "Patterns view":
 
 ----
 
-> **Note!**</br>  The easiest way to use the newly saved regex pattern is to double-click on it.
+> **Note!**
+>
+> The easiest way to use the newly saved regex pattern is to double-click on it.
 > That will cause a search with usage of a stand-alone regex pattern.
 
 ----
@@ -69,7 +71,8 @@ Adjust its location, via e.g.:
 - Removal of existing sub-tree levels
 - Specifying the totally location
 
-![Screenshot of the sub-tree "Edit" dialog](./pattern_edit_sub_tree_dialog.png)</br>
+![Screenshot of the sub-tree "Edit" dialog](./pattern_edit_sub_tree_dialog.png)
+
 ![Screenshot of the adjusted sub-tree "Edit" dialog](./pattern_edit_sub_tree_dialog_adjusted.png)
 
 Press OK:
@@ -78,11 +81,13 @@ Press OK:
 
 Check the modified tree:
 
-![Screenshot of the sub-tree \"Edit\" operation result](./pattern_edit_sub_tree_result.png)</br>
+![Screenshot of the sub-tree \"Edit\" operation result](./pattern_edit_sub_tree_result.png)
 
 ----
 
-> **Note!**</br>  It is possible to move one sub-tree level into another one. In such a case plugin's implementation will merge both sub-trees.
+> **Note!**
+>
+> It is possible to move one sub-tree level into another one. In such a case plugin's implementation will merge both sub-trees.
 > In case if 2 sub-trees will have collisions of leaf elements, the plugin will ask you regarding whether you want to overwrite the existing pattern with the candidate one.
 > The promt will be provided for each collision.
 
@@ -104,8 +109,10 @@ Adjust its location, via e.g.:
 
 Adjust the target regex.
 
-![Screenshot of the pattern "Edit" dialog](./pattern_edit_pattern_dialog.png)</br>
-![Screenshot of the adjusted pattern "Edit" dialog - alias adjusted](./pattern_edit_pattern_dialog_alias_adjusted.png)</br>
+![Screenshot of the pattern "Edit" dialog](./pattern_edit_pattern_dialog.png)
+
+![Screenshot of the adjusted pattern "Edit" dialog - alias adjusted](./pattern_edit_pattern_dialog_alias_adjusted.png)
+
 ![Screenshot of the adjusted pattern "Edit" dialog - regex adjusted](./pattern_edit_pattern_dialog_regex_adjusted.png)
 
 Press OK:
@@ -166,7 +173,9 @@ Another bonuses, whih come with this functionality, are the ability to:
 
 ----
 
-> **Note!**</br>  Above example is a simplification.
+> **Note!**
+>
+> Above example is a simplification.
 > But in case, if you have 100+ saved patterns, then those options will allow you to feel the power of deep analysis at your fingertips.
 
 ----
@@ -222,7 +231,9 @@ As soon as you will select the alternative regex configuration, the view will be
 
 ----
 
-> **Note!**</br> Plugin supports copy-paste of patterns between the files via the Ctrl+C and Ctrl+V shortcuts ( or via the corresponding context-menu items ). 
+> **Note!**
+>
+> Plugin supports copy-paste of patterns between the files via the Ctrl+C and Ctrl+V shortcuts ( or via the corresponding context-menu items ). 
 > It might become quite useful, in case if you'll decide to use some of the colleague's regexes in combination with your own ones.
 
 ----

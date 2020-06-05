@@ -18,7 +18,9 @@ As of now there is no way exist to change this rule. Still, implementation might
 
 ----
 
-> **Note!** Above means, that you can easily: 
+> **Note!**
+>
+> Above means, that you can easily: 
 > - filter out messages of the specific application - e.g. ^DLTD
 > - filter out messages, which originate from the specific context id of all applicaitons - e.g. ^[\w]{1,4} CTX
 > - filter out messages, which originate from the specific context id of of the specific applicaiton - e.g. ^SYS JOUR
@@ -40,12 +42,15 @@ Simply start the search:
 
 You will see, that in case if your HU is connected, the search will continue to proceed with adding more and more results:
 
-![Screenshot of the connected ECU](./ECU_connected.png)</br></br>
+![Screenshot of the connected ECU](./ECU_connected.png)
+
 ![Screenshot of the connected ECU](./search_ongoing.png)
 
 ----
 
-> **Note!** The continuous search will stop in the following cases:
+> **Note!**
+>
+> The continuous search will stop in the following cases:
 > - loss of connection to the target
 > - if user presses the "Stop search" button
 
@@ -80,7 +85,8 @@ The plugin's implementation is using the QRegularExpression regex engine, which 
 It works much faster than the QRegExp, which is still used in the dlt-viewer's v.2.19.0.
 
 Qt documentation itself tells:
->https://doc.qt.io/qt-5/qregularexpression.html#notes-for-qregexp-users</br>
+>https://doc.qt.io/qt-5/qregularexpression.html#notes-for-qregexp-users
+>
 >The QRegularExpression class introduced in Qt 5 is a big improvement upon QRegExp, in terms of APIs offered, supported pattern syntax and speed of execution. 
 
 And we've checked that. It really works faster and provides a deeper support of the regex syntax.
