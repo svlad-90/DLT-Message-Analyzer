@@ -54,8 +54,8 @@ and many other features
 
 ## Screenshots:
 
-![Screenshot of DLT Message Analyzer plugin - Search view](./md/DLT Message Analyzer_screenshot_SearchView.png)
+![Screenshot of DLT Message Analyzer plugin - Search view](./md/DLTMessageAnalyzer_screenshot_SearchView.png)
 ----
-![Screenshot of DLT Message Analyzer plugin - Grouped view](./md/DLT Message Analyzer_screenshot_GroupedView.png)
+![Screenshot of DLT Message Analyzer plugin - Grouped view](./md/DLTMessageAnalyzer_screenshot_GroupedView.png)
 ----
-![Screenshot of DLT Message Analyzer plugin - Filters view](./md/DLT Message Analyzer_screenshot_FilterView.png)
+![Screenshot of DLT Message Analyzer plugin - Filters view](./md/DLTMessageAnalyzer_screenshot_FilterView.png)
