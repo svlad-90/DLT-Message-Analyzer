@@ -11,7 +11,7 @@ Still there are additional things which it does on top of what the standard func
 
 ## How does it look?
 
-![Screenshot of the "Search view" appearence](./search_view_appearence.png)
+![Screenshot of the "Search view" appearance](./search_view_appearance.png)
 
 ----
 
@@ -61,7 +61,7 @@ It allows you to specify, which range of the message id-s should be considered d
 > **Note!**
 >
 > It really helps while you work with huge DLT files.
-> E.g. you have 10 Gb DLT file with the 3 hours of tracing, while you are insterested in specific use-case, which took around several minutes.
+> E.g. you have 10 Gb DLT file with the 3 hours of tracing, while you are interested in specific use-case, which took around several minutes.
 
 ----
 

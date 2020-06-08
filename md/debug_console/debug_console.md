@@ -10,7 +10,7 @@ Plugin contains the debug console, which prints different kinds of the debug mes
 
 ## How does it look like?
 
-![Screenshot of the "Debug console" appearence](./debug_console_appearence.png)
+![Screenshot of the "Debug console" appearance](./debug_console_appearance.png)
 
 ----
 
@@ -25,7 +25,7 @@ Still, some messages are presented even in the production versions, as:
 - messages regarding the time, which was consumed to process the search query
 - warning messages regarding the timestamp mismatch within the analyzed file. That impacts possibility to represent average values within the "Grouped view"
 
-As of now there is no possibility for the final user of the plugin to send his own messages. Still, we are thinking of the use-cases, where that could be applicable.
+As of now there is no possibility for the final user of the plugin to send his own messages. Still, we are thinking of the use-cases where that could be applicable.
 
 ----
 
