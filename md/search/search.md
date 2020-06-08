@@ -20,10 +20,10 @@ As of now there is no way exist to change this rule. Still, implementation might
 
 > **Note!**
 >
-> Above means, that you can easily: 
+> Above means that you can easily: 
 > - filter out messages of the specific application - e.g. ^DLTD
-> - filter out messages, which originate from the specific context id of all applicaitons - e.g. ^[\w]{1,4} CTX
-> - filter out messages, which originate from the specific context id of of the specific applicaiton - e.g. ^SYS JOUR
+> - filter out messages, which originate from the specific context id of all applications - e.g. ^[\w]{1,4} CTX
+> - filter out messages, which originate from the specific context id of the specific application - e.g. ^SYS JOUR
 > - use your already existing regex expression, which do not consider the above filtering capabilities
 >
 > Together with the increased speed of the search this way of filtering becomes much more comfortable, than usage of the usual dlt-viewer's filters.
@@ -34,7 +34,7 @@ As of now there is no way exist to change this rule. Still, implementation might
 
 ## Continuous search
 
-Another thing, which differs between the "dlt-viewer's search" and the "plugin's search" is that DLTMessageAnalyzer allows to get the continuous updates of the search results.
+Another thing, which differs between the "dlt-viewer's search" and the "plugin's search" is that DLT Message Analyzer allows to get the continuous updates of the search results.
 
 Simply start the search:
 

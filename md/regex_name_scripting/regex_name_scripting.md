@@ -4,7 +4,7 @@
 
 # Regex name scripting
 
-DLTMessageAnalyzer plugin supports regex name scripting. It means, that the provided regex name might be considered by the implementation of the plugin and used by it in this or that view.
+DLT Message Analyzer plugin supports regex name scripting. It means, that the provided regex name might be considered by the implementation of the plugin and used by it in this or that view.
 
 Currently, the following options are supported.
 
@@ -55,7 +55,7 @@ All the above parameters are case insensitive.
 When you are working with a complex regex expression, it is quite complex to find an important part of it in order to change some parameters.
 
 E.g. the default regex, which is used in the one of the projects where this plugin is used consists of 1831 characters.
-Try to find and change something in uch a big string! It is a quite complex task.
+Try to find and change something in such a big string! It is a quite complex task.
 
 To keep things easier, the variable scripting was introduced within the plugin. It does the following thing:
 

@@ -6,13 +6,13 @@
 
 This view of the plugin shows the list of the DLT files, which are currently opened by the dlt-viewer. 
 The view contains  full paths to the opened DLT files.
-The view preserved the order, in which the fiels were opened.
+The view preserved the order, in which the files were opened.
 
 ----
 
 ## How does it look?
 
-![Screenshot of the "Files view" appearence](./files_view_appearence.png)
+![Screenshot of the "Files view" appearance](./files_view_appearance.png)
 
 ----
 

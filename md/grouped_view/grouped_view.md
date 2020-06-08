@@ -9,15 +9,15 @@ Those groups are then represented in a form of the tree view.
 
 The view provides the following information regarding each tree level:
 - number of messages, entries
-- number of messages, percents
+- number of messages, percent
 - number of messages, average per second
 - payload size, bytes
-- payload size, percents
+- payload size, percent
 - payload size, average per second
 
 # How does it look like?
 
-![Screenshot of the "grouped view"](./grouped_view_appearence.png)
+![Screenshot of the "grouped view"](./grouped_view_appearance.png)
 
 # How does it work?
 
@@ -58,13 +58,13 @@ The above screenshot contains an example of "grouped view" for a system journal'
  As you can see, result formed tree levels for:
  - SYS app id
  - JOUR context
- - dlt-damon service
+ - dlt-daemon service
  - Information message type
  - Messages
  
 The tested file was a quite small one, which contained system journal messages only from the dlt-daemon.
 Still even in that data-set we can see, that there were 19 same messages from dlt-daemon regarding sending log-level contexts.
-And 10 desctivation of connection type 2.
+And 10 deactivations of connection type 2.
 
 Together with that you can see which kind of message has taken which amount of payload.
 That is quite important in case if you work within a system, which has a trace-spam cases, which should be addressed.

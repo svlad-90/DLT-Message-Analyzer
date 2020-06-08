@@ -31,7 +31,7 @@ All saved patterns are represented as a tree-view.
 
 In order to save a new element you can do the following.
 
-Enter any useful regex expression into the "regex input" efit field:
+Enter any useful regex expression into the "regex input" edit field:
 
 ![Screenshot of regex input field](./pattern_save_new_regex_input.png)
 
@@ -43,7 +43,7 @@ Fill in the alias name.
 Depending on which element was the already selected one in the "Patterns view" the plugin might auto-fill part of the alias name, in order to locate new pattern in the same sub-tree.
 After that press OK:
 
-![Screenshot of the \"Specify aias\" dialog](./pattern_save_new_regex_fill_in_alias.png)
+![Screenshot of the \"Specify alias\" dialog](./pattern_save_new_regex_fill_in_alias.png)
 
 Check the result in the "Patterns view":
 
@@ -60,7 +60,7 @@ Check the result in the "Patterns view":
 
 ## Relocation of the sub-tree levels
 
-Plugin alllows you to move a particular sub-tree into another location.
+Plugin allows you to move a particular sub-tree into another location.
 
 Just select any non-leaf element:
 
@@ -89,13 +89,13 @@ Check the modified tree:
 >
 > It is possible to move one sub-tree level into another one. In such a case plugin's implementation will merge both sub-trees.
 > In case if 2 sub-trees will have collisions of leaf elements, the plugin will ask you regarding whether you want to overwrite the existing pattern with the candidate one.
-> The promt will be provided for each collision.
+> The prompt will be provided for each collision.
 
 ----
 
 ## Editing the existing elements
 
-You can edit an already exisitng patterns.
+You can edit an already existing patterns.
 
 Just select any target leaf element:
 
@@ -136,14 +136,14 @@ Each saved regex pattern within the plugin as of now has 4 parameters, 3 of whic
 The purpose of "default" and "combination" settings is to allow you to form a more complex regex expressions from a set of the saved ones.
 
 > Some example from real project: you want to see "FPS of your app" & "CPU consumption of cgroups" & "Top 10 threads within the system" & "List of crashed systemd services".
-> Combination of 4 regex patterns would easily allow to form such a request in ordeer to analyze performance issues.
+> Combination of 4 regex patterns would easily allow to form such a request in order to analyze performance issues.
 
 As I can't provide here examples from the real project, here is another "simplification with screenshots".
 
 ----
 
 I've created 2 patterns:
-- One gets system joucnal messages of dlt-daemon
+- One gets system journal messages of dlt-daemon
 - Another one gets "logger_test" message from system journal and marks it as error.
 
 I've checked "comb." setting of both patterns:
@@ -165,7 +165,7 @@ As you might assume, the "Def." option means the same as "Comb.", beside the fac
 So on next each LC of the dlt-viewer, plugin will return back to the set of "Def." patterns.
 You can think of it as of some sort of favorites option.
 
-Another bonuses, whih come with this functionality, are the ability to:
+Another bonuses, which come with this functionality, are the ability to:
 - Instantly switch from any Comb. selection back to a set of "Def." favorites
 - Clear the "Comb." selection in order to create some specific combination
 
