@@ -1,11 +1,37 @@
 # Hi, guest. You are on the page of the DLT Message Analyzer plugin.
 
 ----
+
 ## What is the DLT Message Analyzer?
 
 The DLT Message Analyzer is a plugin for dlt-viewer SW. It works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.
 
 It is developed in order to increase the analytical capabilities of the dlt-viewer.
+
+----
+
+## Installation guide:
+
+- Clone the dlt-viewer project from the following location: **https://github.com/GENIVI/dlt-viewer**.
+
+----
+
+> **Note!**
+> 
+> Currently plugin can be built against the head v2.20.0 release.
+
+----
+
+- Follow instructions within the dlt-viewer's repo to have it successfully built.
+- Clone this git repository as a nested one inside the **"./dlt-viewer/plugin"** location.
+Your target path to plugin should look like **"./dlt-viewer/plugin/DLT-Message-Analyzer"**
+- Modify the **"./dlt-viewer/plugin.pro"** in the following way:
+<pre>SUBDIRS += DLT-Message-Analyzer ... all other plugin's names, which exist in delivery by default ...</pre>
+- Run qmake and rebuild the dlt-viewer project
+- Run dlt-viewer, including the dynamic library of the DLT-Message-Analyzer plugin
+- Enable the DLT-Message-Analyzer plugin
+
+----
 
 ## Feature-set:
 
