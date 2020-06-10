@@ -10,8 +10,8 @@
 #include <QLineEdit>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
-#include <CTreeItem.hpp>
-#include <CPatternsModel.hpp>
+#include "CTreeItem.hpp"
+#include "CPatternsModel.hpp"
 #include <QRegExp>
 #include <QInputDialog>
 #include <QHeaderView>
