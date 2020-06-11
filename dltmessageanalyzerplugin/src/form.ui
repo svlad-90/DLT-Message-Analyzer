@@ -275,11 +275,11 @@
            <property name="sortingEnabled">
             <bool>true</bool>
            </property>
-           <attribute name="headerDefaultSectionSize">
-            <number>100</number>
-           </attribute>
            <attribute name="headerMinimumSectionSize">
             <number>28</number>
+           </attribute>
+           <attribute name="headerDefaultSectionSize">
+            <number>100</number>
            </attribute>
            <attribute name="headerShowSortIndicator" stdset="0">
             <bool>true</bool>
@@ -394,7 +394,7 @@
            <enum>QTabWidget::South</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>1</number>
           </property>
           <property name="iconSize">
            <size>
@@ -1065,27 +1065,27 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CSearchResultView</class>
    <extends>QTableView</extends>
-   <header>CSearchResultView.hpp</header>
+   <header>searchView/CSearchResultView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CLogo</class>
    <extends>QPushButton</extends>
-   <header>CLogo.hpp</header>
+   <header>logo/CLogo.hpp</header>
   </customwidget>
   <customwidget>
    <class>CGroupedView</class>
    <extends>QTreeView</extends>
-   <header>CGroupedView.hpp</header>
+   <header>groupedView/CGroupedView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CPatternsView</class>
    <extends>QTreeView</extends>
-   <header>CPatternsView.hpp</header>
+   <header>patternsView/CPatternsView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CFiltersView</class>
    <extends>QTreeView</extends>
-   <header>CFiltersView.hpp</header>
+   <header>filtersView/CFiltersView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

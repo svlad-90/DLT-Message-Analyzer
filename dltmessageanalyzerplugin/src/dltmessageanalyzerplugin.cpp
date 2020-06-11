@@ -11,12 +11,12 @@
 
 #include "dltmessageanalyzerplugin.hpp"
 #include "CDLTMessageAnalyzer.hpp"
-#include "CContinuousAnalyzer.hpp"
-#include "CMTAnalyzer.hpp"
-#include "CDLTFileWrapper.hpp"
-#include "CSettingsManager.hpp"
-#include "CDLTMsgWrapper.hpp"
-#include "CPatternsView.hpp"
+#include "analyzer/CContinuousAnalyzer.hpp"
+#include "analyzer/CMTAnalyzer.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "dltWrappers/CDLTMsgWrapper.hpp"
+#include "patternsView/CPatternsView.hpp"
 
 Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
 

@@ -17,10 +17,10 @@
 #include "QSequentialAnimationGroup"
 #include "QPropertyAnimation"
 
-#include "CSettingsManager.hpp"
-#include "CBGColorAnimation.hpp"
-#include "CPatternsView.hpp"
-#include "CConsoleCtrl.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "common/CBGColorAnimation.hpp"
+#include "patternsView/CPatternsView.hpp"
+#include "log/CConsoleCtrl.hpp"
 
 Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
     QWidget(parent),
