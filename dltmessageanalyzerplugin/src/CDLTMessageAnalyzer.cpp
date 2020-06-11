@@ -10,8 +10,8 @@
 #include <QLineEdit>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
-#include "CTreeItem.hpp"
-#include "CPatternsModel.hpp"
+#include "common/CTreeItem.hpp"
+#include "patternsView/CPatternsModel.hpp"
 #include <QRegExp>
 #include <QInputDialog>
 #include <QHeaderView>
@@ -31,20 +31,20 @@
 #include "QApplication"
 #include "QColorDialog"
 
-#include "CSearchResultView.hpp"
-#include "CGroupedView.hpp"
-#include "CSettingsManager.hpp"
-#include "CDLTFileWrapper.hpp"
-#include "CRegexDirectoryMonitor.hpp"
+#include "searchView/CSearchResultView.hpp"
+#include "groupedView/CGroupedView.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "common/CRegexDirectoryMonitor.hpp"
 
-#include "CGroupedViewModel.hpp"
-#include "CSearchResultModel.hpp"
-#include "IDLTMessageAnalyzerController.hpp"
-#include "CBGColorAnimation.hpp"
-#include "CPatternsView.hpp"
-#include "CFiltersView.hpp"
-#include "CFiltersModel.hpp"
-#include "CConsoleCtrl.hpp"
+#include "groupedView/CGroupedViewModel.hpp"
+#include "searchView/CSearchResultModel.hpp"
+#include "analyzer/IDLTMessageAnalyzerController.hpp"
+#include "common/CBGColorAnimation.hpp"
+#include "patternsView/CPatternsView.hpp"
+#include "filtersView/CFiltersView.hpp"
+#include "filtersView/CFiltersModel.hpp"
+#include "log/CConsoleCtrl.hpp"
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,

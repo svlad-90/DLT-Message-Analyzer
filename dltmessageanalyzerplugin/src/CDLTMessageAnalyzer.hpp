@@ -18,8 +18,8 @@
 #include "plugininterface.h"
 #include "qdltpluginmanager.h"
 
-#include "Definitions.hpp"
-#include "IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "common/Definitions.hpp"
+#include "analyzer/IDLTMessageAnalyzerControllerConsumer.hpp"
 
 #ifdef DEBUG_BUILD
 #include "QTime"

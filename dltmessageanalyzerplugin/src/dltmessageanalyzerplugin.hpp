@@ -14,7 +14,7 @@
 #include "plugininterface.h"
 #include "form.h"
 
-#include "Definitions.hpp"
+#include "common/Definitions.hpp"
 
 
 #define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.22"
