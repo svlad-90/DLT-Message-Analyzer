@@ -77,7 +77,7 @@ private slots:
     void on_regex_returnPressed();
     void on_pushButton_clicked();
     void on_hidePatterns_clicked();
-    void on_splitter_splitterMoved(int pos, int index);
+    void on_splitter_patterns_results_splitterMoved(int pos, int index);
     void on_searchView_doubleClicked(const QModelIndex &index);
     void hidePatternLogic(bool userTriggered);
     void on_continuousAnalysis_clicked(bool checked);

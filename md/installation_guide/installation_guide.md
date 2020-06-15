@@ -20,10 +20,16 @@ Your target path to plugin should look like **"./dlt-viewer/plugin/DLT-Message-A
 
 ![Screenshot of DLT Message Analyzer plugin location inside the dlt-viewer project](./installation_guide_plugin_location.png)
 
+----
+
+## "QT Creator"-specific part of guide.
+
 - Modify the **"./dlt-viewer/plugin.pro"** in the following way:
 <pre>SUBDIRS += DLT-Message-Analyzer ... all other plugin's names, which exist in delivery by default ...</pre>
 
 ![Screenshot of plugin.pro file's modification](./installation_guide_plugin_pro.png)
+
+![Screenshot of plugin.pro cmakelists.txt modification](./installation_guide_cmakelists_modification.png)
 
 - Run qmake:
 
@@ -31,8 +37,33 @@ Your target path to plugin should look like **"./dlt-viewer/plugin/DLT-Message-A
 
 - Rebuild the dlt-viewer project: ![Screenshot of "Build project" QT's option](./installation_guide_build.png)
 
-- Run dlt-viewer, including the dynamic library of the DLT-Message-Analyzer plugin
-- Enable the DLT-Message-Analyzer plugin
+----
+
+## CMake-specific part of guide
+
+- In case if you build the project without the QT Creator, using only the CMakeLists.txt, modigy also the **"./dlt-viewer/plugin"**:
+
+<pre>add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)</pre>
+
+- Open console in the "./dlt-viewer" folder:
+
+![Screenshot of console](./installation_guide_console.png)
+
+- Run the following set of commands in it:
+
+<pre>mkdir build
+cd ./build
+rm -r *
+cmake ../
+make
+</pre>
+
+----
+
+- Proceed to the build artifact's folder and run the dlt-viewer, including dynamic library of the DLT-Message-Analyzer plugin
+- Enable and show the DLT-Message-Analyzer plugin:
+
+![Screenshot of enabling the plugin](./installation_guide_enable_plugin.png)
 
 ----
 

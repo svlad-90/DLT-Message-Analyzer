@@ -579,7 +579,7 @@ void Form::on_hidePatterns_clicked()
     hidePatternLogic(true);
 }
 
-void Form::on_splitter_splitterMoved(int, int)
+void Form::on_splitter_patterns_results_splitterMoved(int, int)
 {
     if(nullptr != mpUI->splitter_patterns_results)
     {
