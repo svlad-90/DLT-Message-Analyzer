@@ -29,6 +29,9 @@ mLastAvailableNumberOfMsg(0),
 mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false)
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+,mpMainTableView(nullptr)
+#endif
 {
     //qDebug() << "DLTMessageAnalyzerPlugin lives in thread - " << QThread::currentThreadId();
     qRegisterMetaType<tDltMsgWrapperPtr>("tDLTMsgWrapperPtr");
@@ -43,7 +46,8 @@ QString DLTMessageAnalyzerPlugin::name()
     return QString("DLTMessageAnalyzerPlugin");
 }
 
-QString DLTMessageAnalyzerPlugin::pluginVersion(){
+QString DLTMessageAnalyzerPlugin::pluginVersion()
+{
     return DLT_MESSAGE_ANALYZER_PLUGIN_VERSION;
 }
 
@@ -104,6 +108,13 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getConfigComboBox(),
                                                                                                       mpForm->getFiltersView(),
                                                                                                       mpForm->getFiltersSearchInput());
+
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    if(nullptr != mpDLTMessageAnalyzer)
+    {
+        mpDLTMessageAnalyzer->setMainTableView(mpMainTableView);
+    }
+#endif
 
     connect( this, &DLTMessageAnalyzerPlugin::analysisWithEmptyStringRequested, mpForm->getPatternsTableView(), &CPatternsView::applyPatternsCombination );
 
@@ -277,6 +288,34 @@ bool DLTMessageAnalyzerPlugin::stateChanged(int, QDltConnection::QDltConnectionS
 
     return true;
 }
+
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+void DLTMessageAnalyzerPlugin::initMainTableView(QTableView* pMainTableView)
+{
+    mpMainTableView = pMainTableView;
+
+    if(nullptr != mpDLTMessageAnalyzer)
+    {
+        mpDLTMessageAnalyzer->setMainTableView(pMainTableView);
+    }
+}
+
+void DLTMessageAnalyzerPlugin::initMessageDecoder(QDltMessageDecoder* pMessageDecoder)
+{
+    if(nullptr != mpDLTMessageAnalyzer)
+    {
+        mpDLTMessageAnalyzer->setMessageDecoder(pMessageDecoder);
+    }
+}
+
+void DLTMessageAnalyzerPlugin::configurationChanged()
+{
+    if(nullptr != mpDLTMessageAnalyzer)
+    {
+        mpDLTMessageAnalyzer->configurationChanged();
+    }
+}
+#endif
 
 void DLTMessageAnalyzerPlugin::updateFileStart()
 {

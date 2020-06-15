@@ -7,6 +7,7 @@
 #include <stack>
 
 #include "CTreeItem.hpp"
+#include "../log/CConsoleCtrl.hpp"
 
 //CTreeItem
 void CTreeItem::visit( const tVisitFunction& preVisitFunction,
@@ -555,9 +556,10 @@ tTreeItemPtrVec CTreeItem::addData( const tDataVec& dataVec  )
 
 const tDataItem& CTreeItem::data(int column) const
 {
-    Q_ASSERT(column >= 0);
-    Q_ASSERT(column < mData.size());
-    return mData[column];
+    if(column >= 0 && column < mData.size())
+        return mData[column];
+    else
+        SEND_WRN(QString("[CTreeItem] Was not able to access data item row - %1, column - %2").arg(row()).arg(column));
 }
 
 int CTreeItem::columnCount() const

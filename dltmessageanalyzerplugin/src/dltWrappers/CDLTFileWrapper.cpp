@@ -13,6 +13,11 @@
 
 CDLTFileWrapper::CDLTFileWrapper(QDltFile* pFile):
     mpFile(pFile),
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    mpMessageDecoder(nullptr),
+#else
+    mDecoderPlugins(),
+#endif
     mMaxCacheSize(0),
     mCurrentCacheSize(0),
     mbCacheEnabled(false),
@@ -76,10 +81,17 @@ tDltMsgWrapperPtr CDLTFileWrapper::getMsg(const tMsgId& msgId)
 
         msg.setMsg(byteArray);
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+        if(nullptr != mpMessageDecoder)
+        {
+            mpMessageDecoder->decodeMsg(msg,false);
+        }
+#else
         for(auto* pPlugin: mDecoderPlugins)
         {
             pPlugin->decodeMsg(msg,false);
         }
+#endif
 
         pResult = std::make_shared<CDLTMsgWrapper>(msg);
     };
@@ -239,10 +251,17 @@ bool CDLTFileWrapper::decodeAndCacheMsg( const int& msgId, QDltMsg& msg )
 
         if(foundMsg == mCache.cache.end())
         {
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+            if(nullptr != mpMessageDecoder)
+            {
+                mpMessageDecoder->decodeMsg(msg,false);
+            }
+#else
             for(auto* pPlugin: mDecoderPlugins) // decode message in all plugins
             {
                 pPlugin->decodeMsg(msg,false);
             }
+#endif
 
             tDltMsgWrapperPtr pMsgWrapper = std::make_shared<CDLTMsgWrapper>(msg); // create wrapper
 
@@ -382,10 +401,17 @@ void CDLTFileWrapper::resetCache()
     handleCacheFull(false);
 }
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+void CDLTFileWrapper::setMessageDecoder( QDltMessageDecoder* pMessageDecoder )
+{
+    mpMessageDecoder = pMessageDecoder;
+}
+#else
 void CDLTFileWrapper::setDecoderPlugins( const tPluginPtrList& decoderPlugins )
 {
     mDecoderPlugins = decoderPlugins;
 }
+#endif
 
 void CDLTFileWrapper::setEnableCache(bool isEnabled)
 {
