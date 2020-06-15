@@ -7,6 +7,9 @@ OBJECTS_DIR = build/obj
 RCC_DIR     = build/rcc
 UI_DIR      = build/ui
 
+# Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
+#DEFINES += PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+
 # target name
 TARGET = $$qtLibraryTarget(dltmessageanalyzerplugin)
 

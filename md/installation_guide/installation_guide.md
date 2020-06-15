@@ -24,6 +24,8 @@ Your target path to plugin should look like **"./dlt-viewer/plugin/DLT-Message-A
 
 ## "QT Creator"-specific part of guide.
 
+In case if you are using QT Creator for building the dlt-viewer:
+
 - Modify the **"./dlt-viewer/plugin.pro"** in the following way:
 <pre>SUBDIRS += DLT-Message-Analyzer ... all other plugin's names, which exist in delivery by default ...</pre>
 
@@ -37,11 +39,19 @@ Your target path to plugin should look like **"./dlt-viewer/plugin/DLT-Message-A
 
 - Rebuild the dlt-viewer project: ![Screenshot of "Build project" QT's option](./installation_guide_build.png)
 
+> **Note!** 
+> 
+> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the **./DLT-Message-Analyzer.pro**:
+> 
+> ![Screenshot enable 1.0.0 compatibility define in QT creator](./installation_guide_enable_define_pro.png)
+
 ----
 
 ## CMake-specific part of guide
 
-- In case if you build the project without the QT Creator, using only the CMakeLists.txt, modigy also the **"./dlt-viewer/plugin"**:
+In case if you build the project without the QT Creator, using only the CMakeLists.txt:
+
+- modigy also the **"./dlt-viewer/plugin"**:
 
 <pre>add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)</pre>
 
@@ -57,6 +67,12 @@ rm -r *
 cmake ../
 make
 </pre>
+
+> **Note!** 
+> 
+> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the **./dltmessageanalyzerplugin/src/CMakeLists.txt:
+> 
+> ![Screenshot enable 1.0.0 compatibility define in CMakeLists.txt](./installation_guide_enable_define_cmake.png)
 
 ----
 

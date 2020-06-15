@@ -12,7 +12,7 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 ## Installation guide
 
-### [Installation guide is located here](./md/installation_guide/installation_guide.md)
+### [Here](./md/installation_guide/installation_guide.md)
 
 ----
 
