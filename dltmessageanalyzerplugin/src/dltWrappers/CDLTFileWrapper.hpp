@@ -15,6 +15,8 @@
 
 #include "../common/Definitions.hpp"
 
+#include "qdlt.h"
+
 class QDltFile;
 class QDltMsg;
 typedef std::shared_ptr<CDLTMsgWrapper> tDltMsgWrapperPtr;
@@ -37,12 +39,20 @@ public:
      */
     CDLTFileWrapper(QDltFile* pFile);
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    /**
+     * @brief setMessageDecoder - sets the message decoder, which is used to decode the messages
+     * @param pMessageDecoder - the message decoder to be used for decoding
+     */
+    void setMessageDecoder( QDltMessageDecoder* pMessageDecoder );
+#else
     /**
      * @brief setDecoderPlugins - sets the collection of decoder plugins, which are used then to
      * decode the file messages
      * @param decoderPlugins - list of plugins, which should be used during fetch of the file messages.
      */
     void setDecoderPlugins( const tPluginPtrList& decoderPlugins );
+#endif
 
     /**
      * @brief getNumberOfFiles - provides number of files within the nested QDltFile
@@ -227,7 +237,11 @@ private:
     };
 
     tCacheData mCache;
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    QDltMessageDecoder* mpMessageDecoder;
+#else
     tPluginPtrList mDecoderPlugins;
+#endif
     tCacheSizeB mMaxCacheSize;
     tCacheSizeB mCurrentCacheSize;
     bool mbCacheEnabled;

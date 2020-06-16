@@ -302,6 +302,9 @@ CGroupedViewModel::CGroupedViewModel(QObject *parent)
     mpRootItem->appendColumn( getName(eGroupedViewColumn::Payload) );
     mpRootItem->appendColumn( getName(eGroupedViewColumn::PayloadPercantage) );
     mpRootItem->appendColumn( getName(eGroupedViewColumn::PayloadPerSecondAverage) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::AfterLastVisible) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::Metadata) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::Last) );
 }
 
 void CGroupedViewModel::updateAverageValues(CTreeItem* pItem, bool updatePayload, bool updateMessages)
@@ -568,6 +571,9 @@ void CGroupedViewModel::resetData()
     mpRootItem->appendColumn( getName(eGroupedViewColumn::Payload) );
     mpRootItem->appendColumn( getName(eGroupedViewColumn::PayloadPercantage) );
     mpRootItem->appendColumn( getName(eGroupedViewColumn::PayloadPerSecondAverage) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::AfterLastVisible) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::Metadata) );
+    mpRootItem->appendColumn( getName(eGroupedViewColumn::Last) );
     mAnalyzedValues = tAnalyzedValues();
     endResetModel();
     updateView();

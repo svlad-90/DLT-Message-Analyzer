@@ -128,6 +128,14 @@ CFiltersModel::CFiltersModel(QObject *parent)
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Value) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Index) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::ItemType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::AfterLastVisible) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Color) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Range) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::RowType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::IsFiltered) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupName) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupSyntaxType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Last) );
 }
 
 CFiltersModel::~CFiltersModel()
@@ -410,6 +418,14 @@ void CFiltersModel::resetData()
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Value) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Index) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::ItemType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::AfterLastVisible) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Color) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Range) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::RowType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::IsFiltered) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupName) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupSyntaxType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Last) );
 
     endResetModel();
     updateView();

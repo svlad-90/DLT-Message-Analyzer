@@ -54,7 +54,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput, QComboBox* pRegexSelectionComboBox,
-                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput):
+                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput
+                                         ):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
@@ -63,7 +64,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpLabel(pLabel),
     mpNumberOfThreadsCombobBox(pNumberOfThreadsCombobBox),
     mpMainTableView(nullptr),
-    mpApplyConfigurationButton(nullptr),
     mpContinuousSearchCheckBox(pContinuousSearchCheckBox),
     mpCacheStatusLabel(pCacheStatusLabel),
     mpMainTabWidget(pMainTabWidget),
@@ -83,7 +83,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mRequestId(INVALID_REQUEST_ID),
     mNumberOfDots(0),
     mbIsConnected(false),
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    mpMessageDecoder(nullptr),
+#else
     mDecoderPluginsList(),
+#endif
     mPluginManager(),
     mpRegexDirectoryMonitor(nullptr)
   // timers
@@ -292,47 +296,46 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         mpSearchResultTableView->setModel(mpSearchResultModel);
     }
 
-    QMainWindow* pMainWindow = nullptr;
-
-    foreach(QWidget* pWidget, qApp->topLevelWidgets())
+#ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     {
-        if(pWidget->inherits("QMainWindow"))
-        {
-            pMainWindow = qobject_cast<QMainWindow*>( pWidget );
-            break;
-        }
-    }
+        QMainWindow* pMainWindow = nullptr;
 
-    if(nullptr != pMainWindow)
-    {
+        foreach(QWidget* pWidget, qApp->topLevelWidgets())
         {
-            auto pFoundChild = pMainWindow->findChild<QTableView*>( QStringLiteral("tableView") );
-
-            if(nullptr != pFoundChild)
+            if(pWidget->inherits("QMainWindow"))
             {
-                mpMainTableView = pFoundChild;
+                pMainWindow = qobject_cast<QMainWindow*>( pWidget );
+                break;
             }
         }
 
+        if(nullptr != pMainWindow)
         {
-            auto pFoundChild = pMainWindow->findChild<QPushButton*>( QStringLiteral("applyConfig") );
-
-            if(nullptr != pFoundChild)
             {
-                mpApplyConfigurationButton = pFoundChild;
-            }
+                auto pFoundChild = pMainWindow->findChild<QTableView*>( QStringLiteral("tableView") );
 
-            if(nullptr != mpApplyConfigurationButton)
-            {
-                connect( mpApplyConfigurationButton, &QPushButton::pressed,
-                         [this]()
+                if(nullptr != pFoundChild)
                 {
-                    mSearchRange.isFiltered = false; // reset filtering of range
-                    cancel();
-                });
+                    mpMainTableView = pFoundChild;
+                }
+            }
+
+            {
+                auto pFoundChild = pMainWindow->findChild<QPushButton*>( QStringLiteral("applyConfig") );
+
+                if(nullptr != pFoundChild)
+                {
+                    connect( pFoundChild, &QPushButton::pressed,
+                             [this]()
+                    {
+                        mSearchRange.isFiltered = false; // reset filtering of range
+                        cancel();
+                    });
+                }
             }
         }
     }
+#endif
 
     connect( qApp, &QApplication::aboutToQuit, []()
     {
@@ -492,10 +495,17 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
 void CDLTMessageAnalyzer::decodeMsg(QDltMsg& msg) const
 {
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    if(nullptr != mpMessageDecoder)
+    {
+        mpMessageDecoder->decodeMsg(msg, false);
+    }
+#else
     for( const auto& pDecoderPlugin : mDecoderPluginsList )
     {
         pDecoderPlugin->decodeMsg(msg, false);
     }
+#endif
 }
 
 void CDLTMessageAnalyzer::handleLoadedRegexConfig()
@@ -651,8 +661,15 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
     {
         mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB()) ) );
         mpFile->setEnableCache( CSettingsManager::getInstance()->getCacheEnabled() );
-        mpFile->setDecoderPlugins(mDecoderPluginsList);
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+        if(nullptr != mpMessageDecoder)
+        {
+            mpFile->setMessageDecoder(mpMessageDecoder);
+        }
+#else
+        mpFile->setDecoderPlugins(mDecoderPluginsList);
+#endif
     }
 
     auto updateCacheStatus = [this]()
@@ -717,11 +734,18 @@ bool CDLTMessageAnalyzer::analyze()
         return false;
     }
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+    if(nullptr != mpMessageDecoder)
+    {
+        mpFile->setMessageDecoder(mpMessageDecoder);
+    }
+#else
     tryLoadDecoderPlugins();
+    mpFile->setDecoderPlugins(mDecoderPluginsList);
+#endif
 
     mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB() ) ) );
     mpFile->setEnableCache( CSettingsManager::getInstance()->getCacheEnabled() );
-    mpFile->setDecoderPlugins(mDecoderPluginsList);
 
     tryStop();
 
@@ -1490,6 +1514,7 @@ void CDLTMessageAnalyzer::updateStatusLabel( const QString& text, bool isError )
     }
 }
 
+#ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 void CDLTMessageAnalyzer::tryLoadDecoderPlugins()
 {
     if(true == mDecoderPluginsList.empty())
@@ -1513,6 +1538,7 @@ void CDLTMessageAnalyzer::tryLoadDecoderPlugins()
         mDecoderPluginsList = mPluginManager.getDecoderPlugins();
     }
 }
+#endif
 
 void CDLTMessageAnalyzer::searchView_clicked_jumpTo_inMainTable(const QModelIndex &index)
 {
@@ -1584,3 +1610,21 @@ void CDLTMessageAnalyzer::filterRegexTokens( const QString& filter )
         mpFiltersModel->filterRegexTokens(filter);
     }
 }
+
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+void CDLTMessageAnalyzer::setMainTableView( QTableView* pMainTableView )
+{
+    mpMainTableView = pMainTableView;
+}
+
+void CDLTMessageAnalyzer::configurationChanged()
+{
+    mSearchRange.isFiltered = false; // reset filtering of range
+    cancel();
+}
+
+void CDLTMessageAnalyzer::setMessageDecoder( QDltMessageDecoder* pMessageDecoder )
+{
+    mpMessageDecoder = pMessageDecoder;
+}
+#endif

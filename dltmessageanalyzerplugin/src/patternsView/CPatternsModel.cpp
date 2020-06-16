@@ -219,6 +219,7 @@ CPatternsModel::CPatternsModel(QObject *parent):
     mpRootItem->appendColumn( getName(ePatternsColumn::AfterLastVisible) );
     mpRootItem->appendColumn( getName(ePatternsColumn::Alias) );
     mpRootItem->appendColumn( getName(ePatternsColumn::IsFiltered) );
+    mpRootItem->appendColumn( getName(ePatternsColumn::Last) );
 }
 
 CPatternsModel::~CPatternsModel()
@@ -356,6 +357,7 @@ void CPatternsModel::resetData()
     mpRootItem->appendColumn( getName(ePatternsColumn::AfterLastVisible) );
     mpRootItem->appendColumn( getName(ePatternsColumn::Alias) );
     mpRootItem->appendColumn( getName(ePatternsColumn::IsFiltered) );
+    mpRootItem->appendColumn( getName(ePatternsColumn::Last) );
     endResetModel();
     updateView();
 }

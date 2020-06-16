@@ -89,6 +89,25 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
          */
         void setFile(const tDLTFileWrapperPtr& pFile);
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+        /**
+         * @brief setMainTableView - sets main table view, which is used for jumping functioanlity
+         * @param pMainTableView - pointer to the instance of the main table view
+         */
+        void setMainTableView( QTableView* pMainTableView );
+
+        /**
+         * @brief configurationChanged - used to notify from the outside, that configuration of the dlt-viewer has changed.
+         */
+        void configurationChanged();
+
+        /**
+         * @brief setMessageDecoder - set's an instance of message decoder to be used for decoding of the analyzed messages
+         * @param pMessageDecoder - pointer to instance of the message decoder
+         */
+        void setMessageDecoder( QDltMessageDecoder* pMessageDecoder );
+#endif
+
         /**
          * @brief analyze - starts analysis
          * @return - trye in case of successful start of analysis.
@@ -225,7 +244,11 @@ signals:
 
         void updateStatusLabel( const QString& text, bool isError = false );
         void processOverwritePattern(const QString& alias, const QString checkedRegex, const QModelIndex editItem = QModelIndex());
+
+#ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         void tryLoadDecoderPlugins();
+#endif
+
         void handleLoadedConfig();
         void handleLoadedRegexConfig();
         void resetSearchRange();
@@ -247,7 +270,6 @@ signals:
         QLabel* mpLabel;
         QComboBox* mpNumberOfThreadsCombobBox;
         QTableView* mpMainTableView;
-        QPushButton* mpApplyConfigurationButton;
         QCheckBox* mpContinuousSearchCheckBox;
         QLabel* mpCacheStatusLabel;
         QTabWidget* mpMainTabWidget;
@@ -273,7 +295,12 @@ signals:
         int mNumberOfDots;
         bool mbIsConnected;
         tDLTFileWrapperPtr mpFile;
+
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+        QDltMessageDecoder* mpMessageDecoder;
+#else
         tPluginPtrList mDecoderPluginsList;
+#endif
         QDltPluginManager mPluginManager;
         std::shared_ptr<CRegexDirectoryMonitor> mpRegexDirectoryMonitor;
 

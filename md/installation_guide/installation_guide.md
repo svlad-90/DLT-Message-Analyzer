@@ -51,7 +51,7 @@ In case if you are using QT Creator for building the dlt-viewer:
 
 In case if you build the project without the QT Creator, using only the CMakeLists.txt:
 
-- modigy also the **"./dlt-viewer/plugin"**:
+- modify also the **"./dlt-viewer/plugin/CMakeLists.txt"**:
 
 <pre>add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)</pre>
 
@@ -62,15 +62,14 @@ In case if you build the project without the QT Creator, using only the CMakeLis
 - Run the following set of commands in it:
 
 <pre>mkdir build
-cd ./build
-rm -r *
-cmake ../
-make
+cd build
+cmake ..
+make -j4
 </pre>
 
 > **Note!** 
 > 
-> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the **./dltmessageanalyzerplugin/src/CMakeLists.txt:
+> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the **./dltmessageanalyzerplugin/src/CMakeLists.txt**:
 > 
 > ![Screenshot enable 1.0.0 compatibility define in CMakeLists.txt](./installation_guide_enable_define_cmake.png)
 

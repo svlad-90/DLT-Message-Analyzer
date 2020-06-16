@@ -3,9 +3,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set (CMAKE_AUTOUIC ON)
 
-# Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
-#add_definitions(-DPLUGIN_API_COMPATIBILITY_MODE_1_0_0 )
-
 QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
 
 add_library(dltmessageanalyzerplugin MODULE 
@@ -36,6 +33,9 @@ add_library(dltmessageanalyzerplugin MODULE
     searchView/CSearchResultModel.cpp
     searchView/CSearchResultView.cpp
                           	${UI_HEADERS})
+
+# Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
+#target_compile_definitions(dltmessageanalyzerplugin PRIVATE -DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
 
 target_link_libraries(dltmessageanalyzerplugin qdlt Qt5::Widgets )
 install(TARGETS dltmessageanalyzerplugin DESTINATION deploy/plugins)
