@@ -4,9 +4,9 @@
 2. [ ] Have you checked to ensure there aren't other open [Pull Requests](../../pulls) for the same update/change?
 3. [ ] Have you built the project, and performed manual testing of your functionality for all supported platforms - Linux and Windows?
 4. [ ] Does your change introduce new interfaces? 
-5. [ ] Have you increased version of the plugin?
-6. [ ] Is your change backward-compatible with previous version of the plugin?
-7. [ ] Does your functionality designed in a way to allow execution of the unit-tests?
+5. [ ] Have you increased the version of the plugin?
+6. [ ] Is your change backward-compatible with the previous version of the plugin?
+7. [ ] Does your functionality designed in a way to allow the execution of the unit-tests?
 8. [ ] Have you developed unit-tests for newly developed functionality?
 
 #### Change description:
@@ -22,7 +22,7 @@ Add to this section any:
 - screen-shots
 - etc.
 
-which will proof that new functionaltiy works as expected.
+which will prove that new functionality works as expected.
 
 ----
 #### Were unit-tests executed?
