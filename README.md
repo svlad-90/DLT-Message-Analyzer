@@ -1,3 +1,7 @@
+![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
+
+----
+
 # Hi, guest. You are on the page of the DLT Message Analyzer plugin.
 
 ----
