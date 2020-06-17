@@ -2,10 +2,6 @@
 
 ----
 
-# Hi, guest. You are on the page of the DLT Message Analyzer plugin.
-
-----
-
 ## What is the DLT Message Analyzer?
 
 The DLT Message Analyzer is a plugin for dlt-viewer SW. It works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.

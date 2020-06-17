@@ -1,5 +1,5 @@
-#ifndef CCONSOLEVIEW_HPP
-#define CCONSOLEVIEW_HPP
+#ifndef CCONSOLECTRL_HPP
+#define CCONSOLECTRL_HPP
 
 #include <QMap>
 
@@ -38,7 +38,6 @@ namespace NDLTMessageAnalyzer
          */
         class CConsoleCtrl : public QObject
         {
-
             Q_OBJECT
 
         public:
@@ -117,4 +116,4 @@ private slots:
  */
 #define SEND_ERR(STRING) NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, NDLTMessageAnalyzer::NConsole::eMessageType::eErr)
 
-#endif // CCONSOLEVIEW_HPP
+#endif // CCONSOLECTRL_HPP
