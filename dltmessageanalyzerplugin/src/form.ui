@@ -394,7 +394,7 @@
            <enum>QTabWidget::South</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>3</number>
           </property>
           <property name="iconSize">
            <size>
@@ -581,13 +581,16 @@ QPushButton:hover:!pressed{
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <widget class="QPlainTextEdit" name="consoleView">
+             <widget class="CConsoleView" name="consoleView">
               <property name="font">
                <font>
                 <family>Times New Roman</family>
                 <pointsize>8</pointsize>
                 <italic>false</italic>
                </font>
+              </property>
+              <property name="contextMenuPolicy">
+               <enum>Qt::CustomContextMenu</enum>
               </property>
              </widget>
             </item>
@@ -1086,6 +1089,11 @@ color: rgb(0, 0, 0);</string>
    <class>CFiltersView</class>
    <extends>QTreeView</extends>
    <header>filtersView/CFiltersView.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>CConsoleView</class>
+   <extends>QPlainTextEdit</extends>
+   <header>log/CConsoleView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

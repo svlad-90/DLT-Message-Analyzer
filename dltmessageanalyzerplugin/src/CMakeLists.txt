@@ -12,6 +12,7 @@ add_library(dltmessageanalyzerplugin MODULE
     settings/CSettingsManager.cpp
     logo/CLogo.cpp
     log/CConsoleCtrl.cpp
+	log/CConsoleView.cpp
     analyzer/IDLTMessageAnalyzerController.cpp
     analyzer/IDLTMessageAnalyzerControllerConsumer.cpp
     analyzer/CMTAnalyzer.cpp

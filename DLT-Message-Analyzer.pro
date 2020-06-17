@@ -13,7 +13,7 @@ UI_DIR      = build/ui
 # target name
 TARGET = $$qtLibraryTarget(dltmessageanalyzerplugin)
 
-INCLUDEPATH+=dltmessageanalyzerplugin
+INCLUDEPATH+=dltmessageanalyzerplugin/src
 
 # plugin header files
 HEADERS += \
@@ -21,6 +21,7 @@ HEADERS += \
     dltmessageanalyzerplugin/src/dltmessageanalyzerplugin.hpp \
     dltmessageanalyzerplugin/src/form.h \
     \
+    dltmessageanalyzerplugin/src/log/CConsoleView.hpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.hpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.hpp \
@@ -61,6 +62,7 @@ SOURCES += \
     dltmessageanalyzerplugin/src/CDLTMessageAnalyzer.cpp\
     dltmessageanalyzerplugin/src/form.cpp \
     \
+    dltmessageanalyzerplugin/src/log/CConsoleView.cpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.cpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.cpp \

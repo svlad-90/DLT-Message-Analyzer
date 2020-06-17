@@ -557,9 +557,15 @@ tTreeItemPtrVec CTreeItem::addData( const tDataVec& dataVec  )
 const tDataItem& CTreeItem::data(int column) const
 {
     if(column >= 0 && column < mData.size())
+    {
         return mData[column];
+    }
     else
+    {
         SEND_WRN(QString("[CTreeItem] Was not able to access data item row - %1, column - %2").arg(row()).arg(column));
+        static const tDataItem sDummyResult;
+        return sDummyResult;
+    }
 }
 
 int CTreeItem::columnCount() const
