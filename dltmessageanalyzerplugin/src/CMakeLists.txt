@@ -22,6 +22,7 @@ add_library(dltmessageanalyzerplugin MODULE
     common/Definitions.cpp
     common/CBGColorAnimation.cpp
     common/CRegexDirectoryMonitor.cpp
+	common/CTableMemoryJumper.cpp
     dltWrappers/CDLTFileWrapper.cpp
     dltWrappers/CDLTMsgWrapper.cpp
     filtersView/CFiltersModel.cpp
@@ -33,6 +34,7 @@ add_library(dltmessageanalyzerplugin MODULE
     searchView/CSearchResultHighlightingDelegate.cpp
     searchView/CSearchResultModel.cpp
     searchView/CSearchResultView.cpp
+
                           	${UI_HEADERS})
 
 # Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"

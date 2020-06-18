@@ -39,6 +39,7 @@ class CPatternsView;
 class CRegexDirectoryMonitor;
 class CFiltersView;
 class CFiltersModel;
+class CTableMemoryJumper;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -89,13 +90,13 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
          */
         void setFile(const tDLTFileWrapperPtr& pFile);
 
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         /**
          * @brief setMainTableView - sets main table view, which is used for jumping functioanlity
          * @param pMainTableView - pointer to the instance of the main table view
          */
         void setMainTableView( QTableView* pMainTableView );
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         /**
          * @brief configurationChanged - used to notify from the outside, that configuration of the dlt-viewer has changed.
          */
@@ -310,6 +311,7 @@ signals:
 #endif
 
         QTime mMeasurementRequestTimer;
+        std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
 };
 
 #endif // CDLTMESSAGEANALYZER_HPP
