@@ -34,6 +34,7 @@ HEADERS += \
     dltmessageanalyzerplugin/src/analyzer/CMTAnalyzer.hpp \
     dltmessageanalyzerplugin/src/analyzer/CContinuousAnalyzer.hpp \
     \
+    dltmessageanalyzerplugin/src/common/CTableMemoryJumper.hpp \
     dltmessageanalyzerplugin/src/common/Definitions.hpp \
     dltmessageanalyzerplugin/src/common/CTreeItem.hpp \
     dltmessageanalyzerplugin/src/common/variant/variant.hpp \
@@ -75,6 +76,7 @@ SOURCES += \
     dltmessageanalyzerplugin/src/analyzer/CContinuousAnalyzer.cpp \
     dltmessageanalyzerplugin/src/analyzer/CDLTRegexAnalyzerWorker.cpp \
     \
+    dltmessageanalyzerplugin/src/common/CTableMemoryJumper.cpp \
     dltmessageanalyzerplugin/src/common/CTreeItem.cpp \
     dltmessageanalyzerplugin/src/common/Definitions.cpp \
     dltmessageanalyzerplugin/src/common/CBGColorAnimation.cpp \

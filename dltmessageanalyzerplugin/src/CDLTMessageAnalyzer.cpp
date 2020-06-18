@@ -45,6 +45,7 @@
 #include "filtersView/CFiltersView.hpp"
 #include "filtersView/CFiltersModel.hpp"
 #include "log/CConsoleCtrl.hpp"
+#include "common/CTableMemoryJumper.hpp"
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
@@ -94,7 +95,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   #ifdef DEBUG_BUILD
   , mMeasurementNotificationTimer()
   #endif
-  , mMeasurementRequestTimer()
+  , mMeasurementRequestTimer(),
+    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView))
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tRangePtrWrapper>("tRangePtrWrapper");
@@ -316,7 +318,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
                 if(nullptr != pFoundChild)
                 {
-                    mpMainTableView = pFoundChild;
+                    setMainTableView(pFoundChild);
                 }
             }
 
@@ -481,6 +483,19 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     {
         handleLoadedRegexConfig();
     });
+
+    if(nullptr != mpSearchResultTableView)
+    {
+        connect(mpSearchResultTableView->selectionModel(), &QItemSelectionModel::currentChanged,
+        [this](const QModelIndex &current, const QModelIndex &)
+        {
+            if(nullptr != mpSearchResultTableView)
+            {
+                auto index = current.sibling(current.row(), static_cast<int>(eSearchResultColumn::Index));
+                mpSearchViewTableJumper->setSelectedRow(index.data().value<int>());
+            }
+        });
+    }
 
     handleLoadedConfig();
     handleLoadedRegexConfig();
@@ -656,6 +671,11 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
     resetSearchRange();
 
     mpFile = pFile;
+
+    if(nullptr != mpSearchViewTableJumper)
+    {
+        mpSearchViewTableJumper->resetSelectedRow();
+    }
 
     if(nullptr != mpFile)
     {
@@ -986,73 +1006,96 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
 
         switch(requestState)
         {
-        case eRequestState::SUCCESSFUL:
-        {
-            for(auto foundMatchesIt = processedMatches.matchedItemVec.begin(); foundMatchesIt != processedMatches.matchedItemVec.end(); ++foundMatchesIt)
+            case eRequestState::SUCCESSFUL:
             {
-                auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
-                auto endIt = processedMatches.matchedItemVec.end();
-                mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
+                for(auto foundMatchesIt = processedMatches.matchedItemVec.begin(); foundMatchesIt != processedMatches.matchedItemVec.end(); ++foundMatchesIt)
+                {
+                    auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
+                    auto endIt = processedMatches.matchedItemVec.end();
+                    mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
+                }
+
+                updateProgress(progress, requestState, false);
+
+                if( false == isContinuousAnalysis() )
+                {
+                    analysisStatusChanged(false);
+                    setReuqestId( INVALID_REQUEST_ID );
+                }
+
+                {
+                    SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
+                             .arg(requestId)
+                             .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
+
+                    mMeasurementRequestTimer.restart();
+                }
             }
-
-            updateProgress(progress, requestState, false);
-
-            if( false == isContinuousAnalysis() )
+                break;
+            case eRequestState::ERROR_STATE:
             {
-                analysisStatusChanged(false);
+                updateStatusLabel("Error ...", true);
+
+                updateProgress(0, eRequestState::ERROR_STATE, false);
+
+                mpGroupedViewModel->resetData();
+
                 setReuqestId( INVALID_REQUEST_ID );
-            }
-
-            {
-                SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
-                         .arg(requestId)
-                         .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
-
-                mMeasurementRequestTimer.restart();
-            }
-        }
-            break;
-        case eRequestState::ERROR_STATE:
-        {
-            updateStatusLabel("Error ...", true);
-
-            updateProgress(0, eRequestState::ERROR_STATE, false);
-
-            mpGroupedViewModel->resetData();
-
-            setReuqestId( INVALID_REQUEST_ID );
-            analysisStatusChanged(false);
-        }
-            break;
-        case eRequestState::PROGRESS:
-        {
-            for(auto foundMatchesIt = processedMatches.matchedItemVec.begin();
-                foundMatchesIt != processedMatches.matchedItemVec.end();
-                ++foundMatchesIt)
-            {
-                auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
-                auto endIt = processedMatches.matchedItemVec.end();
-                mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
-            }
-
-            updateProgress(progress, requestState, false);
-
-            if(progress == 100 && false == mbIsConnected)
-            {
-                cancelRequest(requestId);
-                updateProgress(progress, eRequestState::SUCCESSFUL, false);
                 analysisStatusChanged(false);
-
-                SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
-                         .arg(requestId)
-                         .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
             }
+                break;
+            case eRequestState::PROGRESS:
+            {
+                for(auto foundMatchesIt = processedMatches.matchedItemVec.begin();
+                    foundMatchesIt != processedMatches.matchedItemVec.end();
+                    ++foundMatchesIt)
+                {
+                    auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
+                    auto endIt = processedMatches.matchedItemVec.end();
+                    mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
+                }
 
-            break;
-        }
+                updateProgress(progress, requestState, false);
+
+                if(progress == 100 && false == mbIsConnected)
+                {
+                    cancelRequest(requestId);
+                    updateProgress(progress, eRequestState::SUCCESSFUL, false);
+                    analysisStatusChanged(false);
+
+                    SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
+                             .arg(requestId)
+                             .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
+                }
+
+                break;
+            }
         }
 
-        mpSearchResultModel->addNextMessageIdxVec( processedMatches );
+        auto additionResult = mpSearchResultModel->addNextMessageIdxVec( processedMatches );
+
+        if(nullptr != mpSearchViewTableJumper &&
+           nullptr != mpSearchResultModel &&
+           additionResult.first &&
+           false == processedMatches.matchedItemVec.empty())
+        {
+            if( (additionResult.second.to - additionResult.second.from + 1) == static_cast<int>(processedMatches.matchedItemVec.size()))
+            {
+                int counter = 0;
+                CTableMemoryJumper::tCheckSet checkSet;
+
+                for(const auto& match : processedMatches.matchedItemVec)
+                {
+                    CTableMemoryJumper::tCheckItem checkItem;
+                    checkItem.first = static_cast<CTableMemoryJumper::tRowID>( match.getItemMetadata().msgId );
+                    checkItem.second = additionResult.second.from + counter;
+                    checkSet.insert(checkItem);
+                    ++counter;
+                }
+
+                mpSearchViewTableJumper->checkRows(checkSet);
+            }
+        }
     }
 
     //#ifdef DEBUG_BUILD
@@ -1611,12 +1654,12 @@ void CDLTMessageAnalyzer::filterRegexTokens( const QString& filter )
     }
 }
 
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 void CDLTMessageAnalyzer::setMainTableView( QTableView* pMainTableView )
 {
     mpMainTableView = pMainTableView;
 }
 
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 void CDLTMessageAnalyzer::configurationChanged()
 {
     mSearchRange.isFiltered = false; // reset filtering of range
