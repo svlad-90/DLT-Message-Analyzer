@@ -71,6 +71,7 @@ public:
     QComboBox* getConfigComboBox();
     CFiltersView* getFiltersView();
     QLineEdit* getFiltersSearchInput();
+    QLineEdit* getConsoleViewInput();
 
 private slots:
     void on_analyze_clicked();

@@ -17,6 +17,14 @@ namespace NDLTMessageAnalyzer
             eErr
         };
 
+        struct tMessageSettings
+        {
+            bool bCustomColor = false;
+            QColor color;
+            eMessageType messageType = eMessageType::eMsg;
+            bool clear = false;
+        };
+
         struct tConsoleConfig
         {
             // size of log ring buffer, which is represente to the user. Measured in number of dedicated messages.
@@ -71,9 +79,10 @@ namespace NDLTMessageAnalyzer
              * Otherwise does nothing.
              * Method is thread-safe.
              * @param message - message to be added to the log
-             * @param messageType - message type to be considered.
+             * @param messageSettings - set of the message settings, which should be considered.
              */
-            static void sendMessage( const QString& message, eMessageType messageType = eMessageType::eMsg );
+            static void sendMessage( const QString& message,
+                                     const tMessageSettings& messageSettings );
 
 private slots:
             /**
@@ -81,9 +90,9 @@ private slots:
              * sends a message to the corresponding text edit.
              * Depending on type of the message, highlights
              * @param message - string of the message, to be added to console
-             * @param messageType - type of the message, to be applied for this message
+             * @param messageSettings - set of the message settings, which should be considered.
              */
-            void addMessage( const QString& message, eMessageType messageType = eMessageType::eMsg );
+            void addMessage( const QString& message, const tMessageSettings& messageSettings );
 
         private: // methods
             /**
@@ -104,16 +113,55 @@ private slots:
 /**
  * Sends debug message to console. Takes string as an argument.
  */
-#define SEND_MSG(STRING) NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, NDLTMessageAnalyzer::NConsole::eMessageType::eMsg)
+#define SEND_MSG(STRING)\
+do\
+{\
+   NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;\
+   messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eMsg;\
+   NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, messageSettings);\
+}while(false)
 
 /**
  * Sends warning message to console. Takes string as an argument.
  */
-#define SEND_WRN(STRING) NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, NDLTMessageAnalyzer::NConsole::eMessageType::eWrn)
+#define SEND_WRN(STRING)\
+do\
+{\
+   NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;\
+   messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eWrn;\
+   NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, messageSettings);\
+}while(false)
 
 /**
  * Sends error message to console. Takes string as an argument.
  */
-#define SEND_ERR(STRING) NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, NDLTMessageAnalyzer::NConsole::eMessageType::eErr)
+#define SEND_ERR(STRING)\
+do\
+{\
+   NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;\
+   messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eErr;\
+   NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, messageSettings);\
+}while(false)
+
+/**
+ * Sends debug message of specified color to console. Takes string and color as arguments.
+ */
+#define SEND_MSG_COLORED(STRING, COLOR)\
+do\
+{\
+   NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;\
+   messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eWrn;\
+   messageSettings.bCustomColor = true;\
+   messageSettings.color = COLOR;\
+   NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(STRING, messageSettings);\
+}while(false)
+
+#define CLEAR_CONSOLE_VIEW()\
+do\
+{\
+   NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;\
+   messageSettings.clear = true;\
+   NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage("", messageSettings);\
+}while(false)
 
 #endif // CCONSOLECTRL_HPP

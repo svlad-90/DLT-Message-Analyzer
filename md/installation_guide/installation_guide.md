@@ -31,8 +31,6 @@ In case if you are using QT Creator for building the dlt-viewer:
 
 ![Screenshot of plugin.pro file's modification](./installation_guide_plugin_pro.png)
 
-![Screenshot of plugin.pro cmakelists.txt modification](./installation_guide_cmakelists_modification.png)
-
 - Run qmake:
 
 ![Screenshot of "Run qmake" QT's option](./installation_guide_run_qmake.png)
@@ -54,6 +52,8 @@ In case if you build the project without the QT Creator, using only the CMakeLis
 - modify also the **"./dlt-viewer/plugin/CMakeLists.txt"**:
 
 <pre>add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)</pre>
+
+![Screenshot of plugin.pro cmakelists.txt modification](./installation_guide_cmakelists_modification.png)
 
 - Open console in the "./dlt-viewer" folder:
 

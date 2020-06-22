@@ -20,6 +20,8 @@
 
 //#define DEBUG_BUILD
 
+extern const std::map<QString, QColor> sColorsMap;
+
 extern const QString sVARPrefix;
 extern const QString sRegexScriptingDelimiter;
 
@@ -482,5 +484,7 @@ struct tRangeProperty
  */
 Qt::CheckState V_2_CS( const tDataItem& val );
 Qt::CheckState V_2_CS( const QVariant& val );
+
+QString rgb2hex(const QColor& color, bool with_head = true);
 
 #endif // DEFINITIONS_HPP

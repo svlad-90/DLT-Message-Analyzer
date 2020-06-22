@@ -40,6 +40,7 @@ class CRegexDirectoryMonitor;
 class CFiltersView;
 class CFiltersModel;
 class CTableMemoryJumper;
+class CConsoleInputProcessor;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -77,7 +78,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                             QLineEdit* pPatternsSearchInput,
                             QComboBox* pRegexSelectionComboBox,
-                            CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput);
+                            CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
+                            QLineEdit* pConsoleViewInput);
 
         /**
          * Destructor
@@ -312,6 +314,7 @@ signals:
 
         QTime mMeasurementRequestTimer;
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
+        std::shared_ptr<CConsoleInputProcessor> mpConsoleInputProcessor;
 };
 
 #endif // CDLTMESSAGEANALYZER_HPP

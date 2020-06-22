@@ -6,9 +6,10 @@
 #include <QTabBar>
 #include <QThread>
 
+#include "../common/Definitions.hpp"
 #include "CConsoleCtrl.hpp"
 
-Q_DECLARE_METATYPE(NDLTMessageAnalyzer::NConsole::eMessageType)
+Q_DECLARE_METATYPE(NDLTMessageAnalyzer::NConsole::tMessageSettings)
 
 using namespace NDLTMessageAnalyzer::NConsole;
 
@@ -32,7 +33,7 @@ static std::mutex& g_MessageBufferProtector()
 
 struct tMessageBufferItem
 {
-    eMessageType messageType;
+    tMessageSettings messageSettings;
     QString message;
 };
 
@@ -89,9 +90,10 @@ bool CConsoleCtrl::isExist()
     return g_IsExist();
 }
 
-void CConsoleCtrl::sendMessage( const QString& message, eMessageType messageType )
+void CConsoleCtrl::sendMessage( const QString& message,
+                                const tMessageSettings& messageSettings )
 {
-    qRegisterMetaType<eMessageType>("eMessageType");
+    qRegisterMetaType<tMessageSettings>("tMessageSettings");
 
     if( true == g_IsExist() )
     {
@@ -109,7 +111,7 @@ void CConsoleCtrl::sendMessage( const QString& message, eMessageType messageType
                 {
                     QMetaObject::invokeMethod(g_InstancePtr().get(), "addMessage", Qt::QueuedConnection,
                                               Q_ARG(QString, messageBufferItem.message),
-                                              Q_ARG(eMessageType, messageBufferItem.messageType));
+                                              Q_ARG(tMessageSettings, messageBufferItem.messageSettings));
                 }
 
                 messageBuffer.clear();
@@ -125,7 +127,7 @@ void CConsoleCtrl::sendMessage( const QString& message, eMessageType messageType
 
         QMetaObject::invokeMethod(g_InstancePtr().get(), "addMessage", Qt::QueuedConnection,
                                   Q_ARG(QString, messageExtended),
-                                  Q_ARG(eMessageType, messageType));
+                                  Q_ARG(tMessageSettings, messageSettings));
     }
     else
     {
@@ -133,7 +135,7 @@ void CConsoleCtrl::sendMessage( const QString& message, eMessageType messageType
 
         tMessageBufferItem bufferItem;
         bufferItem.message = message;
-        bufferItem.messageType = messageType;
+        bufferItem.messageSettings = messageSettings;
         g_MessageBuffer().push_back(bufferItem);
     }
 }
@@ -192,78 +194,92 @@ static const QColor msgColor = QColor(0,0,0);
 static const QColor wrnColor = QColor(150,150,0);
 static const QColor errColor = QColor(150,0,0);
 
-void CConsoleCtrl::addMessage( const QString& message, eMessageType messageType )
+void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& messageSettings )
 {
     if(nullptr != mConsoleConfig.pConsoleTextEdit)
     {
-        QString messageEscaped = message.toHtmlEscaped();
-        QString HTMLMessage;
-
-        switch(messageType)
+        if(true == messageSettings.clear)
         {
-            case eMessageType::eMsg: HTMLMessage.append(msgHtml); break;
-            case eMessageType::eWrn: HTMLMessage.append(wrnHtml); break;
-            case eMessageType::eErr: HTMLMessage.append(errHtml); break;
-        }
-
-        HTMLMessage.append("[").append(QDateTime::currentDateTime().toString()).append("]");
-
-        switch(messageType)
-        {
-            case eMessageType::eMsg: HTMLMessage.append("[M]"); break;
-            case eMessageType::eWrn: HTMLMessage.append("[W]"); break;
-            case eMessageType::eErr: HTMLMessage.append("[E]"); break;
-        }
-
-        HTMLMessage.append(" : ");
-
-        QString messageNormalized = messageEscaped.size() >= static_cast<int>(mConsoleConfig.maxMsgSize)
-                ? messageEscaped.mid(0, static_cast<int>(mConsoleConfig.maxMsgSize)).append("...")
-                : messageEscaped;
-
-        HTMLMessage.append(messageNormalized);
-        HTMLMessage.append(endHtml);
-
-        mConsoleConfig.pConsoleTextEdit->appendHtml(HTMLMessage);
-    }
-
-    if(nullptr != mConsoleConfig.pTabWidget && nullptr != mConsoleConfig.pConsoleTab)
-    {
-        auto* pTabWidget = mConsoleConfig.pTabWidget;
-        auto* pConsoleTab = mConsoleConfig.pConsoleTab;
-        auto* pTabBar = pTabWidget->tabBar();
-
-        auto consoleTabIndex = pTabWidget->indexOf(pConsoleTab);
-
-        ++mMessageCounters[messageType];
-
-        if(consoleTabIndex != pTabWidget->currentIndex()) // if console view tab is not selected
-        {
-            if(messageType >= mCountedMessageType)
-            {
-                mCountedMessageType = messageType;
-
-                // update tab's highlighting
-                QColor tabHighlightingColor;
-
-                switch(messageType)
-                {
-                    case eMessageType::eMsg: tabHighlightingColor = msgColor; break;
-                    case eMessageType::eWrn: tabHighlightingColor = wrnColor; break;
-                    case eMessageType::eErr: tabHighlightingColor = errColor; break;
-                }
-
-                pTabBar->setTabTextColor(consoleTabIndex, tabHighlightingColor);
-
-                // update tab's text
-                pTabBar->setTabText( consoleTabIndex,
-                                     QString(g_TabName()).append(" (%1)").arg(QString::number(mMessageCounters[messageType])));
-            }
+            mConsoleConfig.pConsoleTextEdit->clear();
         }
         else
         {
-            // reset counter
-            mMessageCounters[messageType] = 0u;
+            QString messageEscaped = message.toHtmlEscaped();
+            QString HTMLMessage;
+
+            if(true == messageSettings.bCustomColor)
+            {
+                HTMLMessage.append("<font color=\"").append(rgb2hex(messageSettings.color)).append("\">");
+            }
+            else
+            {
+                switch(messageSettings.messageType)
+                {
+                    case eMessageType::eMsg: HTMLMessage.append(msgHtml); break;
+                    case eMessageType::eWrn: HTMLMessage.append(wrnHtml); break;
+                    case eMessageType::eErr: HTMLMessage.append(errHtml); break;
+                }
+            }
+
+            HTMLMessage.append("[").append(QDateTime::currentDateTime().toString()).append("]");
+
+            switch(messageSettings.messageType)
+            {
+                case eMessageType::eMsg: HTMLMessage.append("[M]"); break;
+                case eMessageType::eWrn: HTMLMessage.append("[W]"); break;
+                case eMessageType::eErr: HTMLMessage.append("[E]"); break;
+            }
+
+            HTMLMessage.append(" : ");
+
+            QString messageNormalized = messageEscaped.size() >= static_cast<int>(mConsoleConfig.maxMsgSize)
+                    ? messageEscaped.mid(0, static_cast<int>(mConsoleConfig.maxMsgSize)).append("...")
+                    : messageEscaped;
+
+            HTMLMessage.append(messageNormalized);
+            HTMLMessage.append(endHtml);
+
+            mConsoleConfig.pConsoleTextEdit->appendHtml(HTMLMessage);
+        }
+
+        if(nullptr != mConsoleConfig.pTabWidget && nullptr != mConsoleConfig.pConsoleTab)
+        {
+            auto* pTabWidget = mConsoleConfig.pTabWidget;
+            auto* pConsoleTab = mConsoleConfig.pConsoleTab;
+            auto* pTabBar = pTabWidget->tabBar();
+
+            auto consoleTabIndex = pTabWidget->indexOf(pConsoleTab);
+
+            ++mMessageCounters[messageSettings.messageType];
+
+            if(consoleTabIndex != pTabWidget->currentIndex()) // if console view tab is not selected
+            {
+                if(messageSettings.messageType >= mCountedMessageType)
+                {
+                    mCountedMessageType = messageSettings.messageType;
+
+                    // update tab's highlighting
+                    QColor tabHighlightingColor;
+
+                    switch(messageSettings.messageType)
+                    {
+                        case eMessageType::eMsg: tabHighlightingColor = msgColor; break;
+                        case eMessageType::eWrn: tabHighlightingColor = wrnColor; break;
+                        case eMessageType::eErr: tabHighlightingColor = errColor; break;
+                    }
+
+                    pTabBar->setTabTextColor(consoleTabIndex, tabHighlightingColor);
+
+                    // update tab's text
+                    pTabBar->setTabText( consoleTabIndex,
+                                         QString(g_TabName()).append(" (%1)").arg(QString::number(mMessageCounters[messageSettings.messageType])));
+                }
+            }
+            else
+            {
+                // reset counter
+                mMessageCounters[messageSettings.messageType] = 0u;
+            }
         }
     }
 }

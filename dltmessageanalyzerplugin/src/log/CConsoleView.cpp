@@ -42,4 +42,8 @@ void CConsoleView::keyPressEvent ( QKeyEvent* pEvent )
     {
         clear();
     }
+    else
+    {
+        tParent::keyPressEvent(pEvent);
+    }
 }
