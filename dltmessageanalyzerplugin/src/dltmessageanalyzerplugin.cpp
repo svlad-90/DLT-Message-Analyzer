@@ -57,7 +57,10 @@ QString DLTMessageAnalyzerPlugin::pluginInterfaceVersion(){
 
 QString DLTMessageAnalyzerPlugin::pluginData() const
 {
-    return QString("You are using DLTMessageAnalyzerPlugin | Version: v.%1 | Author - Vladyslav Goncharuk <svlad1990@gmail.com>").arg(DLT_MESSAGE_ANALYZER_PLUGIN_VERSION);
+    return QString("You are using %1 | Version: v.%2 | Author - %3")
+            .arg(DLT_MESSAGE_ANALYZER_NAME)
+            .arg(DLT_MESSAGE_ANALYZER_PLUGIN_VERSION)
+            .arg(DLT_MESSAGE_ANALYZER_PLUGIN_AUTHOR);
 }
 
 QString DLTMessageAnalyzerPlugin::description()
@@ -107,7 +110,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getPatternSearchInput(),
                                                                                                       mpForm->getConfigComboBox(),
                                                                                                       mpForm->getFiltersView(),
-                                                                                                      mpForm->getFiltersSearchInput());
+                                                                                                      mpForm->getFiltersSearchInput(),
+                                                                                                      mpForm->getConsoleViewInput());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)

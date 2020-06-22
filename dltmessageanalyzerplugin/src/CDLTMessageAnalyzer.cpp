@@ -46,6 +46,7 @@
 #include "filtersView/CFiltersModel.hpp"
 #include "log/CConsoleCtrl.hpp"
 #include "common/CTableMemoryJumper.hpp"
+#include "log/CConsoleInputProcessor.hpp"
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
@@ -55,7 +56,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput, QComboBox* pRegexSelectionComboBox,
-                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput
+                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
+                                         QLineEdit* pConsoleViewInput
                                          ):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
@@ -96,7 +98,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   , mMeasurementNotificationTimer()
   #endif
   , mMeasurementRequestTimer(),
-    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView))
+    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView)),
+    mpConsoleInputProcessor(std::make_shared<CConsoleInputProcessor>(pConsoleViewInput))
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tRangePtrWrapper>("tRangePtrWrapper");

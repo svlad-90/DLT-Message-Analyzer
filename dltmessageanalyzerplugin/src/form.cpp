@@ -512,6 +512,18 @@ QLineEdit* Form::getFiltersSearchInput()
     return pResult;
 }
 
+QLineEdit* Form::getConsoleViewInput()
+{
+    QLineEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->consoleViewInputLineEdit;
+    }
+
+    return pResult;
+}
+
 void Form::on_regex_returnPressed()
 {
     if(nullptr != mpDLTMessageAnalyzerPlugin)

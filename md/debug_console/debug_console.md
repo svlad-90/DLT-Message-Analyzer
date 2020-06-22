@@ -25,7 +25,22 @@ Still, some messages are presented even in the production versions, as:
 - messages regarding the time, which was consumed to process the search query
 - warning messages regarding the timestamp mismatch within the analyzed file. That impacts possibility to represent average values within the "Grouped view"
 
-As of now there is no possibility for the final user of the plugin to send his own messages. Still, we are thinking of the use-cases where that could be applicable.
+----
+
+Besides that, there is an input field, which allows you to get some useful information about the plugin:
+
+![Screenshot of the "Debug console" input field](./debug_console_input.png)
+
+Supported commands are:
+
+help -> get list of supported commands
+- clear -> clear console view
+- color-aliases -> show list of the color aliases, which can be used within the regex name scripting
+- support -> represent the support message
+- version -> represent the version of the plugin
+- web-link -> represent link to plugin's web-site
+
+List of the supported commands will be extended in future releases.
 
 ----
 

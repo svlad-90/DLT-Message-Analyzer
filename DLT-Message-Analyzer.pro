@@ -21,11 +21,12 @@ HEADERS += \
     dltmessageanalyzerplugin/src/dltmessageanalyzerplugin.hpp \
     dltmessageanalyzerplugin/src/form.h \
     \
-    dltmessageanalyzerplugin/src/log/CConsoleView.hpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.hpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.hpp \
     \
+    dltmessageanalyzerplugin/src/log/CConsoleInputProcessor.hpp \
+    dltmessageanalyzerplugin/src/log/CConsoleView.hpp \
     dltmessageanalyzerplugin/src/log/CConsoleCtrl.hpp \
     \
     dltmessageanalyzerplugin/src/analyzer/IDLTMessageAnalyzerController.hpp \
@@ -63,11 +64,12 @@ SOURCES += \
     dltmessageanalyzerplugin/src/CDLTMessageAnalyzer.cpp\
     dltmessageanalyzerplugin/src/form.cpp \
     \
-    dltmessageanalyzerplugin/src/log/CConsoleView.cpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.cpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.cpp \
     \
+    dltmessageanalyzerplugin/src/log/CConsoleInputProcessor.cpp \
+    dltmessageanalyzerplugin/src/log/CConsoleView.cpp \
     dltmessageanalyzerplugin/src/log/CConsoleCtrl.cpp \
     \
     dltmessageanalyzerplugin/src/analyzer/IDLTMessageAnalyzerController.cpp \
