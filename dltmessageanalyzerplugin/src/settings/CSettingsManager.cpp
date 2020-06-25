@@ -10,6 +10,8 @@
 #include <QJsonObject>
 #include <QDir>
 
+#include "QDebug"
+
 #include "../log/CConsoleCtrl.hpp"
 
 #include "CSettingsManager.hpp"
@@ -31,9 +33,9 @@ static const QString sCopySearchResultAsHTMLKey = "copySearchResultAsHTML";
 static const QString sMinimizePatternsViewOnSelectionKey = "minimizePatternsViewOnSelection";
 static const QString sWriteSettingsOnEachUpdateChangedKey = "writeSettingsOnEachUpdateChanged";
 static const QString sCacheEnabledKey = "cacheEnabled";
-static const QString sCacheMaxSizeMsBKey = "cacheMaxSizeMB";
+static const QString sCacheMaxSizeMBKey = "cacheMaxSizeMB";
 static const QString sRDPModeKey = "RDPMode";
-static const QString sRegexMonoHighlightingColosRKey = "regexMonoHighlightingColor";
+static const QString sRegexMonoHighlightingColosKey = "regexMonoHighlightingColor";
 static const QString sRKey = "r";
 static const QString sGKey = "g";
 static const QString sBKey = "b";
@@ -115,30 +117,108 @@ static const tRegexFiltersColumnsVisibilityMap sDefaultRegexFiltersColumnsVisibi
 = fillInDefaultRegexFiltersColumnsVisibilityMap();
 
 CSettingsManager::CSettingsManager():
-    mSettingsManagerVersion(sDefaultSettingsManagerVersion),
-    mAliases(),
-    mNumberOfThreads(1),
-    mbContinuousSearch(true),
-    mbCopySearchResultAsHTML(true),
-    mbMinimizePatternsViewOnSelection(false),
-    mbWriteSettingsOnEachUpdate(true),
-    mbCacheEnabled(true),
-    mCacheMaxSizeMB(500),
-    mbRDPMode(false),
-    mRegexMonoHighlightingColor(150,0,0),
-    mbHighlightActivePatterns(true),
-    mPatternsHighlightingColor(0,150,0),
-    mbSearchResultMonoColorHighlighting(false),
-    mSearchResultHighlightingGradient( QColor(154,0,146), QColor(1,162,165), 3 ),
+    mSetting_SettingsManagerVersion(createIntegralSettingsItem<tSettingsManagerVersion>(sSettingsManagerVersionKey,
+        [this](const tSettingsManagerVersion& data){settingsManagerVersionChanged(data);},
+        [this](){tryStoreRootConfig();},
+        sDefaultSettingsManagerVersion)),
+    mSetting_Aliases(createAliasItemVecSettingsItem(sAliasesKey,
+        [this](const tAliasItemVec& data){ aliasesChanged(data); },
+        [this]()
+        {
+            QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
+            storeRegexConfigCustomPath(regexSettingsFilePath);
+        },
+                                                   tAliasItemVec())),
+    mSetting_NumberOfThreads(createIntegralSettingsItem<int>(sNumberOfThreadsKey,
+        [this](const int& data){numberOfThreadsChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_ContinuousSearch(createBooleanSettingsItem(sIsContinuousSearchKey,
+        [this](const bool& data){continuousSearchChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_CopySearchResultAsHTML(createBooleanSettingsItem(sCopySearchResultAsHTMLKey,
+        [this](const bool& data){copySearchResultAsHTMLChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_MinimizePatternsViewOnSelection(createBooleanSettingsItem(sMinimizePatternsViewOnSelectionKey,
+        [this](const bool& data){minimizePatternsViewOnSelectionChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        false)),
+    mSetting_WriteSettingsOnEachUpdate(createBooleanSettingsItem(sWriteSettingsOnEachUpdateChangedKey,
+        [this](const bool& data){writeSettingsOnEachUpdateChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_CacheEnabled(createBooleanSettingsItem(sCacheEnabledKey,
+        [this](const bool& data){cacheEnabledChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_CacheMaxSizeMB(createIntegralSettingsItem<tCacheSizeMB>(sCacheMaxSizeMBKey,
+        [this](const tCacheSizeMB& data){cacheMaxSizeMBChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        500)),
+    mSetting_RDPMode(createBooleanSettingsItem(sRDPModeKey,
+        [this](const bool& data){RDPModeChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        false)),
+    mSetting_RegexMonoHighlightingColor(createColorSettingsItem(sRegexMonoHighlightingColosKey,
+        [this](const QColor& data){regexMonoHighlightingColorChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        QColor(150,0,0))),
+    mSetting_HighlightActivePatterns(createBooleanSettingsItem(sHighlightActivePatternsKey,
+        [this](const bool& data){highlightActivePatternsChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        false)),
+    mSetting_PatternsHighlightingColor(createColorSettingsItem(sPatternsHighlightingColorKey,
+        [this](const QColor& data){patternsHighlightingColorChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        QColor(0,150,0))),
+    mSetting_SearchResultMonoColorHighlighting(createBooleanSettingsItem(sSearchResultMonoColorHighlightingKey,
+        [this](const bool& data){searchResultMonoColorHighlightingChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        false)),
     mSearchResultHighlightingGradientProtector(),
-    mSearchResultColumnsVisibilityMap(sDefaultSearchResultColumnsVisibilityMap),
-    mbMarkTimeStampWithBold(true),
-    mPatternsColumnsVisibilityMap(sDefaultPatternsColumnsVisibilityMap),
-    mbCaseSensitiveRegex(false),
-    mRegexFiltersColumnsVisibilityMap(sDefaultRegexFiltersColumnsVisibilityMap),
-    mbFilterVariables(true),
-    mbRootConfigInitialised(false),
-    mSelectedRegexFile(sDefaultRegexFileName)
+    mSetting_SearchResultHighlightingGradient(createHighlightingGradientSettingsItem(sSearchResultHighlightingGradientKey,
+        [this](const tHighlightingGradient& data){searchResultHighlightingGradientChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        tHighlightingGradient(QColor(154,0,146), QColor(1,162,165), 3))),
+    mSetting_SearchResultColumnsVisibilityMap(createSearchResultColumnsVisibilityMapSettingsItem(sSearchResultColumnsVisibilityMapKey,
+        [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsVisibilityMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultSearchResultColumnsVisibilityMap)),
+    mSetting_MarkTimeStampWithBold(createBooleanSettingsItem(sMarkTimeStampWithBold,
+        [this](const bool& data){markTimeStampWithBoldChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_PatternsColumnsVisibilityMap(createPatternsColumnsVisibilityMapSettingsItem(sPatternsColumnsVisibilityMapKey,
+        [this](const tPatternsColumnsVisibilityMap& data){patternsColumnsVisibilityMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultPatternsColumnsVisibilityMap)),
+    mSetting_CaseSensitiveRegex(createBooleanSettingsItem(sCaseSensitiveRegex,
+        [this](const bool& data){caseSensitiveRegexChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        false)),
+    mSetting_RegexFiltersColumnsVisibilityMap(createRegexFiltersColumnsVisibilityMapSettingsItem(sRegexFiltersColumnsVisibilityMapKey,
+        [this](const tRegexFiltersColumnsVisibilityMap& data){regexFiltersColumnsVisibilityMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultRegexFiltersColumnsVisibilityMap)),
+    mSetting_FilterVariables(createBooleanSettingsItem(sFilterVariablesKey,
+        [this](const bool& data){filterVariablesChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_SelectedRegexFile(createStringSettingsItem(sSelectedRegexFile,
+        [this](const QString& data)
+        {
+            clearRegexConfig();
+
+            QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + data;
+            loadRegexConfigCustomPath(regexSettingsFilePath);
+
+            selectedRegexFileChanged(data);
+        },
+        [this](){tryStoreSettingsConfig();},
+        sDefaultRegexFileName)),
+    mbRootConfigInitialised(false)
 {
     CSettingsManager::tOperationResult result = setUp();
 
@@ -149,6 +229,22 @@ CSettingsManager::CSettingsManager():
     else
     {
         SEND_MSG(QString("[CSettingsManager][setUp] set up is successful"));
+    }
+}
+
+void CSettingsManager::tryStoreSettingsConfig()
+{
+    if(true == getWriteSettingsOnEachUpdate())
+    {
+        storeSettingsConfig();
+    }
+}
+
+void CSettingsManager::tryStoreRootConfig()
+{
+    if(true == getWriteSettingsOnEachUpdate())
+    {
+        storeRootConfig();
     }
 }
 
@@ -174,6 +270,521 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility()
     return result;
 }
 
+TSettingItem<bool> CSettingsManager::createBooleanSettingsItem(const QString& key,
+                                                               const TSettingItem<bool>::tUpdateDataFunc& updateDataFunc,
+                                                               const TSettingItem<bool>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                               const bool& defaultValue) const
+{
+    auto writeFunc = [&key](const bool& value)->QJsonObject
+    {
+        QJsonObject result;
+        result.insert( key, QJsonValue( value ) );
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem, bool& data, const bool&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isBool())
+        {
+            data = JSONItem.toBool();
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<bool>(key,
+                              defaultValue,
+                              writeFunc,
+                              readFunc,
+                              updateDataFunc,
+                              updateFileFunc);
+}
+
+TSettingItem<QColor> CSettingsManager::createColorSettingsItem(const QString& key,
+                                             const TSettingItem<QColor>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<QColor>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const QColor& defaultValue) const
+{
+    auto writeFunc = [&key](const QColor& value)->QJsonObject
+    {
+        QJsonObject JSONColor;
+
+        JSONColor.insert(sRKey, value.red());
+        JSONColor.insert(sGKey, value.green());
+        JSONColor.insert(sBKey, value.blue());
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( JSONColor ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem, QColor& data, const QColor&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isObject())
+        {
+            QJsonObject obj = JSONItem.toObject();
+
+            auto r = obj.find( sRKey );
+            auto g = obj.find( sGKey );
+            auto b = obj.find( sBKey );
+
+            if( r != obj.end() && r->isDouble() &&
+                g != obj.end() && g->isDouble() &&
+                b != obj.end() && b->isDouble())
+            {
+                data = QColor(static_cast<int>(r->toDouble()),
+                              static_cast<int>(g->toDouble()),
+                              static_cast<int>(b->toDouble()));
+
+                bResult = true;
+            }
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<QColor>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<tHighlightingGradient> CSettingsManager::createHighlightingGradientSettingsItem(const QString& key,
+                                             const TSettingItem<tHighlightingGradient>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tHighlightingGradient>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tHighlightingGradient& defaultValue) const
+{
+    auto writeFunc = [&key](const tHighlightingGradient& value)->QJsonObject
+    {
+        QJsonObject highlightGradientJSONObject;
+
+        highlightGradientJSONObject.insert(sRKey + "_1", value.from.red());
+        highlightGradientJSONObject.insert(sGKey + "_1", value.from.green());
+        highlightGradientJSONObject.insert(sBKey + "_1", value.from.blue());
+        highlightGradientJSONObject.insert(sRKey + "_2", value.to.red());
+        highlightGradientJSONObject.insert(sGKey + "_2", value.to.green());
+        highlightGradientJSONObject.insert(sBKey + "_2", value.to.blue());
+
+        highlightGradientJSONObject.insert(sNumberOfColorsKey, value.numberOfColors);
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( highlightGradientJSONObject ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tHighlightingGradient& data,
+                       const tHighlightingGradient&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isObject())
+        {
+            QJsonObject obj = JSONItem.toObject();
+
+            auto r_1 = obj.find( sRKey + "_1" );
+            auto g_1 = obj.find( sGKey + "_1" );
+            auto b_1 = obj.find( sBKey + "_1" );
+
+            auto r_2 = obj.find( sRKey + "_2" );
+            auto g_2 = obj.find( sGKey + "_2" );
+            auto b_2 = obj.find( sBKey + "_2" );
+
+            auto numberOfColors = obj.find( sNumberOfColorsKey );
+
+            if( r_1 != obj.end() && r_1->isDouble() &&
+                g_1 != obj.end() && g_1->isDouble() &&
+                b_1 != obj.end() && b_1->isDouble() &&
+                r_2 != obj.end() && r_2->isDouble() &&
+                g_2 != obj.end() && g_2->isDouble() &&
+                b_2 != obj.end() && b_2->isDouble() &&
+                numberOfColors->isDouble() )
+            {
+                data = tHighlightingGradient(
+                            QColor( static_cast<int>(r_1->toDouble()),
+                                    static_cast<int>(g_1->toDouble()),
+                                    static_cast<int>(b_1->toDouble()) ),
+                            QColor( static_cast<int>(r_2->toDouble()),
+                                    static_cast<int>(g_2->toDouble()),
+                                    static_cast<int>(b_2->toDouble()) ),
+                            static_cast<int>(numberOfColors->toDouble()));
+            }
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tHighlightingGradient>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<CSettingsManager::tAliasItemVec> CSettingsManager::createAliasItemVecSettingsItem(const QString& key,
+                                             const TSettingItem<tAliasItemVec>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tAliasItemVec>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tAliasItemVec& defaultValue) const
+{
+    auto writeFunc = [&key](const tAliasItemVec& value)->QJsonObject
+    {
+        QJsonObject aliases;
+        QJsonArray arrayAliases;
+        for(const auto& item : value)
+        {
+            QJsonObject obj;
+            obj.insert( sIsDefaultKey, QJsonValue( item.isDefault ) );
+            obj.insert( sAliasKey, QJsonValue( item.alias ) );
+            obj.insert( sRegexKey, QJsonValue( item.regex ) );
+            arrayAliases.append( obj );
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arrayAliases ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tAliasItemVec& data,
+                       const tAliasItemVec&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto aliasesArray = JSONItem.toArray();
+
+            for( const auto aliasObj : aliasesArray)
+            {
+                if(true == aliasObj.isObject())
+                {
+                    QJsonObject obj = aliasObj.toObject();
+
+                    auto alias = obj.find( sAliasKey );
+
+                    if(alias != obj.end() && alias->isString())
+                    {
+                        auto regex = obj.find(sRegexKey);
+
+                        if(regex != obj.end() && regex->isString())
+                        {
+                            bool bIsDefault = false;
+
+                            auto isDefault = obj.find(sIsDefaultKey);
+
+                            if(isDefault != obj.end() && isDefault->isBool())
+                            {
+                                bIsDefault = isDefault->toBool();
+                            }
+
+                            data.push_back(tAliasItem(bIsDefault, alias->toString(), regex->toString()));
+                        }
+                    }
+                }
+
+                bResult = true;
+            }
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tAliasItemVec>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<tSearchResultColumnsVisibilityMap> CSettingsManager::createSearchResultColumnsVisibilityMapSettingsItem(const QString& key,
+                                             const TSettingItem<tSearchResultColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tSearchResultColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tSearchResultColumnsVisibilityMap& defaultValue) const
+{
+    auto writeFunc = [&key](const tSearchResultColumnsVisibilityMap& value)->QJsonObject
+    {
+        QJsonObject searchResultColumnsVisibilityMap;
+        QJsonArray arraySearchResultColumnsVisibilityItems;
+        for(auto it = value.begin(); it != value.end(); ++it)
+        {
+            QJsonObject obj;
+            obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
+            arraySearchResultColumnsVisibilityItems.append( obj );
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arraySearchResultColumnsVisibilityItems ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tSearchResultColumnsVisibilityMap& data,
+                       const tSearchResultColumnsVisibilityMap&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto searchResultColumnsVisibilityArray = JSONItem.toArray();
+            for( const auto searchResultColumnsVisibilityObj : searchResultColumnsVisibilityArray )
+            {
+                if(true == searchResultColumnsVisibilityObj.isObject())
+                {
+                    QJsonObject visibilityObj = searchResultColumnsVisibilityObj.toObject();
+
+                    if(false == visibilityObj.empty())
+                    {
+                        auto visibilityKeys = visibilityObj.keys();
+
+                        for(const auto& visibilityKey : visibilityKeys)
+                        {
+                            auto foundVisibilityValue = visibilityObj.find(visibilityKey);
+
+                            if(foundVisibilityValue != visibilityObj.end())
+                            {
+                                if(foundVisibilityValue->isBool())
+                                {
+                                    bool bConvertionStatus = false;
+
+                                    int columnIdx = visibilityKey.toInt(&bConvertionStatus);
+
+                                    bool bIsVisible = foundVisibilityValue->toBool();
+                                    data.insert(static_cast<eSearchResultColumn>(columnIdx), bIsVisible);
+                                }
+                            }
+                        }
+                    }
+
+                    bResult = true;
+                }
+            }
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tSearchResultColumnsVisibilityMap>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<tPatternsColumnsVisibilityMap> CSettingsManager::createPatternsColumnsVisibilityMapSettingsItem(const QString& key,
+                                             const TSettingItem<tPatternsColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tPatternsColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tPatternsColumnsVisibilityMap& defaultValue) const
+{
+    auto writeFunc = [&key](const tPatternsColumnsVisibilityMap& value)->QJsonObject
+    {
+        QJsonObject patternsColumnsVisibilityMap;
+        QJsonArray arrayPatternsColumnsVisibilityItems;
+        for(auto it = value.begin(); it != value.end(); ++it)
+        {
+            QJsonObject obj;
+            obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
+            arrayPatternsColumnsVisibilityItems.append( obj );
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arrayPatternsColumnsVisibilityItems ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tPatternsColumnsVisibilityMap& data,
+                       const tPatternsColumnsVisibilityMap&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto patternsColumnsVisibilityArray = JSONItem.toArray();
+            for( const auto patternsColumnsVisibilityObj : patternsColumnsVisibilityArray )
+            {
+                if(true == patternsColumnsVisibilityObj.isObject())
+                {
+                    QJsonObject visibilityObj = patternsColumnsVisibilityObj.toObject();
+
+                    if(false == visibilityObj.empty())
+                    {
+                        auto visibilityKeys = visibilityObj.keys();
+
+                        for(const auto& visibilityKey : visibilityKeys)
+                        {
+                            auto foundVisibilityValue = visibilityObj.find(visibilityKey);
+
+                            if(foundVisibilityValue != visibilityObj.end())
+                            {
+                                if(foundVisibilityValue->isBool())
+                                {
+                                    bool bConvertionStatus = false;
+
+                                    int columnIdx = visibilityKey.toInt(&bConvertionStatus);
+
+                                    bool bIsVisible = foundVisibilityValue->toBool();
+                                    data.insert(static_cast<ePatternsColumn>(columnIdx), bIsVisible);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tPatternsColumnsVisibilityMap>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<tRegexFiltersColumnsVisibilityMap> CSettingsManager::createRegexFiltersColumnsVisibilityMapSettingsItem(const QString& key,
+                                             const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tRegexFiltersColumnsVisibilityMap& defaultValue) const
+{
+    auto writeFunc = [&key](const tRegexFiltersColumnsVisibilityMap& value)->QJsonObject
+    {
+        QJsonObject regexFiltersColumnsVisibilityMap;
+        QJsonArray arrayRegexFiltersColumnsVisibilityItems;
+        for(auto it = value.begin(); it != value.end(); ++it)
+        {
+            QJsonObject obj;
+            obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
+            arrayRegexFiltersColumnsVisibilityItems.append( obj );
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arrayRegexFiltersColumnsVisibilityItems ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tRegexFiltersColumnsVisibilityMap& data,
+                       const tRegexFiltersColumnsVisibilityMap&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto regexFiltersColumnsVisibilityArray = JSONItem.toArray();
+            for( const auto regexFiltersColumnsVisibilityObj : regexFiltersColumnsVisibilityArray )
+            {
+                if(true == regexFiltersColumnsVisibilityObj.isObject())
+                {
+                    QJsonObject visibilityObj = regexFiltersColumnsVisibilityObj.toObject();
+
+                    if(false == visibilityObj.empty())
+                    {
+                        auto visibilityKeys = visibilityObj.keys();
+
+                        for(const auto& visibilityKey : visibilityKeys)
+                        {
+                            auto foundVisibilityValue = visibilityObj.find(visibilityKey);
+
+                            if(foundVisibilityValue != visibilityObj.end())
+                            {
+                                if(foundVisibilityValue->isBool())
+                                {
+                                    bool bConvertionStatus = false;
+
+                                    int columnIdx = visibilityKey.toInt(&bConvertionStatus);
+
+                                    bool bIsVisible = foundVisibilityValue->toBool();
+                                    data.insert(static_cast<eRegexFiltersColumn>(columnIdx), bIsVisible);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tRegexFiltersColumnsVisibilityMap>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<QString> CSettingsManager::createStringSettingsItem(const QString& key,
+                                             const TSettingItem<QString>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<QString>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const QString& defaultValue) const
+{
+    auto writeFunc = [&key](const QString& value)->QJsonObject
+    {
+        QJsonObject result;
+        result.insert( key, QJsonValue( value ) );
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       QString& data,
+                       const QString& defaultValue)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isString())
+        {
+            data = JSONItem.toString();
+
+            if(true == data.isEmpty()) // if stored filepath is empty
+            {
+                data = defaultValue; // let's do a fallback to the default value
+            }
+
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<QString>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
 CSettingsManager::tOperationResult CSettingsManager::loadRootConfig()
 {
     CSettingsManager::tOperationResult result;
@@ -190,27 +801,7 @@ CSettingsManager::tOperationResult CSettingsManager::loadRootConfig()
         {
             QJsonArray arrayRows = jsonDoc.array();
 
-            for(auto item : arrayRows) // no references returned
-            {
-                if(true == item.isObject())
-                {
-                    auto object = item.toObject();
-
-                    {
-                        auto foundSettingsManagerVersion = object.find(sSettingsManagerVersionKey);
-
-                        if(foundSettingsManagerVersion != object.end())
-                        {
-                            if(true == foundSettingsManagerVersion->isDouble())
-                            {
-                                mSettingsManagerVersion = static_cast<tSettingsManagerVersion>(foundSettingsManagerVersion->toDouble());
-                            }
-                        }
-
-                        settingsManagerVersionChanged(mSettingsManagerVersion);
-                    }
-                }
-            }
+            mSetting_SettingsManagerVersion.readDataFromArray(arrayRows);
         }
 
         result.bResult = true;
@@ -236,11 +827,7 @@ CSettingsManager::tOperationResult CSettingsManager::storeRootConfig()
     {
         QJsonArray settingsArray;
 
-        {
-            QJsonObject settingsManagerVersion;
-            settingsManagerVersion.insert( sSettingsManagerVersionKey, QJsonValue( static_cast<int>(mSettingsManagerVersion) ) );
-            settingsArray.append(settingsManagerVersion);
-        }
+        settingsArray.append(mSetting_SettingsManagerVersion.writeData());
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -265,7 +852,7 @@ CSettingsManager::tOperationResult CSettingsManager::storeConfigs()
 
         if(true == result.bResult)
         {
-            QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSelectedRegexFile;
+            QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
             result = storeRegexConfigCustomPath(regexSettingsFilePath);
         }
     }
@@ -283,9 +870,9 @@ CSettingsManager::tOperationResult CSettingsManager::loadConfigs()
 
         if( true == result.bResult )
         {
-            if(false == mSelectedRegexFile.isEmpty())
+            if(false == mSetting_SelectedRegexFile.getData().isEmpty())
             {
-                QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSelectedRegexFile;
+                QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
                 result = loadRegexConfigCustomPath(regexSettingsFilePath); // load regexes
             }
         }
@@ -339,7 +926,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
 
                 // create root settings
                 {
-                    mSettingsManagerVersion = 1;
+                    mSetting_SettingsManagerVersion.setDataSilent(1);
                     result = storeRootConfig();
                 }
 
@@ -364,7 +951,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
 
                                     if(true == result.bResult)
                                     {
-                                        mSelectedRegexFile = sDefaultRegexFileName;
+                                        mSetting_SelectedRegexFile.setDataSilent( sDefaultRegexFileName );
 
                                         // delete old-style JSON file
                                         if(false == V0_SettingsFile.remove())
@@ -419,495 +1006,241 @@ tSettingsManagerPtr CSettingsManager::getInstance()
 
 void CSettingsManager::setSettingsManagerVersion(const tSettingsManagerVersion& val)
 {
-    bool bUpdate = mSettingsManagerVersion != val;
-
-    if(true == bUpdate)
-    {
-        mSettingsManagerVersion = val;
-        settingsManagerVersionChanged(mSettingsManagerVersion);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeRootConfig();
-    }
+    mSetting_SettingsManagerVersion.setData(val);
 }
 
 void CSettingsManager::setAliases(const tAliasItemVec& val)
 {
-    bool bUpdate = mAliases != val;
-
-    if(true == bUpdate)
-    {
-        mAliases = val;
-        aliasesChanged(mAliases);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSelectedRegexFile;
-        storeRegexConfigCustomPath(regexSettingsFilePath);
-    }
+    mSetting_Aliases.setData(val);
 }
 
 void CSettingsManager::setAliasIsDefault(const QString& alias, bool isDefault)
 {
-    auto foundAlias = std::find_if( mAliases.begin(), mAliases.end(), [&alias](const tAliasItem& aliasItem)->bool
+    auto aliases = mSetting_Aliases.getData();
+
+    auto foundAlias = std::find_if( aliases.begin(), aliases.end(), [&alias](const tAliasItem& aliasItem)->bool
     {
         return aliasItem.alias == alias;
     });
 
-    if(foundAlias != mAliases.end())
+    if(foundAlias != aliases.end())
     {
         foundAlias->isDefault = isDefault;
     }
 
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSelectedRegexFile;
-        storeRegexConfigCustomPath(regexSettingsFilePath);
-    }
-
-    aliasesChanged(mAliases);
+    mSetting_Aliases.setData(aliases);
 }
 
 void CSettingsManager::setNumberOfThreads(const int& val)
 {
-    bool bUpdate = mNumberOfThreads != val;
-
-    if(true == bUpdate)
-    {
-        mNumberOfThreads = val;
-        numberOfThreadsChanged(mNumberOfThreads);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_NumberOfThreads.setData(val);
 }
 
 void CSettingsManager::setContinuousSearch(bool val)
 {
-    bool bUpdate = mbContinuousSearch != val;
-
-    if(true == bUpdate)
-    {
-        mbContinuousSearch = val;
-        continuousSearchChanged(mbContinuousSearch);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_ContinuousSearch.setData(val);
 }
 
 void CSettingsManager::setCopySearchResultAsHTML(bool val)
 {
-    bool bUpdate = mbCopySearchResultAsHTML != val;
-
-    if(true == bUpdate)
-    {
-        mbCopySearchResultAsHTML = val;
-        copySearchResultAsHTMLChanged(mbCopySearchResultAsHTML);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_CopySearchResultAsHTML.setData(val);
 }
 
 void CSettingsManager::setMinimizePatternsViewOnSelection(bool val)
 {
-    bool bUpdate = mbMinimizePatternsViewOnSelection != val;
-
-    if(true == bUpdate)
-    {
-        mbMinimizePatternsViewOnSelection = val;
-        minimizePatternsViewOnSelectionChanged(mbMinimizePatternsViewOnSelection);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_MinimizePatternsViewOnSelection.setData(val);
 }
 
 void CSettingsManager::setWriteSettingsOnEachUpdate(bool val)
 {
-    bool bUpdate = mbWriteSettingsOnEachUpdate != val;
-
-    if(true == bUpdate)
-    {
-        mbWriteSettingsOnEachUpdate = val;
-        writeSettingsOnEachUpdateChanged(mbWriteSettingsOnEachUpdate);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_WriteSettingsOnEachUpdate.setData(val);
 }
 
 void CSettingsManager::setCacheEnabled(bool val)
 {
-    bool bUpdate = mbCacheEnabled != val;
-
-    if(true == bUpdate)
-    {
-        mbCacheEnabled = val;
-        cacheEnabledChanged(mbCacheEnabled);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_CacheEnabled.setData(val);
 }
 
 void CSettingsManager::setCacheMaxSizeMB(tCacheSizeMB val)
 {
-    bool bUpdate = mCacheMaxSizeMB != val;
-
-    if(true == bUpdate)
-    {
-        mCacheMaxSizeMB = val;
-        cacheMaxSizeMBChanged(mCacheMaxSizeMB);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_CacheMaxSizeMB.setData(val);
 }
 
 void CSettingsManager::setRDPMode(bool val)
 {
-    bool bUpdate = mbRDPMode != val;
-
-    if(true == bUpdate)
-    {
-        mbRDPMode = val;
-        RDPModeChanged(mbRDPMode);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_RDPMode.setData(val);
 }
 
 void CSettingsManager::setRegexMonoHighlightingColor(const QColor& val)
 {
-    bool bUpdate = mRegexMonoHighlightingColor != val;
-
-    if(true == bUpdate)
-    {
-        mRegexMonoHighlightingColor = val;
-        regexMonoHighlightingColorChanged(mRegexMonoHighlightingColor);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_RegexMonoHighlightingColor.setData(val);
 }
 
 void CSettingsManager::setHighlightActivePatterns(bool val)
 {
-    bool bUpdate = mbHighlightActivePatterns != val;
-
-    if(true == bUpdate)
-    {
-        mbHighlightActivePatterns = val;
-        highlightActivePatternsChanged(mbHighlightActivePatterns);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_HighlightActivePatterns.setData(val);
 }
 
 void CSettingsManager::setPatternsHighlightingColor(const QColor& val)
 {
-    bool bUpdate = mPatternsHighlightingColor != val;
-
-    if(true == bUpdate)
-    {
-        mPatternsHighlightingColor = val;
-        patternsHighlightingColorChanged(mPatternsHighlightingColor);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_PatternsHighlightingColor.setData(val);
 }
 
 void CSettingsManager::setSearchResultMonoColorHighlighting(bool val)
 {
-    bool bUpdate = mbSearchResultMonoColorHighlighting != val;
-
-    if(true == bUpdate)
-    {
-        mbSearchResultMonoColorHighlighting = val;
-        searchResultMonoColorHighlightingChanged(mbSearchResultMonoColorHighlighting);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_SearchResultMonoColorHighlighting.setData(val);
 }
 
 void CSettingsManager::setSearchResultHighlightingGradient(const tHighlightingGradient& val)
 {
-    std::lock_guard<std::mutex> lock(mSearchResultHighlightingGradientProtector);
-
-    bool bUpdate = mSearchResultHighlightingGradient != val;
-
-    if(true == bUpdate)
-    {
-        mSearchResultHighlightingGradient = val;
-        searchResultHighlightingGradientChanged(mSearchResultHighlightingGradient);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    std::lock_guard<std::recursive_mutex> lock(mSearchResultHighlightingGradientProtector);
+    mSetting_SearchResultHighlightingGradient.setData(val);
 }
 
 void CSettingsManager::setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val)
 {
-    bool bUpdate = mSearchResultColumnsVisibilityMap != val;
-
-    if(true == bUpdate)
-    {
-        mSearchResultColumnsVisibilityMap = val;
-        searchResultColumnsVisibilityMapChanged(mSearchResultColumnsVisibilityMap);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_SearchResultColumnsVisibilityMap.setData(val);
 }
 
 void CSettingsManager::setMarkTimeStampWithBold(bool val)
 {
-    bool bUpdate = mbMarkTimeStampWithBold != val;
-
-    if(true == bUpdate)
-    {
-        mbMarkTimeStampWithBold = val;
-        markTimeStampWithBoldChanged(mbMarkTimeStampWithBold);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_MarkTimeStampWithBold.setData(val);
 }
 
 void CSettingsManager::setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val)
 {
-    bool bUpdate = mPatternsColumnsVisibilityMap != val;
-
-    if(true == bUpdate)
-    {
-        mPatternsColumnsVisibilityMap = val;
-        patternsColumnsVisibilityMapChanged(mPatternsColumnsVisibilityMap);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_PatternsColumnsVisibilityMap.setData(val);
 }
 
 void CSettingsManager::setCaseSensitiveRegex(bool val)
 {
-    bool bUpdate = mbCaseSensitiveRegex != val;
-
-    if(true == bUpdate)
-    {
-        mbCaseSensitiveRegex = val;
-        caseSensitiveRegexChanged(mbCaseSensitiveRegex);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_CaseSensitiveRegex.setData(val);
 }
 
 void CSettingsManager::setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val)
 {
-    bool bUpdate = mRegexFiltersColumnsVisibilityMap != val;
-
-    if(true == bUpdate)
-    {
-        mRegexFiltersColumnsVisibilityMap = val;
-        regexFiltersColumnsVisibilityMapChanged(mRegexFiltersColumnsVisibilityMap);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_RegexFiltersColumnsVisibilityMap.setData(val);
 }
 
 void CSettingsManager::setFilterVariables(bool val)
 {
-    bool bUpdate = mbFilterVariables != val;
-
-    if(true == bUpdate)
-    {
-        mbFilterVariables = val;
-        filterVariablesChanged(mbFilterVariables);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_FilterVariables.setData(val);
 }
 
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
-    bool bUpdate = mSelectedRegexFile != val;
-
-    if(true == bUpdate)
-    {
-        mSelectedRegexFile = val;
-
-        clearRegexConfig();
-
-        QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + val;
-        loadRegexConfigCustomPath(regexSettingsFilePath);
-
-        selectedRegexFileChanged(mSelectedRegexFile);
-    }
-
-    if(true == getWriteSettingsOnEachUpdate())
-    {
-        storeSettingsConfig();
-    }
+    mSetting_SelectedRegexFile.setData(val);
 }
 
 const tSettingsManagerVersion& CSettingsManager::getSettingsManagerVersion() const
 {
-    return mSettingsManagerVersion;
+    return mSetting_SettingsManagerVersion.getData();
 }
 
 const CSettingsManager::tAliasItemVec& CSettingsManager::getAliases() const
 {
-    return mAliases;
+    return mSetting_Aliases.getData();
 }
 
 const int& CSettingsManager::getNumberOfThreads() const
 {
-    return mNumberOfThreads;
+    return mSetting_NumberOfThreads.getData();
 }
 
 bool CSettingsManager::getContinuousSearch() const
 {
-    return mbContinuousSearch;
+    return mSetting_ContinuousSearch.getData();
 }
 
 bool CSettingsManager::getCopySearchResultAsHTML() const
 {
-    return mbCopySearchResultAsHTML;
+    return mSetting_CopySearchResultAsHTML.getData();
 }
 
 bool CSettingsManager::getMinimizePatternsViewOnSelection() const
 {
-    return mbMinimizePatternsViewOnSelection;
+    return mSetting_MinimizePatternsViewOnSelection.getData();
 }
 
 bool CSettingsManager::getWriteSettingsOnEachUpdate()const
 {
-    return mbWriteSettingsOnEachUpdate;
+    return mSetting_WriteSettingsOnEachUpdate.getData();
 }
 
 bool CSettingsManager::getCacheEnabled() const
 {
-    return mbCacheEnabled;
+    return mSetting_CacheEnabled.getData();
 }
 
 const tCacheSizeMB& CSettingsManager::getCacheMaxSizeMB() const
 {
-    return mCacheMaxSizeMB;
+    return mSetting_CacheMaxSizeMB.getData();
 }
 
 bool CSettingsManager::getRDPMode() const
 {
-    return mbRDPMode;
+    return mSetting_RDPMode.getData();
 }
 
 const QColor& CSettingsManager::getRegexMonoHighlightingColor() const
 {
-    return mRegexMonoHighlightingColor;
+    return mSetting_RegexMonoHighlightingColor.getData();
 }
 
 bool CSettingsManager::getHighlightActivePatterns() const
 {
-    return mbHighlightActivePatterns;
+    return mSetting_HighlightActivePatterns.getData();
 }
 
 const QColor& CSettingsManager::getPatternsHighlightingColor() const
 {
-    return mPatternsHighlightingColor;
+    return mSetting_PatternsHighlightingColor.getData();
 }
 
 bool CSettingsManager::getSearchResultMonoColorHighlighting() const
 {
-    return mbSearchResultMonoColorHighlighting;
+    return mSetting_SearchResultMonoColorHighlighting.getData();
 }
 
 tHighlightingGradient CSettingsManager::getSearchResultHighlightingGradient() const
 {
-   std::lock_guard<std::mutex> lock(*const_cast<std::mutex*>(&mSearchResultHighlightingGradientProtector));
-   return mSearchResultHighlightingGradient;
+   std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
+   return mSetting_SearchResultHighlightingGradient.getData();
 }
 
 const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsVisibilityMap() const
 {
-    return mSearchResultColumnsVisibilityMap;
+    return mSetting_SearchResultColumnsVisibilityMap.getData();
 }
 
 bool CSettingsManager::getMarkTimeStampWithBold() const
 {
-    return mbMarkTimeStampWithBold;
+    return mSetting_MarkTimeStampWithBold.getData();
 }
 
 const tPatternsColumnsVisibilityMap& CSettingsManager::getPatternsColumnsVisibilityMap() const
 {
-    return mPatternsColumnsVisibilityMap;
+    return mSetting_PatternsColumnsVisibilityMap.getData();
 }
 
 bool CSettingsManager::getCaseSensitiveRegex() const
 {
-    return mbCaseSensitiveRegex;
+    return mSetting_CaseSensitiveRegex.getData();
 }
 
 const tRegexFiltersColumnsVisibilityMap& CSettingsManager::getRegexFiltersColumnsVisibilityMap() const
 {
-    return mRegexFiltersColumnsVisibilityMap;
+    return mSetting_RegexFiltersColumnsVisibilityMap.getData();
 }
 
 bool CSettingsManager::getFilterVariables() const
 {
-    return mbFilterVariables;
+    return mSetting_FilterVariables.getData();
 }
 
 QString CSettingsManager::getSelectedRegexFile() const
 {
-    return mSelectedRegexFile;
+    return mSetting_SelectedRegexFile.getData();
 }
 
 QString CSettingsManager::getRegexDirectory() const
@@ -940,8 +1273,8 @@ QString CSettingsManager::getRootSettingsFilepath() const
 
 void CSettingsManager::clearRegexConfig()
 {
-    mAliases.clear();
-    aliasesChanged(mAliases);
+    mSetting_Aliases.setDataSilent(tAliasItemVec());
+    aliasesChanged(mSetting_Aliases.getData());
 }
 
 CSettingsManager::tOperationResult CSettingsManager::loadRegexConfigCustomPath(const QString &filePath)
@@ -957,59 +1290,7 @@ CSettingsManager::tOperationResult CSettingsManager::loadRegexConfigCustomPath(c
         if( true == jsonDoc.isArray() )
         {
             QJsonArray arrayRows = jsonDoc.array();
-
-            for(auto item : arrayRows) // no references returned
-            {
-                if(true == item.isObject())
-                {
-                    auto object = item.toObject();
-
-                    {
-                        auto foundAliases = object.find(sAliasesKey);
-                        if(foundAliases != object.end())
-                        {
-                            auto aliases = foundAliases.value();
-
-                            if(true == aliases.isArray())
-                            {
-                                mAliases.clear();
-
-                                auto aliasesArray = aliases.toArray();
-                                for( const auto aliasObj : aliasesArray)
-                                {
-                                    if(true == aliasObj.isObject())
-                                    {
-                                        QJsonObject obj = aliasObj.toObject();
-
-                                        auto alias = obj.find( sAliasKey );
-
-                                        if(alias != obj.end() && alias->isString())
-                                        {
-                                            auto regex = obj.find(sRegexKey);
-
-                                            if(regex != obj.end() && regex->isString())
-                                            {
-                                                bool bIsDefault = false;
-
-                                                auto isDefault = obj.find(sIsDefaultKey);
-
-                                                if(isDefault != obj.end() && isDefault->isBool())
-                                                {
-                                                    bIsDefault = isDefault->toBool();
-                                                }
-
-                                                mAliases.push_back(tAliasItem(bIsDefault, alias->toString(), regex->toString()));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        aliasesChanged(mAliases);
-                    }
-                }
-            }
+            mSetting_Aliases.readDataFromArray(arrayRows);
         }
 
         result.bResult = true;
@@ -1034,23 +1315,7 @@ CSettingsManager::tOperationResult CSettingsManager::storeRegexConfigCustomPath(
     {
         QJsonArray settingsArray;
 
-        {
-            QJsonObject aliases;
-            QJsonArray arrayAliases;
-            for(const auto& item : mAliases)
-            {
-                QJsonObject obj;
-                obj.insert( sIsDefaultKey, QJsonValue( item.isDefault ) );
-                obj.insert( sAliasKey, QJsonValue( item.alias ) );
-                obj.insert( sRegexKey, QJsonValue( item.regex ) );
-                arrayAliases.append( obj );
-            }
-
-            QJsonObject setting;
-            setting.insert( sAliasesKey, QJsonValue( arrayAliases ) );
-
-            settingsArray.append(setting);
-        }
+        settingsArray.append(mSetting_Aliases.writeData());
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1087,175 +1352,31 @@ CSettingsManager::tOperationResult CSettingsManager::storeSettingsConfigCustomPa
     {
         QJsonArray settingsArray;
 
-        {
-            QJsonObject numberOfThreads;
-            numberOfThreads.insert( sNumberOfThreadsKey, QJsonValue( mNumberOfThreads ) );
-            settingsArray.append(numberOfThreads);
-        }
+        settingsArray.append(mSetting_NumberOfThreads.writeData());
+        settingsArray.append(mSetting_ContinuousSearch.writeData());
+        settingsArray.append(mSetting_CopySearchResultAsHTML.writeData());
+        settingsArray.append(mSetting_MinimizePatternsViewOnSelection.writeData());
+        settingsArray.append(mSetting_WriteSettingsOnEachUpdate.writeData());
+        settingsArray.append(mSetting_CacheEnabled.writeData());
+        settingsArray.append(mSetting_HighlightActivePatterns.writeData());
+        settingsArray.append(mSetting_CacheMaxSizeMB.writeData());
+        settingsArray.append(mSetting_RDPMode.writeData());
+        settingsArray.append(mSetting_RegexMonoHighlightingColor.writeData());
+        settingsArray.append(mSetting_PatternsHighlightingColor.writeData());
+        settingsArray.append( mSetting_SearchResultMonoColorHighlighting.writeData() );
 
         {
-            QJsonObject isContinuousSearch;
-            isContinuousSearch.insert( sIsContinuousSearchKey, QJsonValue( mbContinuousSearch ) );
-            settingsArray.append(isContinuousSearch);
+            std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
+            settingsArray.append(mSetting_SearchResultHighlightingGradient.writeData());
         }
 
-        {
-            QJsonObject copySearchResultAsHTML;
-            copySearchResultAsHTML.insert( sCopySearchResultAsHTMLKey, QJsonValue( mbCopySearchResultAsHTML ) );
-            settingsArray.append(copySearchResultAsHTML);
-        }
-
-        {
-            QJsonObject minimizePatternsViewOnSelection;
-            minimizePatternsViewOnSelection.insert( sMinimizePatternsViewOnSelectionKey, QJsonValue( mbMinimizePatternsViewOnSelection ) );
-            settingsArray.append(minimizePatternsViewOnSelection);
-        }
-
-        {
-            QJsonObject writeSettingsOnEachUpdateChanged;
-            writeSettingsOnEachUpdateChanged.insert( sWriteSettingsOnEachUpdateChangedKey, QJsonValue( mbWriteSettingsOnEachUpdate ) );
-            settingsArray.append(writeSettingsOnEachUpdateChanged);
-        }
-
-        {
-            QJsonObject cacheEnabled;
-            cacheEnabled.insert( sCacheEnabledKey, QJsonValue( mbCacheEnabled ) );
-            settingsArray.append(cacheEnabled);
-        }
-
-        {
-            QJsonObject cacheMaxSizeMB;
-            cacheMaxSizeMB.insert( sCacheMaxSizeMsBKey, QJsonValue( static_cast<int>(mCacheMaxSizeMB) ) );
-            settingsArray.append(cacheMaxSizeMB);
-        }
-
-        {
-            QJsonObject RDPMode;
-            RDPMode.insert( sRDPModeKey, QJsonValue( mbRDPMode ) );
-            settingsArray.append(RDPMode);
-        }
-
-        {
-            QJsonObject regexMonoHighlightingColor;
-
-            regexMonoHighlightingColor.insert(sRKey, mRegexMonoHighlightingColor.red());
-            regexMonoHighlightingColor.insert(sGKey, mRegexMonoHighlightingColor.green());
-            regexMonoHighlightingColor.insert(sBKey, mRegexMonoHighlightingColor.blue());
-
-            QJsonObject setting;
-            setting.insert( sRegexMonoHighlightingColosRKey, QJsonValue( regexMonoHighlightingColor ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject highlightActivePatterns;
-            highlightActivePatterns.insert( sHighlightActivePatternsKey, QJsonValue( mbHighlightActivePatterns ) );
-            settingsArray.append(highlightActivePatterns);
-        }
-
-        {
-            QJsonObject patternsHighlightingColor;
-
-            patternsHighlightingColor.insert(sRKey, mPatternsHighlightingColor.red());
-            patternsHighlightingColor.insert(sGKey, mPatternsHighlightingColor.green());
-            patternsHighlightingColor.insert(sBKey, mPatternsHighlightingColor.blue());
-
-            QJsonObject setting;
-            setting.insert( sPatternsHighlightingColorKey, QJsonValue( patternsHighlightingColor ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject searchResultMonoColorHighlighting;
-            searchResultMonoColorHighlighting.insert( sSearchResultMonoColorHighlightingKey, QJsonValue( mbSearchResultMonoColorHighlighting ) );
-            settingsArray.append(searchResultMonoColorHighlighting);
-        }
-
-        {
-            QJsonObject searchResultHighlightingGradient;
-
-            searchResultHighlightingGradient.insert(sRKey + "_1", mSearchResultHighlightingGradient.from.red());
-            searchResultHighlightingGradient.insert(sGKey + "_1", mSearchResultHighlightingGradient.from.green());
-            searchResultHighlightingGradient.insert(sBKey + "_1", mSearchResultHighlightingGradient.from.blue());
-            searchResultHighlightingGradient.insert(sRKey + "_2", mSearchResultHighlightingGradient.to.red());
-            searchResultHighlightingGradient.insert(sGKey + "_2", mSearchResultHighlightingGradient.to.green());
-            searchResultHighlightingGradient.insert(sBKey + "_2", mSearchResultHighlightingGradient.to.blue());
-
-            searchResultHighlightingGradient.insert(sNumberOfColorsKey, mSearchResultHighlightingGradient.numberOfColors);
-
-            QJsonObject setting;
-            setting.insert( sSearchResultHighlightingGradientKey, QJsonValue( searchResultHighlightingGradient ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject searchResultColumnsVisibilityMap;
-            QJsonArray arraySearchResultColumnsVisibilityItems;
-            for(auto it = mSearchResultColumnsVisibilityMap.begin(); it != mSearchResultColumnsVisibilityMap.end(); ++it)
-            {
-                QJsonObject obj;
-                obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
-                arraySearchResultColumnsVisibilityItems.append( obj );
-            }
-
-            QJsonObject setting;
-            setting.insert( sSearchResultColumnsVisibilityMapKey, QJsonValue( arraySearchResultColumnsVisibilityItems ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject markTimeStampWithBold;
-            markTimeStampWithBold.insert( sMarkTimeStampWithBold, QJsonValue( mbMarkTimeStampWithBold ) );
-            settingsArray.append(markTimeStampWithBold);
-        }
-
-        {
-            QJsonObject patternsColumnsVisibilityMap;
-            QJsonArray arrayPatternsColumnsVisibilityItems;
-            for(auto it = mPatternsColumnsVisibilityMap.begin(); it != mPatternsColumnsVisibilityMap.end(); ++it)
-            {
-                QJsonObject obj;
-                obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
-                arrayPatternsColumnsVisibilityItems.append( obj );
-            }
-
-            QJsonObject setting;
-            setting.insert( sPatternsColumnsVisibilityMapKey, QJsonValue( arrayPatternsColumnsVisibilityItems ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject caseSensitiveRegex;
-            caseSensitiveRegex.insert( sCaseSensitiveRegex, QJsonValue( mbCaseSensitiveRegex ) );
-            settingsArray.append(caseSensitiveRegex);
-        }
-
-        {
-            QJsonObject regexFiltersColumnsVisibilityMap;
-            QJsonArray arrayRegexFiltersColumnsVisibilityItems;
-            for(auto it = mRegexFiltersColumnsVisibilityMap.begin(); it != mRegexFiltersColumnsVisibilityMap.end(); ++it)
-            {
-                QJsonObject obj;
-                obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
-                arrayRegexFiltersColumnsVisibilityItems.append( obj );
-            }
-
-            QJsonObject setting;
-            setting.insert( sRegexFiltersColumnsVisibilityMapKey, QJsonValue( arrayRegexFiltersColumnsVisibilityItems ) );
-            settingsArray.append(setting);
-        }
-
-        {
-            QJsonObject filterVariables;
-            filterVariables.insert( sFilterVariablesKey, QJsonValue( mbFilterVariables ) );
-            settingsArray.append(filterVariables);
-        }
-
-        {
-            QJsonObject selectedRegexFile;
-            selectedRegexFile.insert( sSelectedRegexFile, QJsonValue( mSelectedRegexFile ) );
-            settingsArray.append(selectedRegexFile);
-        }
+        settingsArray.append(mSetting_SearchResultColumnsVisibilityMap.writeData());
+        settingsArray.append(mSetting_MarkTimeStampWithBold.writeData());
+        settingsArray.append(mSetting_PatternsColumnsVisibilityMap.writeData());
+        settingsArray.append(mSetting_CaseSensitiveRegex.writeData());
+        settingsArray.append(mSetting_RegexFiltersColumnsVisibilityMap.writeData());
+        settingsArray.append(mSetting_FilterVariables.writeData());
+        settingsArray.append(mSetting_SelectedRegexFile.writeData());
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1285,446 +1406,31 @@ CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfigCustomPat
         {
             QJsonArray arrayRows = jsonDoc.array();
 
-            for(auto item : arrayRows) // no references returned
+            mSetting_NumberOfThreads.readDataFromArray(arrayRows);
+            mSetting_ContinuousSearch.readDataFromArray(arrayRows);
+            mSetting_CopySearchResultAsHTML.readDataFromArray(arrayRows);
+            mSetting_MinimizePatternsViewOnSelection.readDataFromArray(arrayRows);
+            mSetting_WriteSettingsOnEachUpdate.readDataFromArray(arrayRows);
+            mSetting_CacheEnabled.readDataFromArray(arrayRows);
+            mSetting_RDPMode.readDataFromArray(arrayRows);
+            mSetting_HighlightActivePatterns.readDataFromArray(arrayRows);
+            mSetting_SearchResultMonoColorHighlighting.readDataFromArray(arrayRows);
+            mSetting_MarkTimeStampWithBold.readDataFromArray(arrayRows);
+            mSetting_CaseSensitiveRegex.readDataFromArray(arrayRows);
+            mSetting_FilterVariables.readDataFromArray(arrayRows);
+            mSetting_RegexMonoHighlightingColor.readDataFromArray(arrayRows);
+            mSetting_PatternsHighlightingColor.readDataFromArray(arrayRows);
+            mSetting_CacheMaxSizeMB.readDataFromArray(arrayRows);
+            mSetting_SearchResultColumnsVisibilityMap.readDataFromArray(arrayRows);
+
             {
-                if(true == item.isObject())
-                {
-                    auto object = item.toObject();
-
-                    {
-                        auto foundNumberOfThreads = object.find(sNumberOfThreadsKey);
-                        if(foundNumberOfThreads != object.end())
-                        {
-                            if(true == foundNumberOfThreads->isDouble())
-                            {
-                                mNumberOfThreads = static_cast<int>(foundNumberOfThreads->toDouble());
-                            }
-                        }
-
-                        numberOfThreadsChanged(mNumberOfThreads);
-                    }
-
-                    {
-                        auto foundIsContinuousSearch = object.find(sIsContinuousSearchKey);
-
-                        if(foundIsContinuousSearch != object.end())
-                        {
-                            if(true == foundIsContinuousSearch->isBool())
-                            {
-                                mbContinuousSearch = foundIsContinuousSearch->toBool();
-                            }
-                        }
-
-                        continuousSearchChanged(mbContinuousSearch);
-                    }
-
-                    {
-                        auto foundCopySearchResultAsHTML = object.find(sCopySearchResultAsHTMLKey);
-
-                        if(foundCopySearchResultAsHTML != object.end())
-                        {
-                            if(true == foundCopySearchResultAsHTML->isBool())
-                            {
-                                mbCopySearchResultAsHTML = foundCopySearchResultAsHTML->toBool();
-                            }
-                        }
-
-                        copySearchResultAsHTMLChanged(mbCopySearchResultAsHTML);
-                    }
-
-                    {
-                        auto foundMinimizePatternsViewOnSelection = object.find(sMinimizePatternsViewOnSelectionKey);
-
-                        if(foundMinimizePatternsViewOnSelection != object.end())
-                        {
-                            if(true == foundMinimizePatternsViewOnSelection->isBool())
-                            {
-                                mbMinimizePatternsViewOnSelection = foundMinimizePatternsViewOnSelection->toBool();
-                            }
-                        }
-
-                        minimizePatternsViewOnSelectionChanged(mbMinimizePatternsViewOnSelection);
-                    }
-
-                    {
-                        auto foundWriteSettingsOnEachUpdateChanged = object.find(sWriteSettingsOnEachUpdateChangedKey);
-
-                        if(foundWriteSettingsOnEachUpdateChanged != object.end())
-                        {
-                            if(true == foundWriteSettingsOnEachUpdateChanged->isBool())
-                            {
-                                mbWriteSettingsOnEachUpdate = foundWriteSettingsOnEachUpdateChanged->toBool();
-                            }
-                        }
-
-                        writeSettingsOnEachUpdateChanged(mbMinimizePatternsViewOnSelection);
-                    }
-
-                    {
-                        auto foundCacheEnabled = object.find(sCacheEnabledKey);
-
-                        if(foundCacheEnabled != object.end())
-                        {
-                            if(true == foundCacheEnabled->isBool())
-                            {
-                                mbCacheEnabled = foundCacheEnabled->toBool();
-                            }
-                        }
-
-                        cacheEnabledChanged(mbCacheEnabled);
-                    }
-
-                    {
-                        auto foundCacheMaxSizeMB = object.find(sCacheMaxSizeMsBKey);
-
-                        if(foundCacheMaxSizeMB != object.end())
-                        {
-                            if(true == foundCacheMaxSizeMB->isDouble())
-                            {
-                                mCacheMaxSizeMB = static_cast<unsigned int>(foundCacheMaxSizeMB->toDouble());
-                            }
-                        }
-
-                        cacheMaxSizeMBChanged(mCacheMaxSizeMB);
-                    }
-
-                    {
-                        auto foundRDPMode = object.find(sRDPModeKey);
-
-                        if(foundRDPMode != object.end())
-                        {
-                            if(true == foundRDPMode->isBool())
-                            {
-                                mbRDPMode = foundRDPMode->toBool();
-                            }
-                        }
-
-                        RDPModeChanged(mbRDPMode);
-                    }
-
-                    {
-                        auto foundRegexMonoHighlightingColor = object.find(sRegexMonoHighlightingColosRKey);
-
-                        if(foundRegexMonoHighlightingColor != object.end())
-                        {
-                            if(true == foundRegexMonoHighlightingColor->isObject())
-                            {
-                                QJsonObject obj = foundRegexMonoHighlightingColor->toObject();
-
-                                auto r = obj.find( sRKey );
-                                auto g = obj.find( sGKey );
-                                auto b = obj.find( sBKey );
-
-                                if( r != obj.end() && r->isDouble() &&
-                                        g != obj.end() && g->isDouble() &&
-                                        b != obj.end() && b->isDouble())
-                                {
-                                    mRegexMonoHighlightingColor = QColor(static_cast<int>(r->toDouble()),
-                                                                         static_cast<int>(g->toDouble()),
-                                                                         static_cast<int>(b->toDouble()));
-                                }
-                            }
-                        }
-
-                        regexMonoHighlightingColorChanged(mRegexMonoHighlightingColor);
-                    }
-
-                    {
-                        auto foundHighlightActivePatterns = object.find(sHighlightActivePatternsKey);
-
-                        if(foundHighlightActivePatterns != object.end())
-                        {
-                            if(true == foundHighlightActivePatterns->isBool())
-                            {
-                                mbHighlightActivePatterns = foundHighlightActivePatterns->toBool();
-                            }
-                        }
-
-                        highlightActivePatternsChanged(mbHighlightActivePatterns);
-                    }
-
-                    {
-                        auto foundPatternsHighlightingColor = object.find(sPatternsHighlightingColorKey);
-
-                        if(foundPatternsHighlightingColor != object.end())
-                        {
-                            if(true == foundPatternsHighlightingColor->isObject())
-                            {
-                                QJsonObject obj = foundPatternsHighlightingColor->toObject();
-
-                                auto r = obj.find( sRKey );
-                                auto g = obj.find( sGKey );
-                                auto b = obj.find( sBKey );
-
-                                if( r != obj.end() && r->isDouble() &&
-                                        g != obj.end() && g->isDouble() &&
-                                        b != obj.end() && b->isDouble())
-                                {
-                                    mPatternsHighlightingColor = QColor(static_cast<int>(r->toDouble()),
-                                                                        static_cast<int>(g->toDouble()),
-                                                                        static_cast<int>(b->toDouble()));
-                                }
-                            }
-                        }
-
-                        patternsHighlightingColorChanged(mPatternsHighlightingColor);
-                    }
-
-                    {
-                        auto foundSearchResultMonoColorHighlighting = object.find(sSearchResultMonoColorHighlightingKey);
-
-                        if(foundSearchResultMonoColorHighlighting != object.end())
-                        {
-                            if(true == foundSearchResultMonoColorHighlighting->isBool())
-                            {
-                                mbSearchResultMonoColorHighlighting = foundSearchResultMonoColorHighlighting->toBool();
-                            }
-                        }
-
-                        searchResultMonoColorHighlightingChanged(mbSearchResultMonoColorHighlighting);
-                    }
-
-                    {
-                        auto foundSearchResultHighlightingGradient = object.find(sSearchResultHighlightingGradientKey);
-
-                        if(foundSearchResultHighlightingGradient != object.end())
-                        {
-                            if(true == foundSearchResultHighlightingGradient->isObject())
-                            {
-                                QJsonObject obj = foundSearchResultHighlightingGradient->toObject();
-
-                                auto r_1 = obj.find( sRKey + "_1" );
-                                auto g_1 = obj.find( sGKey + "_1" );
-                                auto b_1 = obj.find( sBKey + "_1" );
-
-                                auto r_2 = obj.find( sRKey + "_2" );
-                                auto g_2 = obj.find( sGKey + "_2" );
-                                auto b_2 = obj.find( sBKey + "_2" );
-
-                                auto numberOfColors = obj.find( sNumberOfColorsKey );
-
-                                if( r_1 != obj.end() && r_1->isDouble() &&
-                                    g_1 != obj.end() && g_1->isDouble() &&
-                                    b_1 != obj.end() && b_1->isDouble() &&
-                                    r_2 != obj.end() && r_2->isDouble() &&
-                                    g_2 != obj.end() && g_2->isDouble() &&
-                                    b_2 != obj.end() && b_2->isDouble() &&
-                                    numberOfColors->isDouble() )
-                                {
-                                    mSearchResultHighlightingGradient = tHighlightingGradient(
-                                                QColor( static_cast<int>(r_1->toDouble()),
-                                                        static_cast<int>(g_1->toDouble()),
-                                                        static_cast<int>(b_1->toDouble()) ),
-                                                QColor( static_cast<int>(r_2->toDouble()),
-                                                        static_cast<int>(g_2->toDouble()),
-                                                        static_cast<int>(b_2->toDouble()) ),
-                                                static_cast<int>(numberOfColors->toDouble()));
-                                }
-                            }
-                        }
-
-                        searchResultHighlightingGradientChanged(mSearchResultHighlightingGradient);
-                    }
-
-                    {
-                        auto foundSearchResultColumnsVisibilityMap = object.find(sSearchResultColumnsVisibilityMapKey);
-                        if(foundSearchResultColumnsVisibilityMap != object.end())
-                        {
-                            auto searchResultColumnsVisibilityArrayObj = foundSearchResultColumnsVisibilityMap.value();
-
-                            if(true == searchResultColumnsVisibilityArrayObj.isArray())
-                            {
-                                mSearchResultColumnsVisibilityMap.clear();
-
-                                auto searchResultColumnsVisibilityArray = searchResultColumnsVisibilityArrayObj.toArray();
-                                for( const auto searchResultColumnsVisibilityObj : searchResultColumnsVisibilityArray )
-                                {
-                                    if(true == searchResultColumnsVisibilityObj.isObject())
-                                    {
-                                        QJsonObject visibilityObj = searchResultColumnsVisibilityObj.toObject();
-
-                                        if(false == visibilityObj.empty())
-                                        {
-                                            auto keys = visibilityObj.keys();
-
-                                            for(const auto& key : keys)
-                                            {
-                                                auto foundVisibilityValue = visibilityObj.find(key);
-
-                                                if(foundVisibilityValue != visibilityObj.end())
-                                                {
-                                                    if(foundVisibilityValue->isBool())
-                                                    {
-                                                        bool bConvertionStatus = false;
-
-                                                        int columnIdx = key.toInt(&bConvertionStatus);
-
-                                                        bool bIsVisible = foundVisibilityValue->toBool();
-                                                        mSearchResultColumnsVisibilityMap.insert(static_cast<eSearchResultColumn>(columnIdx), bIsVisible);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        searchResultColumnsVisibilityMapChanged(mSearchResultColumnsVisibilityMap);
-                    }
-
-                    {
-                        auto foundMarkTimeStampWithBold = object.find(sMarkTimeStampWithBold);
-
-                        if(foundMarkTimeStampWithBold != object.end())
-                        {
-                            if(true == foundMarkTimeStampWithBold->isBool())
-                            {
-                                mbMarkTimeStampWithBold = foundMarkTimeStampWithBold->toBool();
-                            }
-                        }
-
-                        markTimeStampWithBoldChanged(mbMarkTimeStampWithBold);
-                    }
-
-                    {
-                        auto foundPatternsColumnsVisibilityMap = object.find(sPatternsColumnsVisibilityMapKey);
-                        if(foundPatternsColumnsVisibilityMap != object.end())
-                        {
-                            auto patternsColumnsVisibilityArrayObj = foundPatternsColumnsVisibilityMap.value();
-
-                            if(true == patternsColumnsVisibilityArrayObj.isArray())
-                            {
-                                mPatternsColumnsVisibilityMap.clear();
-
-                                auto patternsColumnsVisibilityArray = patternsColumnsVisibilityArrayObj.toArray();
-                                for( const auto patternsColumnsVisibilityObj : patternsColumnsVisibilityArray )
-                                {
-                                    if(true == patternsColumnsVisibilityObj.isObject())
-                                    {
-                                        QJsonObject visibilityObj = patternsColumnsVisibilityObj.toObject();
-
-                                        if(false == visibilityObj.empty())
-                                        {
-                                            auto keys = visibilityObj.keys();
-
-                                            for(const auto& key : keys)
-                                            {
-                                                auto foundVisibilityValue = visibilityObj.find(key);
-
-                                                if(foundVisibilityValue != visibilityObj.end())
-                                                {
-                                                    if(foundVisibilityValue->isBool())
-                                                    {
-                                                        bool bConvertionStatus = false;
-
-                                                        int columnIdx = key.toInt(&bConvertionStatus);
-
-                                                        bool bIsVisible = foundVisibilityValue->toBool();
-                                                        mPatternsColumnsVisibilityMap.insert(static_cast<ePatternsColumn>(columnIdx), bIsVisible);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        patternsColumnsVisibilityMapChanged(mPatternsColumnsVisibilityMap);
-                    }
-
-                    {
-                        auto foundCaseSensitiveRegex = object.find(sCaseSensitiveRegex);
-
-                        if(foundCaseSensitiveRegex != object.end())
-                        {
-                            if(true == foundCaseSensitiveRegex->isBool())
-                            {
-                                mbCaseSensitiveRegex = foundCaseSensitiveRegex->toBool();
-                            }
-                        }
-
-                        caseSensitiveRegexChanged(mbCaseSensitiveRegex);
-                    }
-
-                    {
-                        auto foundRegexFiltersColumnsVisibilityMap = object.find(sRegexFiltersColumnsVisibilityMapKey);
-                        if(foundRegexFiltersColumnsVisibilityMap != object.end())
-                        {
-                            auto regexFiltersColumnsVisibilityArrayObj = foundRegexFiltersColumnsVisibilityMap.value();
-
-                            if(true == regexFiltersColumnsVisibilityArrayObj.isArray())
-                            {
-                                mRegexFiltersColumnsVisibilityMap.clear();
-
-                                auto regexFiltersColumnsVisibilityArray = regexFiltersColumnsVisibilityArrayObj.toArray();
-                                for( const auto regexFiltersColumnsVisibilityObj : regexFiltersColumnsVisibilityArray )
-                                {
-                                    if(true == regexFiltersColumnsVisibilityObj.isObject())
-                                    {
-                                        QJsonObject visibilityObj = regexFiltersColumnsVisibilityObj.toObject();
-
-                                        if(false == visibilityObj.empty())
-                                        {
-                                            auto keys = visibilityObj.keys();
-
-                                            for(const auto& key : keys)
-                                            {
-                                                auto foundVisibilityValue = visibilityObj.find(key);
-
-                                                if(foundVisibilityValue != visibilityObj.end())
-                                                {
-                                                    if(foundVisibilityValue->isBool())
-                                                    {
-                                                        bool bConvertionStatus = false;
-
-                                                        int columnIdx = key.toInt(&bConvertionStatus);
-
-                                                        bool bIsVisible = foundVisibilityValue->toBool();
-                                                        mRegexFiltersColumnsVisibilityMap.insert(static_cast<eRegexFiltersColumn>(columnIdx), bIsVisible);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        regexFiltersColumnsVisibilityMapChanged(mRegexFiltersColumnsVisibilityMap);
-                    }
-
-                    {
-                        auto foundFilterVariables = object.find(sFilterVariablesKey);
-
-                        if(foundFilterVariables != object.end())
-                        {
-                            if(true == foundFilterVariables->isBool())
-                            {
-                                mbFilterVariables = foundFilterVariables->toBool();
-                            }
-                        }
-
-                        filterVariablesChanged(mbFilterVariables);
-                    }
-
-                    {
-                        auto foundSelectedRegexFile = object.find(sSelectedRegexFile);
-                        if(foundSelectedRegexFile != object.end())
-                        {
-                            mSelectedRegexFile = foundSelectedRegexFile->toString();
-
-                            if(true == mSelectedRegexFile.isEmpty()) // if stored filepath is empty
-                            {
-                                mSelectedRegexFile = sDefaultRegexFileName; // let's do a fallback to the default value
-                            }
-                        }
-
-                        selectedRegexFileChanged(mSelectedRegexFile);
-                    }
-                }
+                std::lock_guard<std::recursive_mutex> lock(mSearchResultHighlightingGradientProtector);
+                mSetting_SearchResultHighlightingGradient.readDataFromArray(arrayRows);
             }
+
+            mSetting_PatternsColumnsVisibilityMap.readDataFromArray(arrayRows);
+            mSetting_RegexFiltersColumnsVisibilityMap.readDataFromArray(arrayRows);
+            mSetting_SelectedRegexFile.readDataFromArray(arrayRows);
         }
 
         result.bResult = true;
@@ -1763,8 +1469,9 @@ bool CSettingsManager::areAnyDefaultAliasesAvailable() const
 {
     bool bResult = false;
 
+    const auto& aliases = mSetting_Aliases.getData();
 
-    for( const auto& alias : mAliases )
+    for( const auto& alias : aliases )
     {
         if( true == alias.isDefault )
         {

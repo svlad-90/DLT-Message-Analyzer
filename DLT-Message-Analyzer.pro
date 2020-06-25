@@ -21,7 +21,10 @@ HEADERS += \
     dltmessageanalyzerplugin/src/dltmessageanalyzerplugin.hpp \
     dltmessageanalyzerplugin/src/form.h \
     \
+    dltmessageanalyzerplugin/src/settings/CSettingItem.hpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.hpp \
+    dltmessageanalyzerplugin/src/settings/ISettingItem.hpp \
+    dltmessageanalyzerplugin/src/settings/TSettingItem.hpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.hpp \
     \
@@ -64,7 +67,9 @@ SOURCES += \
     dltmessageanalyzerplugin/src/CDLTMessageAnalyzer.cpp\
     dltmessageanalyzerplugin/src/form.cpp \
     \
+    dltmessageanalyzerplugin/src/settings/CSettingItem.cpp \
     dltmessageanalyzerplugin/src/settings/CSettingsManager.cpp \
+    dltmessageanalyzerplugin/src/settings/ISettingItem.cpp \
     \
     dltmessageanalyzerplugin/src/logo/CLogo.cpp \
     \
