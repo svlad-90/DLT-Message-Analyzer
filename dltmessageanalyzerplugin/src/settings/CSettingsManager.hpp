@@ -17,6 +17,8 @@
 
 #include "../common/Definitions.hpp"
 
+#include "TSettingItem.hpp"
+
 class CSettingsManager;
 typedef std::shared_ptr<CSettingsManager> tSettingsManagerPtr;
 
@@ -177,6 +179,7 @@ private: // methods
     /**
      * @brief setUp - this method is using other methods of this class in order to set it up for further usage.
      * Called from constructor of instance of this single-tone class
+     * @return - result of the operation
      */
     tOperationResult setUp();
 
@@ -184,11 +187,13 @@ private: // methods
 
     /**
      * @brief backwardCompatibility - calls all versions of backward compatibility functions
+     * @return - result of the operation
      */
     tOperationResult backwardCompatibility();
 
     /**
      * @brief backwardCompatibility_V0_V1 - function, which handles backward compatibility between V0 and V1 of settings manager
+     * @return - result of the operation
      */
     tOperationResult backwardCompatibility_V0_V1();
 
@@ -196,11 +201,13 @@ private: // methods
 
     /**
      * @brief loadRootConfig - loads root configuration, which contains version of used settings manager and most general values
+     * @return - result of the operation
      */
     tOperationResult loadRootConfig();
 
     /**
      * @brief storeRootConfig - stores root configuration, which contains version of used settings manager and most general values
+     * @return - result of the operation
      */
     tOperationResult storeRootConfig();
 
@@ -208,29 +215,27 @@ private: // methods
 
     /**
      * @brief storeSettingsConfig - stores config to a predefined file ( path is hard-coded )
-     * @param path - path to a config file
-     * @return - true on success, false otherwise
+     * @return - result of the operation
      */
     tOperationResult storeSettingsConfig();
 
     /**
      * @brief loadSettingsConfig - loads general configuration from a file ( path is hard-coded )
-     * @param path - path to a config file
-     * @return - true on success, false otherwise
+     * @return - result of the operation
      */
     tOperationResult loadSettingsConfig();
 
     /**
      * @brief storeSettingsConfigCustomPath - stores config to a specified file
-     * @param path - path to a config file
-     * @return - true on success, false otherwise
+     * @param filepath - filepath to a config file
+     * @return - result of the operation
      */
     tOperationResult storeSettingsConfigCustomPath(const QString& filepath);
 
     /**
      * @brief loadSettingsConfigCustomPath - loads general configuration from a specified file
-     * @param path - path to a config file
-     * @return - true on success, false otherwise
+     * @param filepath - path to a config file
+     * @return - result of the operation
      */
     tOperationResult loadSettingsConfigCustomPath(const QString& filepath);
 
@@ -238,14 +243,14 @@ private: // methods
 
     /**
      * @brief storeRegexConfigCustomPath - stores regex config to a specified config file
-     * @return - true on success, false otherwise
+     * @return - result of the operation
      */
     tOperationResult storeRegexConfigCustomPath( const QString& filePath ) const;
 
     /**
      * @brief loadRegexConfigCustomPath - loads regex config from a specified file
      * @param filePath - path to a file with configuration
-     * @return - true on success, false otherwise
+     * @return - result of the operation
      */
     tOperationResult loadRegexConfigCustomPath( const QString& filePath );
 
@@ -254,32 +259,128 @@ private: // methods
      */
     void clearRegexConfig();
 
+private: // methods
+
+    /**
+     * @brief tryStoreSettingsConfig - checks, whether it is needed to store the non-root settings.
+     * If needed - stores the data to file.
+     */
+    void tryStoreSettingsConfig();
+
+    /**
+     * @brief tryStoreRootConfig - checks, whether it is needed to store the root settings.
+     * If needed - stores the data to file.
+     */
+    void tryStoreRootConfig();
+
+    TSettingItem<bool> createBooleanSettingsItem(const QString& key,
+                                                 const TSettingItem<bool>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<bool>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const bool& defaultValue) const;
+
+    TSettingItem<QColor> createColorSettingsItem(const QString& key,
+                                                 const TSettingItem<QColor>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<QColor>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const QColor& defaultValue) const;
+
+    TSettingItem<tHighlightingGradient> createHighlightingGradientSettingsItem(const QString& key,
+                                                 const TSettingItem<tHighlightingGradient>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tHighlightingGradient>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tHighlightingGradient& defaultValue) const;
+
+    TSettingItem<tAliasItemVec> createAliasItemVecSettingsItem(const QString& key,
+                                                 const TSettingItem<tAliasItemVec>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tAliasItemVec>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tAliasItemVec& defaultValue) const;
+
+    TSettingItem<tSearchResultColumnsVisibilityMap> createSearchResultColumnsVisibilityMapSettingsItem(const QString& key,
+                                                 const TSettingItem<tSearchResultColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tSearchResultColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tSearchResultColumnsVisibilityMap& defaultValue) const;
+
+    TSettingItem<tPatternsColumnsVisibilityMap> createPatternsColumnsVisibilityMapSettingsItem(const QString& key,
+                                                 const TSettingItem<tPatternsColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tPatternsColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tPatternsColumnsVisibilityMap& defaultValue) const;
+
+    TSettingItem<tRegexFiltersColumnsVisibilityMap> createRegexFiltersColumnsVisibilityMapSettingsItem(const QString& key,
+                                                 const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tRegexFiltersColumnsVisibilityMap& defaultValue) const;
+
+    TSettingItem<QString> createStringSettingsItem(const QString& key,
+                                                 const TSettingItem<QString>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<QString>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const QString& defaultValue) const;
+
+    template<typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+    TSettingItem<T> createIntegralSettingsItem(const QString& key,
+                                                 const typename TSettingItem<T>::tUpdateDataFunc& updateDataFunc,
+                                                 const typename TSettingItem<T>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                      const T& defaultValue) const
+    {
+        auto writeFunc = [&key](const T& value)->QJsonObject
+        {
+            QJsonObject result;
+            result.insert( key, QJsonValue( static_cast<double>(value) ) );
+            return result;
+        };
+
+        auto readFunc = [](const QJsonValueRef& JSONItem,
+                           T& data,
+                           const T&)->bool
+        {
+            bool bResult = false;
+
+            if(true == JSONItem.isObject())
+            {
+                if(true == JSONItem.isDouble())
+                {
+                    data = static_cast<T>(JSONItem.toDouble());
+                    bResult = true;
+                }
+            }
+
+            return bResult;
+        };
+
+        return TSettingItem<T>(key,
+                                 defaultValue,
+                                 writeFunc,
+                                 readFunc,
+                                 updateDataFunc,
+                                 updateFileFunc);
+    }
+
 private: // fields
 
-    tSettingsManagerVersion mSettingsManagerVersion;
-    tAliasItemVec mAliases;
-    int mNumberOfThreads;
-    bool mbContinuousSearch;
-    bool mbCopySearchResultAsHTML;
-    bool mbMinimizePatternsViewOnSelection;
-    bool mbWriteSettingsOnEachUpdate;
-    bool mbCacheEnabled;
-    tCacheSizeMB mCacheMaxSizeMB;
-    bool mbRDPMode;
-    QColor mRegexMonoHighlightingColor;
-    bool mbHighlightActivePatterns;
-    QColor mPatternsHighlightingColor;
-    bool mbSearchResultMonoColorHighlighting;
-    tHighlightingGradient mSearchResultHighlightingGradient;
-    std::mutex mSearchResultHighlightingGradientProtector;
-    tSearchResultColumnsVisibilityMap mSearchResultColumnsVisibilityMap;
-    bool mbMarkTimeStampWithBold;
-    tPatternsColumnsVisibilityMap mPatternsColumnsVisibilityMap;
-    bool mbCaseSensitiveRegex;
-    tRegexFiltersColumnsVisibilityMap mRegexFiltersColumnsVisibilityMap;
-    bool mbFilterVariables;
+    TSettingItem<tSettingsManagerVersion> mSetting_SettingsManagerVersion;
+    TSettingItem<tAliasItemVec> mSetting_Aliases;
+    TSettingItem<int> mSetting_NumberOfThreads;
+    TSettingItem<bool> mSetting_ContinuousSearch;
+    TSettingItem<bool> mSetting_CopySearchResultAsHTML;
+    TSettingItem<bool> mSetting_MinimizePatternsViewOnSelection;
+    TSettingItem<bool> mSetting_WriteSettingsOnEachUpdate;
+    TSettingItem<bool> mSetting_CacheEnabled;
+    TSettingItem<tCacheSizeMB> mSetting_CacheMaxSizeMB;
+    TSettingItem<bool> mSetting_RDPMode;
+    TSettingItem<QColor> mSetting_RegexMonoHighlightingColor;
+    TSettingItem<bool> mSetting_HighlightActivePatterns;
+    TSettingItem<QColor> mSetting_PatternsHighlightingColor;
+    TSettingItem<bool> mSetting_SearchResultMonoColorHighlighting;
+
+    std::recursive_mutex mSearchResultHighlightingGradientProtector;
+    TSettingItem<tHighlightingGradient> mSetting_SearchResultHighlightingGradient;
+
+    TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsVisibilityMap;
+    TSettingItem<bool> mSetting_MarkTimeStampWithBold;
+    TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsVisibilityMap;
+    TSettingItem<bool> mSetting_CaseSensitiveRegex;
+    TSettingItem<tRegexFiltersColumnsVisibilityMap> mSetting_RegexFiltersColumnsVisibilityMap;
+    TSettingItem<bool> mSetting_FilterVariables;
+    TSettingItem<QString> mSetting_SelectedRegexFile; // name of the regex file to be used.
+
     bool mbRootConfigInitialised;
-    QString mSelectedRegexFile; // name of the regex file to be used.
 };
 
 #endif // CSETTINGSMANAGER_HPP

@@ -10,6 +10,8 @@ add_library(dltmessageanalyzerplugin MODULE
     CDLTMessageAnalyzer.cpp
     form.cpp
     settings/CSettingsManager.cpp
+	settings/ISettingItem.cpp
+	settings/CSettingItem.cpp
     logo/CLogo.cpp
     log/CConsoleCtrl.cpp
 	log/CConsoleView.cpp
