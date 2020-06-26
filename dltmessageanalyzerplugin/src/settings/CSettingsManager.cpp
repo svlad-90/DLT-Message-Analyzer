@@ -45,6 +45,7 @@ static const QString sSearchResultMonoColorHighlightingKey = "searchResultMonoCo
 static const QString sSearchResultHighlightingGradientKey = "searchResultHighlightingGradient";
 static const QString sNumberOfColorsKey = "numberOfColors";
 static const QString sSearchResultColumnsVisibilityMapKey = "searchResultColumnsVisibilityMap";
+static const QString sSearchResultColumnsCopyPasteMapKey = "searchResultColumnsCopyPasteMap";
 static const QString sMarkTimeStampWithBold = "markTimeStampWithBold";
 static const QString sPatternsColumnsVisibilityMapKey = "patternsColumnsVisibilityMap";
 static const QString sRegexFiltersColumnsVisibilityMapKey = "RegexFiltersColumnsVisibilityMap";
@@ -184,6 +185,10 @@ CSettingsManager::CSettingsManager():
         tHighlightingGradient(QColor(154,0,146), QColor(1,162,165), 3))),
     mSetting_SearchResultColumnsVisibilityMap(createSearchResultColumnsVisibilityMapSettingsItem(sSearchResultColumnsVisibilityMapKey,
         [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsVisibilityMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultSearchResultColumnsVisibilityMap)),
+    mSetting_SearchResultColumnsCopyPasteMap(createSearchResultColumnsVisibilityMapSettingsItem(sSearchResultColumnsCopyPasteMapKey,
+        [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsCopyPasteMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
         sDefaultSearchResultColumnsVisibilityMap)),
     mSetting_MarkTimeStampWithBold(createBooleanSettingsItem(sMarkTimeStampWithBold,
@@ -1102,6 +1107,11 @@ void CSettingsManager::setSearchResultColumnsVisibilityMap(const tSearchResultCo
     mSetting_SearchResultColumnsVisibilityMap.setData(val);
 }
 
+void CSettingsManager::setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val)
+{
+    mSetting_SearchResultColumnsCopyPasteMap.setData(val);
+}
+
 void CSettingsManager::setMarkTimeStampWithBold(bool val)
 {
     mSetting_MarkTimeStampWithBold.setData(val);
@@ -1211,6 +1221,11 @@ tHighlightingGradient CSettingsManager::getSearchResultHighlightingGradient() co
 const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsVisibilityMap() const
 {
     return mSetting_SearchResultColumnsVisibilityMap.getData();
+}
+
+const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsCopyPasteMap() const
+{
+    return mSetting_SearchResultColumnsCopyPasteMap.getData();
 }
 
 bool CSettingsManager::getMarkTimeStampWithBold() const
@@ -1377,6 +1392,7 @@ CSettingsManager::tOperationResult CSettingsManager::storeSettingsConfigCustomPa
         settingsArray.append(mSetting_RegexFiltersColumnsVisibilityMap.writeData());
         settingsArray.append(mSetting_FilterVariables.writeData());
         settingsArray.append(mSetting_SelectedRegexFile.writeData());
+        settingsArray.append(mSetting_SearchResultColumnsCopyPasteMap.writeData());
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1431,6 +1447,7 @@ CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfigCustomPat
             mSetting_PatternsColumnsVisibilityMap.readDataFromArray(arrayRows);
             mSetting_RegexFiltersColumnsVisibilityMap.readDataFromArray(arrayRows);
             mSetting_SelectedRegexFile.readDataFromArray(arrayRows);
+            mSetting_SearchResultColumnsCopyPasteMap.readDataFromArray(arrayRows);
         }
 
         result.bResult = true;
@@ -1487,6 +1504,12 @@ void CSettingsManager::resetSearchResultColumnsVisibilityMap()
 {
     setSearchResultColumnsVisibilityMap(sDefaultSearchResultColumnsVisibilityMap);
 }
+
+void CSettingsManager::resetSearchResultColumnsCopyPasteMap()
+{
+    setSearchResultColumnsCopyPasteMap(sDefaultSearchResultColumnsVisibilityMap);
+}
+
 
 void CSettingsManager::resetPatternsColumnsVisibilityMap()
 {

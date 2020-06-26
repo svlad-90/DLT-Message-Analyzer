@@ -241,15 +241,15 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
                         connect(pAction, &QAction::triggered, [i](bool checked)
                         {
-                            auto searchResultColumnsVisibilityMap =
+                            auto searchResultColumnsVisibilityMapInner =
                                     CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
 
-                            auto foundItem = searchResultColumnsVisibilityMap.find(static_cast<eSearchResultColumn>(i));
+                            auto foundItemInner = searchResultColumnsVisibilityMapInner.find(static_cast<eSearchResultColumn>(i));
 
-                            if(foundItem != searchResultColumnsVisibilityMap.end()) // if item is in the map
+                            if(foundItemInner != searchResultColumnsVisibilityMapInner.end()) // if item is in the map
                             {
-                                foundItem.value() = checked; // let's update visibility value
-                                CSettingsManager::getInstance()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMap);
+                                foundItemInner.value() = checked; // let's update visibility value
+                                CSettingsManager::getInstance()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMapInner);
                             }
                         });
                         pAction->setCheckable(true);
@@ -267,6 +267,56 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             connect(pAction, &QAction::triggered, [this]()
             {
                 CSettingsManager::getInstance()->resetSearchResultColumnsVisibilityMap();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Copy columns", this);
+
+            {
+                const auto& searchResultColumnsCopyPasteMap =
+                        CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
+
+                for( int i = static_cast<int>(eSearchResultColumn::Index);
+                     i < static_cast<int>(eSearchResultColumn::Last);
+                     ++i)
+                {
+                    auto foundItem = searchResultColumnsCopyPasteMap.find(static_cast<eSearchResultColumn>(i));
+
+                    if(foundItem != searchResultColumnsCopyPasteMap.end())
+                    {
+                        QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        {
+                            auto searchResultColumnsCopyPasteMapInner =
+                                    CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
+
+                            auto foundItemInner = searchResultColumnsCopyPasteMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                            if(foundItemInner != searchResultColumnsCopyPasteMapInner.end()) // if item is in the map
+                            {
+                                foundItemInner.value() = checked; // let's update copy paste value
+                                CSettingsManager::getInstance()->setSearchResultColumnsCopyPasteMap(searchResultColumnsCopyPasteMapInner);
+                            }
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(foundItem.value());
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        {
+            QAction* pAction = new QAction("Reset copy columns", this);
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                CSettingsManager::getInstance()->resetSearchResultColumnsCopyPasteMap();
             });
             contextMenu.addAction(pAction);
         }
@@ -709,22 +759,27 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
     const int NOT_FOUND_COLUMN_IDX = -1;
     int payloadColumnIdx = NOT_FOUND_COLUMN_IDX;
 
-    QVector<int> visibleColumns;
-    visibleColumns.reserve((static_cast<int>(eSearchResultColumn::Last)));
+    QVector<int> copyPasteColumns;
+    copyPasteColumns.reserve((static_cast<int>(eSearchResultColumn::Last)));
 
     {
-        const int lastId = static_cast<int>(eSearchResultColumn::Last);
-        for( int i = 0; i < lastId; ++i )
-        {
-            if(false == isColumnHidden(i))
-            {
-                visibleColumns.push_back(i);
+        const auto& copyPasteColumnsMap = CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
 
-                if(i == static_cast<int>(eSearchResultColumn::Payload))
+        int counter = 0;
+
+        for( const auto& copyPaste : copyPasteColumnsMap )
+        {
+            if(true == copyPaste)
+            {
+                copyPasteColumns.push_back(counter);
+
+                if(counter == static_cast<int>(eSearchResultColumn::Payload))
                 {
-                    payloadColumnIdx = visibleColumns.size() - 1;
+                    payloadColumnIdx = counter;
                 }
             }
+
+            ++counter;
         }
     }
 
@@ -733,7 +788,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
     int finalRichStringSize = 0;
     int finalStringSize = 0;
 
-    int visibleColumnsSize = visibleColumns.size();
+    int copyPasteColumnsSize = copyPasteColumns.size();
 
     for(const auto& index : sortedSelectedRows)
     {
@@ -768,17 +823,17 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
         if( (true == copyOnlyPayload) && (NOT_FOUND_COLUMN_IDX != payloadColumnIdx) )
         {
             i = payloadColumnIdx;
-            visibleColumnsSize = payloadColumnIdx + 1;
+            copyPasteColumnsSize = payloadColumnIdx + 1;
         }
 
-        for( ; i < visibleColumnsSize; ++i )
+        for( ; i < copyPasteColumnsSize; ++i )
         {
-            auto columnId = visibleColumns[i];
+            auto columnId = copyPasteColumns[i];
             auto column = index.sibling(index.row(), columnId);
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [this, &clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &visibleColumnsSize, &field](const tRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [this, &clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tRange& range, const QColor& color, bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field
@@ -811,7 +866,8 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
                 str.append("</font>");
 
-                if(i < visibleColumnsSize - 1)
+                if(i < copyPasteColumnsSize - 1 &&
+                   range.to == columnStr.size() - 1 )
                 {
                     str.append(" ");
                     subStr.append(" ");
@@ -839,12 +895,13 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
                     if(fieldRanges.end() != foundfieldRange)
                     {
-                        int i = 0;
+                        int counter = 0;
+
                         for(auto it = foundHighlightingItem->begin(); it != foundHighlightingItem->end(); ++it)
                         {
                             const auto& range = *it;
 
-                            if(0 == i)
+                            if(0 == counter)
                             {
                                 if(0 != range.from)
                                 {
@@ -853,7 +910,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
                                 attachText( tRange( range.from, range.to ), getHighlightedColor(*it), true );
                             }
-                            else if(0 < i)
+                            else if(0 < counter)
                             {
                                 auto itPrev = it;
                                 --itPrev;
@@ -867,7 +924,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                                 attachText( tRange( range.from, range.to ), getHighlightedColor(*it), true );
                             }
 
-                            if(i == static_cast<int>(foundHighlightingItem->size() - 1)) // last element
+                            if(counter == static_cast<int>(foundHighlightingItem->size() - 1)) // last element
                             {
                                 if( range.to < columnStr.size() - 1 )
                                 {
@@ -875,7 +932,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                                 }
                             }
 
-                            ++i;
+                            ++counter;
                         }
                     }
                     else
