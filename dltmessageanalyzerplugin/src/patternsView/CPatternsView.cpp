@@ -587,6 +587,56 @@ CPatternsView::CPatternsView(QWidget *parent):
         contextMenu.addSeparator();
 
         {
+            QMenu* pSubMenu = new QMenu("Copy columns", this);
+
+            {
+                const auto& patternsColumnsCopyPasteMap =
+                        CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+
+                for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
+                     i < static_cast<int>(ePatternsColumn::AfterLastVisible);
+                     ++i)
+                {
+                    auto foundItem = patternsColumnsCopyPasteMap.find(static_cast<ePatternsColumn>(i));
+
+                    if(foundItem != patternsColumnsCopyPasteMap.end())
+                    {
+                        QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
+                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        {
+                            auto patternsColumnsCopyPasteMap_ =
+                                    CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+
+                            auto foundItem_ = patternsColumnsCopyPasteMap_.find(static_cast<ePatternsColumn>(i));
+
+                            if(foundItem_ != patternsColumnsCopyPasteMap_.end()) // if item is in the map
+                            {
+                                foundItem_.value() = checked; // let's update visibility value
+                                CSettingsManager::getInstance()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
+                            }
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(foundItem.value());
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        {
+            QAction* pAction = new QAction("Reset copy columns", this);
+            connect(pAction, &QAction::triggered, []()
+            {
+                CSettingsManager::getInstance()->resetPatternsColumnsCopyPasteMap();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
             QAction* pAction = new QAction("Highlight \"combined\" patterns", this);
             connect(pAction, &QAction::triggered, [](bool checked)
             {
@@ -995,8 +1045,7 @@ void CPatternsView::copySelectedRow()
                 tCopyPastePatternItem copyPasteItem;
 
                 ePatternsRowType patternsRowType =
-                        idx.sibling(idx.row(),
-                                            static_cast<int>(ePatternsColumn::RowType)).data().value<ePatternsRowType>();
+                        idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType)).data().value<ePatternsRowType>();
 
                 if(ePatternsRowType::ePatternsRowType_Alias == patternsRowType)
                 {
@@ -1012,11 +1061,15 @@ void CPatternsView::copySelectedRow()
 
                     QString rowStr(QString("[#%1]\n").arg(counter));
 
-                    for( int i = 0; i < static_cast<int>(ePatternsColumn::AfterLastVisible); ++i )
+                    const auto& copyPasteMap = CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+
+                    for( auto it = copyPasteMap.begin(); it != copyPasteMap.end(); ++it )
                     {
-                        if( false == isColumnHidden(i) )
+                        bool bCopyPasteColumn = it.value();
+
+                        if( true == bCopyPasteColumn )
                         {
-                            ePatternsColumn column = static_cast<ePatternsColumn>(i);
+                            ePatternsColumn column = it.key();
                             rowStr.append(getName(column)).append(" - ");
 
                             switch( column )
@@ -1028,13 +1081,13 @@ void CPatternsView::copySelectedRow()
                                     break;
                                 case ePatternsColumn::Regex:
                                 {
-                                    rowStr.append(idx.sibling(idx.row(), i).data().value<QString>());
+                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<QString>());
                                 }
                                     break;
                                 case ePatternsColumn::Default:
                                 case ePatternsColumn::Combine:
                                 {
-                                    rowStr.append(idx.sibling(idx.row(), i).data().value<bool>() ? "TRUE" : "FALSE");
+                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<bool>() ? "TRUE" : "FALSE");
                                 }
                                     break;
                                 default:
