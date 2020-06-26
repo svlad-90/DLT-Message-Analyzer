@@ -60,6 +60,7 @@ public:
     //helpers
     bool areAnyDefaultAliasesAvailable() const;
     void resetSearchResultColumnsVisibilityMap();
+    void resetSearchResultColumnsCopyPasteMap();
     void resetPatternsColumnsVisibilityMap();
     void resetRegexFiltersColumnsVisibilityMap();
     QString getRegexDirectory() const;
@@ -92,6 +93,7 @@ public:
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
     void setSearchResultHighlightingGradient(const tHighlightingGradient& val);
     void setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val);
+    void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val);
     void setMarkTimeStampWithBold(bool val);
     void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val);
     void setCaseSensitiveRegex(bool val);
@@ -129,6 +131,7 @@ public:
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
     tHighlightingGradient getSearchResultHighlightingGradient() const;
     const tSearchResultColumnsVisibilityMap& getSearchResultColumnsVisibilityMap() const;
+    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const;
     bool getMarkTimeStampWithBold() const;
     const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const;
     bool getCaseSensitiveRegex() const;
@@ -161,6 +164,7 @@ signals:
     void searchResultMonoColorHighlightingChanged(bool searchResultMonoColorHighlighting);
     void searchResultHighlightingGradientChanged(const tHighlightingGradient& searchResultHighlightingGradient);
     void searchResultColumnsVisibilityMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsVisibilityMap);
+    void searchResultColumnsCopyPasteMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsCopyPasteMap);
     void markTimeStampWithBoldChanged(bool markTimeStampWithBold);
     void patternsColumnsVisibilityMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsVisibilityMap);
     void caseSensitiveRegexChanged(bool bCaseSensitiveRegex);
@@ -373,6 +377,7 @@ private: // fields
     TSettingItem<tHighlightingGradient> mSetting_SearchResultHighlightingGradient;
 
     TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsVisibilityMap;
+    TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsCopyPasteMap;
     TSettingItem<bool> mSetting_MarkTimeStampWithBold;
     TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsVisibilityMap;
     TSettingItem<bool> mSetting_CaseSensitiveRegex;
