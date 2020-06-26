@@ -48,6 +48,7 @@ static const QString sSearchResultColumnsVisibilityMapKey = "searchResultColumns
 static const QString sSearchResultColumnsCopyPasteMapKey = "searchResultColumnsCopyPasteMap";
 static const QString sMarkTimeStampWithBold = "markTimeStampWithBold";
 static const QString sPatternsColumnsVisibilityMapKey = "patternsColumnsVisibilityMap";
+static const QString sPatternsColumnsCopyPasteMapKey = "patternsColumnsCopyPasteMap";
 static const QString sRegexFiltersColumnsVisibilityMapKey = "RegexFiltersColumnsVisibilityMap";
 static const QString sFilterVariablesKey = "FilterVariables";
 static const QString sCaseSensitiveRegex = "caseSensitiveRegex";
@@ -100,6 +101,24 @@ static tPatternsColumnsVisibilityMap fillInDefaultPatternsColumnsVisibilityMap()
 
 static const tPatternsColumnsVisibilityMap sDefaultPatternsColumnsVisibilityMap
 = fillInDefaultPatternsColumnsVisibilityMap();
+
+static tPatternsColumnsVisibilityMap fillInDefaultPatternsColumnsCopyPasteMap()
+{
+    tPatternsColumnsVisibilityMap result;
+
+    // fields, which are visible by default
+    result.insert(ePatternsColumn::AliasTreeLevel, true);
+    result.insert(ePatternsColumn::Regex, true);
+
+    // fields, which are not visible by default
+    result.insert(ePatternsColumn::Default, false);
+    result.insert(ePatternsColumn::Combine, false);
+
+    return result;
+}
+
+static const tPatternsColumnsVisibilityMap sDefaultPatternsColumnsCopyPasteMap
+= fillInDefaultPatternsColumnsCopyPasteMap();
 
 static tRegexFiltersColumnsVisibilityMap fillInDefaultRegexFiltersColumnsVisibilityMap()
 {
@@ -199,6 +218,10 @@ CSettingsManager::CSettingsManager():
         [this](const tPatternsColumnsVisibilityMap& data){patternsColumnsVisibilityMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
         sDefaultPatternsColumnsVisibilityMap)),
+    mSetting_PatternsColumnsCopyPasteMap(createPatternsColumnsVisibilityMapSettingsItem(sPatternsColumnsCopyPasteMapKey,
+        [this](const tPatternsColumnsVisibilityMap& data){patternsColumnsCopyPasteMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultPatternsColumnsCopyPasteMap)),
     mSetting_CaseSensitiveRegex(createBooleanSettingsItem(sCaseSensitiveRegex,
         [this](const bool& data){caseSensitiveRegexChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -223,8 +246,41 @@ CSettingsManager::CSettingsManager():
         },
         [this](){tryStoreSettingsConfig();},
         sDefaultRegexFileName)),
+    mRootSettingItemPtrVec(),
+    mUserSettingItemPtrVec(),
+    mPatternsSettingItemPtrVec(),
     mbRootConfigInitialised(false)
 {
+    /////////////// ROOT SETTINGS ///////////////
+    mRootSettingItemPtrVec.push_back(&mSetting_SettingsManagerVersion);
+
+    /////////////// USER SETTINGS ///////////////
+    mUserSettingItemPtrVec.push_back(&mSetting_NumberOfThreads);
+    mUserSettingItemPtrVec.push_back(&mSetting_ContinuousSearch);
+    mUserSettingItemPtrVec.push_back(&mSetting_CopySearchResultAsHTML);
+    mUserSettingItemPtrVec.push_back(&mSetting_MinimizePatternsViewOnSelection);
+    mUserSettingItemPtrVec.push_back(&mSetting_WriteSettingsOnEachUpdate);
+    mUserSettingItemPtrVec.push_back(&mSetting_CacheEnabled);
+    mUserSettingItemPtrVec.push_back(&mSetting_CacheMaxSizeMB);
+    mUserSettingItemPtrVec.push_back(&mSetting_RDPMode);
+    mUserSettingItemPtrVec.push_back(&mSetting_RegexMonoHighlightingColor);
+    mUserSettingItemPtrVec.push_back(&mSetting_HighlightActivePatterns);
+    mUserSettingItemPtrVec.push_back(&mSetting_PatternsHighlightingColor);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchResultMonoColorHighlighting);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchResultHighlightingGradient);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsVisibilityMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsCopyPasteMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_MarkTimeStampWithBold);
+    mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsVisibilityMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsCopyPasteMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_CaseSensitiveRegex);
+    mUserSettingItemPtrVec.push_back(&mSetting_RegexFiltersColumnsVisibilityMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_FilterVariables);
+    mUserSettingItemPtrVec.push_back(&mSetting_SelectedRegexFile);
+
+    /////////////// PATTERNS SETTINGS ///////////////
+    mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
+
     CSettingsManager::tOperationResult result = setUp();
 
     if(false == result.bResult)
@@ -806,7 +862,10 @@ CSettingsManager::tOperationResult CSettingsManager::loadRootConfig()
         {
             QJsonArray arrayRows = jsonDoc.array();
 
-            mSetting_SettingsManagerVersion.readDataFromArray(arrayRows);
+            for(auto* pSetting : mRootSettingItemPtrVec)
+            {
+                pSetting->readDataFromArray(arrayRows);
+            }
         }
 
         result.bResult = true;
@@ -832,7 +891,10 @@ CSettingsManager::tOperationResult CSettingsManager::storeRootConfig()
     {
         QJsonArray settingsArray;
 
-        settingsArray.append(mSetting_SettingsManagerVersion.writeData());
+        for(auto* pSetting : mRootSettingItemPtrVec)
+        {
+            settingsArray.append(pSetting->writeData());
+        }
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1122,6 +1184,11 @@ void CSettingsManager::setPatternsColumnsVisibilityMap(const tPatternsColumnsVis
     mSetting_PatternsColumnsVisibilityMap.setData(val);
 }
 
+void CSettingsManager::setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val)
+{
+    mSetting_PatternsColumnsCopyPasteMap.setData(val);
+}
+
 void CSettingsManager::setCaseSensitiveRegex(bool val)
 {
     mSetting_CaseSensitiveRegex.setData(val);
@@ -1238,6 +1305,11 @@ const tPatternsColumnsVisibilityMap& CSettingsManager::getPatternsColumnsVisibil
     return mSetting_PatternsColumnsVisibilityMap.getData();
 }
 
+const tPatternsColumnsVisibilityMap& CSettingsManager::getPatternsColumnsCopyPasteMap() const
+{
+    return mSetting_PatternsColumnsCopyPasteMap.getData();
+}
+
 bool CSettingsManager::getCaseSensitiveRegex() const
 {
     return mSetting_CaseSensitiveRegex.getData();
@@ -1305,7 +1377,11 @@ CSettingsManager::tOperationResult CSettingsManager::loadRegexConfigCustomPath(c
         if( true == jsonDoc.isArray() )
         {
             QJsonArray arrayRows = jsonDoc.array();
-            mSetting_Aliases.readDataFromArray(arrayRows);
+
+            for(auto* pSettingItem : mPatternsSettingItemPtrVec)
+            {
+                pSettingItem->readDataFromArray(arrayRows);
+            }
         }
 
         result.bResult = true;
@@ -1330,7 +1406,10 @@ CSettingsManager::tOperationResult CSettingsManager::storeRegexConfigCustomPath(
     {
         QJsonArray settingsArray;
 
-        settingsArray.append(mSetting_Aliases.writeData());
+        for(auto* pSettingItem : mPatternsSettingItemPtrVec)
+        {
+            settingsArray.append(pSettingItem->writeData());
+        }
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1367,32 +1446,18 @@ CSettingsManager::tOperationResult CSettingsManager::storeSettingsConfigCustomPa
     {
         QJsonArray settingsArray;
 
-        settingsArray.append(mSetting_NumberOfThreads.writeData());
-        settingsArray.append(mSetting_ContinuousSearch.writeData());
-        settingsArray.append(mSetting_CopySearchResultAsHTML.writeData());
-        settingsArray.append(mSetting_MinimizePatternsViewOnSelection.writeData());
-        settingsArray.append(mSetting_WriteSettingsOnEachUpdate.writeData());
-        settingsArray.append(mSetting_CacheEnabled.writeData());
-        settingsArray.append(mSetting_HighlightActivePatterns.writeData());
-        settingsArray.append(mSetting_CacheMaxSizeMB.writeData());
-        settingsArray.append(mSetting_RDPMode.writeData());
-        settingsArray.append(mSetting_RegexMonoHighlightingColor.writeData());
-        settingsArray.append(mSetting_PatternsHighlightingColor.writeData());
-        settingsArray.append( mSetting_SearchResultMonoColorHighlighting.writeData() );
-
+        for( auto* pSetting : mUserSettingItemPtrVec )
         {
-            std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
-            settingsArray.append(mSetting_SearchResultHighlightingGradient.writeData());
+            if(pSetting == &mSetting_SearchResultHighlightingGradient)
+            {
+                std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
+                settingsArray.append(pSetting->writeData());
+            }
+            else
+            {
+                settingsArray.append(pSetting->writeData());
+            }
         }
-
-        settingsArray.append(mSetting_SearchResultColumnsVisibilityMap.writeData());
-        settingsArray.append(mSetting_MarkTimeStampWithBold.writeData());
-        settingsArray.append(mSetting_PatternsColumnsVisibilityMap.writeData());
-        settingsArray.append(mSetting_CaseSensitiveRegex.writeData());
-        settingsArray.append(mSetting_RegexFiltersColumnsVisibilityMap.writeData());
-        settingsArray.append(mSetting_FilterVariables.writeData());
-        settingsArray.append(mSetting_SelectedRegexFile.writeData());
-        settingsArray.append(mSetting_SearchResultColumnsCopyPasteMap.writeData());
 
         QJsonDocument jsonDoc( settingsArray );
         jsonFile.write( jsonDoc.toJson() );
@@ -1422,32 +1487,18 @@ CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfigCustomPat
         {
             QJsonArray arrayRows = jsonDoc.array();
 
-            mSetting_NumberOfThreads.readDataFromArray(arrayRows);
-            mSetting_ContinuousSearch.readDataFromArray(arrayRows);
-            mSetting_CopySearchResultAsHTML.readDataFromArray(arrayRows);
-            mSetting_MinimizePatternsViewOnSelection.readDataFromArray(arrayRows);
-            mSetting_WriteSettingsOnEachUpdate.readDataFromArray(arrayRows);
-            mSetting_CacheEnabled.readDataFromArray(arrayRows);
-            mSetting_RDPMode.readDataFromArray(arrayRows);
-            mSetting_HighlightActivePatterns.readDataFromArray(arrayRows);
-            mSetting_SearchResultMonoColorHighlighting.readDataFromArray(arrayRows);
-            mSetting_MarkTimeStampWithBold.readDataFromArray(arrayRows);
-            mSetting_CaseSensitiveRegex.readDataFromArray(arrayRows);
-            mSetting_FilterVariables.readDataFromArray(arrayRows);
-            mSetting_RegexMonoHighlightingColor.readDataFromArray(arrayRows);
-            mSetting_PatternsHighlightingColor.readDataFromArray(arrayRows);
-            mSetting_CacheMaxSizeMB.readDataFromArray(arrayRows);
-            mSetting_SearchResultColumnsVisibilityMap.readDataFromArray(arrayRows);
-
+            for( auto* pSetting : mUserSettingItemPtrVec )
             {
-                std::lock_guard<std::recursive_mutex> lock(mSearchResultHighlightingGradientProtector);
-                mSetting_SearchResultHighlightingGradient.readDataFromArray(arrayRows);
+                if(pSetting == &mSetting_SearchResultHighlightingGradient)
+                {
+                    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
+                    pSetting->readDataFromArray(arrayRows);
+                }
+                else
+                {
+                    pSetting->readDataFromArray(arrayRows);
+                }
             }
-
-            mSetting_PatternsColumnsVisibilityMap.readDataFromArray(arrayRows);
-            mSetting_RegexFiltersColumnsVisibilityMap.readDataFromArray(arrayRows);
-            mSetting_SelectedRegexFile.readDataFromArray(arrayRows);
-            mSetting_SearchResultColumnsCopyPasteMap.readDataFromArray(arrayRows);
         }
 
         result.bResult = true;
@@ -1510,10 +1561,14 @@ void CSettingsManager::resetSearchResultColumnsCopyPasteMap()
     setSearchResultColumnsCopyPasteMap(sDefaultSearchResultColumnsVisibilityMap);
 }
 
-
 void CSettingsManager::resetPatternsColumnsVisibilityMap()
 {
     setPatternsColumnsVisibilityMap(sDefaultPatternsColumnsVisibilityMap);
+}
+
+void CSettingsManager::resetPatternsColumnsCopyPasteMap()
+{
+    setPatternsColumnsCopyPasteMap(sDefaultPatternsColumnsCopyPasteMap);
 }
 
 void CSettingsManager::resetRegexFiltersColumnsVisibilityMap()

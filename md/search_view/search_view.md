@@ -15,21 +15,23 @@ Still there are additional things which it does on top of what the standard func
 
 ----
 
-## Copy-paste extensions 
+## Visible columns
 
-As in the dlt-viewer, the view allows you to copy the whole message, or only the payload:
-
-![Screenshot of the context-menu part, which is related to the "Copy" operation](./search_view_copy_context_menu.png)
-
-Besides that, you can select the visible columns:
+Search view allows you to select the visible columns, which might increase the readability of the messages:
 
 ![Screenshot of the "Visible columns" context menu](./search_view_visible_columns.png)
 
 ----
 
->**Note!**
->
-> Copy operation will consider ONLY visible columns, making it possible to copy ONLY needed amount of information.
+## Copy-paste extensions 
+
+As in the dlt-viewer, the search view allows you to copy the whole message, or only the payload:
+
+![Screenshot of the context-menu part, which is related to the "Copy" operation](./search_view_copy_context_menu.png)
+
+Besides that, you can select, which columns will be copied. That might help you to copy ONLY required sub-set of information:
+
+![Screenshot of the "Copy columns" context menu](./search_view_copy_columns.png)
 
 ----
 

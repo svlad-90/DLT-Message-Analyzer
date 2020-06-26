@@ -69,7 +69,8 @@ make -j4
 
 > **Note!** 
 > 
-> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the **./dlt-viewer/plugin/DLT-Message-Analyzer/dltmessageanalyzerplugin/src/CMakeLists.txt**:
+> If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the 
+> **./dlt-viewer/plugin/ DLT-Message-Analyzer/ dltmessageanalyzerplugin/ src/ CMakeLists.txt**:
 > 
 > ![Screenshot enable 1.0.0 compatibility define in CMakeLists.txt](./installation_guide_enable_define_cmake.png)
 

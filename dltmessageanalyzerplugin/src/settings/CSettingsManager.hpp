@@ -62,6 +62,7 @@ public:
     void resetSearchResultColumnsVisibilityMap();
     void resetSearchResultColumnsCopyPasteMap();
     void resetPatternsColumnsVisibilityMap();
+    void resetPatternsColumnsCopyPasteMap();
     void resetRegexFiltersColumnsVisibilityMap();
     QString getRegexDirectory() const;
     QString getRegexDirectoryFull() const;
@@ -96,6 +97,7 @@ public:
     void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val);
     void setMarkTimeStampWithBold(bool val);
     void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val);
+    void setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val);
     void setCaseSensitiveRegex(bool val);
     void setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val);
     void setFilterVariables(bool val);
@@ -134,6 +136,7 @@ public:
     const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const;
     bool getMarkTimeStampWithBold() const;
     const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const;
+    const tPatternsColumnsVisibilityMap& getPatternsColumnsCopyPasteMap() const;
     bool getCaseSensitiveRegex() const;
     const tRegexFiltersColumnsVisibilityMap& getRegexFiltersColumnsVisibilityMap() const;
     bool getFilterVariables() const;
@@ -167,6 +170,7 @@ signals:
     void searchResultColumnsCopyPasteMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsCopyPasteMap);
     void markTimeStampWithBoldChanged(bool markTimeStampWithBold);
     void patternsColumnsVisibilityMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsVisibilityMap);
+    void patternsColumnsCopyPasteMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsCopyPasteMap);
     void caseSensitiveRegexChanged(bool bCaseSensitiveRegex);
     void regexFiltersColumnsVisibilityMapChanged(const tRegexFiltersColumnsVisibilityMap& regexFiltersColumnsVisibilityMap);
     void filterVariablesChanged(bool filterVariables);
@@ -336,13 +340,10 @@ private: // methods
         {
             bool bResult = false;
 
-            if(true == JSONItem.isObject())
+            if(true == JSONItem.isDouble())
             {
-                if(true == JSONItem.isDouble())
-                {
-                    data = static_cast<T>(JSONItem.toDouble());
-                    bResult = true;
-                }
+                data = static_cast<T>(JSONItem.toDouble());
+                bResult = true;
             }
 
             return bResult;
@@ -380,10 +381,18 @@ private: // fields
     TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsCopyPasteMap;
     TSettingItem<bool> mSetting_MarkTimeStampWithBold;
     TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsVisibilityMap;
+    TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsCopyPasteMap;
     TSettingItem<bool> mSetting_CaseSensitiveRegex;
     TSettingItem<tRegexFiltersColumnsVisibilityMap> mSetting_RegexFiltersColumnsVisibilityMap;
     TSettingItem<bool> mSetting_FilterVariables;
     TSettingItem<QString> mSetting_SelectedRegexFile; // name of the regex file to be used.
+
+    typedef ISettingItem* tSettingItemPtr;
+    typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
+
+    tSettingItemsPtrVec mRootSettingItemPtrVec;
+    tSettingItemsPtrVec mUserSettingItemPtrVec;
+    tSettingItemsPtrVec mPatternsSettingItemPtrVec;
 
     bool mbRootConfigInitialised;
 };
