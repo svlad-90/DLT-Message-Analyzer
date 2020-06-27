@@ -17,6 +17,7 @@
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTMsgWrapper.hpp"
 #include "patternsView/CPatternsView.hpp"
+#include "filtersView/CFiltersView.hpp"
 
 Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
 
@@ -94,6 +95,11 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     auto pMTController = IDLTMessageAnalyzerController::createInstance<CMTAnalyzer>();
     mpMessageAnalyzerController = IDLTMessageAnalyzerController::createInstance<CContinuousAnalyzer>(pMTController);
+
+    if(nullptr != mpForm->getFiltersView())
+    {
+        mpForm->getFiltersView()->setRegexInputField(mpForm->getRegexLineEdit());
+    }
 
     mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(mpMessageAnalyzerController,
                                                                                                       mpForm->getGroupedResultView(),

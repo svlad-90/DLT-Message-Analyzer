@@ -7,12 +7,27 @@
 #include "QScrollBar"
 #include "QMenu"
 #include "QStyledItemDelegate"
+#include "QClipboard"
+#include "QLineEdit"
 
 #include "CFiltersModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../log/CConsoleCtrl.hpp"
 
 #include "CFiltersView.hpp"
+
+namespace NShortcuts
+{
+    static bool isEnter( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->key() == Qt::Key_Enter;
+    }
+
+    static bool isCopyShortcut( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->modifiers() & Qt::ControlModifier && pEvent->key() == Qt::Key_C;
+    }
+}
 
 class CRegexTreeRepresentationDelegate : public QStyledItemDelegate
 {
@@ -334,6 +349,18 @@ CFiltersView::CFiltersView(QWidget *parent):
         QMenu contextMenu("Context menu", this);
 
         {
+            QAction* pAction = new QAction("Copy", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                copySelectedRowToClipboard();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
             QAction* pAction = new QAction("Filter variables", this);
             connect(pAction, &QAction::triggered, [](bool checked)
             {
@@ -351,7 +378,10 @@ CFiltersView::CFiltersView(QWidget *parent):
             pAction->setShortcut(QKeySequence(tr("Enter")));
             connect(pAction, &QAction::triggered, [this]()
             {
-                returnPressed();
+                if(nullptr != mpRegexInputField)
+                {
+                    mpRegexInputField->setFocus();
+                }
             });
             contextMenu.addAction(pAction);
         }
@@ -397,6 +427,15 @@ CFiltersView::CFiltersView(QWidget *parent):
             contextMenu.addMenu(pSubMenu);
         }
 
+        {
+            QAction* pAction = new QAction("Reset visible columns", this);
+            connect(pAction, &QAction::triggered, []()
+            {
+                CSettingsManager::getInstance()->resetRegexFiltersColumnsVisibilityMap();
+            });
+            contextMenu.addAction(pAction);
+        }
+
         contextMenu.exec(mapToGlobal(pos));
     };
 
@@ -413,15 +452,32 @@ CFiltersView::CFiltersView(QWidget *parent):
     setItemDelegate(mpRepresentationDelegate);
 }
 
+void CFiltersView::setRegexInputField(QLineEdit* pRegexInputField)
+{
+    mpRegexInputField = pRegexInputField;
+}
+
+void CFiltersView::copySelectedRowToClipboard()
+{
+    QClipboard* pClipboard = QApplication::clipboard();
+
+    if(nullptr != pClipboard && nullptr != mpRegexInputField)
+    {
+        pClipboard->setText(mpRegexInputField->selectedText());
+    }
+}
+
 void CFiltersView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     if(true == current.isValid())
     {
         auto pTreeItem = static_cast<CTreeItem*>(current.internalPointer());
 
-        if(nullptr != pTreeItem)
+        if(nullptr != pTreeItem &&
+           nullptr != mpRegexInputField)
         {
-            regexRangeSelectionRequested( pTreeItem->data(static_cast<int>(eRegexFiltersColumn::Range)).get<tRange>() );
+            auto range = pTreeItem->data(static_cast<int>(eRegexFiltersColumn::Range)).get<tRange>();
+            mpRegexInputField->setSelection(range.from, range.to - range.from);
         }
     }
 
@@ -593,9 +649,16 @@ void CFiltersView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
 
 void CFiltersView::keyPressEvent ( QKeyEvent * event )
 {
-    if(event->key() == Qt::Key::Key_Enter)
+    if(true == NShortcuts::isEnter(event))
     {
-        returnPressed();
+        if(nullptr != mpRegexInputField)
+        {
+            mpRegexInputField->setFocus();
+        }
+    }
+    else if(true == NShortcuts::isCopyShortcut(event))
+    {
+        copySelectedRowToClipboard();
     }
     else
     {

@@ -20,10 +20,7 @@ public:
 
     void setSpecificModel( CFiltersModel* pModel );
     void highlightInvalidRegex(const QModelIndex &index);
-
-signals:
-    void regexRangeSelectionRequested( const tRange& range );
-    void returnPressed();
+    void setRegexInputField(QLineEdit* pRegexInputField);
 
 protected:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
@@ -34,6 +31,7 @@ private:
     void updateColumnsVisibility();
     void updateWidth();
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
+    void copySelectedRowToClipboard();
 
 private: // fields
     CFiltersModel* mpModel;
@@ -50,6 +48,7 @@ private: // fields
     CRegexTreeRepresentationDelegate * mpRepresentationDelegate;
     bool mbResizeOnExpandCollapse;
     bool mbSkipFirstUpdateWidth;
+    QLineEdit* mpRegexInputField;
 };
 
 #endif // CFILTERSVIEW_HPP

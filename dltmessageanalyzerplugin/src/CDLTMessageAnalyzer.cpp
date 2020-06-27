@@ -123,15 +123,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     mpPatternsTreeView->setPatternsSearchInput(pPatternsSearchInput);
 
-    if(nullptr != mpFiltersView && nullptr != mpRegexLineEdit)
-    {
-        connect( mpFiltersView, &CFiltersView::regexRangeSelectionRequested, this,
-                 [this](const tRange range)
-        {
-            mpRegexLineEdit->setSelection(range.from, range.to - range.from);
-        });
-    }
-
     if( nullptr != mpGroupedResultView &&
             nullptr != mpGroupedViewModel )
     {
@@ -225,14 +216,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     if(nullptr != mpFiltersSearchInput)
     {
         connect( mpFiltersSearchInput, &QLineEdit::returnPressed, this, [this](){ analyze(); } );
-    }
-
-    if(nullptr != mpFiltersView && nullptr != mpRegexLineEdit)
-    {
-        connect(mpFiltersView, &CFiltersView::returnPressed, this, [this]()
-        {
-            mpRegexLineEdit->setFocus();
-        });
     }
 
     if(nullptr != mpFiltersModel && nullptr != mpFiltersView)
