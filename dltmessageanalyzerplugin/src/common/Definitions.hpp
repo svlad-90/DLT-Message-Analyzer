@@ -20,6 +20,18 @@
 
 //#define DEBUG_BUILD
 
+namespace cpp_14
+{
+    template<bool C, class T = void>
+    using enable_if_t = typename std::enable_if<C, T>::type;
+
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args&&... args)
+    {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+}
+
 extern const std::map<QString, QColor> sColorsMap;
 
 extern const QString sVARPrefix;

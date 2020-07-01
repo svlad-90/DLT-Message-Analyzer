@@ -321,7 +321,7 @@ private: // methods
                                                  const TSettingItem<QString>::tUpdateSettingsFileFunc& updateFileFunc,
                                                  const QString& defaultValue) const;
 
-    template<typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+    template<typename T, typename = cpp_14::enable_if_t<std::is_integral<T>::value>>
     TSettingItem<T> createIntegralSettingsItem(const QString& key,
                                                  const typename TSettingItem<T>::tUpdateDataFunc& updateDataFunc,
                                                  const typename TSettingItem<T>::tUpdateSettingsFileFunc& updateFileFunc,
