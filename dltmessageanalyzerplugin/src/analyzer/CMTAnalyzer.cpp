@@ -42,7 +42,7 @@ mRequestIdCounter( static_cast<uint64_t>(-1) )
         // instance of CDLTRegexAnalyzerWorker, located in QThread will send updates to CMTAnalyzer
         connect(pWorker, &CDLTRegexAnalyzerWorker::portionAnalysisFinished, this, &CMTAnalyzer::portionRegexAnalysisFinished, Qt::QueuedConnection);
 
-        tQThreadPtr pWorkerThread = std::make_unique<QThread>();
+        tQThreadPtr pWorkerThread = cpp_14::make_unique<QThread>();
 
         // After worker thread will be stopped, worker object should be aynchronously deleted.
         connect(pWorkerThread.get(), &QThread::finished, pWorker, &QObject::deleteLater, Qt::QueuedConnection);
