@@ -1,0 +1,57 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Print out debug information 
+    - name: Debug Action
+      uses: hmarr/debug-action@v1.0.0
+
+    # Checkout dlt-viewer's revision 2.20.
+    - name: Checkout of the dlt-viewer
+      uses: actions/checkout@v2
+      with:
+        repository: GENIVI/dlt-viewer
+        ref: v2.20.0
+
+    # Checkout DLT-Message-Analyzer's revision, which is pushed
+    - name: Checkout of the DLT-Message-Analyzer
+      uses: actions/checkout@v2
+      with:
+        repository: svlad-90/DLT-Message-Analyzer
+        path: ./dlt-viewer/plugins
+        ref: ${{ github.ref }}
+        
+    # Adjust dlt-viewer's CMake file to sub-include DLT-Message-Analyzer
+    - name: Patch dlt-viewer's CMakeLists.txt
+      run: echo 'add_subdirectory(DLT-Message-Analyzer)' >> CMakeLists.txt
+      shell: bash
+      working-directory: ./dlt-viewer/plugins
+
+    # Create build directory
+    - name: Creation of the "./build" directory
+      run: touch ./build
+      shell: bash
+      working-directory: ./dlt-viewer
+
+    # CMake for dlt-viewer, including the DLT-Message_analyzer plugin
+    - name: CMake
+      run: cmake ..
+      shell: bash
+      working-directory: ./dlt-viewer/build
+    
+    # Build of the project
+    - name: Make
+      run: make -j4
+      shell: bash
+      working-directory: ./dlt-viewer/build 
