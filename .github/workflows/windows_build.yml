@@ -1,0 +1,94 @@
+name: Build windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_windows:
+    
+    runs-on: windows-latest
+
+    steps:
+ 
+    # Caching the Qt
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v1
+      with:
+        path: ..\Qt
+        key: ${{ runner.os }}-QtCache
+
+    # Installation of the Qt
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+         version: 5.15.0
+         target: desktop
+         host: windows
+         dir: ..\Qt 
+         cached: ${{ steps.cache-qt.outputs.cache-hit }}
+         
+    # Creation of the ..\downloads directory
+    - name: Creation of the "..\downloads" directory
+      run: mkdir ..\downloads
+      shell: cmd
+      working-directory: .\
+    
+    # Creation of the ..\tools directory
+    - name: Creation of the "..\tools" directory
+      run: mkdir ..\tools
+      shell: cmd
+      working-directory: .\
+         
+    # Installation of jom
+    - name: Installation of the jom
+      run: |
+           Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile ..\downloads\jom.zip
+           Expand-Archive '..\downloads\jom.zip' '..\tools\jom' 
+      shell: powershell
+
+    # Checkout dlt-viewer's revision 2.20.
+    - name: Checkout of the dlt-viewer
+      uses: actions/checkout@v2
+      with:
+        repository: GENIVI/dlt-viewer
+        ref: v2.20.0
+
+    # Checkout DLT-Message-Analyzer's revision, which is pushed
+    - name: Checkout of the DLT-Message-Analyzer
+      uses: actions/checkout@v2
+      with:
+        repository: svlad-90/DLT-Message-Analyzer
+        path: .\plugin\DLT-Message-Analyzer
+        ref: ${{ github.ref }}
+        
+    # Adjust dlt-viewer's plugin.pro file to sub-include DLT-Message-Analyzer
+    - name: Patch dlt-viewer's plugin.pro
+      run: ((Get-Content -path .\plugin.pro -Raw) -replace '(SUBDIRS.*\+=)','$1 DLT-Message-Analyzer') | Set-Content -Path .\plugin.pro
+      shell: powershell
+      working-directory: .\plugin
+
+    # Create build directory
+    - name: Creation of the ".\build" directory
+      run: mkdir ..\build
+      shell: cmd
+      working-directory: .\
+
+    # QMake for dlt-viewer, including the DLT-Message_analyzer plugin
+    - name: QMake
+      run: |
+        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        qmake ..\DLT-Message-Analyzer\BuildDltViewer.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
+      shell: cmd
+      working-directory: ..\build
+    
+    # Build of the project
+    - name: Jom
+      run: |
+        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        ..\tools\jom\jom.exe -j8
+      shell: cmd
+      working-directory: ..\build
