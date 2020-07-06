@@ -34,7 +34,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    QString exportToHTML();
+    std::pair<bool /*result*/, QString /*error*/> exportToHTML(QString& resultHTML);
 
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 

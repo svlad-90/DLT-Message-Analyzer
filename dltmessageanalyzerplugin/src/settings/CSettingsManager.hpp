@@ -64,6 +64,7 @@ public:
     void resetPatternsColumnsVisibilityMap();
     void resetPatternsColumnsCopyPasteMap();
     void resetRegexFiltersColumnsVisibilityMap();
+    void resetGroupedViewColumnsVisibilityMap();
     QString getRegexDirectory() const;
     QString getRegexDirectoryFull() const;
     QString getUserSettingsFilepath() const;
@@ -101,6 +102,7 @@ public:
     void setCaseSensitiveRegex(bool val);
     void setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val);
     void setFilterVariables(bool val);
+    void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -141,6 +143,7 @@ public:
     const tRegexFiltersColumnsVisibilityMap& getRegexFiltersColumnsVisibilityMap() const;
     bool getFilterVariables() const;
     QString getSelectedRegexFile() const;
+    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -175,6 +178,7 @@ signals:
     void regexFiltersColumnsVisibilityMapChanged(const tRegexFiltersColumnsVisibilityMap& regexFiltersColumnsVisibilityMap);
     void filterVariablesChanged(bool filterVariables);
     void selectedRegexFileChanged( const QString& regexDirectory );
+    void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
 
 private: // methods
 
@@ -311,6 +315,11 @@ private: // methods
                                                  const TSettingItem<tPatternsColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
                                                  const tPatternsColumnsVisibilityMap& defaultValue) const;
 
+    TSettingItem<tGroupedViewColumnsVisibilityMap> createGroupedViewColumnsVisibilityMapSettingsItem(const QString& key,
+                                                 const TSettingItem<tGroupedViewColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<tGroupedViewColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const tGroupedViewColumnsVisibilityMap& defaultValue) const;
+
     TSettingItem<tRegexFiltersColumnsVisibilityMap> createRegexFiltersColumnsVisibilityMapSettingsItem(const QString& key,
                                                  const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
                                                  const TSettingItem<tRegexFiltersColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
@@ -386,6 +395,7 @@ private: // fields
     TSettingItem<tRegexFiltersColumnsVisibilityMap> mSetting_RegexFiltersColumnsVisibilityMap;
     TSettingItem<bool> mSetting_FilterVariables;
     TSettingItem<QString> mSetting_SelectedRegexFile; // name of the regex file to be used.
+    TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsVisibilityMap;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

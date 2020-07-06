@@ -18,6 +18,7 @@
 #include "CGroupedView.hpp"
 #include "../common/CTreeItem.hpp"
 #include "../log/CConsoleCtrl.hpp"
+#include "../settings/CSettingsManager.hpp"
 
 class CDoubleDelegate: public QStyledItemDelegate
 {
@@ -213,6 +214,58 @@ CGroupedView::CGroupedView(QWidget *parent):
             contextMenu.addSeparator();
         }
 
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Visible columns", this);
+
+            {
+                const auto& gorupedViewColumnsVisibilityMap =
+                        CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+
+                for( int i = static_cast<int>(eGroupedViewColumn::SubString);
+                     i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
+                     ++i)
+                {
+                    auto foundItem = gorupedViewColumnsVisibilityMap.find(static_cast<eGroupedViewColumn>(i));
+
+                    if(foundItem != gorupedViewColumnsVisibilityMap.end())
+                    {
+                        QAction* pAction = new QAction(getName(static_cast<eGroupedViewColumn>(i)), this);
+                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        {
+                            auto groupedViewColumnsVisibilityMap_ =
+                                    CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+
+                            auto foundItem_ = groupedViewColumnsVisibilityMap_.find(static_cast<eGroupedViewColumn>(i));
+
+                            if(foundItem_ != groupedViewColumnsVisibilityMap_.end()) // if item is in the map
+                            {
+                                foundItem_.value() = checked; // let's update visibility value
+                                CSettingsManager::getInstance()->setGroupedViewColumnsVisibilityMap(groupedViewColumnsVisibilityMap_);
+                            }
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(foundItem.value());
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        {
+            QAction* pAction = new QAction("Reset visible columns", this);
+            connect(pAction, &QAction::triggered, []()
+            {
+                CSettingsManager::getInstance()->resetGroupedViewColumnsVisibilityMap();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
         {
             auto selectedRows = selectionModel()->selectedRows();
 
@@ -290,6 +343,14 @@ CGroupedView::CGroupedView(QWidget *parent):
         {
             isExpanded(index)? collapse(index) : expand(index);
         }
+    });
+
+    connect( CSettingsManager::getInstance().get(),
+             &CSettingsManager::groupedViewColumnsVisibilityMapChanged,
+             [this](const tGroupedViewColumnsVisibilityMap&)
+    {
+        updateColumnsVisibility();
+        updateWidth();
     });
 }
 
@@ -420,63 +481,83 @@ void CGroupedView::copyGroupedViewSelection() const
 
     QString finalText;
 
-    for(const auto& item : selectedRowSet)
+    const auto& visibleColumns = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+
+    bool bAnythingToCopy = false;
+
+    for(const auto& visibleColumn : visibleColumns)
     {
-        auto index = item.getModelIndex();
-
-        for( int i = static_cast<int>(eGroupedViewColumn::SubString);
-             i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
-             ++i )
+        if(true == visibleColumn)
         {
-            auto column = index.model()->sibling(index.row(), i, index);
-
-            switch(static_cast<eGroupedViewColumn>(i))
-            {
-                case eGroupedViewColumn::SubString:
-                {
-                    QString message = index.data().value<QString>();
-
-                    for(int j = 0; j < item.getLevel(); ++j)
-                    {
-                        if(j == item.getLevel() - 1)
-                        {
-                            finalText.append("|-");
-                        }
-                        else
-                        {
-                            finalText.append("  ");
-                        }
-                    }
-
-                    finalText.append(message);
-                }
-                    break;
-                case eGroupedViewColumn::Messages:
-                case eGroupedViewColumn::MessagesPerSecondAverage:
-                case eGroupedViewColumn::Payload:
-                case eGroupedViewColumn::PayloadPerSecondAverage:
-                {
-                    finalText.append(" | ").append(getName(static_cast<eGroupedViewColumn>(i))).append(" : ");
-                    finalText.append( QString::number( column.data().value<int>() ) );
-                }
-                    break;
-                case eGroupedViewColumn::PayloadPercantage:
-                case eGroupedViewColumn::MessagesPercantage:
-                {
-                    finalText.append(" | ").append(getName(static_cast<eGroupedViewColumn>(i))).append(" : ");
-                    finalText.append( QString::number( column.data().value<double>(), 'f', 3 ) );
-                }
-                    break;
-                case eGroupedViewColumn::AfterLastVisible:
-                case eGroupedViewColumn::Metadata:
-                case eGroupedViewColumn::Last:
-                    break;
-            }
+            bAnythingToCopy = true;
+            break;
         }
-
-        finalText.append("\n");
     }
 
+    if(true == bAnythingToCopy)
+    {
+        for(const auto& item : selectedRowSet)
+        {
+            auto index = item.getModelIndex();
+
+            for( int i = static_cast<int>(eGroupedViewColumn::SubString);
+                 i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
+                 ++i )
+            {
+                auto foundVisibleColumn = visibleColumns.find(static_cast<eGroupedViewColumn>(i));
+
+                if(foundVisibleColumn != visibleColumns.end() && true == foundVisibleColumn.value())
+                {
+                    auto column = index.model()->sibling(index.row(), i, index);
+
+                    switch(static_cast<eGroupedViewColumn>(i))
+                    {
+                        case eGroupedViewColumn::SubString:
+                        {
+                            QString message = index.data().value<QString>();
+
+                            for(int j = 0; j < item.getLevel(); ++j)
+                            {
+                                if(j == item.getLevel() - 1)
+                                {
+                                    finalText.append("|-");
+                                }
+                                else
+                                {
+                                    finalText.append("  ");
+                                }
+                            }
+
+                            finalText.append(message);
+                        }
+                            break;
+                        case eGroupedViewColumn::Messages:
+                        case eGroupedViewColumn::MessagesPerSecondAverage:
+                        case eGroupedViewColumn::Payload:
+                        case eGroupedViewColumn::PayloadPerSecondAverage:
+                        {
+                            finalText.append(" | ").append(getName(static_cast<eGroupedViewColumn>(i))).append(" : ");
+                            finalText.append( QString::number( column.data().value<int>() ) );
+                        }
+                            break;
+                        case eGroupedViewColumn::PayloadPercantage:
+                        case eGroupedViewColumn::MessagesPercantage:
+                        {
+                            finalText.append(" | ").append(getName(static_cast<eGroupedViewColumn>(i))).append(" : ");
+                            finalText.append( QString::number( column.data().value<double>(), 'f', 3 ) );
+                        }
+                            break;
+                        case eGroupedViewColumn::AfterLastVisible:
+                        case eGroupedViewColumn::Metadata:
+                        case eGroupedViewColumn::Last:
+                            break;
+                    }
+                }
+            }
+
+            finalText.append("\n");
+        }
+    }
 
 
     QClipboard *pClipboard = QApplication::clipboard();
@@ -527,17 +608,28 @@ void CGroupedView::updateWidth()
 
 void CGroupedView::updateColumnsVisibility()
 {
+    const tGroupedViewColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+
     for( int i = static_cast<int>(eGroupedViewColumn::SubString);
          i < static_cast<int>(eGroupedViewColumn::Last);
          ++i)
     {
-        if(i >= static_cast<int>(eGroupedViewColumn::AfterLastVisible))
+        auto foundColumn = visibilityMap.find(static_cast<eGroupedViewColumn>(i));
+
+        if( foundColumn != visibilityMap.end() )
         {
-            hideColumn(i);
+            if(true == foundColumn.value()) // if column is visible
+            {
+                showColumn(i);
+            }
+            else
+            {
+                hideColumn(static_cast<int>(i));
+            }
         }
         else
         {
-            showColumn(i);
+             hideColumn(static_cast<int>(i));
         }
     }
 }

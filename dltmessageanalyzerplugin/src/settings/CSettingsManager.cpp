@@ -53,6 +53,7 @@ static const QString sRegexFiltersColumnsVisibilityMapKey = "RegexFiltersColumns
 static const QString sFilterVariablesKey = "FilterVariables";
 static const QString sCaseSensitiveRegex = "caseSensitiveRegex";
 static const QString sSelectedRegexFile = "selectedRegexFile";
+static const QString sGroupedViewColumnsVisibilityMapKey = "GroupedViewColumnsVisibilityMap";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -135,6 +136,25 @@ static tRegexFiltersColumnsVisibilityMap fillInDefaultRegexFiltersColumnsVisibil
 
 static const tRegexFiltersColumnsVisibilityMap sDefaultRegexFiltersColumnsVisibilityMap
 = fillInDefaultRegexFiltersColumnsVisibilityMap();
+
+static tGroupedViewColumnsVisibilityMap fillInDefaultGroupedViewColumnsVisibilityMap()
+{
+    tGroupedViewColumnsVisibilityMap result;
+
+    // fields, which are visible by default
+    result.insert(eGroupedViewColumn::SubString, true);
+    result.insert(eGroupedViewColumn::Messages, true);
+    result.insert(eGroupedViewColumn::MessagesPercantage, true);
+    result.insert(eGroupedViewColumn::MessagesPerSecondAverage, true);
+    result.insert(eGroupedViewColumn::Payload, true);
+    result.insert(eGroupedViewColumn::PayloadPercantage, true);
+    result.insert(eGroupedViewColumn::PayloadPerSecondAverage, true);
+
+    return result;
+}
+
+static const tGroupedViewColumnsVisibilityMap sDefaultGroupedViewColumnsVisibilityMap
+= fillInDefaultGroupedViewColumnsVisibilityMap();
 
 CSettingsManager::CSettingsManager():
     mSetting_SettingsManagerVersion(createIntegralSettingsItem<tSettingsManagerVersion>(sSettingsManagerVersionKey,
@@ -246,6 +266,10 @@ CSettingsManager::CSettingsManager():
         },
         [this](){tryStoreSettingsConfig();},
         sDefaultRegexFileName)),
+    mSetting_GroupedViewColumnsVisibilityMap(createGroupedViewColumnsVisibilityMapSettingsItem(sGroupedViewColumnsVisibilityMapKey,
+        [this](const tGroupedViewColumnsVisibilityMap& data){groupedViewColumnsVisibilityMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultGroupedViewColumnsVisibilityMap)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -277,6 +301,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_RegexFiltersColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_FilterVariables);
     mUserSettingItemPtrVec.push_back(&mSetting_SelectedRegexFile);
+    mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsVisibilityMap);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -578,7 +603,6 @@ TSettingItem<tSearchResultColumnsVisibilityMap> CSettingsManager::createSearchRe
 {
     auto writeFunc = [&key](const tSearchResultColumnsVisibilityMap& value)->QJsonObject
     {
-        QJsonObject searchResultColumnsVisibilityMap;
         QJsonArray arraySearchResultColumnsVisibilityItems;
         for(auto it = value.begin(); it != value.end(); ++it)
         {
@@ -656,7 +680,6 @@ TSettingItem<tPatternsColumnsVisibilityMap> CSettingsManager::createPatternsColu
 {
     auto writeFunc = [&key](const tPatternsColumnsVisibilityMap& value)->QJsonObject
     {
-        QJsonObject patternsColumnsVisibilityMap;
         QJsonArray arrayPatternsColumnsVisibilityItems;
         for(auto it = value.begin(); it != value.end(); ++it)
         {
@@ -720,6 +743,83 @@ TSettingItem<tPatternsColumnsVisibilityMap> CSettingsManager::createPatternsColu
     };
 
     return TSettingItem<tPatternsColumnsVisibilityMap>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<tGroupedViewColumnsVisibilityMap> CSettingsManager::createGroupedViewColumnsVisibilityMapSettingsItem(const QString& key,
+                                             const TSettingItem<tGroupedViewColumnsVisibilityMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tGroupedViewColumnsVisibilityMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tGroupedViewColumnsVisibilityMap& defaultValue) const
+{
+    auto writeFunc = [&key](const tGroupedViewColumnsVisibilityMap& value)->QJsonObject
+    {
+        QJsonArray arrayGroupedViewColumnsVisibilityItems;
+        for(auto it = value.begin(); it != value.end(); ++it)
+        {
+            QJsonObject obj;
+            obj.insert( QString::number( static_cast<int>(it.key()) ), QJsonValue( it.value() ) );
+            arrayGroupedViewColumnsVisibilityItems.append( obj );
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arrayGroupedViewColumnsVisibilityItems ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tGroupedViewColumnsVisibilityMap& data,
+                       const tGroupedViewColumnsVisibilityMap&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto groupedViewColumnsVisibilityArray = JSONItem.toArray();
+            for( const auto groupedViewColumnsVisibilityObj : groupedViewColumnsVisibilityArray )
+            {
+                if(true == groupedViewColumnsVisibilityObj.isObject())
+                {
+                    QJsonObject visibilityObj = groupedViewColumnsVisibilityObj.toObject();
+
+                    if(false == visibilityObj.empty())
+                    {
+                        auto visibilityKeys = visibilityObj.keys();
+
+                        for(const auto& visibilityKey : visibilityKeys)
+                        {
+                            auto foundVisibilityValue = visibilityObj.find(visibilityKey);
+
+                            if(foundVisibilityValue != visibilityObj.end())
+                            {
+                                if(foundVisibilityValue->isBool())
+                                {
+                                    bool bConvertionStatus = false;
+
+                                    int columnIdx = visibilityKey.toInt(&bConvertionStatus);
+
+                                    bool bIsVisible = foundVisibilityValue->toBool();
+                                    data.insert(static_cast<eGroupedViewColumn>(columnIdx), bIsVisible);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tGroupedViewColumnsVisibilityMap>(key,
                              defaultValue,
                              writeFunc,
                              readFunc,
@@ -819,7 +919,7 @@ TSettingItem<QString> CSettingsManager::createStringSettingsItem(const QString& 
 
     auto readFunc = [](const QJsonValueRef& JSONItem,
                        QString& data,
-                       const QString& defaultValue)->bool
+                       const QString& defaultValue_)->bool
     {
         bool bResult = false;
 
@@ -829,7 +929,7 @@ TSettingItem<QString> CSettingsManager::createStringSettingsItem(const QString& 
 
             if(true == data.isEmpty()) // if stored filepath is empty
             {
-                data = defaultValue; // let's do a fallback to the default value
+                data = defaultValue_; // let's do a fallback to the default value
             }
 
             bResult = true;
@@ -1204,6 +1304,11 @@ void CSettingsManager::setFilterVariables(bool val)
     mSetting_FilterVariables.setData(val);
 }
 
+void CSettingsManager::setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val)
+{
+    mSetting_GroupedViewColumnsVisibilityMap.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1329,6 +1434,11 @@ QString CSettingsManager::getSelectedRegexFile() const
 {
     return mSetting_SelectedRegexFile.getData();
 }
+
+ const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsVisibilityMap() const
+ {
+     return mSetting_GroupedViewColumnsVisibilityMap.getData();
+ }
 
 QString CSettingsManager::getRegexDirectory() const
 {
@@ -1574,4 +1684,9 @@ void CSettingsManager::resetPatternsColumnsCopyPasteMap()
 void CSettingsManager::resetRegexFiltersColumnsVisibilityMap()
 {
     setRegexFiltersColumnsVisibilityMap(sDefaultRegexFiltersColumnsVisibilityMap);
+}
+
+void CSettingsManager::resetGroupedViewColumnsVisibilityMap()
+{
+    setGroupedViewColumnsVisibilityMap(sDefaultGroupedViewColumnsVisibilityMap);
 }
