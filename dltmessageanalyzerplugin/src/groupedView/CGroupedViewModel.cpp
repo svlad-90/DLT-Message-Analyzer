@@ -11,6 +11,7 @@
 
 #include "CGroupedViewModel.hpp"
 #include "../log/CConsoleCtrl.hpp"
+#include "../settings/CSettingsManager.hpp"
 
 static const QString sRootItemName = "Root";
 
@@ -579,197 +580,229 @@ void CGroupedViewModel::resetData()
     updateView();
 }
 
-QString CGroupedViewModel::exportToHTML()
+std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QString& resultHTML)
 {
+    std::pair<bool /*result*/, QString /*error*/> result;
+    result.first = false;
+
     if(nullptr != mpRootItem)
     {
-        mpRootItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
+        const auto& visibleColumns = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
 
-        QString finalText;
+        bool bIsAnythingToShow = false;
 
-        QString currentTime = QString().append("[").append(QDateTime::currentDateTime().toString()).append("]");
-
-        finalText.append(QString("<!DOCTYPE html>\n"
-                         "<html>\n"
-                         "<head>\n"
-                         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-                         "<title>Trace spam analysis report %1</title>\n").arg(currentTime));
-        finalText.append("<style>\n"
-                         "ul, #myUL {\n"
-                         "  list-style-type: none;\n"
-                         "}\n"
-                         "\n"
-                         "#myUL {\n"
-                         "  margin: 0;\n"
-                         "  padding: 0;\n"
-                         "}\n"
-                         "\n"
-                         ".box {\n"
-                         "  cursor: pointer;\n"
-                         "  -webkit-user-select: none; /* Safari 3.1+ */\n"
-                         "  -moz-user-select: none; /* Firefox 2+ */\n"
-                         "  -ms-user-select: none; /* IE 10+ */\n"
-                         "  user-select: none;\n"
-                         "}\n"
-                         "\n"
-                         ".box::before {\n"
-                         "  content: \"\\2610\";\n"
-                         "  color: black;\n"
-                         "  display: inline-block;\n"
-                         "  margin-right: 6px;\n"
-                         "}\n"
-                         "\n"
-                         ".check-box::before {\n"
-                         "color: dodgerblue;\n"
-                         "}\n"
-                         "\n"
-                         ".nested {\n"
-                         "  display: none;\n"
-                         "}\n"
-                         "\n"
-                         ".active {\n"
-                         "  display: block;\n"
-                         "}\n"
-                         "</style>\n"
-                         "</head>\n"
-                         "<body>\n");
-
-        finalText.append( QString("\n<h2>Trace spam analysis report %1</h2>").arg(currentTime) );
-        finalText.append( QString("\n<h3>Analysis based on regex: \"").append(mRegex).append("\"</h3>") );
-        finalText.append("<ul id=\"myUL\">");
-
-        auto preVisitFunction = [this, &finalText](tTreeItem* pItem)
+        for(const auto& columnVisibility : visibleColumns)
         {
-            if(nullptr != pItem->getParent())
+            if(true == columnVisibility)
             {
-                if(0 != pItem->childCount())
-                {
-                    finalText.append("<li><span class=\"box\">");
-                }
+                bIsAnythingToShow = true;
+                break;
+            }
+        }
 
-                for( int i = static_cast<int>(eGroupedViewColumn::SubString);
-                     i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
-                     ++i )
+        if(true == bIsAnythingToShow)
+        {
+            mpRootItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
+    
+            QString& finalText = resultHTML;
+    
+            QString currentTime = QString().append("[").append(QDateTime::currentDateTime().toString()).append("]");
+    
+            finalText.append(QString("<!DOCTYPE html>\n"
+                             "<html lang=\"en\">\n"
+                             "<head>\n"
+                             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+                             "<title>Trace spam analysis report %1</title>\n").arg(currentTime));
+            finalText.append("<style>\n"
+                             "ul, #myUL {\n"
+                             "  list-style-type: none;\n"
+                             "}\n"
+                             "\n"
+                             "#myUL {\n"
+                             "  margin: 0;\n"
+                             "  padding: 0;\n"
+                             "}\n"
+                             "\n"
+                             ".box {\n"
+                             "  cursor: pointer;\n"
+                             "  -webkit-user-select: none; /* Safari 3.1+ */\n"
+                             "  -moz-user-select: none; /* Firefox 2+ */\n"
+                             "  -ms-user-select: none; /* IE 10+ */\n"
+                             "  user-select: none;\n"
+                             "}\n"
+                             "\n"
+                             ".box::before {\n"
+                             "  content: \"\\2610\";\n"
+                             "  color: black;\n"
+                             "  display: inline-block;\n"
+                             "  margin-right: 6px;\n"
+                             "}\n"
+                             "\n"
+                             ".check-box::before {\n"
+                             "color: dodgerblue;\n"
+                             "}\n"
+                             "\n"
+                             ".nested {\n"
+                             "  display: none;\n"
+                             "}\n"
+                             "\n"
+                             ".active {\n"
+                             "  display: block;\n"
+                             "}\n"
+                             "</style>\n"
+                             "</head>\n"
+                             "<body>\n");
+    
+            finalText.append( QString("\n<h2>Trace spam analysis report %1</h2>").arg(currentTime) );
+            finalText.append( QString("\n<h3>Analysis based on regex: \"").append(mRegex).append("\"</h3>") );
+            finalText.append("<ul id=\"myUL\">");
+
+            auto preVisitFunction = [this, &finalText, &visibleColumns](tTreeItem* pItem)
+            {
+                if(nullptr != pItem->getParent())
                 {
-                    if(i > 0)
+                    if(0 != pItem->childCount())
                     {
-                        finalText.append("\t|\t");
+                        finalText.append("<li><span class=\"box\">");
+                    }
+                    else
+                    {
+                        finalText.append("<li>");
                     }
 
-                    switch(static_cast<eGroupedViewColumn>(i))
+                    for( int i = static_cast<int>(eGroupedViewColumn::SubString);
+                         i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
+                         ++i )
                     {
-                        case eGroupedViewColumn::SubString:
+                        // lets consider ONLY the visible columns
+                        auto foundVisibleColumn = visibleColumns.find(static_cast<eGroupedViewColumn>(i));
+                        if(foundVisibleColumn != visibleColumns.end() && true == foundVisibleColumn.value())
                         {
-                            auto variantVal = pItem->data(i);
-                            finalText.append(variantVal
-                                             .get<QString>()
-                                             .toHtmlEscaped());
+                            if(i > 0)
+                            {
+                                finalText.append("\t|\t");
+                            }
+
+                            switch(static_cast<eGroupedViewColumn>(i))
+                            {
+                                case eGroupedViewColumn::SubString:
+                                {
+                                    auto variantVal = pItem->data(i);
+                                    finalText.append(variantVal
+                                                     .get<QString>()
+                                                     .toHtmlEscaped());
+                                }
+                                    break;
+                                case eGroupedViewColumn::Messages:
+                                case eGroupedViewColumn::MessagesPerSecondAverage:
+                                case eGroupedViewColumn::Payload:
+                                case eGroupedViewColumn::PayloadPerSecondAverage:
+                                {
+
+                                    if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::PayloadPerSecondAverage)
+                                    {
+                                        updateAverageValues(pItem, true, false);
+                                    }
+                                    else if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::MessagesPerSecondAverage)
+                                    {
+                                        updateAverageValues(pItem, false, true);
+                                    }
+
+                                    auto variantVal = pItem->data(i);
+
+                                    finalText.append(getName(static_cast<eGroupedViewColumn>(i)))
+                                    .append(" : ")
+                                    .append(QString::number(variantVal
+                                    .get<int>()));
+                                }
+                                    break;
+                                case eGroupedViewColumn::PayloadPercantage:
+                                case eGroupedViewColumn::MessagesPercantage:
+                                {
+                                    if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::PayloadPercantage)
+                                    {
+                                        updatePercentageValues(pItem, true, false);
+                                    }
+                                    else if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::MessagesPercantage)
+                                    {
+                                        updatePercentageValues(pItem, false, true);
+                                    }
+
+                                    auto variantVal = pItem->data(i);
+
+                                    finalText.append(getName(static_cast<eGroupedViewColumn>(i)))
+                                    .append(" : ")
+                                    .append(QString::number(variantVal
+                                    .get<double>(), 'f', 3));
+                                }
+                                    break;
+                                case eGroupedViewColumn::AfterLastVisible:
+                                case eGroupedViewColumn::Metadata:
+                                case eGroupedViewColumn::Last:
+                                    break;
+                            }
                         }
-                            break;
-                        case eGroupedViewColumn::Messages:
-                        case eGroupedViewColumn::MessagesPerSecondAverage:
-                        case eGroupedViewColumn::Payload:
-                        case eGroupedViewColumn::PayloadPerSecondAverage:
-                        {
+                    }
 
-                            if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::PayloadPerSecondAverage)
-                            {
-                                updateAverageValues(pItem, true, false);
-                            }
-                            else if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::MessagesPerSecondAverage)
-                            {
-                                updateAverageValues(pItem, false, true);
-                            }
+                    finalText.append("\n");
 
-                            auto variantVal = pItem->data(i);
-
-                            finalText.append(getName(static_cast<eGroupedViewColumn>(i)))
-                            .append(" : ")
-                            .append(QString::number(variantVal
-                            .get<int>()));
-                        }
-                            break;
-                        case eGroupedViewColumn::PayloadPercantage:
-                        case eGroupedViewColumn::MessagesPercantage:
-                        {
-                            if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::PayloadPercantage)
-                            {
-                                updatePercentageValues(pItem, true, false);
-                            }
-                            else if(static_cast<eGroupedViewColumn>(i) == eGroupedViewColumn::MessagesPercantage)
-                            {
-                                updatePercentageValues(pItem, false, true);
-                            }
-
-                            auto variantVal = pItem->data(i);
-
-                            finalText.append(getName(static_cast<eGroupedViewColumn>(i)))
-                            .append(" : ")
-                            .append(QString::number(variantVal
-                            .get<double>(), 'f', 3));
-                        }
-                            break;
-                        case eGroupedViewColumn::AfterLastVisible:
-                        case eGroupedViewColumn::Metadata:
-                        case eGroupedViewColumn::Last:
-                            break;
+                    if(0 != pItem->childCount())
+                    {
+                        finalText.append("</span><ul class=\"nested\">");
                     }
                 }
 
-                finalText.append("\n");
+                return true;
+            };
 
-                if(0 != pItem->childCount())
-                {
-                    finalText.append("</span><ul class=\"nested\">");
-                }
-            }
-
-            return true;
-        };
-
-        auto postVisitFunction = [&finalText](const tTreeItem* pItem)
-        {
-            if(nullptr != pItem->getParent())
+            auto postVisitFunction = [&finalText](const tTreeItem* pItem)
             {
-                if(0 != pItem->childCount())
+                if(nullptr != pItem->getParent())
                 {
-                    finalText.append("</ul>"
-                                     "</li>");
+                    if(0 != pItem->childCount())
+                    {
+                        finalText.append("</ul>"
+                                         "</li>");
+                    }
+                    else
+                    {
+                        finalText.append("</li>");
+                    }
                 }
-                else
-                {
-                    finalText.append("</li>");
-                }
-            }
 
-            return true;
-        };
+                return true;
+            };
 
-        mpRootItem->visit( preVisitFunction, postVisitFunction );
+            mpRootItem->visit( preVisitFunction, postVisitFunction );
+    
+            finalText.append("</ul>"
+            ""
+            "<script>\n"
+            "var toggler = document.getElementsByClassName(\"box\");\n"
+            "var i;\n"
+            "\n"
+            "for (i = 0; i < toggler.length; i++) {\n"
+            "toggler[i].addEventListener(\"click\", function() {\n"
+            "this.parentElement.querySelector(\".nested\").classList.toggle(\"active\");\n"
+            "this.classList.toggle(\"check-box\");\n"
+            "});\n"
+            "}\n"
+            "</script>\n"
+            "\n"
+            "</body>\n"
+            "</html>\n");
+    
+            finalText.toHtmlEscaped();
 
-        finalText.append("</ul>"
-        ""
-        "<script>\n"
-        "var toggler = document.getElementsByClassName(\"box\");\n"
-        "var i;\n"
-        "\n"
-        "for (i = 0; i < toggler.length; i++) {\n"
-        "toggler[i].addEventListener(\"click\", function() {\n"
-        "this.parentElement.querySelector(\".nested\").classList.toggle(\"active\");\n"
-        "this.classList.toggle(\"check-box\");\n"
-        "});\n"
-        "}\n"
-        "</script>\n"
-        "\n"
-        "</body>\n"
-        "</html>\n");
-
-        finalText.toHtmlEscaped();
-
-        return finalText;
+            result.first = true;
+        }
+        else
+        {
+            result.second = "There are 0 visible columns. Nothing to export.";
+        }
     }
 
-    return QString();
+    return result;
 }
 
 void CGroupedViewModel::setUsedRegex(const QString& regex)

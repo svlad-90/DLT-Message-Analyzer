@@ -1099,9 +1099,11 @@ void CDLTMessageAnalyzer::exportGroupedViewToHTML()
     {
         if( 0 != mpGroupedViewModel->rowCount() )
         {
-            QString HTML_Str = mpGroupedViewModel->exportToHTML();
+            QString HTML_Str;
 
-            if(0 != HTML_Str.size())
+            auto exportResult= mpGroupedViewModel->exportToHTML(HTML_Str);
+
+            if(true == exportResult.first)
             {
                 QString filters("HTML (*.html);;All files (*.*)");
                 QString defaultFilter("HTML (*.html)");
@@ -1131,6 +1133,10 @@ void CDLTMessageAnalyzer::exportGroupedViewToHTML()
                 {
                     updateStatusLabel(QString( "Nothing to store. Result HTML is empty." ), true);
                 }
+            }
+            else
+            {
+                updateStatusLabel(exportResult.second, true);
             }
         }
         else

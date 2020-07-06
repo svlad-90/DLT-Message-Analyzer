@@ -197,6 +197,8 @@ enum class eGroupedViewColumn : int
 QString getName(eGroupedViewColumn field);
 eGroupedViewColumn toGroupedViewColumn(int column);
 
+typedef QMap<eGroupedViewColumn, bool> tGroupedViewColumnsVisibilityMap;
+
 enum class eGroupSyntaxType
 {
     SYNTAX_1 = 0,  /*?<name>*/
