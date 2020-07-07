@@ -611,7 +611,7 @@ CPatternsView::CPatternsView(QWidget *parent):
 
                             if(foundItem_ != patternsColumnsCopyPasteMap_.end()) // if item is in the map
                             {
-                                foundItem_.value() = checked; // let's update visibility value
+                                foundItem_.value() = checked; // let's update copy paste value
                                 CSettingsManager::getInstance()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
                             }
                         });
