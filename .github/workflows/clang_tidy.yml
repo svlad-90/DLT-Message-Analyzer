@@ -1,0 +1,76 @@
+name: Build clang-tidy
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_clang_tidy:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Install clang-tidy
+    - name: Install clang-tidy
+      run: sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install clang-tidy
+      shell: bash
+
+    # Cache Qt
+    - name: Cache Qt
+      id: cache-qt
+      uses: actions/cache@v1
+      with:
+        path: ../Qt
+        key: ${{ runner.os }}-QtCache
+
+    # Install Qt
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+         version: 5.15.0
+         target: desktop
+         host: linux
+         dir: ../Qt 
+         cached: ${{ steps.cache-qt.outputs.cache-hit }}
+
+    # Checkout dlt-viewer's revision 2.20.
+    - name: Checkout of the dlt-viewer
+      uses: actions/checkout@v2
+      with:
+        repository: GENIVI/dlt-viewer
+        ref: v2.20.0
+
+    # Checkout DLT-Message-Analyzer's revision, which is pushed
+    - name: Checkout of the DLT-Message-Analyzer
+      uses: actions/checkout@v2
+      with:
+        repository: svlad-90/DLT-Message-Analyzer
+        path: ./plugin/DLT-Message-Analyzer
+        ref: ${{ github.ref }}
+        
+    # Adjust dlt-viewer's CMake file to sub-include DLT-Message-Analyzer
+    - name: Patch dlt-viewer's CMakeLists.txt
+      run: echo 'add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)' >> CMakeLists.txt
+      shell: bash
+      working-directory: ./plugin
+
+    # Create build directory
+    - name: Creation of the "./build" directory
+      run: mkdir ../build
+      shell: bash
+      working-directory: ./
+
+    # CMake for DLT-Message_analyzer plugin, including clang-tidy directive
+    - name: CMake with clang-tidy
+      run: cmake ../DLT-Message-Analyzer -DDMA_CLANG_TIDY_BUILD=true
+      shell: bash
+      working-directory: ../build
+    
+    # Build of the project with proceed on error
+    - name: Make
+      run: make -k -j8
+      shell: bash
+      working-directory: ../build

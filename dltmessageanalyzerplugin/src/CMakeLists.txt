@@ -3,6 +3,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set (CMAKE_AUTOUIC ON)
 
+if( DMA_CLANG_TIDY_BUILD ) 
+    message("-- [DLT-Message-Analyzer]: clang-tidy build.")
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+    list(APPEND CMAKE_CXX_CLANG_TIDY 
+    "-format-style='file'"
+    "-warnings-as-errors=*" )
+endif()
+
 QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
 
 add_library(dltmessageanalyzerplugin MODULE 
