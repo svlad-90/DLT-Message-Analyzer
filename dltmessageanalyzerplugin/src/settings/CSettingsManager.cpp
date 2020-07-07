@@ -54,6 +54,7 @@ static const QString sFilterVariablesKey = "FilterVariables";
 static const QString sCaseSensitiveRegex = "caseSensitiveRegex";
 static const QString sSelectedRegexFile = "selectedRegexFile";
 static const QString sGroupedViewColumnsVisibilityMapKey = "GroupedViewColumnsVisibilityMap";
+static const QString sGroupedViewColumnsCopyPasteMapKey = "GroupedViewColumnsCopyPasteMap";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -270,6 +271,10 @@ CSettingsManager::CSettingsManager():
         [this](const tGroupedViewColumnsVisibilityMap& data){groupedViewColumnsVisibilityMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
         sDefaultGroupedViewColumnsVisibilityMap)),
+    mSetting_GroupedViewColumnsCopyPasteMap(createGroupedViewColumnsVisibilityMapSettingsItem(sGroupedViewColumnsCopyPasteMapKey,
+        [this](const tGroupedViewColumnsVisibilityMap& data){groupedViewColumnsCopyPasteMapChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        sDefaultGroupedViewColumnsVisibilityMap)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -302,6 +307,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_FilterVariables);
     mUserSettingItemPtrVec.push_back(&mSetting_SelectedRegexFile);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsVisibilityMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsCopyPasteMap);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1309,6 +1315,11 @@ void CSettingsManager::setGroupedViewColumnsVisibilityMap(const tGroupedViewColu
     mSetting_GroupedViewColumnsVisibilityMap.setData(val);
 }
 
+void CSettingsManager::setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val)
+{
+    mSetting_GroupedViewColumnsCopyPasteMap.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1438,6 +1449,11 @@ QString CSettingsManager::getSelectedRegexFile() const
  const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsVisibilityMap() const
  {
      return mSetting_GroupedViewColumnsVisibilityMap.getData();
+ }
+
+ const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsCopyPasteMap() const
+ {
+     return mSetting_GroupedViewColumnsCopyPasteMap.getData();
  }
 
 QString CSettingsManager::getRegexDirectory() const
@@ -1689,4 +1705,9 @@ void CSettingsManager::resetRegexFiltersColumnsVisibilityMap()
 void CSettingsManager::resetGroupedViewColumnsVisibilityMap()
 {
     setGroupedViewColumnsVisibilityMap(sDefaultGroupedViewColumnsVisibilityMap);
+}
+
+void CSettingsManager::resetGroupedViewColumnsCopyPasteMap()
+{
+    setGroupedViewColumnsCopyPasteMap(sDefaultGroupedViewColumnsVisibilityMap);
 }

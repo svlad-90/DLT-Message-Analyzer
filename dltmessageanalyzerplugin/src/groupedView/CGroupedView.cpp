@@ -267,6 +267,56 @@ CGroupedView::CGroupedView(QWidget *parent):
         contextMenu.addSeparator();
 
         {
+            QMenu* pSubMenu = new QMenu("Copy columns", this);
+
+            {
+                const auto& gorupedViewColumnsCopyPasteMap =
+                        CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
+
+                for( int i = static_cast<int>(eGroupedViewColumn::SubString);
+                     i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
+                     ++i)
+                {
+                    auto foundItem = gorupedViewColumnsCopyPasteMap.find(static_cast<eGroupedViewColumn>(i));
+
+                    if(foundItem != gorupedViewColumnsCopyPasteMap.end())
+                    {
+                        QAction* pAction = new QAction(getName(static_cast<eGroupedViewColumn>(i)), this);
+                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        {
+                            auto groupedViewColumnsCopyPasteMap_ =
+                                    CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
+
+                            auto foundItem_ = groupedViewColumnsCopyPasteMap_.find(static_cast<eGroupedViewColumn>(i));
+
+                            if(foundItem_ != groupedViewColumnsCopyPasteMap_.end()) // if item is in the map
+                            {
+                                foundItem_.value() = checked; // let's update copy paste value
+                                CSettingsManager::getInstance()->setGroupedViewColumnsCopyPasteMap(groupedViewColumnsCopyPasteMap_);
+                            }
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(foundItem.value());
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        {
+            QAction* pAction = new QAction("Reset copy columns", this);
+            connect(pAction, &QAction::triggered, []()
+            {
+                CSettingsManager::getInstance()->resetGroupedViewColumnsCopyPasteMap();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
             auto selectedRows = selectionModel()->selectedRows();
 
             if(1 == selectedRows.size()) // if one row is selected
@@ -481,13 +531,13 @@ void CGroupedView::copyGroupedViewSelection() const
 
     QString finalText;
 
-    const auto& visibleColumns = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+    const auto& copyColumns = CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
 
     bool bAnythingToCopy = false;
 
-    for(const auto& visibleColumn : visibleColumns)
+    for(const auto& copyColumn : copyColumns)
     {
-        if(true == visibleColumn)
+        if(true == copyColumn)
         {
             bAnythingToCopy = true;
             break;
@@ -504,9 +554,9 @@ void CGroupedView::copyGroupedViewSelection() const
                  i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
                  ++i )
             {
-                auto foundVisibleColumn = visibleColumns.find(static_cast<eGroupedViewColumn>(i));
+                auto foundVisibleColumn = copyColumns.find(static_cast<eGroupedViewColumn>(i));
 
-                if(foundVisibleColumn != visibleColumns.end() && true == foundVisibleColumn.value())
+                if(foundVisibleColumn != copyColumns.end() && true == foundVisibleColumn.value())
                 {
                     auto column = index.model()->sibling(index.row(), i, index);
 
@@ -558,7 +608,6 @@ void CGroupedView::copyGroupedViewSelection() const
             finalText.append("\n");
         }
     }
-
 
     QClipboard *pClipboard = QApplication::clipboard();
     pClipboard->setText(finalText);

@@ -65,6 +65,7 @@ public:
     void resetPatternsColumnsCopyPasteMap();
     void resetRegexFiltersColumnsVisibilityMap();
     void resetGroupedViewColumnsVisibilityMap();
+    void resetGroupedViewColumnsCopyPasteMap();
     QString getRegexDirectory() const;
     QString getRegexDirectoryFull() const;
     QString getUserSettingsFilepath() const;
@@ -103,6 +104,7 @@ public:
     void setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val);
     void setFilterVariables(bool val);
     void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
+    void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -144,6 +146,7 @@ public:
     bool getFilterVariables() const;
     QString getSelectedRegexFile() const;
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
+    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -179,6 +182,7 @@ signals:
     void filterVariablesChanged(bool filterVariables);
     void selectedRegexFileChanged( const QString& regexDirectory );
     void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
+    void groupedViewColumnsCopyPasteMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsCopyPasteMap);
 
 private: // methods
 
@@ -396,6 +400,7 @@ private: // fields
     TSettingItem<bool> mSetting_FilterVariables;
     TSettingItem<QString> mSetting_SelectedRegexFile; // name of the regex file to be used.
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsVisibilityMap;
+    TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsCopyPasteMap;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
