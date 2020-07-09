@@ -1,5 +1,9 @@
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
 
+![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux/badge.svg)
+![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows/badge.svg)
+![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy/badge.svg)
+
 ----
 
 ## What is the DLT Message Analyzer?
