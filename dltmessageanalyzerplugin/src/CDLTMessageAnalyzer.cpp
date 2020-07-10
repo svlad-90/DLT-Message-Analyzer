@@ -1148,7 +1148,8 @@ void CDLTMessageAnalyzer::exportGroupedViewToHTML()
 
 void CDLTMessageAnalyzer::addPattern(const QString& pattern)
 {
-    if( nullptr == mpAvailablePatternsModel )
+    if( nullptr == mpAvailablePatternsModel ||
+        nullptr == mpPatternsTreeView )
     {
         return;
     }
@@ -1215,7 +1216,7 @@ void CDLTMessageAnalyzer::updatePatternsInPersistency()
 
 void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QString checkedRegex, const QModelIndex editItem)
 {
-    if(nullptr == mpAvailablePatternsModel)
+    if(nullptr == mpAvailablePatternsModel || nullptr == mpPatternsTreeView)
         return;
 
     bool bContinue = false;

@@ -264,7 +264,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
         {
             QAction* pAction = new QAction("Reset visible columns", this);
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, []()
             {
                 CSettingsManager::getInstance()->resetSearchResultColumnsVisibilityMap();
             });
@@ -314,7 +314,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
         {
             QAction* pAction = new QAction("Reset copy columns", this);
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, []()
             {
                 CSettingsManager::getInstance()->resetSearchResultColumnsCopyPasteMap();
             });
@@ -490,8 +490,7 @@ void CSearchResultView::getUserSearchRange()
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                Qt::Horizontal, &dialog);
 
-    auto acceptHandler = [this,
-            &dialog,
+    auto acceptHandler = [&dialog,
             &lineEditFrom,
             &lineEditTo,
             &minOverallVal,
@@ -659,7 +658,6 @@ void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelInde
     {
         updateWidth();
         mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
-        bUpdated = true;
     }
 }
 
@@ -833,7 +831,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [this, &clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [&clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tRange& range, const QColor& color, bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field

@@ -792,7 +792,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
             "</body>\n"
             "</html>\n");
     
-            finalText.toHtmlEscaped();
+            finalText = finalText.toHtmlEscaped();
 
             result.first = true;
         }

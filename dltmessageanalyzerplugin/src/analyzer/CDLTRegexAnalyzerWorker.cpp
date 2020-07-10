@@ -11,7 +11,7 @@
 #include "../common/Definitions.hpp"
 
 #ifdef DEBUG_BUILD
-#include "QTime"
+#include "QElapsedTimer"
 #endif
 
 #include "../settings/CSettingsManager.hpp"
@@ -69,7 +69,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
     try
     {
 #ifdef DEBUG_BUILD
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 #endif
 
@@ -110,7 +110,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
         SEND_MSG( QString("[CDLTRegexAnalyzerWorker][%1] Portion number - %2; found matches - %3; portion analysis took - %4 ms")
                   .arg(__FUNCTION__)
                   .arg(workerThreadCookie)
-                  .arg(metadataAnalysisItems.size())
+                  .arg(foundMatchesPack.matchedItemVec.size())
                   .arg(QLocale().toString(timer.elapsed()), 4) );
 #endif
     }

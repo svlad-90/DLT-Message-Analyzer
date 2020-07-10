@@ -992,7 +992,7 @@ void CFiltersModel::filterRegexTokens( const QString& filter )
 
 void CFiltersModel::filterRegexTokensInternal()
 {
-    //QTime time;
+    //QElapsedTimer time;
 
     //time.start();
 
