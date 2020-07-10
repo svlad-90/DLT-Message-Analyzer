@@ -329,7 +329,11 @@ CGroupedView::CGroupedView(QWidget *parent):
                 const int childCount = model()->rowCount( selectedRow );
                 for(int i = 0; i < childCount; ++i)
                 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
                     if( true == isExpanded(selectedRow.child(i, 0) ) )
+#else
+                    if( true == isExpanded(model()->index(i, 0, selectedRow) ) )
+#endif
                     {
                         bIsAnyChildExpanded = true;
                     }
@@ -426,7 +430,11 @@ void CGroupedView::changeLevelExpansion(const QModelIndex& expandIdx, bool bExpa
         const int childCount = model()->rowCount( expandIdx );
         for(int i = 0; i < childCount; ++i)
         {
-            expand( expandIdx.child(i, 0) );
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    expand( expandIdx.child(i, 0) );
+#else
+    expand( model()->index(i,0,expandIdx) );
+#endif
         }
     }
     else if(false == bExpand && true == isExpanded(expandIdx))
@@ -436,7 +444,11 @@ void CGroupedView::changeLevelExpansion(const QModelIndex& expandIdx, bool bExpa
         const int childCount = model()->rowCount( expandIdx );
         for(int i = 0; i < childCount; ++i)
         {
-            auto childIdx = expandIdx.child(i, 0);
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    auto childIdx = expandIdx.child(i, 0);
+#else
+    auto childIdx = model()->index(i,0,expandIdx);
+#endif
 
             if(isExpanded(childIdx))
             {
@@ -492,7 +504,6 @@ void CGroupedView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     {
         updateWidth();
         mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
-        bUpdated = true;
     }
 
     if(model()->rowCount() == 0)

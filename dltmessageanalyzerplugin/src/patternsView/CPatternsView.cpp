@@ -17,7 +17,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QPainter>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QAbstractScrollArea>
 #include <QColorDialog>
@@ -121,7 +121,7 @@ public:
 
         for(const auto& row : rows)
         {
-            int startTime = mTime.elapsed();
+            auto startTime = mTime.elapsed();
 
             for(int columnId = 0; columnId < columnsNumber; ++columnId)
             {
@@ -177,10 +177,10 @@ public:
         {
             auto& animatedObject = *it;
 
-            int nowToStartDiff = mTime.elapsed() - animatedObject.startTime;
-            int endToStartDiff = animatedObject.endTime - animatedObject.startTime;
+            auto nowToStartDiff = mTime.elapsed() - animatedObject.startTime;
+            auto endToStartDiff = animatedObject.endTime - animatedObject.startTime;
 
-            int passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
+            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
 
             if(passedTimePercantage > 100)
             {
@@ -202,7 +202,7 @@ public:
 
         painter->save();
 
-        QStyleOptionViewItemV4 viewItemOption(option);
+        QStyleOptionViewItem viewItemOption = option;
 
         if (toPatternsColumn(index.column()) == ePatternsColumn::Default ||
             toPatternsColumn(index.column()) == ePatternsColumn::Combine)
@@ -219,10 +219,10 @@ public:
 
         if(foundAnimatedObject != mRowAnimationDataMap.end())
         {
-            int nowToStartDiff = mTime.elapsed() - foundAnimatedObject->startTime;
-            int endToStartDiff = foundAnimatedObject->endTime - foundAnimatedObject->startTime;
+            auto nowToStartDiff = mTime.elapsed() - foundAnimatedObject->startTime;
+            auto endToStartDiff = foundAnimatedObject->endTime - foundAnimatedObject->startTime;
 
-            int passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
+            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
 
             //qDebug() << "nowToStartDiff - " << nowToStartDiff << "; endToStartDiff - " << endToStartDiff << "; passedTimePercantage - " << passedTimePercantage;
 
@@ -286,8 +286,8 @@ public:
         tRowAnimationData(const QColor& startColor_,
                           const QColor& intermediateColor_,
                           const QColor& endColor_,
-                          const int& startTime_,
-                          const int& endTime_):
+                          const int64_t& startTime_,
+                          const int64_t& endTime_):
             startColor(startColor_),
             intermediateColor(intermediateColor_),
             endColor(endColor_),
@@ -298,13 +298,13 @@ public:
         QColor startColor;
         QColor intermediateColor;
         QColor endColor;
-        int startTime;
-        int endTime;
+        int64_t startTime;
+        int64_t endTime;
     };
 
     typedef QMap<QModelIndex, tRowAnimationData> tRowAnimationDataMap;
     tRowAnimationDataMap mRowAnimationDataMap;
-    QTime mTime;
+    QElapsedTimer mTime;
     QTimer mUpdateTimer;
     QTreeView* mpParentTree;
 };
@@ -961,7 +961,7 @@ void CPatternsView::setSpecificModel( CPatternsModel* pModel )
                  [this](const CPatternsModel::tFilteredEntryVec& filteredEntries,
                  bool expandVisible)
         {
-            //QTime timer;
+            //QElapsedTimer timer;
             //timer.start();
 
             //SEND_MSG(QString("~0 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));

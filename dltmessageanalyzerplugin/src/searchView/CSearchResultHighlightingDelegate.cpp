@@ -29,32 +29,31 @@ CSearchResultHighlightingDelegate::~CSearchResultHighlightingDelegate()
 }
 
 void drawText(const QString& inputStr,
-              const QStyleOptionViewItemV4& opt,
               QPainter *painter,
               const QStyleOptionViewItem &option,
               bool bold)
 {
     int baseShift = 0;
 
-    if(Qt::AlignmentFlag::AlignLeft == opt.displayAlignment)
+    if(Qt::AlignmentFlag::AlignLeft == option.displayAlignment)
     {
         baseShift = 2;
     }
 
-    QRect rect = opt.rect;
+    QRect rect = option.rect;
 
     //set pen color
-    if (opt.state & QStyle::State_Selected)
+    if (option.state & QStyle::State_Selected)
     {
         painter->fillRect(option.rect, option.palette.highlight());
 
         QPalette::ColorGroup cg = QPalette::Normal;
-        painter->setPen(opt.palette.color(cg, QPalette::HighlightedText));
+        painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
     }
     else
     {
         QPalette::ColorGroup cg = QPalette::Normal;
-        painter->setPen(opt.palette.color(cg, QPalette::Text));
+        painter->setPen(option.palette.color(cg, QPalette::Text));
 
         if(true == bold)
         {
@@ -77,13 +76,12 @@ void drawText(const QString& inputStr,
     }
 
     painter->drawText(QRect(rect.left()+baseShift, rect.top(), rect.width(), rect.height()),
-                             opt.displayAlignment, inputStr);
+                             option.displayAlignment, inputStr);
 }
 
 static void drawHighlightedText(eSearchResultColumn field,
                     const tFoundMatchesPackItem& foundMatchPackItem,
                     const QString& inputStr,
-                    const QStyleOptionViewItemV4& opt,
                     QPainter *painter,
                     const QStyleOptionViewItem &option)
 {
@@ -109,7 +107,7 @@ static void drawHighlightedText(eSearchResultColumn field,
 
     tDrawDataPack drawDataPack;
 
-    drawDataPack.alignment = opt.displayAlignment;
+    drawDataPack.alignment = option.displayAlignment;
 
     const auto& highlightingInfo = foundMatchPackItem.getItemMetadata().highlightingInfoMultiColor;
     auto foundHighlightingInfoItem = highlightingInfo.find(field);
@@ -120,12 +118,12 @@ static void drawHighlightedText(eSearchResultColumn field,
 
         if(false == highlightingData.empty())
         {
-            if (opt.state & QStyle::State_Selected)
+            if (option.state & QStyle::State_Selected)
             {
                 drawDataPack.isSelected = true;
             }
 
-            auto collectDrawData = [&inputStr, &drawDataPack, &opt](const tHighlightingRange& range, bool isHighlighted)
+            auto collectDrawData = [&inputStr, &drawDataPack, &option](const tHighlightingRange& range, bool isHighlighted)
             {
                 tDrawData drawData;
 
@@ -135,7 +133,7 @@ static void drawHighlightedText(eSearchResultColumn field,
                 if (true == drawDataPack.isSelected)
                 {
                     drawData.colorGroup = QPalette::Normal;
-                    drawData.color = opt.palette.color(QPalette::Normal, QPalette::HighlightedText);
+                    drawData.color = option.palette.color(QPalette::Normal, QPalette::HighlightedText);
 
                     if(true == isHighlighted)
                     {
@@ -185,7 +183,7 @@ static void drawHighlightedText(eSearchResultColumn field,
                 drawDataPack.drawDataList.push_back(drawData);
             };
 
-            auto calculateShifts = [&drawDataPack, &painter, &opt]()
+            auto calculateShifts = [&drawDataPack, &painter, &option]()
             {
                 int shift = 0;
 
@@ -204,14 +202,19 @@ static void drawHighlightedText(eSearchResultColumn field,
 
                     drawDataItem.shift = shift;
                     QFontMetrics fm(font);
-                    shift += fm.width(drawDataItem.subStr);
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    shift += fm.width(drawDataItem.subStr);
+#else
+    shift += fm.horizontalAdvance(drawDataItem.subStr);
+#endif
 
                      //qDebug() << "drawDataItem.shift - " << drawDataItem.shift;
                 }
 
                 if(Qt::AlignmentFlag::AlignCenter == drawDataPack.alignment)
                 {
-                    QRect rect = opt.rect;
+                    QRect rect = option.rect;
                     drawDataPack.baseShift = (( rect.width() -  shift ) / 2 );
                 }
                 else
@@ -222,7 +225,7 @@ static void drawHighlightedText(eSearchResultColumn field,
                 //qDebug() << "drawDataPack.baseShift - " << drawDataPack.baseShift;
             };
 
-            auto drawText = [&drawDataPack, &opt, &painter, &option]()
+            auto drawText = [&drawDataPack, &option, &painter]()
             {
                 if(true == drawDataPack.isSelected)
                 {
@@ -231,7 +234,7 @@ static void drawHighlightedText(eSearchResultColumn field,
 
                 for(const auto& drawDataItem : drawDataPack.drawDataList)
                 {
-                    const QRect& rect = opt.rect;
+                    const QRect& rect = option.rect;
 
                     painter->setPen(drawDataItem.color);
 
@@ -299,12 +302,12 @@ static void drawHighlightedText(eSearchResultColumn field,
         }
         else
         {
-            drawText(inputStr,opt,painter,option,false);
+            drawText(inputStr,painter,option,false);
         }
     }
     else
     {
-        drawText(inputStr,opt,painter,option,false);
+        drawText(inputStr,painter,option,false);
     }
 
     {
@@ -322,9 +325,10 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
     if(nullptr != pModel)
     {
-         auto stringData = pModel->data(index, Qt::DisplayRole).value<QString>();
+        auto stringData = pModel->data(index, Qt::DisplayRole).value<QString>();
 
-        QStyleOptionViewItemV4 opt = option;
+        QStyleOptionViewItem opt = option;
+
         initStyleOption(&opt, index);
 
         auto field = static_cast<eSearchResultColumn>(index.column());
@@ -336,7 +340,7 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             case eSearchResultColumn::Payload:
             {
                 const auto& matchData = pModel->getFoundMatchesItemPack(index);
-                drawHighlightedText(field, matchData, stringData, opt, painter, option);
+                drawHighlightedText(field, matchData, stringData, painter, opt);
             }
                 break;
             case eSearchResultColumn::Args:
@@ -350,12 +354,12 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             case eSearchResultColumn::Subtype:
             case eSearchResultColumn::SessionId:
             {
-                drawText( stringData, opt, painter, option, false );
+                drawText( stringData, painter, opt, false );
             }
             break;
             case eSearchResultColumn::Timestamp:
             {
-                drawText( stringData, opt, painter, option, mbMarkTimestampWithBold );
+                drawText( stringData, painter, opt, mbMarkTimestampWithBold );
             }
             break;
         }

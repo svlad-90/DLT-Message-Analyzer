@@ -1,4 +1,4 @@
-#include "QTime"
+#include "QElapsedTimer"
 #include "QTimer"
 #include "QPainter"
 #include "QApplication"
@@ -42,7 +42,7 @@ public:
         mTime.start();
     }
 
-    void animateRows(const QVector<QModelIndex>& rows, const QColor& color, const int& duration)
+    void animateRows(const QVector<QModelIndex>& rows, const QColor& color, const int64_t& duration)
     {
         mRowAnimationDataMap.clear();
 
@@ -50,7 +50,7 @@ public:
 
         for(const auto& row : rows)
         {
-            int startTime = mTime.elapsed();
+            int64_t startTime = mTime.elapsed();
 
             for(int columnId = 0; columnId < columnsNumber; ++columnId)
             {
@@ -109,10 +109,10 @@ private:
         {
             auto& animatedObject = *it;
 
-            int nowToStartDiff = mTime.elapsed() - animatedObject.startTime;
-            int endToStartDiff = animatedObject.endTime - animatedObject.startTime;
+            auto nowToStartDiff = mTime.elapsed() - animatedObject.startTime;
+            auto endToStartDiff = animatedObject.endTime - animatedObject.startTime;
 
-            int passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
+            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
 
             if(passedTimePercantage > 100)
             {
@@ -178,7 +178,7 @@ private:
     }
 
     void drawText(const QString& inputStr,
-                  const QStyleOptionViewItemV4& opt,
+                  const QStyleOptionViewItem& opt,
                   QPainter *painter,
                   bool bold) const
     {
@@ -237,16 +237,16 @@ private:
 
         painter->save();
 
-        QStyleOptionViewItemV4 viewItemOption(option);
+        QStyleOptionViewItem viewItemOption = option;
 
         auto foundAnimatedObject = const_cast<tRowAnimationDataMap*>(&mRowAnimationDataMap)->find( index );
 
         if(foundAnimatedObject != mRowAnimationDataMap.end())
         {
-            int nowToStartDiff = mTime.elapsed() - foundAnimatedObject->startTime;
-            int endToStartDiff = foundAnimatedObject->endTime - foundAnimatedObject->startTime;
+            auto nowToStartDiff = mTime.elapsed() - foundAnimatedObject->startTime;
+            auto endToStartDiff = foundAnimatedObject->endTime - foundAnimatedObject->startTime;
 
-            int passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
+            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
 
             if( passedTimePercantage >= 100.0 ) // last frame
             {
@@ -295,8 +295,8 @@ private:
     {
         tRowAnimationData(const QColor& startColor_,
                           const QColor& intermediateColor_,
-                          const int& startTime_,
-                          const int& endTime_):
+                          const int64_t& startTime_,
+                          const int64_t& endTime_):
             startColor(startColor_),
             intermediateColor(intermediateColor_),
             startTime(startTime_),
@@ -305,13 +305,13 @@ private:
 
         QColor startColor;
         QColor intermediateColor;
-        int startTime;
-        int endTime;
+        int64_t startTime;
+        int64_t endTime;
     };
 
     typedef QMap<QModelIndex, tRowAnimationData> tRowAnimationDataMap;
     tRowAnimationDataMap mRowAnimationDataMap;
-    QTime mTime;
+    QElapsedTimer mTime;
     QTimer mUpdateTimer;
     QTreeView* mpParentTree;
 };
@@ -556,7 +556,7 @@ void CFiltersView::setSpecificModel( CFiltersModel* pModel )
         {
             mbResizeOnExpandCollapse = false;
 
-            //QTime timer;
+            //QElapsedTimer timer;
             //timer.start();
 
             //SEND_MSG(QString("~0 [CFiltersView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
@@ -643,7 +643,6 @@ void CFiltersView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     {
         updateWidth();
         mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
-        bUpdated = true;
     }
 }
 

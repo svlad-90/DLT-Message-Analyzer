@@ -16,7 +16,6 @@
 
 #include "CSettingsManager.hpp"
 
-static const int sSettingsManager_Version = 1;
 static const QString sSettingsManager_Directory = QString("plugins") + QDir::separator() + "DLTMessageAnalyzerConfig";
 static const QString sSettingsManager_Regex_SubDirectory = "regexes";
 static const QString sSettingsManager_User_SettingsFile = "user_settings.json";
@@ -353,9 +352,9 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility()
         if(true == result.bResult)
         {
             SEND_MSG(QString("[CSettingsManager] Persisted settings manager verison - %1.").arg(getSettingsManagerVersion()));
-            SEND_MSG(QString("[CSettingsManager] Target settings manager verison - %1.").arg(sSettingsManager_Version));
+            SEND_MSG(QString("[CSettingsManager] Target settings manager verison - %1.").arg(sCurrentSettingsManagerVersion));
 
-            setSettingsManagerVersion( sSettingsManager_Version ); // if backward compatibility was successful, we need to update the settings manager version
+            setSettingsManagerVersion( sCurrentSettingsManagerVersion ); // if backward compatibility was successful, we need to update the settings manager version
         }
     }
 

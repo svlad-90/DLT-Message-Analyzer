@@ -328,24 +328,26 @@ bool tRangePtrWrapper::operator< ( const tRangePtrWrapper& rVal ) const
         bResult = false;
     else if(pRange == nullptr && rVal.pRange == nullptr)
         bResult = true;
-
-    if( pRange->from < rVal.pRange->from )
+    else
     {
-        bResult = true;
-    }
-    else if( pRange->from > rVal.pRange->from )
-    {
-        bResult = false;
-    }
-    else // if from == rVal.from
-    {
-        if( pRange->to < rVal.pRange->to )
+        if( pRange->from < rVal.pRange->from )
         {
             bResult = true;
         }
-        else
+        else if( pRange->from > rVal.pRange->from )
         {
             bResult = false;
+        }
+        else // if from == rVal.from
+        {
+            if( pRange->to < rVal.pRange->to )
+            {
+                bResult = true;
+            }
+            else
+            {
+                bResult = false;
+            }
         }
     }
 
@@ -625,7 +627,8 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
             if( false == bToShrinked  )
             {
-                colorsCounter = ++colorsCounter % maxColorsSize;
+                ++colorsCounter;
+                colorsCounter %= maxColorsSize;
             }
 
             return QPair<bool /*isExplicit*/, QColor>(bIsExplicitColor, color);
@@ -1272,9 +1275,15 @@ bool tHighlightingGradient::operator!=(const tHighlightingGradient& rhs) const
 
 tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
                                                  QString::SplitBehavior::SkipEmptyParts,
                                                  Qt::CaseInsensitive);
+#else
+    QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
+                                                 Qt::SkipEmptyParts,
+                                                 Qt::CaseInsensitive);
+#endif
 
     tRegexScriptingMetadataItem result;
 
@@ -1577,6 +1586,11 @@ tDataItem toRegexDataItem(const QVariant& variant, const eRegexFiltersColumn& co
             result = variant.value<QString>();
         }
             break;
+        case eRegexFiltersColumn::GroupSyntaxType:
+        {
+            result = variant.value<int>();
+        }
+            break;
         case eRegexFiltersColumn::Last:
         {
             result = QString();
@@ -1668,7 +1682,11 @@ QString rgb2hex(const QColor& color, bool with_head)
         ss << "000000";
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     ss << hex << (color.red() << 16 | color.green() << 8 | color.blue() );
+#else
+    ss << Qt::hex << (color.red() << 16 | color.green() << 8 | color.blue() );
+#endif
 
     return result;
 }

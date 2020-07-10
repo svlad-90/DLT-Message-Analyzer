@@ -436,7 +436,11 @@ QModelIndex CPatternsModel::addData(const QString& alias, const QString& regex, 
 
     if(nullptr != mpRootItem)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
         QStringList aliasParts = alias.split(sTreeLevelSeparator, QString::SkipEmptyParts);
+#else
+        QStringList aliasParts = alias.split(sTreeLevelSeparator, Qt::SkipEmptyParts);
+#endif
 
         QString finalAlias;
 
@@ -775,7 +779,6 @@ void CPatternsModel::removeData(const QModelIndex& idx)
             else
             {
                 bResult = false;
-                updateSubTree(createIndexInternal(pVisitParent->getIdx(), 0, pVisitParent));
             }
 
             return bResult;

@@ -21,9 +21,7 @@
 #include "common/Definitions.hpp"
 #include "analyzer/IDLTMessageAnalyzerControllerConsumer.hpp"
 
-#ifdef DEBUG_BUILD
-#include "QTime"
-#endif
+#include "QElapsedTimer"
 
 class QRegularExpression;
 class QCheckBox;
@@ -309,10 +307,10 @@ signals:
 
         // timers
 #ifdef DEBUG_BUILD
-        QTime mMeasurementNotificationTimer;
+        QElapsedTimer mMeasurementNotificationTimer;
 #endif
 
-        QTime mMeasurementRequestTimer;
+        QElapsedTimer mMeasurementRequestTimer;
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
         std::shared_ptr<CConsoleInputProcessor> mpConsoleInputProcessor;
 };

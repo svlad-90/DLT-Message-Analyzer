@@ -276,9 +276,9 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
             {
                 auto foundRequest = mRequestDataMap.find(requestId);
 
-                if(mRequestDataMap.end() != foundRequest)
+                if(mRequestDataMap.end() != foundRequest) // NOLINT
                 {
-                    triggerContinuousAnalysisIteration(foundRequest);
+                    triggerContinuousAnalysisIteration(foundRequest); // NOLINT
                 }
             });
         }
