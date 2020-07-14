@@ -5,9 +5,14 @@
  */
 
 #include "QDebug"
+#include "QElapsedTimer"
+#include "QClipboard"
+#include "QApplication"
 
 #include "CDLTFileWrapper.hpp"
 #include "CDLTMsgWrapper.hpp"
+
+#include "log/CConsoleCtrl.hpp"
 
 #include "qdlt.h"
 
@@ -22,8 +27,10 @@ CDLTFileWrapper::CDLTFileWrapper(QDltFile* pFile):
     mCurrentCacheSize(0),
     mbCacheEnabled(false),
     mbIsFull(false),
-    mCacheLoadPercentage(0)
+    mCacheLoadPercentage(0),
+    mpSubFilesHandler(std::make_shared<CSubFilesHandler>())
 {
+    mpSubFilesHandler->setFile(pFile);
 }
 
 int CDLTFileWrapper::getNumberOfFiles() const
@@ -524,6 +531,55 @@ QString CDLTFileWrapper::getCacheStatusAsString() const
     return formCacheStatusString( mCurrentCacheSize, mMaxCacheSize, mCacheLoadPercentage, mbCacheEnabled, mbIsFull );
 }
 
+
+tRangeList CDLTFileWrapper::getSubFilesSizeRanges() const
+{
+    tRangeList result;
+
+    if(nullptr != mpSubFilesHandler && true == mpSubFilesHandler->getSubFilesHandlingStatus())
+    {
+        result = mpSubFilesHandler->getSubFilesSizeRanges();
+    }
+
+    return result;
+}
+
+void CDLTFileWrapper::setSubFilesHandlingStatus(const bool& val)
+{
+    if(nullptr != mpSubFilesHandler)
+    {
+        mpSubFilesHandler->setSubFilesHandlingStatus(val);
+    }
+}
+
+bool CDLTFileWrapper::getSubFilesHandlingStatus() const
+{
+    bool bResult = false;
+
+    if(nullptr != mpSubFilesHandler)
+    {
+        bResult = mpSubFilesHandler->getSubFilesHandlingStatus();
+    }
+
+    return bResult;
+}
+
+void CDLTFileWrapper::copyFileNameToClipboard( const int& msgId ) const
+{
+    if(nullptr != mpSubFilesHandler)
+    {
+        mpSubFilesHandler->copyFileNameToClipboard(msgId);
+    }
+}
+
+void CDLTFileWrapper::copyFileNamesToClipboard( const tRange& msgsRange ) const
+{
+    if(nullptr != mpSubFilesHandler)
+    {
+        mpSubFilesHandler->copyFileNamesToClipboard(msgsRange);
+    }
+}
+
 QString CDLTFileWrapper::formCacheStatusString( const tCacheSizeB& currentCacheSize,
                                                 const tCacheSizeB& maxCacheSize,
                                                 const unsigned int& cacheLoadPercentage,
@@ -555,4 +611,213 @@ QString CDLTFileWrapper::formCacheStatusString( const tCacheSizeB& currentCacheS
     }
 
     return result;
+}
+
+CDLTFileWrapper::CSubFilesHandler::CSubFilesHandler():
+mbSubFilesInitialized(false),
+mSubFilesMap(),
+mpFile(nullptr)
+{
+}
+
+void CDLTFileWrapper::CSubFilesHandler::setFile( QDltFile* pFile )
+{
+    mpFile = pFile;
+
+    if(mpFile == nullptr)
+    {
+        clearSubFiles();
+    }
+    else
+    {
+        if(true == mbSubFilesInitialized)
+        {
+            updateSubFiles();
+        }
+        else
+        {
+            clearSubFiles();
+        }
+    }
+}
+
+void CDLTFileWrapper::CSubFilesHandler::setSubFilesHandlingStatus(const bool& value)
+{
+    if(false == mbSubFilesInitialized && true == value)
+    {
+        mbSubFilesInitialized = true;
+        updateSubFiles();
+    }
+    else if(true == mbSubFilesInitialized && false == value)
+    {
+        mbSubFilesInitialized = false;
+        clearSubFiles();
+    }
+}
+
+tRangeList CDLTFileWrapper::CSubFilesHandler::getSubFilesSizeRanges() const
+{
+    tRangeList result;
+
+    if(true == mbSubFilesInitialized)
+    {
+        const_cast<CSubFilesHandler*>(this)->updateSubFiles();
+
+        int processedIndexes = -1;
+
+        for(const auto& item : mSubFilesMap)
+        {
+            tRange analyzedRange;
+            analyzedRange.from = processedIndexes + 1;
+            analyzedRange.to += processedIndexes + 1 + item.second->size() - 1;
+            result.push_back(analyzedRange);
+
+            processedIndexes += item.second->size();
+
+            //SEND_MSG(QString("%1-%2\n").arg(analyzedRange.from).arg(analyzedRange.to));
+        }
+    }
+
+    return result;
+}
+
+void CDLTFileWrapper::CSubFilesHandler::copyFileNameToClipboard( const int& msgId ) const
+{
+    if( nullptr != mpFile && true == mbSubFilesInitialized )
+    {
+        auto subFilesSizeRanges = getSubFilesSizeRanges();
+
+        if(false == subFilesSizeRanges.empty())
+        {
+            int counter = 0;
+
+            for(const auto& subFilesSizeRange : subFilesSizeRanges)
+            {
+                if(msgId >= subFilesSizeRange.from && msgId <= subFilesSizeRange.to)
+                {
+                    QClipboard* pClipboard = QApplication::clipboard();
+
+                    pClipboard->setText(mpFile->getFileName(counter));
+
+                    break;
+                }
+
+                ++counter;
+            }
+        }
+    }
+}
+
+void CDLTFileWrapper::CSubFilesHandler::copyFileNamesToClipboard( const tRange& msgsRange ) const
+{
+    if( nullptr != mpFile && true == mbSubFilesInitialized )
+    {
+        QVector<QString> fileNames;
+
+        const int INVALID_IDX = -1;
+        int startFileIdx = INVALID_IDX;
+        int finishFileIdx = INVALID_IDX;
+
+        auto subFilesSizeRanges = getSubFilesSizeRanges();
+
+        int counter = 0;
+
+        for(const auto& subFilesSizeRange : subFilesSizeRanges)
+        {
+            if(INVALID_IDX == startFileIdx)
+            {
+                if(msgsRange.from >= subFilesSizeRange.from && msgsRange.from <= subFilesSizeRange.to)
+                {
+                    startFileIdx = counter;
+                }
+            }
+
+            if(INVALID_IDX != startFileIdx && INVALID_IDX == finishFileIdx) // we should already find start at this point
+            {
+                if(msgsRange.to >= subFilesSizeRange.from && msgsRange.to <= subFilesSizeRange.to)
+                {
+                    finishFileIdx = counter;
+                    break;
+                }
+            }
+
+            ++counter;
+        }
+
+        if(INVALID_IDX != startFileIdx && INVALID_IDX != finishFileIdx)
+        {
+            QClipboard* pClipboard = QApplication::clipboard();
+
+            QString finalText;
+
+            for(int i = startFileIdx; i <= finishFileIdx; ++i )
+            {
+                finalText.append(mpFile->getFileName(i).append("\n"));
+            }
+
+            pClipboard->setText(finalText);
+        }
+    }
+}
+
+bool CDLTFileWrapper::CSubFilesHandler::getSubFilesHandlingStatus() const
+{
+    return mbSubFilesInitialized;
+}
+
+void CDLTFileWrapper::CSubFilesHandler::updateSubFiles()
+{
+    if(nullptr != mpFile)
+    {
+        //QElapsedTimer timer;
+
+        //timer.start();
+
+        auto numberOfFiles = mpFile->getNumberOfFiles();
+
+        for(int i = 0; i < numberOfFiles; ++i)
+        {
+            auto foundSubFile = mSubFilesMap.find(mpFile->getFileName(i));
+
+            if(foundSubFile == mSubFilesMap.end())
+            {
+                auto pNewFile = std::make_shared<QDltFile>();
+                QString filePath = mpFile->getFileName(i);
+
+                bool bOpen = pNewFile->open(filePath);
+
+                if(true == bOpen)
+                {
+                    bool bIndexed = pNewFile->updateIndex();
+
+                    if(true == bIndexed)
+                    {
+                        mSubFilesMap.insert(std::make_pair(filePath, pNewFile));
+                    }
+                    else
+                    {
+                        QString str( QString("Was not able to index file \"%1\"").arg(filePath) );
+                        SEND_WRN(str);
+                    }
+                }
+                else
+                {
+                    QString str( QString("Was not able to open file \"%1\"").arg(filePath) );
+                    SEND_WRN(str);
+                }
+            }
+            else
+            {
+                foundSubFile->second->updateIndex();
+            }
+        }
+
+        //auto elapsed = timer.elapsed();
+        //SEND_MSG(QString("Update file data took %1 ms").arg(elapsed));
+    }
+}
+
+void CDLTFileWrapper::CSubFilesHandler::clearSubFiles()
+{
+    mSubFilesMap.clear();
 }

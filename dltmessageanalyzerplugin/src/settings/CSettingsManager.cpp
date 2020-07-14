@@ -54,6 +54,7 @@ static const QString sCaseSensitiveRegex = "caseSensitiveRegex";
 static const QString sSelectedRegexFile = "selectedRegexFile";
 static const QString sGroupedViewColumnsVisibilityMapKey = "GroupedViewColumnsVisibilityMap";
 static const QString sGroupedViewColumnsCopyPasteMapKey = "GroupedViewColumnsCopyPasteMap";
+static const QString sSubFilesHandlingStatusKey = "SubFilesHandlingStatus";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -274,6 +275,10 @@ CSettingsManager::CSettingsManager():
         [this](const tGroupedViewColumnsVisibilityMap& data){groupedViewColumnsCopyPasteMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
         sDefaultGroupedViewColumnsVisibilityMap)),
+    mSetting_SubFilesHandlingStatus(createBooleanSettingsItem(sSubFilesHandlingStatusKey,
+        [this](const bool& data){subFilesHandlingStatusChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -307,6 +312,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_SelectedRegexFile);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsCopyPasteMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_SubFilesHandlingStatus);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1319,6 +1325,11 @@ void CSettingsManager::setGroupedViewColumnsCopyPasteMap(const tGroupedViewColum
     mSetting_GroupedViewColumnsCopyPasteMap.setData(val);
 }
 
+void CSettingsManager::setSubFilesHandlingStatus( const bool& val )
+{
+    mSetting_SubFilesHandlingStatus.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1453,6 +1464,11 @@ QString CSettingsManager::getSelectedRegexFile() const
  const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsCopyPasteMap() const
  {
      return mSetting_GroupedViewColumnsCopyPasteMap.getData();
+ }
+
+ bool CSettingsManager::getSubFilesHandlingStatus() const
+ {
+     return mSetting_SubFilesHandlingStatus.getData();
  }
 
 QString CSettingsManager::getRegexDirectory() const

@@ -188,6 +188,41 @@ public:
      */
     QString getCacheStatusAsString() const;
 
+    //////////////// SUB_FILES SECTION ////////////////
+
+    /**
+     * @brief setSubFilesHandlingStatus - sets sub-files handling status
+     * @param val - if true, the number of messages in each sub-file would be monitored. False otherwise.
+     */
+    void setSubFilesHandlingStatus(const bool& val);
+
+    /**
+     * @brief getSubFilesHandlingStatus - gets status of sub-files handling
+     * @return - true, if the number of messages in each sub-file is be monitored. False otherwise.
+     */
+    bool getSubFilesHandlingStatus() const;
+
+    /**
+     * @brief getSubFilesSizeRanges - get's vector, which lists number of messages in each physical file
+     * @return  - instance of the vector, which lists ranges of messages in each physical file
+     * Note! This functionality works ONLY if subFilesHandlingStatus was switched to "ON".
+     */
+    tRangeList getSubFilesSizeRanges() const;
+
+    /**
+     * @brief copyFileNameToClipboard - copies file name associated with provided msgId to clipboard
+     * @param msgId - msg id to be checked
+     * Note! This functionality works ONLY if subFilesHandlingStatus was switched to "ON".
+     */
+    void copyFileNameToClipboard( const int& msgId ) const;
+
+    /**
+     * @brief copyFileNamesToClipboard - copies file name associated with provided range of msg id-s to clipboard
+     * @param msgsRange - range of messages to be checked
+     * Note! This functionality works ONLY if subFilesHandlingStatus was switched to "ON".
+     */
+    void copyFileNamesToClipboard( const tRange& msgsRange ) const;
+
 signals:
     /**
      * @brief isEnabledChanged - signal, which is fired whenver cache enabling status is changing
@@ -247,6 +282,33 @@ private:
     bool mbCacheEnabled;
     bool mbIsFull;
     unsigned int mCacheLoadPercentage;
+
+    ///////////////////////////////////////////////////////
+
+    class CSubFilesHandler
+    {
+        public:
+            CSubFilesHandler();
+            void setFile( QDltFile* pFile );
+            void setSubFilesHandlingStatus(const bool& value);
+            bool getSubFilesHandlingStatus() const;
+            tRangeList getSubFilesSizeRanges() const;
+            void copyFileNameToClipboard( const int& msgId ) const;
+            void copyFileNamesToClipboard( const tRange& msgsRange ) const;
+
+        private:
+            void updateSubFiles();
+            void clearSubFiles();
+
+        private:
+            bool mbSubFilesInitialized;
+            typedef std::map<QString, std::shared_ptr<QDltFile> > tSubFilesMap;
+            tSubFilesMap mSubFilesMap;
+            QDltFile* mpFile;
+    };
+
+    typedef std::shared_ptr<CSubFilesHandler> tSubFilesHandlerPtr;
+    tSubFilesHandlerPtr mpSubFilesHandler;
 };
 
 typedef std::shared_ptr<CDLTFileWrapper> tDLTFileWrapperPtr;

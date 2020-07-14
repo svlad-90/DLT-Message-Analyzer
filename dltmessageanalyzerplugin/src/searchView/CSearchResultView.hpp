@@ -35,6 +35,7 @@ private:
     bool isVerticalScrollBarVisible() const;
     void updateColumnsVisibility();
     void getUserSearchRange();
+    void copyMessageFiles();
 
 private:
     enum class eUpdateRequired

@@ -105,6 +105,7 @@ public:
     void setFilterVariables(bool val);
     void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
     void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val);
+    void setSubFilesHandlingStatus( const bool& val );
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -147,6 +148,7 @@ public:
     QString getSelectedRegexFile() const;
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const;
+    bool getSubFilesHandlingStatus() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -183,6 +185,7 @@ signals:
     void selectedRegexFileChanged( const QString& regexDirectory );
     void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
     void groupedViewColumnsCopyPasteMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsCopyPasteMap);
+    void subFilesHandlingStatusChanged(const bool& subFilesHandlingStatus);
 
 private: // methods
 
@@ -401,6 +404,7 @@ private: // fields
     TSettingItem<QString> mSetting_SelectedRegexFile; // name of the regex file to be used.
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsVisibilityMap;
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsCopyPasteMap;
+    TSettingItem<bool> mSetting_SubFilesHandlingStatus;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
