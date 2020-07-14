@@ -118,4 +118,32 @@ Nothing special, still it is quite useful when you want to emphasize that time i
 
 ----
 
+## Copy file name
+
+Sometimes developer can analyze bunch of the files, related to the same life-cycle.
+E.g. he can work with 30 files from archive "Friday testing.zip".
+In his analysis he might want to mention which sub-set of files is related to the finding.
+
+For this purpose plugin's implementation provides the possibility to copy file name(s) by selected message(s):
+
+![Screenshot of the "Copy filename(s)" context-menu item](./search_view_copy_filename_by_message.png)
+
+----
+
+> **Note!**
+>
+> In case if more than one row is selected, plugin will copy names of all files within the range of the selected messages. File names are separated with '\n' symbol.
+
+----
+
+Due to limitation of dlt-viewer's SW API, this feature requires some overhead to index each sub-file separately inside the plugin.
+Usually, that will not cause visible side-effects, e.g. additional processing for 500 000 messages might additionally take ~1-2 seconds on i5 CPU.
+Still, if needed, feature can be turned off or on via the following context-menu:
+
+![Screenshot of the "Mark timestamp with bold" feature, before being applied](./search_view_monitor_sub_files.png)
+
+By default feature is turned on.
+
+----
+
 [**Go to the previous page**](../../README.md)

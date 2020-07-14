@@ -27,6 +27,7 @@
 #include "CSearchResultModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"
+#include "log/CConsoleCtrl.hpp"
 
 
 CSearchResultView::CSearchResultView(QWidget *parent):
@@ -61,6 +62,48 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             });
             contextMenu.addAction(pAction);
         }
+
+        contextMenu.addSeparator();
+
+        const auto* pSelectionModel = selectionModel();
+        auto selectedRows = pSelectionModel->selectedRows();
+        const int selectedRowsSize = selectedRows.size();
+
+        auto minSelectedRow = std::min_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+        auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+
+        {
+            if(nullptr != mpFile && true == mpFile->getSubFilesHandlingStatus())
+            {
+                if(selectedRowsSize >= 1)
+                {
+                    QString msg = QString("Copy file name(s)");
+
+                    QAction* pAction = new QAction(msg, this);
+                    pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+C")));
+                    connect(pAction, &QAction::triggered, [this, selectedRows]()
+                    {
+                        copyMessageFiles();
+                    });
+                    contextMenu.addAction(pAction);
+                }
+            }
+        }
+
+        {
+            QAction* pAction = new QAction("Monitor sub-files", this);
+            connect(pAction, &QAction::triggered, [](bool checked)
+            {
+                CSettingsManager::getInstance()->setSubFilesHandlingStatus(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
 
         {
             QAction* pAction = new QAction("Select all", this);
@@ -103,18 +146,10 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                     contextMenu.addAction(pAction);
                 }
 
-                const auto* pSelectionModel = selectionModel();
-                auto selectedRows = pSelectionModel->selectedRows();
-                const int selectedRowsSize = selectedRows.size();
                 if(selectedRowsSize >= 2)
                 {
-                    auto minSelectedRow = std::min_element( selectedRows.begin(), selectedRows.end(),
-                                                            [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-                    auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
-                                                            [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-
-                    tMsgId from = minSelectedRow->data().value<int>();
-                    tMsgId to = maxSelectedRow->data().value<int>();
+                    tMsgId from = minSelectedRow->data().value<tMsgId>();
+                    tMsgId to = maxSelectedRow->data().value<tMsgId>();
 
                     tRangeProperty prop;
                     prop.isSet = true;
@@ -397,12 +432,12 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                     {
                         bool ok;
 
-                        const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
+                        const auto& currentGradientValue_ = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
 
                         QString numberOfColorsStr = QInputDialog::getText(  nullptr, "Set number of gradient colors",
                                    "Provide number of gradient colors ( from 2 to 100 ):",
                                    QLineEdit::Normal,
-                                   QString::number(currentGradientValue.numberOfColors), &ok );
+                                   QString::number(currentGradientValue_.numberOfColors), &ok );
 
                         if(true == ok)
                         {
@@ -422,7 +457,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                                 CSettingsManager::getInstance()->
                                         setSearchResultHighlightingGradient(
                                             tHighlightingGradient(
-                                                currentGradientValue.from, currentGradientValue.to, numberOfColors
+                                                currentGradientValue_.from, currentGradientValue_.to, numberOfColors
                                                 ));
                             }
                         }
@@ -1002,8 +1037,52 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     {
         clearSearchResultsRequested();
     }
+    else if(((event->modifiers() & Qt::ControlModifier) != 0
+             && (event->modifiers() & Qt::AltModifier) != 0)
+             && (event->key() == Qt::Key::Key_C))
+    {
+        copyMessageFiles();
+    }
     else
     {
        tParent::keyPressEvent(event);
+    }
+}
+
+void CSearchResultView::copyMessageFiles()
+{
+    {
+        if(nullptr != mpFile && true == mpFile->getSubFilesHandlingStatus())
+        {
+            const auto* pSelectionModel = selectionModel();
+            auto selectedRows = pSelectionModel->selectedRows();
+            const int selectedRowsSize = selectedRows.size();
+
+            auto minSelectedRow = std::min_element( selectedRows.begin(), selectedRows.end(),
+                                                    [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+            auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
+                                                    [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+
+            if(selectedRowsSize >= 2)
+            {
+                tMsgId from = minSelectedRow->data().value<tMsgId>();
+                tMsgId to = maxSelectedRow->data().value<tMsgId>();
+
+                tRangeProperty prop;
+                prop.isSet = true;
+                prop.from = from;
+                prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
+                prop = mpFile->normalizeSearchRange( prop );
+
+                mpFile->copyFileNamesToClipboard(tRange(prop.from, prop.to));
+            }
+            else if(selectedRowsSize == 1)
+            {
+                auto selectedRowModelIdx = selectedRows.front();
+                auto selectedRowIdx = selectedRowModelIdx.sibling(selectedRowModelIdx.row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
+
+                mpFile->copyFileNameToClipboard(selectedRowIdx);
+            }
+        }
     }
 }

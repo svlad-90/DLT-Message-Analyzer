@@ -646,7 +646,16 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
 {
     if(nullptr != mpFile)
     {
+        mpFile->setSubFilesHandlingStatus(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
         mpFile->resetCache();
+
+        connect( CSettingsManager::getInstance().get(), &CSettingsManager::subFilesHandlingStatusChanged, [this](bool val)
+        {
+            if(nullptr != mpFile)
+            {
+                mpFile->setSubFilesHandlingStatus(val);
+            }
+        });
     }
 
     if(nullptr != mpSearchResultTableView)
