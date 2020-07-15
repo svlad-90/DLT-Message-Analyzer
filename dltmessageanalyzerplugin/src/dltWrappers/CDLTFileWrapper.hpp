@@ -12,6 +12,7 @@
 #include "QSet"
 #include "QMap"
 #include "QObject"
+#include "QFile"
 
 #include "../common/Definitions.hpp"
 
@@ -302,7 +303,26 @@ private:
 
         private:
             bool mbSubFilesInitialized;
-            typedef std::map<QString, std::shared_ptr<QDltFile> > tSubFilesMap;
+
+            class CDLTFileItem
+            {
+                public:
+                    CDLTFileItem(const QString& path);
+                    bool updateIndex();
+                    int size();
+
+                private:
+                    // file path
+                    QString mPath;
+
+                    // DLT log file.
+                    QFile mInfile;
+
+                    // index
+                    QVector<qint64> mIndexAll;
+            };
+
+            typedef std::map<QString, std::shared_ptr<CDLTFileItem> > tSubFilesMap;
             tSubFilesMap mSubFilesMap;
             QDltFile* mpFile;
     };

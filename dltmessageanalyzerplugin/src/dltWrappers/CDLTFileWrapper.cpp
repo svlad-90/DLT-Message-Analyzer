@@ -777,32 +777,22 @@ void CDLTFileWrapper::CSubFilesHandler::updateSubFiles()
 
         for(int i = 0; i < numberOfFiles; ++i)
         {
-            auto foundSubFile = mSubFilesMap.find(mpFile->getFileName(i));
+            QString filePath = mpFile->getFileName(i);
+            auto foundSubFile = mSubFilesMap.find(filePath);
 
             if(foundSubFile == mSubFilesMap.end())
             {
-                auto pNewFile = std::make_shared<QDltFile>();
-                QString filePath = mpFile->getFileName(i);
+                auto pNewFile = std::make_shared<CDLTFileItem>(filePath);
 
-                bool bOpen = pNewFile->open(filePath);
+                bool bIndexed = pNewFile->updateIndex();
 
-                if(true == bOpen)
+                if(true == bIndexed)
                 {
-                    bool bIndexed = pNewFile->updateIndex();
-
-                    if(true == bIndexed)
-                    {
-                        mSubFilesMap.insert(std::make_pair(filePath, pNewFile));
-                    }
-                    else
-                    {
-                        QString str( QString("Was not able to index file \"%1\"").arg(filePath) );
-                        SEND_WRN(str);
-                    }
+                    mSubFilesMap.insert(std::make_pair(filePath, pNewFile));
                 }
                 else
                 {
-                    QString str( QString("Was not able to open file \"%1\"").arg(filePath) );
+                    QString str( QString("Was not able to index file \"%1\"").arg(filePath) );
                     SEND_WRN(str);
                 }
             }
@@ -820,4 +810,181 @@ void CDLTFileWrapper::CSubFilesHandler::updateSubFiles()
 void CDLTFileWrapper::CSubFilesHandler::clearSubFiles()
 {
     mSubFilesMap.clear();
+}
+
+CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::CDLTFileItem(const QString& path):
+mPath(path)
+{}
+
+bool CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::updateIndex()
+{
+    bool bResult = false;
+
+    QByteArray buf;
+    qint64 pos = 0;
+
+    /* open file */
+    if(false == mInfile.isOpen())
+    {
+        mInfile.setFileName(mPath);
+        if(false == mInfile.open(QIODevice::ReadOnly))
+        {
+            /* open file failed */
+            SEND_WRN( QString( "open of file" ).append( mPath ).append( "failed"  ) );
+        }
+        else
+        {
+            /* start at last found position */
+            if(mIndexAll.size())
+            {
+                /* move behind last found position */
+                const QVector<qint64>* const_indexAll = &(mIndexAll);
+                pos = (*const_indexAll)[mIndexAll.size()-1] + 4;
+                mInfile.seek(pos);
+            }
+            else {
+                /* the file was empty the last call */
+                mInfile.seek(0);
+            }
+
+            /* Align kbytes, 1MB read at a time */
+            static const int READ_BUF_SZ = 1024 * 1024;
+
+            /* walk through the whole file and find all DLT0x01 markers */
+            /* store the found positions in the indexAll */
+            char lastFound = 0;
+            qint64 current_message_pos = 0;
+            qint64 next_message_pos = 0;
+            int counter_header = 0;
+            quint16 message_length = 0;
+            qint64 file_size = mInfile.size();
+            qint64 errors_in_file  = 0;
+
+            while(true)
+            {
+                /* read buffer from file */
+                buf = mInfile.read(READ_BUF_SZ);
+                if(buf.isEmpty())
+                    break; // EOF
+
+                /* Use primitive buffer for faster access */
+                int cbuf_sz = buf.size();
+                const char *cbuf = buf.constData();
+
+                /* find marker in buffer */
+                for(int num=0;num<cbuf_sz;num++) {
+                    // search length of DLT message
+                    if(counter_header>0)
+                    {
+                        counter_header++;
+                        if (counter_header==16)
+                        {
+                            // Read low byte of message length
+                            message_length = static_cast<unsigned char>(cbuf[num]);
+                        }
+                        else if (counter_header==17)
+                        {
+                            // Read high byte of message length
+                            counter_header = 0;
+                            message_length = static_cast<quint16>((message_length<<8 | (static_cast<unsigned char>(cbuf[num]))) + 16);
+                            next_message_pos = current_message_pos + message_length;
+                            if(next_message_pos==file_size)
+                            {
+                                // last message found in file
+                                mIndexAll.append(current_message_pos);
+                                break;
+                            }
+                            // speed up move directly to next message, if inside current buffer
+                            if((message_length > 20))
+                            {
+                                if((num+message_length-20<cbuf_sz))
+                                {
+                                    num+=message_length-20;
+                                }
+                            }
+                        }
+                    }
+                    else if(cbuf[num] == 'D')
+                    {
+                        lastFound = 'D';
+                    }
+                    else if(lastFound == 'D' && cbuf[num] == 'L')
+                    {
+                        lastFound = 'L';
+                    }
+                    else if(lastFound == 'L' && cbuf[num] == 'T')
+                    {
+                        lastFound = 'T';
+                    }
+                    else if(lastFound == 'T' && cbuf[num] == 0x01)
+                    {
+                        if(next_message_pos == 0)
+                        {
+                            // first message detected or first message after error
+                            current_message_pos = pos+num-3;
+                            counter_header = 1;
+                            if(current_message_pos!=0)
+                            {
+                                // first messages not at beginning or error occured before
+                                errors_in_file++;
+                            }
+                            // speed up move directly to message length, if inside current buffer
+                            if(num+14<cbuf_sz)
+                            {
+                                num+=14;
+                                counter_header+=14;
+                            }
+                        }
+                        else if( next_message_pos == (pos+num-3) )
+                        {
+                            // Add message only when it is in the correct position in relationship to the last message
+                            mIndexAll.append(current_message_pos);
+                            current_message_pos = pos+num-3;
+                            counter_header = 1;
+                            // speed up move directly to message length, if inside current buffer
+                            if(num+14<cbuf_sz)
+                            {
+                                num+=14;
+                                counter_header+=14;
+                            }
+                        }
+                        else if(next_message_pos > (pos+num-3))
+                        {
+                            // Header detected before end of message
+                        }
+                        else
+                        {
+                            // Header detected after end of message
+                            // start search for new message back after last header found
+                            mInfile.seek(current_message_pos+4);
+                            pos = current_message_pos+4;
+                            buf = mInfile.read(READ_BUF_SZ);
+                            cbuf_sz = buf.size();
+                            cbuf = buf.constData();
+                            num=0;
+                            next_message_pos = 0;
+                        }
+                        lastFound = 0;
+                    }
+                    else
+                    {
+                        lastFound = 0;
+                    }
+                }
+                pos += cbuf_sz;
+            }
+
+            mInfile.close();
+
+            bResult = true;
+        }
+    }
+
+    /* success */
+    return bResult;
+}
+
+int CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::size()
+{
+    return mIndexAll.size();
 }
