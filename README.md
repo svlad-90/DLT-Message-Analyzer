@@ -16,7 +16,7 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 ## Installation guide
 
-### [Here](./md/installation_guide/installation_guide.md)
+### [Read it here](./md/installation_guide/installation_guide.md)
 
 ----
 
@@ -62,6 +62,12 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 - Debug "console view", which prints different kinds of useful information.
 
 and many other features
+
+----
+
+## Development documentation
+
+### [Read it here](./md/dev_docs/dev_docs.md)
 
 ----
 

@@ -1,0 +1,28 @@
+@startuml
+class DLTMessageAnalyzerPlugin
+class CDLTMessageAnalyzer
+class Form
+class IDLTMessageAnalyzerControllerConsumer
+
+class QDLTPluginInterface
+class QDltPluginViewerInterface
+class QDltPluginControlInterface
+class QDltPluginManager
+
+class QWidget
+class QObject
+
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin
+QObject <|-- DLTMessageAnalyzerPlugin
+IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer
+QWidget <|-- Form
+
+QDltPluginManager *- QDLTPluginInterface
+QDltPluginManager *- QDltPluginViewerInterface
+QDltPluginManager *- QDltPluginControlInterface
+
+DLTMessageAnalyzerPlugin o- Form
+DLTMessageAnalyzerPlugin *- CDLTMessageAnalyzer
+@enduml
