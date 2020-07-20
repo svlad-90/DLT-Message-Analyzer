@@ -2,7 +2,7 @@
 
 ----
 
-![test plant-uml](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/svlad-90/DLT-Message-Analyzer/tree/master/dltmessageanalyzerplugin/src/logo/doc/test.puml)
+![test plant-uml](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/svlad-90/DLT-Message-Analyzer/master/dltmessageanalyzerplugin/src/logo/doc/test.puml)
 
 ----
 

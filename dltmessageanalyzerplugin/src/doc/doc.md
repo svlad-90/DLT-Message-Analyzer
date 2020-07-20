@@ -2,7 +2,7 @@
 
 ----
 
-![class diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://github.com/svlad-90/DLT-Message-Analyzer/tree/master/dltmessageanalyzerplugin/src/doc/class.puml)
+![class diagram](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/svlad-90/DLT-Message-Analyzer/master/dltmessageanalyzerplugin/src/doc/class.puml)
 
 ----
 
