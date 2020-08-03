@@ -47,6 +47,7 @@
 #include "log/CConsoleCtrl.hpp"
 #include "common/CTableMemoryJumper.hpp"
 #include "log/CConsoleInputProcessor.hpp"
+#include "uml/CUMLView.hpp"
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
@@ -57,7 +58,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput, QComboBox* pRegexSelectionComboBox,
                                          CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
-                                         QLineEdit* pConsoleViewInput
+                                         QLineEdit* pConsoleViewInput, CUMLView* pUMLView
                                          ):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
@@ -81,6 +82,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpAvailablePatternsModel( new CPatternsModel() ),
     mpFiltersView(pFiltersView),
     mpFiltersModel( new CFiltersModel() ),
+    mpUMLView(pUMLView),
     // internal states
     mSearchRange(),
     mRequestId(INVALID_REQUEST_ID),
@@ -368,6 +370,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpSearchResultTableView)
     {
+        connect( mpSearchResultTableView, &CSearchResultView::restartSearch, [this]()
+        {
+            static_cast<void>(analyze());
+        });
+
         connect( mpSearchResultTableView, &CSearchResultView::searchRangeChanged, [this](const tRangeProperty& searchRange, bool bReset)
         {
             if(false == bReset)
@@ -483,6 +490,21 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         });
     }
 
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
+    {
+        createSequenceDiagram();
+    });
+
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_ShowArgumentsChanged, [this](bool)
+    {
+        createSequenceDiagram();
+    });
+
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_WrapOutputChanged, [this](bool)
+    {
+        createSequenceDiagram();
+    });
+
     handleLoadedConfig();
     handleLoadedRegexConfig();
 
@@ -507,6 +529,23 @@ void CDLTMessageAnalyzer::decodeMsg(QDltMsg& msg) const
         pDecoderPlugin->decodeMsg(msg, false);
     }
 #endif
+}
+
+void CDLTMessageAnalyzer::createSequenceDiagram() const
+{
+    if(nullptr != mpSearchResultModel && nullptr != mpUMLView)
+    {
+        auto UMLResult = mpSearchResultModel->getUMLDiagramContent();
+
+        if(0 != UMLResult.first)
+        {
+            mpUMLView->generateUMLDiagram(UMLResult.second);
+        }
+        else
+        {
+            SEND_WRN( "Can't form empty UML diagram. 0 rows from the \"Search view\" were selected for diagram's creation." );
+        }
+    }
 }
 
 void CDLTMessageAnalyzer::handleLoadedRegexConfig()
@@ -738,6 +777,21 @@ bool CDLTMessageAnalyzer::analyze()
     {
         updateStatusLabel( "Initial enabling error! Caused by limitations of dlt-viewer's plugin API. Please, use \"File->Clear\" or \"Ctrl+K\" to recover", true );
         return false;
+    }
+
+    if(nullptr != mpUMLView)
+    {
+        if(true == mpUMLView->isDiagramGenerationInProgress())
+        {
+            mpUMLView->cancelDiagramGeneration();
+        }
+        else
+        {
+            if(true == mpUMLView->isDiagramShown())
+            {
+                mpUMLView->clearDiagram();
+            }
+        }
     }
 
     if( nullptr == mpProgressBar ||
@@ -1117,7 +1171,7 @@ void CDLTMessageAnalyzer::exportGroupedViewToHTML()
                 QString filters("HTML (*.html);;All files (*.*)");
                 QString defaultFilter("HTML (*.html)");
 
-                auto filePath = QFileDialog::getSaveFileName(nullptr, "Save file", QDir::currentPath(), filters, &defaultFilter);
+                auto filePath = QFileDialog::getSaveFileName(nullptr, "Save file", QCoreApplication::applicationDirPath(), filters, &defaultFilter);
 
                 if(0 != filePath.size())
                 {

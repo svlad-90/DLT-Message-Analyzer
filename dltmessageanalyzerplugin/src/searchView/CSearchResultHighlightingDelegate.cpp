@@ -6,6 +6,7 @@
 
 #include "QPainter"
 #include "QDebug"
+#include "QApplication"
 
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "../common/Definitions.hpp"
@@ -333,6 +334,13 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
         auto field = static_cast<eSearchResultColumn>(index.column());
 
+        bool UML_Applicability = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<bool>();
+
+        if(true == UML_Applicability)
+        {
+            painter->fillRect(opt.rect, QBrush(QColor(200,200,200)));
+        }
+
         switch(static_cast<eSearchResultColumn>(index.column()))
         {
             case eSearchResultColumn::Apid:
@@ -360,6 +368,20 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             case eSearchResultColumn::Timestamp:
             {
                 drawText( stringData, painter, opt, mbMarkTimestampWithBold );
+            }
+            break;
+            case eSearchResultColumn::UML_Applicability:
+            {
+                QStyleOptionViewItem viewItemOption = option;
+
+                const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+                QRect newRect = QStyle::alignedRect(viewItemOption.direction, Qt::AlignCenter,
+                                                    QSize(viewItemOption.decorationSize.width() + 5,option.decorationSize.height()),
+                                                    QRect(viewItemOption.rect.x() + textMargin, option.rect.y(),
+                                                          viewItemOption.rect.width() - (2 * textMargin), viewItemOption.rect.height()));
+                viewItemOption.rect = newRect;
+
+                QStyledItemDelegate::paint(painter, viewItemOption, index);
             }
             break;
         }

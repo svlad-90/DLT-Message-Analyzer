@@ -35,7 +35,8 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     mWidthUpdateRequired(eUpdateRequired::eUpdateRequired_NO),
     mbIsVerticalScrollBarVisible(false),
     mpFile(nullptr),
-    mSearchRange()
+    mSearchRange(),
+    mpSpecificModel(nullptr)
 {
     setItemDelegate(new CSearchResultHighlightingDelegate());
 
@@ -148,8 +149,8 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
                 if(selectedRowsSize >= 2)
                 {
-                    tMsgId from = minSelectedRow->data().value<tMsgId>();
-                    tMsgId to = maxSelectedRow->data().value<tMsgId>();
+                    tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
+                    tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
 
                     tRangeProperty prop;
                     prop.isSet = true;
@@ -169,7 +170,8 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                 }
                 else if(selectedRowsSize == 1)
                 {
-                    tMsgId targetMsgId = selectedRows.begin()->data().value<int>();
+                    auto pSelectedRow = selectedRows.begin();
+                    tMsgId targetMsgId = pSelectedRow->sibling(pSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
 
                     {
                         QString msg = QString("Search \"starting from\" id %1").arg(targetMsgId);
@@ -265,7 +267,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                 const auto& searchResultColumnsVisibilityMap =
                         CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
 
-                for( int i = static_cast<int>(eSearchResultColumn::Index);
+                for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
                      i < static_cast<int>(eSearchResultColumn::Last);
                      ++i)
                 {
@@ -289,6 +291,13 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         });
                         pAction->setCheckable(true);
                         pAction->setChecked(foundItem.value());
+
+                        if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                        && false == CSettingsManager::getInstance()->getUML_FeatureActive())
+                        {
+                            pAction->setEnabled(false);
+                        }
+
                         pSubMenu->addAction(pAction);
                     }
                 }
@@ -315,7 +324,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                 const auto& searchResultColumnsCopyPasteMap =
                         CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
 
-                for( int i = static_cast<int>(eSearchResultColumn::Index);
+                for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
                      i < static_cast<int>(eSearchResultColumn::Last);
                      ++i)
                 {
@@ -339,6 +348,13 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         });
                         pAction->setCheckable(true);
                         pAction->setChecked(foundItem.value());
+
+                        if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                        && false == CSettingsManager::getInstance()->getUML_FeatureActive())
+                        {
+                            pAction->setEnabled(false);
+                        }
+
                         pSubMenu->addAction(pAction);
                     }
                 }
@@ -471,6 +487,64 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
         contextMenu.addSeparator();
 
+        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
+        {
+            {
+                QMenu* pSubMenu = new QMenu("UML options", this);
+                pSubMenu->setToolTipsVisible(true);
+
+                {
+                    QAction* pAction = new QAction("Select all UML items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A, then Space"));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        selectAllUMLItems(true);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Unselect all UML items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A then Space"));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        selectAllUMLItems(false);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                pSubMenu->addSeparator();
+
+                {
+                    QAction* pAction = new QAction("Find previous UML item", this);
+                    pAction->setShortcut(QKeySequence(tr("Alt+Up")));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        switchToNextUMLItem(false);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Find next UML item", this);
+                    pAction->setShortcut(QKeySequence(tr("Alt+Down")));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        switchToNextUMLItem(true);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
+        }
+
         {
             QAction* pAction = new QAction("Mark timestamp with bold", this);
             connect(pAction, &QAction::triggered, [](bool checked)
@@ -485,7 +559,34 @@ CSearchResultView::CSearchResultView(QWidget *parent):
         contextMenu.exec(mapToGlobal(pos));
     };
 
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [this](bool)
+    {
+        updateColumnsVisibility();
+    });
+
+    connect(this, &QTableView::clicked, [this](const QModelIndex &index)
+    {
+        if(false == index.isValid())
+        {
+            return;
+        }
+
+        if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::UML_Applicability)
+        {
+            if(nullptr != mpSpecificModel)
+            {
+                auto siblingIdx = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
+                mpSpecificModel->setUML_Applicability(index, !siblingIdx.data().value<bool>());
+            }
+        }
+    });
+
     connect( this, &QWidget::customContextMenuRequested, showContextMenu );
+
+    connect( CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [this]()
+    {
+        restartSearch();
+    });
 
     connect( CSettingsManager::getInstance().get(),
              &CSettingsManager::searchResultColumnsVisibilityMapChanged,
@@ -700,7 +801,7 @@ void CSearchResultView::updateColumnsVisibility()
 {
     const tSearchResultColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
 
-    for( int i = static_cast<int>(eSearchResultColumn::Index);
+    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
          i < static_cast<int>(eSearchResultColumn::Last);
          ++i)
     {
@@ -710,15 +811,23 @@ void CSearchResultView::updateColumnsVisibility()
         {
             if(true == foundColumn.value()) // if column is visible
             {
-                showColumn(i);
-
-                if(static_cast<eSearchResultColumn>(i) == eSearchResultColumn::Payload)
+                if(i != static_cast<int>(eSearchResultColumn::UML_Applicability) ||
+                  ((i == static_cast<int>(eSearchResultColumn::UML_Applicability) && (true == CSettingsManager::getInstance()->getUML_FeatureActive() ) ) ) )
                 {
-                    setColumnWidth(i, 1000);
+                    showColumn(i);
+
+                    if(static_cast<eSearchResultColumn>(i) == eSearchResultColumn::Payload)
+                    {
+                        setColumnWidth(i, 1000);
+                    }
+                    else
+                    {
+                        setColumnWidth(i, 50);
+                    }
                 }
                 else
                 {
-                    setColumnWidth(i, 50);
+                    hideColumn(i);
                 }
             }
             else
@@ -736,6 +845,11 @@ void CSearchResultView::updateColumnsVisibility()
 void CSearchResultView::setModel(QAbstractItemModel *model)
 {
     tParent::setModel(model);
+
+    if(nullptr != model)
+    {
+       mpSpecificModel = static_cast<CSearchResultModel*>(model);
+    }
 
     updateColumnsVisibility();
 
@@ -798,21 +912,24 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
     {
         const auto& copyPasteColumnsMap = CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
 
-        int counter = 0;
+        int columnsCounter = 0;
+        int copyPasteColumnsCounter = 0;
 
         for( const auto& copyPaste : copyPasteColumnsMap )
         {
             if(true == copyPaste)
             {
-                copyPasteColumns.push_back(counter);
+                copyPasteColumns.push_back(columnsCounter);
 
-                if(counter == static_cast<int>(eSearchResultColumn::Payload))
+                if(columnsCounter == static_cast<int>(eSearchResultColumn::Payload))
                 {
-                    payloadColumnIdx = counter;
+                    payloadColumnIdx = copyPasteColumnsCounter;
                 }
+
+                ++copyPasteColumnsCounter;
             }
 
-            ++counter;
+            ++columnsCounter;
         }
     }
 
@@ -1043,6 +1160,60 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     {
         copyMessageFiles();
     }
+    else if(event->key() == Qt::Key::Key_Space)
+    {
+        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
+        {
+            if(nullptr != mpSpecificModel)
+            {
+                auto selectedRows = selectionModel()->selectedRows();
+
+                if(false == selectedRows.empty())
+                {
+                    auto targetIndex = selectedRows[0];
+                    bool bTargetIndexFound = targetIndex.flags() & Qt::ItemIsEditable;
+
+                    if(false == bTargetIndexFound)
+                    {
+                        for(const auto& selectedRow : selectedRows)
+                        {
+                            if(selectedRow.flags() & Qt::ItemIsEditable)
+                            {
+                                targetIndex = selectedRow;
+                                bTargetIndexFound = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(true == bTargetIndexFound)
+                    {
+                        auto targetValue = !(targetIndex.sibling(targetIndex.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<bool>());
+
+                        for(const auto& selectedRow : selectedRows)
+                        {
+                            auto siblingIdx = selectedRow.sibling(selectedRow.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
+
+                            if(siblingIdx.data().value<bool>() != targetValue)
+                            {
+                                mpSpecificModel->setUML_Applicability(selectedRow, targetValue);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if((event->modifiers() & Qt::AltModifier) != 0
+            && (event->key() == Qt::Key::Key_Down))
+    {
+        switchToNextUMLItem(true);
+    }
+    else if((event->modifiers() & Qt::AltModifier) != 0
+            && (event->key() == Qt::Key::Key_Up))
+    {
+        switchToNextUMLItem(false);
+    }
     else
     {
        tParent::keyPressEvent(event);
@@ -1065,8 +1236,8 @@ void CSearchResultView::copyMessageFiles()
 
             if(selectedRowsSize >= 2)
             {
-                tMsgId from = minSelectedRow->data().value<tMsgId>();
-                tMsgId to = maxSelectedRow->data().value<tMsgId>();
+                tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
+                tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
 
                 tRangeProperty prop;
                 prop.isSet = true;
@@ -1079,9 +1250,106 @@ void CSearchResultView::copyMessageFiles()
             else if(selectedRowsSize == 1)
             {
                 auto selectedRowModelIdx = selectedRows.front();
-                auto selectedRowIdx = selectedRowModelIdx.sibling(selectedRowModelIdx.row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
+                auto selectedRowIdx = selectedRowModelIdx.sibling(selectedRowModelIdx.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<int>();
 
                 mpFile->copyFileNameToClipboard(selectedRowIdx);
+            }
+        }
+    }
+}
+
+void CSearchResultView::switchToNextUMLItem(bool bNext)
+{
+    if(true == CSettingsManager::getInstance()->getUML_FeatureActive()) // if UML feature is active
+    {
+        auto selectedRows = selectionModel()->selectedRows();
+
+        if(false == selectedRows.isEmpty())
+        {
+            QModelIndex targetIndex;
+
+            if(true == bNext)
+            {
+                targetIndex = *std::min_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+            }
+            else
+            {
+                targetIndex = *std::max_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+            }
+
+            if(true == targetIndex.isValid())
+            {                
+                auto iSize = model()->rowCount();
+
+                auto checkIndexFunc = [this](const int& row)->bool
+                {
+                    bool bResult = false;
+
+                    auto checkIndex = model()->index(row, static_cast<int>(eSearchResultColumn::UML_Applicability));
+                    if( true == checkIndex.isValid() )
+                    {
+                        bool bUsedForUML = checkIndex.flags() & Qt::ItemIsEditable;
+
+                        if(true == bUsedForUML)
+                        {
+                            scrollTo( checkIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
+                            setCurrentIndex(checkIndex);
+                            bResult = true;
+                        }
+                    }
+
+                    return bResult;
+                };
+
+                if(true == bNext)
+                {
+                    if(targetIndex.row() < model()->rowCount())
+                    {
+                        for(int i = targetIndex.row() + 1; i < iSize; ++i)
+                        {
+                            if(true == checkIndexFunc(i))
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if(targetIndex.row() > 0)
+                    {
+                        for(int i = targetIndex.row() - 1; i >= 0; --i)
+                        {
+                            if(true == checkIndexFunc(i))
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void CSearchResultView::selectAllUMLItems(bool select)
+{
+    if(true == CSettingsManager::getInstance()->getUML_FeatureActive()) // if UML feature is active
+    {
+        const auto iSize = model()->rowCount();
+        for( int i = 0; i < iSize; ++i )
+        {
+            auto checkIndex = model()->index(i, static_cast<int>(eSearchResultColumn::UML_Applicability));
+            bool bUsedForUML = checkIndex.flags() & Qt::ItemIsEditable;
+
+            if(true == bUsedForUML)
+            {
+                if(checkIndex.data().value<bool>() != select)
+                {
+                    mpSpecificModel->setUML_Applicability(checkIndex, select);
+                }
             }
         }
     }

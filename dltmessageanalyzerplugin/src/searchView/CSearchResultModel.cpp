@@ -7,6 +7,8 @@
 #include "qdlt.h"
 
 #include "CSearchResultModel.hpp"
+#include "../log/CConsoleCtrl.hpp"
+#include "../settings/CSettingsManager.hpp"
 #include "../dltWrappers/CDLTMsgWrapper.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"
 
@@ -71,6 +73,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
 
         switch( static_cast<eSearchResultColumn>(index.column()) )
         {
+            case eSearchResultColumn::UML_Applicability: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Index: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Time: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Timestamp: { alignment = Qt::AlignCenter; } break;
@@ -89,7 +92,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
 
         result = alignment;
     }
-    else if ( role == Qt::DisplayRole )
+    else if ( role == Qt::DisplayRole && static_cast<eSearchResultColumn>(index.column()) != eSearchResultColumn::UML_Applicability )
     {
         if(nullptr != mpFile && 0 < mpFile->size())
         {
@@ -97,15 +100,38 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
             result = getDataStrFromMsg(index, pMsg, static_cast<eSearchResultColumn>(index.column()));
         }
     }
+    else if( ( role == Qt::DisplayRole || role == Qt::CheckStateRole ) && ( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
+    {
+        const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
+
+        if(true == UMLInfo.bUMLConstraintsFulfilled)
+        {
+            if(true == UMLInfo.bApplyForUMLCreation)
+            {
+                result = Qt::CheckState::Checked;
+            }
+            else
+            {
+                result = Qt::CheckState::Unchecked;
+            }
+        }
+    }
+    else if (role == Qt::TextAlignmentRole)
+    {
+        if(index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability))
+        {
+            result = Qt::AlignLeft;
+        }
+    }
 
     return result;
 }
 
-QVariant CSearchResultModel::getDataStrFromMsg(const QModelIndex& modelIndex, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const
+QString CSearchResultModel::getDataStrFromMsg(const QModelIndex& modelIndex, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const
 {
     if(nullptr == pMsg)
     {
-        return QVariant();
+        return QString();
     }
 
     QString strRes;
@@ -184,9 +210,11 @@ QVariant CSearchResultModel::getDataStrFromMsg(const QModelIndex& modelIndex, co
             strRes = "Unhandled field type!";
         }
             break;
+        default:
+            break;
     }
 
-    return QVariant(strRes);
+    return strRes;
 }
 
 QVariant CSearchResultModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -203,12 +231,34 @@ QVariant CSearchResultModel::headerData(int section, Qt::Orientation orientation
 
 Qt::ItemFlags CSearchResultModel::flags(const QModelIndex &index) const
 {
+    Qt::ItemFlags result;
+
     if (false == index.isValid())
     {
-        return Qt::NoItemFlags;
+        result = Qt::NoItemFlags;
+    }
+    else
+    {
+        if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::UML_Applicability)
+        {
+            const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
+
+            if(true == UMLInfo.bUMLConstraintsFulfilled)
+            {
+                result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+            }
+            else
+            {
+                result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+            }
+        }
+        else
+        {
+            result = QAbstractItemModel::flags(index);
+        }
     }
 
-    return QAbstractItemModel::flags(index);
+    return result;
 }
 
 std::pair<bool, tRange> CSearchResultModel::addNextMessageIdxVec(const tFoundMatchesPack &foundMatchesPack)
@@ -245,4 +295,203 @@ int CSearchResultModel::getFileIdx( const QModelIndex& idx ) const
    }
 
    return result;
+}
+
+std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::getUMLDiagramContent() const
+{
+    std::pair<int, QString> result;
+
+    int& numberOfRows = result.first;
+    QString& outputString = result.second;
+
+    outputString.append("@startuml\n");
+    outputString.append("skinparam backgroundColor white\n");
+    outputString.append("skinparam defaultFontName Courier new\n");
+
+    //let's represent wheether UML data is properly filled in
+    for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
+    {
+        QString subStr;
+
+        const auto& itemMetadata = foundMatchPack.getItemMetadata();
+
+        if(true == itemMetadata.UMLInfo.bUMLConstraintsFulfilled
+           && true == itemMetadata.UMLInfo.bApplyForUMLCreation)
+        {
+            const auto& pMsg = mpFile->getMsg(itemMetadata.msgId);
+
+            // Result string - <UCL> <URT|URS|UE> <US> : [timestamp] <USID><UM>(<UA>)
+
+            tRange insertMethodFormattingRange;
+            tRange insertMethodFormattingOffset;
+
+            auto getUMLItemRepresentation = [this, &itemMetadata, &pMsg](const eUML_ID& UML_ID)->std::pair<bool, QString>
+            {
+                std::pair<bool, QString> UMLRepresentationResult;
+                UMLRepresentationResult.first = false;
+
+                auto foundUMLDataItem = itemMetadata.UMLInfo.UMLDataMap.find(UML_ID);
+
+                if(foundUMLDataItem != itemMetadata.UMLInfo.UMLDataMap.end())
+                {
+                    for(const auto& fieldRange : foundUMLDataItem->second)
+                    {
+                        QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(fieldRange.first));
+                        QString message = getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column()));
+
+                        auto messageSize = message.size();
+                        if(fieldRange.second.from >= 0 && fieldRange.second.from < messageSize &&
+                           fieldRange.second.to >= 0 && fieldRange.second.to < messageSize )
+                        {
+                            switch(UML_ID)
+                            {
+                                case eUML_ID::UML_REQUEST:
+                                    UMLRepresentationResult.second.append("->");
+                                    break;
+                                case eUML_ID::UML_RESPONSE:
+                                case eUML_ID::UML_EVENT:
+                                    UMLRepresentationResult.second.append("<-");
+                                    break;
+                                case eUML_ID::UML_ARGUMENTS:
+                                {
+                                    int numberOfCharacters = fieldRange.second.to - fieldRange.second.from + 1;
+                                    QString argString = message.mid(fieldRange.second.from, numberOfCharacters);
+                                    argString.replace("[[", "[ [");
+                                    argString.replace("]]", "] ]");
+                                    UMLRepresentationResult.second.append(argString);
+                                }
+                                    break;
+                                default:
+                                {
+                                    UMLRepresentationResult.second.append(message.mid(fieldRange.second.from, fieldRange.second.to - fieldRange.second.from + 1));
+                                }
+                                    break;
+                            }
+                        }
+
+                        UMLRepresentationResult.first = true;
+                    }
+                }
+
+                return UMLRepresentationResult;
+            };
+
+            auto appendUMLData = [&getUMLItemRepresentation, &subStr](const eUML_ID& UML_ID)
+            {
+                auto findUCLResult = getUMLItemRepresentation(UML_ID);
+
+                if(true == findUCLResult.first)
+                {
+                    subStr.append(findUCLResult.second);
+                }
+                else
+                {
+                    //SEND_ERR(QString("Was not able to find \"%1\" field!").arg(getUMLIDAsString(UML_ID)));
+                }
+            };
+
+            appendUMLData(eUML_ID::UML_CLIENT);
+            subStr.append(" ");
+            appendUMLData(eUML_ID::UML_REQUEST);
+            appendUMLData(eUML_ID::UML_RESPONSE);
+            appendUMLData(eUML_ID::UML_EVENT);
+            subStr.append(" ");
+            appendUMLData(eUML_ID::UML_SERVICE);
+            subStr.append(" : ");
+            int wrappingStartingPoint = subStr.size();
+            subStr.append("[");
+            QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(eSearchResultColumn::Timestamp));
+            subStr.append( getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column())) );
+            subStr.append("] ");
+            appendUMLData(eUML_ID::UML_SEQUENCE_ID);
+            subStr.append(" ");
+            insertMethodFormattingRange.from = subStr.size();
+            appendUMLData(eUML_ID::UML_METHOD);
+            insertMethodFormattingRange.to = subStr.size();
+            subStr.append("(");
+
+            if(true == CSettingsManager::getInstance()->getUML_ShowArguments())
+            {
+                appendUMLData(eUML_ID::UML_ARGUMENTS);
+            }
+            else
+            {
+                subStr.append(" ... ");
+            }
+
+            subStr.append(")");
+
+            subStr.append("\n");
+
+            // wrapping logic
+            {
+                if(true == CSettingsManager::getInstance()->getUML_WrapOutput())
+                {
+                    const int insertNewLineRange = 100;
+
+                    if(subStr.size() > insertNewLineRange)
+                    {
+                        const QString insertStr = "\\n";
+
+                        subStr.reserve(subStr.size() + ( insertStr.size() * ( (subStr.size() / insertNewLineRange) + 1 ) ) );
+
+                        int currentIndex = wrappingStartingPoint + insertNewLineRange;
+                        int currentOffset = 0;
+
+                        while( (currentIndex + currentOffset) < subStr.size())
+                        {
+                            if(currentIndex + currentOffset < insertMethodFormattingRange.from)
+                            {
+                                insertMethodFormattingOffset.from += insertStr.size();
+                            }
+
+                            if(currentIndex + currentOffset < insertMethodFormattingRange.to)
+                            {
+                                insertMethodFormattingOffset.to += insertStr.size();
+                            }
+
+                            subStr.insert( currentIndex + currentOffset, insertStr );
+                            currentIndex += insertNewLineRange;
+                            currentOffset += insertStr.size();
+                        }
+                    }
+                }
+            }
+
+            subStr.insert(insertMethodFormattingRange.from + insertMethodFormattingOffset.from, "__**");
+            subStr.insert(insertMethodFormattingRange.to + insertMethodFormattingOffset.to + 4, "**__");
+
+            outputString.append(subStr);
+
+            ++numberOfRows;
+
+            const auto& maxRowsNumber = CSettingsManager::getInstance()->getUML_MaxNumberOfRowsInDiagram();
+
+            // if we've reached the limit
+            if(numberOfRows >= maxRowsNumber)
+            {
+                // stop addition of new rows
+                SEND_WRN(QString("Not all UML content will be rendered. Number of rows in diagram was limited to %1 rows due to specified settings").arg(maxRowsNumber));
+                break;
+            }
+        }
+    }
+
+    outputString.append("@enduml");
+
+    return result;
+}
+
+void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool checked )
+{
+    if(true == index.isValid())
+    {
+        auto& UML_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadataWriteable().UMLInfo;
+
+        if(true == UML_Info.bUMLConstraintsFulfilled)
+        {
+            UML_Info.bApplyForUMLCreation = checked;
+            dataChanged(index, index);
+        }
+    }
 }

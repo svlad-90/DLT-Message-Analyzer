@@ -8,6 +8,7 @@
 #include "IDLTMessageAnalyzerController.hpp"
 #include "qdlt.h"
 
+#include "../settings/CSettingsManager.hpp"
 #include "../log/CConsoleCtrl.hpp"
 
 //IDLTMessageAnalyzerControllerConsumer
@@ -34,11 +35,29 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tDLTFile
     if(false == mpController.expired())
     {
         tRegexScriptingMetadata regexMetadata;
-        bool bParseResult = regexMetadata.parse(regex);
+
+        bool bUMLFeatureActive = CSettingsManager::getInstance()->getUML_FeatureActive();
+
+        bool bParseResult = regexMetadata.parse(regex, bUMLFeatureActive);
 
         if(false == bParseResult)
         {
             SEND_ERR(QString("[IDLTMessageAnalyzerControllerConsumer][%1] Was not able to parse scripting metadata out of the regex!").arg(__FUNCTION__));
+        }
+        else
+        {
+            if(true == bUMLFeatureActive)
+            {
+                if(true == regexMetadata.doesContainAnyUMLGroup()) // if has at least one UML group
+                {
+                    auto checkUMLDataResult = regexMetadata.doesContainConsistentUMLData(true, tRegexScriptingMetadata::tCheckIDs());
+
+                    if(false == checkUMLDataResult.first) // let's check and trace the warnings
+                    {
+                        SEND_WRN(checkUMLDataResult.second);
+                    }
+                }
+            }
         }
 
         requestId = mpController.lock()->requestAnalyze(shared_from_this(), pFile, fromMessage, numberOfMessages, regex, numberOfThreads, regexMetadata, isContinuous);

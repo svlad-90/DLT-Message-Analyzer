@@ -9,6 +9,8 @@
 #include <QTableView>
 #include "../common/Definitions.hpp"
 
+class CSearchResultModel;
+
 class CSearchResultView : public QTableView
 {
     Q_OBJECT
@@ -26,6 +28,7 @@ public:
 signals:
     void searchRangeChanged( const tRangeProperty& searchRange, bool bReset );
     void clearSearchResultsRequested();
+    void restartSearch();
 
 protected:
     virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
@@ -36,6 +39,8 @@ private:
     void updateColumnsVisibility();
     void getUserSearchRange();
     void copyMessageFiles();
+    void switchToNextUMLItem(bool bNext);
+    void selectAllUMLItems(bool select);
 
 private:
     enum class eUpdateRequired
@@ -49,6 +54,7 @@ private:
     bool mbIsVerticalScrollBarVisible;
     tDLTFileWrapperPtr mpFile;
     tRangeProperty mSearchRange;
+    CSearchResultModel* mpSpecificModel;
 };
 
 #endif // CSEARCHRESULTVIEW_HPP

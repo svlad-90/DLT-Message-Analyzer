@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QDir>
+#include "QCoreApplication"
 
 #include "QDebug"
 
@@ -56,6 +57,11 @@ static const QString sGroupedViewColumnsVisibilityMapKey = "GroupedViewColumnsVi
 static const QString sGroupedViewColumnsCopyPasteMapKey = "GroupedViewColumnsCopyPasteMap";
 static const QString sSubFilesHandlingStatusKey = "SubFilesHandlingStatus";
 
+static const QString sUML_FeatureActiveKey = "UML_FeatureActive";
+static const QString sUML_MaxNumberOfRowsInDiagramKey = "UML_MaxNumberOfRowsInDiagram";
+static const QString sUML_ShowArgumentsKey = "UML_ShowArguments";
+static const QString sUML_WrapOutputKey = "UML_WrapOutput";
+
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
 
@@ -64,6 +70,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultColumnsVisibil
     tSearchResultColumnsVisibilityMap result;
 
     // fields, which are visible by default
+    result.insert(eSearchResultColumn::UML_Applicability, true);
     result.insert(eSearchResultColumn::Index, true);
     result.insert(eSearchResultColumn::Time, true);
     result.insert(eSearchResultColumn::Timestamp, true);
@@ -85,6 +92,34 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultColumnsVisibil
 
 static const tSearchResultColumnsVisibilityMap sDefaultSearchResultColumnsVisibilityMap
 = fillInDefaultSearchResultColumnsVisibilityMap();
+
+static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultCopyPasteMap()
+{
+    tSearchResultColumnsVisibilityMap result;
+
+    // fields, which are visible by default
+    result.insert(eSearchResultColumn::Index, true);
+    result.insert(eSearchResultColumn::Timestamp, true);
+    result.insert(eSearchResultColumn::Ecuid, true);
+    result.insert(eSearchResultColumn::Apid, true);
+    result.insert(eSearchResultColumn::Ctid, true);
+    result.insert(eSearchResultColumn::Payload, true);
+
+    // fields, which are not visible by default
+    result.insert(eSearchResultColumn::UML_Applicability, false);
+    result.insert(eSearchResultColumn::Time, false);
+    result.insert(eSearchResultColumn::Count, false);
+    result.insert(eSearchResultColumn::SessionId, false);
+    result.insert(eSearchResultColumn::Type, false);
+    result.insert(eSearchResultColumn::Subtype, false);
+    result.insert(eSearchResultColumn::Mode, false);
+    result.insert(eSearchResultColumn::Args, false);
+
+    return result;
+}
+
+static const tSearchResultColumnsVisibilityMap sDefaultSearchResultColumnsCopyPasteMap
+= fillInDefaultSearchResultCopyPasteMap();
 
 static tPatternsColumnsVisibilityMap fillInDefaultPatternsColumnsVisibilityMap()
 {
@@ -209,7 +244,7 @@ CSettingsManager::CSettingsManager():
     mSetting_HighlightActivePatterns(createBooleanSettingsItem(sHighlightActivePatternsKey,
         [this](const bool& data){highlightActivePatternsChanged(data);},
         [this](){tryStoreSettingsConfig();},
-        false)),
+        true)),
     mSetting_PatternsHighlightingColor(createColorSettingsItem(sPatternsHighlightingColorKey,
         [this](const QColor& data){patternsHighlightingColorChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -230,7 +265,7 @@ CSettingsManager::CSettingsManager():
     mSetting_SearchResultColumnsCopyPasteMap(createSearchResultColumnsVisibilityMapSettingsItem(sSearchResultColumnsCopyPasteMapKey,
         [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsCopyPasteMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
-        sDefaultSearchResultColumnsVisibilityMap)),
+        sDefaultSearchResultColumnsCopyPasteMap)),
     mSetting_MarkTimeStampWithBold(createBooleanSettingsItem(sMarkTimeStampWithBold,
         [this](const bool& data){markTimeStampWithBoldChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -279,6 +314,23 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){subFilesHandlingStatusChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mUML_FeatureActiveProtector(),
+    mSetting_UML_FeatureActive(createBooleanSettingsItem(sUML_FeatureActiveKey,
+        [this](const bool& data){UML_FeatureActiveChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_UML_MaxNumberOfRowsInDiagram(createIntegralSettingsItem<int>(sUML_MaxNumberOfRowsInDiagramKey,
+        [this](const int& data){UML_MaxNumberOfRowsInDiagramChanged(data);},
+        [this](){tryStoreRootConfig();},
+        1000)),
+    mSetting_UML_ShowArguments(createBooleanSettingsItem(sUML_ShowArgumentsKey,
+        [this](const bool& data){UML_ShowArgumentsChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
+    mSetting_UML_WrapOutput(createBooleanSettingsItem(sUML_WrapOutputKey,
+        [this](const bool& data){UML_WrapOutputChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -313,6 +365,10 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsCopyPasteMap);
     mUserSettingItemPtrVec.push_back(&mSetting_SubFilesHandlingStatus);
+    mUserSettingItemPtrVec.push_back(&mSetting_UML_FeatureActive);
+    mUserSettingItemPtrVec.push_back(&mSetting_UML_MaxNumberOfRowsInDiagram);
+    mUserSettingItemPtrVec.push_back(&mSetting_UML_ShowArguments);
+    mUserSettingItemPtrVec.push_back(&mSetting_UML_WrapOutput);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1078,7 +1134,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
 
     const char* sFileName = "DLTMessageAnalyzer_plugin_config.json";
 
-    QString V0_SettingsFilePath(QString(".") + QDir::separator() + sFileName);
+    QString V0_SettingsFilePath(QCoreApplication::applicationDirPath() + QDir::separator() + sFileName);
     QFile V0_SettingsFile( V0_SettingsFilePath );
 
     QString regexDirPath = getRegexDirectory();
@@ -1091,7 +1147,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
         SEND_MSG(QString("[CSettingsManager] Performing backward compatibility iteration from V0 to V1"));
 
         QDir dir;
-        QString configDirPath = QString(".") + QDir::separator() + sSettingsManager_Directory;
+        QString configDirPath = QCoreApplication::applicationDirPath() + QDir::separator() + sSettingsManager_Directory;
 
         // let's create config dir
         if(true == dir.mkpath(configDirPath))
@@ -1330,6 +1386,27 @@ void CSettingsManager::setSubFilesHandlingStatus( const bool& val )
     mSetting_SubFilesHandlingStatus.setData(val);
 }
 
+void CSettingsManager::setUML_FeatureActive(const bool& val)
+{
+    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mUML_FeatureActiveProtector));
+    mSetting_UML_FeatureActive.setData(val);
+}
+
+void CSettingsManager::setUML_MaxNumberOfRowsInDiagram(const int& val)
+{
+    mSetting_UML_MaxNumberOfRowsInDiagram.setData(val);
+}
+
+void CSettingsManager::setUML_ShowArguments(const bool& val)
+{
+    mSetting_UML_ShowArguments.setData(val);
+}
+
+void CSettingsManager::setUML_WrapOutput(const bool& val)
+{
+    mSetting_UML_WrapOutput.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1456,45 +1533,66 @@ QString CSettingsManager::getSelectedRegexFile() const
     return mSetting_SelectedRegexFile.getData();
 }
 
- const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsVisibilityMap() const
- {
-     return mSetting_GroupedViewColumnsVisibilityMap.getData();
- }
+const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsVisibilityMap() const
+{
+    return mSetting_GroupedViewColumnsVisibilityMap.getData();
+}
 
- const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsCopyPasteMap() const
- {
-     return mSetting_GroupedViewColumnsCopyPasteMap.getData();
- }
+const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsCopyPasteMap() const
+{
+    return mSetting_GroupedViewColumnsCopyPasteMap.getData();
+}
 
- bool CSettingsManager::getSubFilesHandlingStatus() const
- {
-     return mSetting_SubFilesHandlingStatus.getData();
- }
+bool CSettingsManager::getSubFilesHandlingStatus() const
+{
+    return mSetting_SubFilesHandlingStatus.getData();
+}
+
+const bool& CSettingsManager::getUML_FeatureActive() const
+{
+    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mUML_FeatureActiveProtector));
+    return mSetting_UML_FeatureActive.getData();
+}
+
+const int& CSettingsManager::getUML_MaxNumberOfRowsInDiagram() const
+{
+    return mSetting_UML_MaxNumberOfRowsInDiagram.getData();
+}
+
+const bool& CSettingsManager::getUML_ShowArguments() const
+{
+    return mSetting_UML_ShowArguments.getData();
+}
+
+const bool& CSettingsManager::getUML_WrapOutput() const
+{
+    return mSetting_UML_WrapOutput.getData();
+}
 
 QString CSettingsManager::getRegexDirectory() const
 {
-    return QString(".") + QDir::separator() +
+    return QCoreApplication::applicationDirPath() + QDir::separator() +
            sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Regex_SubDirectory;
 }
 
 QString CSettingsManager::getRegexDirectoryFull() const
 {
-    return QDir::toNativeSeparators( QDir::currentPath() ) + QDir::separator() +
+    return QDir::toNativeSeparators( QCoreApplication::applicationDirPath() ) + QDir::separator() +
            sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Regex_SubDirectory;
 }
 
 QString CSettingsManager::getUserSettingsFilepath() const
 {
-    return QString(".") + QDir::separator() +
+    return QCoreApplication::applicationDirPath() + QDir::separator() +
            sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_User_SettingsFile;
 }
 
 QString CSettingsManager::getRootSettingsFilepath() const
 {
-    return QString(".") + QDir::separator() +
+    return QCoreApplication::applicationDirPath() + QDir::separator() +
            sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Root_SettingsFile;
 }

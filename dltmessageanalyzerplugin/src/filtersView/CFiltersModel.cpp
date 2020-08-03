@@ -760,7 +760,7 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                                     pCurrentParsingDataItem->groupName = groupName;
 
                                     // let's parse the name and update the attribute of the analysis item
-                                    auto pRegexMetadataItem = parseRegexGroupName(groupName);
+                                    auto pRegexMetadataItem = parseRegexGroupName(groupName, false);
 
                                     if(nullptr != pRegexMetadataItem)
                                     {

@@ -117,7 +117,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getConfigComboBox(),
                                                                                                       mpForm->getFiltersView(),
                                                                                                       mpForm->getFiltersSearchInput(),
-                                                                                                      mpForm->getConsoleViewInput());
+                                                                                                      mpForm->getConsoleViewInput(),
+                                                                                                      mpForm->getUMLView());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)
@@ -394,6 +395,14 @@ void DLTMessageAnalyzerPlugin::filterRegexTokens( const QString& filter )
     if(nullptr != mpDLTMessageAnalyzer)
     {
         mpDLTMessageAnalyzer->filterRegexTokens( filter );
+    }
+}
+
+void DLTMessageAnalyzerPlugin::createSequenceDiagram()
+{
+    if(nullptr != mpDLTMessageAnalyzer)
+    {
+        mpDLTMessageAnalyzer->createSequenceDiagram();
     }
 }
 

@@ -654,7 +654,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
                              "<body>\n");
     
             finalText.append( QString("\n<h2>Trace spam analysis report %1</h2>").arg(currentTime) );
-            finalText.append( QString("\n<h3>Analysis based on regex: \"").append(mRegex).append("\"</h3>") );
+            finalText.append( QString("\n<h3>Analysis based on regex: \"").append(mRegex.toHtmlEscaped()).append("\"</h3>") );
             finalText.append("<ul id=\"myUL\">");
 
             auto preVisitFunction = [this, &finalText, &visibleColumns](tTreeItem* pItem)
@@ -791,8 +791,6 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
             "\n"
             "</body>\n"
             "</html>\n");
-    
-            finalText = finalText.toHtmlEscaped();
 
             result.first = true;
         }

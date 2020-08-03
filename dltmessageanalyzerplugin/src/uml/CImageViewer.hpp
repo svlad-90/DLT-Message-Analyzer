@@ -1,0 +1,24 @@
+#ifndef CIMAGEVIEWER_HPP
+#define CIMAGEVIEWER_HPP
+
+#include <QWidget>
+#include <QImage>
+
+class CImageViewer : public QWidget
+{
+    Q_OBJECT
+
+public:
+    CImageViewer(QWidget *parent = nullptr);
+    bool loadFile(const QString &);
+    void clear();
+
+private:
+    void setImage(const QImage &newImage);
+    virtual void paintEvent(QPaintEvent* pEv) override;
+
+private:
+    QImage mImage;
+};
+
+#endif // CIMAGEVIEWER_HPP

@@ -30,6 +30,89 @@ const QString sRegexScriptingDelimiter = "_and_";
 const QString sRGBPrefix = "RGB_";
 const QString sVARPrefix = "VAR_";
 
+//////// UML_IDENTIFIERS ////////
+const QString s_UML_SEQUENCE_ID = "USID"; // - optional
+const QString s_UML_CLIENT = "UCL"; // - mandatory
+const QString s_UML_REQUEST = "URT"; // - mandatory
+const QString s_UML_RESPONSE = "URS"; // - mandatory
+const QString s_UML_EVENT = "UEV"; // - mandatory
+const QString s_UML_SERVICE = "US"; // - mandatory
+const QString s_UML_METHOD = "UM"; // - mandatory
+const QString s_UML_ARGUMENTS = "UA"; // - optional
+
+static tUML_IDs_Map createUMLIDsMap()
+{
+    tUML_IDs_Map result;
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Optional;
+        item.id_str = s_UML_SEQUENCE_ID;
+        item.description = "Sequence id of the communication";
+        result.insert(std::make_pair(eUML_ID::UML_SEQUENCE_ID, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Mandatory;
+        item.id_str = s_UML_CLIENT;
+        item.description = "Name of the client";
+        result.insert(std::make_pair(eUML_ID::UML_CLIENT, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_RequestType;
+        item.id_str = s_UML_REQUEST;
+        item.description = "Request identifier";
+        result.insert(std::make_pair(eUML_ID::UML_REQUEST, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_RequestType;
+        item.id_str = s_UML_RESPONSE;
+        item.description = "Response identifier";
+        result.insert(std::make_pair(eUML_ID::UML_RESPONSE, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_RequestType;
+        item.id_str = s_UML_EVENT;
+        item.description = "Event identifier";
+        result.insert(std::make_pair(eUML_ID::UML_EVENT, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Mandatory;
+        item.id_str = s_UML_SERVICE;
+        item.description = "Service name";
+        result.insert(std::make_pair(eUML_ID::UML_SERVICE, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Mandatory;
+        item.id_str = s_UML_METHOD;
+        item.description = "Method name";
+        result.insert(std::make_pair(eUML_ID::UML_METHOD, item));
+    }
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Optional;
+        item.id_str = s_UML_ARGUMENTS;
+        item.description = "Call arguments";
+        result.insert(std::make_pair(eUML_ID::UML_ARGUMENTS, item));
+    }
+
+    return result;
+}
+
+const tUML_IDs_Map s_UML_IDs_Map = createUMLIDsMap();
+
 const tMsgId INVALID_MSG_ID = -1;
 const tRequestId INVALID_REQUEST_ID = static_cast<uint>(-1);
 
@@ -232,6 +315,66 @@ QVector<QColor> generateColors( const tHighlightingGradient& gradient )
     }
 
     result.push_back(gradient.to);
+
+    return result;
+}
+
+QString getUMLIDAsString( const eUML_ID& val )
+{
+    QString result;
+
+    auto foundValue = s_UML_IDs_Map.find(val);
+
+    if(foundValue != s_UML_IDs_Map.end())
+    {
+        result = foundValue->second.id_str;
+    }
+
+    return result;
+}
+
+bool parseUMLIDFromString( const QString& data, eUML_ID& val )
+{
+    bool bResult = false;
+
+    if(false == data.isEmpty())
+    {
+        for(const auto& item : s_UML_IDs_Map)
+        {
+            if( data.compare(item.second.id_str, Qt::CaseInsensitive) == 0 )
+            {
+                val = item.first;
+                bResult = true;
+                break;
+            }
+        }
+    }
+
+    return bResult;
+}
+
+QString getUMLIDTypeAsString( const eUML_ID_Type& val )
+{
+    QString result;
+
+    switch( val )
+    {
+        case eUML_ID_Type::e_Optional:
+        {
+            result = "optional";
+        }
+            break;
+        case eUML_ID_Type::e_Mandatory:
+        {
+            result = "mandatory";
+        }
+            break;
+        case eUML_ID_Type::e_RequestType:
+        {
+            result = "request_type";
+        }
+            break;
+    }
 
     return result;
 }
@@ -784,14 +927,17 @@ tItemMetadata::tItemMetadata( const tMsgId& msgId_,
 
 }
 
-void tItemMetadata::updateHighlightingInfo( const tFoundMatches& foundMatches, const QVector<QColor>& gradientColors, const tRegexScriptingMetadata& regexScriptingMetadata )
+tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& foundMatches,
+                                                          const QVector<QColor>& gradientColors,
+                                                          const tRegexScriptingMetadata& regexScriptingMetadata,
+                                                          tTreeItemSharedPtr pTree)
 {
     QElapsedTimer timer;
     timer.start();
 
     auto colorsCounter = 0;
 
-    auto pMatchesTree = getMatchesTree(foundMatches);
+    auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
 
     for( auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it )
     {
@@ -814,6 +960,118 @@ void tItemMetadata::updateHighlightingInfo( const tFoundMatches& foundMatches, c
     //}
 
     //++counter;
+
+    return pMatchesTree;
+}
+
+tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatches,
+                                                const tRegexScriptingMetadata& regexScriptingMetadata,
+                                                tTreeItemSharedPtr pTree)
+{
+    tRegexScriptingMetadata::tCheckIDs checkIDs;
+
+    for(const auto& match : foundMatches)
+    {
+        checkIDs.insert(match.idx);
+    }
+
+    // check if string matches all required UML attributes
+    UMLInfo.bUMLConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentUMLData(false, checkIDs).first;
+    UMLInfo.UMLDataMap.clear();
+
+    /*
+     * What should we fill in here?
+     * E.g. for the following string:
+     * UI
+     * IF1
+     * [daimler.if1verbose] 10886 MainMultiSeat#2:RP : setIsClientConnected() [unknown:0]]
+     * With the following regex:
+     * ^(?<UCL>[\w]+) IF1 .*\] (?<USID>[\d]+) (?<US>[A-Za-z]+#[\d]+):(?<URS>RP) : (?<UM>[\w])\((?<UA>.*)\) \[unknown
+     * We will need to fill in the following information:
+     * tUMLInfo( bUMLConstraintsFulfilled = true,
+     * UMLDataMap( { eUML_ID::UML_CLIENT, { eSearchResultColumn::Apid, {0, 3} },
+     *             { eUML_ID::UML_SEQUENCE_ID, { eSearchResultColumn::Payload, {22, 26} }
+     *             { eUML_ID::UML_SERVICE, { eSearchResultColumn::Payload, {28, 40} }
+     *             { eUML_ID::UML_RESPONSE, { eSearchResultColumn::Payload, {44, 45} } )
+     *  );
+     */
+
+    auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
+
+    if(true == UMLInfo.bUMLConstraintsFulfilled) // if UML matches are sufficient
+    {
+        if(nullptr != pMatchesTree)
+        {
+            auto preVisitFunction = [&regexScriptingMetadata, this](tTreeItem* pItem)
+            {
+                const auto& match = *(pItem->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
+
+                // for each tree element we should check, whether it is related to UML data representation.
+                // That can be done with checking each tree element against regexScriptingMetadata
+
+                // lambda, which checks whether specific match is representing a UML data
+                auto isUMLData = [&match, &regexScriptingMetadata]()->std::pair<bool, eUML_ID>
+                {
+                    std::pair<bool, eUML_ID> result;
+                    result.first = false;
+
+                    auto groupIdx = match.idx;
+                    auto groups = regexScriptingMetadata.getItemsVec();
+
+                    if(groupIdx >= 0 && groupIdx < groups.size())
+                    {
+                        const auto& pGroupMetadata = groups[groupIdx];
+
+                        if(nullptr != pGroupMetadata && true == pGroupMetadata->UML_ID.first)
+                        {
+                            result.first = true; // we got the UML data
+                            result.second = pGroupMetadata->UML_ID.second;
+                        }
+                    }
+
+                    return result;
+                };
+
+                auto UMLDataRes = isUMLData();
+
+                if(true == UMLDataRes.first) // if we have a UML data
+                {
+                    // let's check and fill in the areas of the string, in which it is located.
+                    for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
+                    {
+                        const auto& fieldRange = *it;
+
+                        bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
+                                           (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
+
+                        if(true == insideRange) // if group is even partially inside the range
+                        {
+                            auto foundUML_ID = UMLInfo.UMLDataMap.find(UMLDataRes.second);
+
+                            if(foundUML_ID != UMLInfo.UMLDataMap.end())
+                            {
+                                foundUML_ID->second[it.key()] = tRange( std::max(fieldRange.from, match.range.from),
+                                                                        std::min( fieldRange.to, match.range.to ) );
+                            }
+                            else
+                            {
+                                tStringCoverageMap coverageMap;
+                                coverageMap[it.key()] = tRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
+                                                                std::min( fieldRange.to, match.range.to ) - fieldRange.from );
+                                UMLInfo.UMLDataMap[UMLDataRes.second] = coverageMap;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            };
+
+            pMatchesTree->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
+        }
+    }
+
+    return pMatchesTree;
 }
 
 //tFoundMatch
@@ -868,6 +1126,16 @@ const tFoundMatches& tFoundMatchesPackItem::getFoundMatches() const
     return mFoundMatches;
 }
 
+tItemMetadata& tFoundMatchesPackItem::getItemMetadataWriteable()
+{
+    return mItemMetadata;
+}
+
+tFoundMatches& tFoundMatchesPackItem::getFoundMatchesWriteable()
+{
+    return mFoundMatches;
+}
+
 //tFoundMatchesPack
 tFoundMatchesPack::tFoundMatchesPack():
 matchedItemVec()
@@ -887,6 +1155,11 @@ QString getName(eSearchResultColumn val)
 
     switch(val)
     {
+        case eSearchResultColumn::UML_Applicability:
+        {
+            result = "UML";
+        }
+            break;
         case eSearchResultColumn::Apid:
         {
             result = "Apid";
@@ -1273,7 +1546,7 @@ bool tHighlightingGradient::operator!=(const tHighlightingGradient& rhs) const
     return !( *this == rhs );
 }
 
-tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
+tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bool bParseUMLData )
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
@@ -1292,6 +1565,33 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
     static const QRegularExpression rgbRegex(rgbRegexStr, QRegularExpression::CaseInsensitiveOption);
     static const QString varRegexStr( QString("%1([\\w\\d]+)").arg(sVARPrefix) );
     static const QRegularExpression varRegex(varRegexStr, QRegularExpression::CaseInsensitiveOption);
+
+    auto createUMLRegexStr = [](  ) -> QString
+    {
+        QString resultRegex("^(");
+
+        auto finalIter = s_UML_IDs_Map.end();
+        --finalIter;
+
+        for( auto it = s_UML_IDs_Map.begin(); it != s_UML_IDs_Map.end(); ++it )
+        {
+            const auto& UML_IDs_MapItem = *it;
+
+            resultRegex.append(UML_IDs_MapItem.second.id_str);
+
+            if(it != finalIter)
+            {
+                resultRegex.append("|");
+            }
+        }
+
+        resultRegex.append(")$");
+
+        return resultRegex;
+    };
+
+    static const QString UMLRegexStr = createUMLRegexStr();
+    static const QRegularExpression UMLRegex(UMLRegexStr, QRegularExpression::CaseInsensitiveOption);
 
     auto normalizeRGBItem = [](const int& rgbItem)->int
     {
@@ -1318,6 +1618,9 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
 
     tOptionalVarName optVarName;
     optVarName.first = false;
+
+    tOptional_UML_ID optUML_ID;
+    optUML_ID.first = false;
 
     for( const auto& groupNamePart : splitGroupName )
     {
@@ -1428,8 +1731,35 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
             }
         }
 
+        if(true == bParseUMLData)
+        {
+            // parse UML data
+            if(false == optUML_ID.first)
+            {
+                QRegularExpressionMatch varMatch = UMLRegex.match(groupNamePart);
+
+                if(varMatch.hasMatch())
+                {
+                    bool UML_ID_Found = varMatch.lastCapturedIndex() == 1;               // if 1 group found
+
+                    if(true == UML_ID_Found)
+                    {
+                        eUML_ID UML_ID = eUML_ID::UML_EVENT; // any value
+                        bool bUML_ID_Parsed = parseUMLIDFromString( varMatch.captured(1), UML_ID );
+
+                        if(true == bUML_ID_Parsed)
+                        {
+                            optUML_ID.first = true;
+                            optUML_ID.second = UML_ID;
+                        }
+                    }
+                }
+            }
+        }
+
         if(true == optVarName.first
-        && true == optColor.isSet) // if we've found everything, lets break the loop
+        && true == optColor.isSet
+        && ( !bParseUMLData || true == optUML_ID.first ) ) // if we've found everything, lets break the loop
         {
             break;
         }
@@ -1438,12 +1768,13 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName )
     tRegexScriptingMetadataItemPtr pItem = std::make_shared<tRegexScriptingMetadataItem>();
     pItem->highlightingColor = optColor;
     pItem->varName = optVarName;
+    pItem->UML_ID = optUML_ID;
 
     return pItem;
 }
 
 //tRegexScriptingMetadata
-bool tRegexScriptingMetadata::parse(const QRegularExpression& regex)
+bool tRegexScriptingMetadata::parse(const QRegularExpression& regex, bool bParseUMLData)
 {
     bool bResult = true;
 
@@ -1453,7 +1784,7 @@ bool tRegexScriptingMetadata::parse(const QRegularExpression& regex)
 
         for(const auto& groupName : groupNames)
         {
-            mItemsVec.push_back(parseRegexGroupName(groupName));
+            mItemsVec.push_back(parseRegexGroupName(groupName, bParseUMLData));
         }
     }
     else
@@ -1467,6 +1798,164 @@ bool tRegexScriptingMetadata::parse(const QRegularExpression& regex)
 const tRegexScriptingMetadataItemPtrVec& tRegexScriptingMetadata::getItemsVec() const
 {
     return mItemsVec;
+}
+
+std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const
+{
+    std::pair<bool /*status*/, QString /*status description*/> result;
+    result.first = false;
+    result.second.append("UML parsing result: ");
+
+    tUML_IDs_Map mandatoryUMLElements;
+
+    for(const auto& element : s_UML_IDs_Map)
+    {
+        if(element.second.id_type == eUML_ID_Type::e_Mandatory)
+        {
+            mandatoryUMLElements.insert(std::make_pair(element.first, element.second));
+        }
+    }
+
+    tRegexScriptingMetadataItemPtrVec iterationVec;
+
+    if(true == checkIDs.empty())
+    {
+        iterationVec = mItemsVec;
+    }
+    else
+    {
+        for(const auto& checkId : checkIDs)
+        {
+            if(checkId >= 0 && checkId < mItemsVec.size())
+            {
+                iterationVec.push_back(mItemsVec[checkId]);
+            }
+        }
+    }
+
+    for(const auto& pElement : iterationVec)
+    {
+        if(nullptr != pElement)
+        {
+            if(true == pElement->UML_ID.first)
+            {
+                auto foundElement = mandatoryUMLElements.find(pElement->UML_ID.second);
+
+                if(foundElement != mandatoryUMLElements.end())
+                {
+                    mandatoryUMLElements.erase(foundElement);
+                }
+            }
+        }
+    }
+
+    auto checkRequestType = [&fillInStringMsg, &iterationVec](QString& msg) -> bool
+    {
+        bool bResult = false;
+
+        // get request type elements
+        tUML_IDs_Map requestTypeUMLElements;
+
+        for(const auto& element : s_UML_IDs_Map)
+        {
+            if(element.second.id_type == eUML_ID_Type::e_RequestType)
+            {
+                requestTypeUMLElements.insert(std::make_pair(element.first, element.second));
+            }
+        }
+
+        auto requestTypeColelctionInitialSize = requestTypeUMLElements.size();
+
+        for(const auto& pElement : iterationVec)
+        {
+            if(nullptr != pElement)
+            {
+                if(true == pElement->UML_ID.first)
+                {
+                    auto foundElement = requestTypeUMLElements.find(pElement->UML_ID.second);
+
+                    if(foundElement != requestTypeUMLElements.end())
+                    {
+                        requestTypeUMLElements.erase(foundElement);
+                    }
+                }
+            }
+        }
+
+        if(requestTypeUMLElements.size() < requestTypeColelctionInitialSize) // if at least one request type element was found
+        {
+            bResult = true;
+        }
+        else
+        {
+            if(true == fillInStringMsg)
+            {
+                QString subMsg;
+
+                bool bFirstIteration = true;
+
+                for(const auto& element : requestTypeUMLElements)
+                {
+                    if(true == bFirstIteration)
+                    {
+                        bFirstIteration = false;
+                    }
+                    else
+                    {
+                        subMsg.append("|");
+                    }
+
+                    subMsg.append(QString("%1").arg(getUMLIDAsString(element.first)));
+                }
+
+                msg.append(QString(" <Request type elements (%1) not found>").arg(subMsg));
+            }
+        }
+
+        return bResult;
+    };
+
+    if(true == mandatoryUMLElements.empty()) // if all mandatory elements were found
+    {
+        result.first = checkRequestType(result.second); // proceed with analysis
+    }
+    else // otherwise
+    {
+        if(true == fillInStringMsg)
+        {
+            // collect warning string
+            for(const auto& element : mandatoryUMLElements)
+            {
+                result.second.append(QString(" <Mandatory element %1 not found>").arg(getUMLIDAsString(element.first)));
+            }
+        }
+
+        static_cast<void>(checkRequestType(result.second));
+    }
+
+    return result;
+}
+
+bool tRegexScriptingMetadata::doesContainAnyUMLGroup() const
+{
+    bool bResult = false;
+
+    for(const auto& element : mItemsVec)
+    {
+        if(true == element->UML_ID.first)
+        {
+            auto foundElement = s_UML_IDs_Map.find(element->UML_ID.second);
+
+            if(foundElement != s_UML_IDs_Map.end()) // match found
+            {
+                bResult = true;
+                break;
+            }
+        }
+    }
+
+    return bResult;
 }
 
 //////////////////////////////////////////////////////////

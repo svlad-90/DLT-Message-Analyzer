@@ -22,9 +22,14 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 ## Feature-set:
 
+### [Search](./md/search/search.md)
+
+- Validation of the entered regular expressions with providing human-readable error in case of the wrong input
+- Continuous search. The analysis ongoing, while new messages are being received from the target device 
+
 ### [In-RAM cache](./md/in_ram_cache/in_ram_cache.md)
 
-- Makes search dramatically faster
+- Makes search dramatically fast
 
 ### [Grouped view](./md/grouped_view/grouped_view.md)
 
@@ -48,14 +53,13 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 - Analog of the dlt-viewer's search with the extended capabilities
 - Possibility to lock the search between the 2 message id-s
 
+### [Integration with PlantUML](./md/plant_uml/plant_uml.md)
+
+- Plugin supports integration with PlantUML tool, which allows you to create sequence diagrams out of the logs
+
 ### [Files view](./md/files_view/files_view.md)
 
 - Extension, which lists the paths & names of all currently opened DLT files
-
-### [Search](./md/search/search.md)
-
-- Validation of the entered regular expressions with providing human-readable error in case of the wrong input
-- Continuous search. The analysis ongoing, while new messages are being received from the target device 
 
 ### [Debug console](./md/debug_console/debug_console.md)
 
