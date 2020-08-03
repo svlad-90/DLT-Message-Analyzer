@@ -306,7 +306,14 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
     outputString.append("@startuml\n");
     outputString.append("skinparam backgroundColor white\n");
-    outputString.append("skinparam defaultFontName Courier new\n");
+
+#ifdef __linux__
+    outputString.append("skinparam defaultFontName Ubuntu Mono\n");
+#elif _WIN32
+    outputString.append("skinparam defaultFontName monospaced\n");
+#else
+    outputString.append("skinparam defaultFontName monospaced\n");
+#endif
 
     //let's represent wheether UML data is properly filled in
     for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)

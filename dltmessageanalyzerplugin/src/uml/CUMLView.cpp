@@ -117,7 +117,8 @@ mbDiagramShown(false),
 mpImageViewer(nullptr),
 mpDiagramCreationSubProcess(nullptr),
 mpSaveSVGSubProcess(nullptr),
-mDiagramContent()
+mDiagramContent(),
+mbDiagramGenerationInProgress(false)
 {
     mpImageViewer = new CImageViewer(this);
     setWidget(mpImageViewer);
@@ -339,9 +340,17 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
         }
     }
 
+    auto pSubProcessWeak = std::weak_ptr<QProcess>(pSubProcess);
+
     connect(pSubProcess.get(),
             static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-            callback);
+            [callback, pSubProcessWeak](int exitCode, QProcess::ExitStatus exitStatus)
+    {
+        if(false == pSubProcessWeak.expired())
+        {
+            callback(exitCode, exitStatus);
+        }
+    });
 
     // call plantuml to generate PNG
     auto resCommand = get_PlantUML_Command(PUML_file_path, extension, CSettingsManager::getInstance()->getUML_MaxNumberOfRowsInDiagram());
@@ -385,6 +394,8 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
             SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
             diagramGenerationFinished(false);
         }
+
+        mbDiagramGenerationInProgress = false;
     };
 
     generateUMLDiagramInternal(diagramContent, eDiagramExtension::e_PNG, callback, mpDiagramCreationSubProcess, false);
@@ -393,18 +404,20 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
     clearDiagram();
 
     diagramGenerationStarted();
+    mbDiagramGenerationInProgress = true;
 }
 
 bool CUMLView::isDiagramGenerationInProgress() const
 {
-    return (mpDiagramCreationSubProcess != nullptr);
+    return mbDiagramGenerationInProgress;
 }
 
 void CUMLView::cancelDiagramGeneration()
 {
-    if(nullptr != mpDiagramCreationSubProcess)
+    if(true == mbDiagramGenerationInProgress)
     {
         mpDiagramCreationSubProcess.reset();
+        mbDiagramGenerationInProgress = false;
         diagramGenerationFinished(false);
     }
 }

@@ -55,7 +55,7 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 ### [Integration with PlantUML](./md/plant_uml/plant_uml.md)
 
-- Plugin supports integration with PlantUML tool, which allows you to create sequence diagrams out of the logs
+- Plugin supports integration with the PlantUML tool, which allows you to create sequence diagrams out of the logs
 
 ### [Files view](./md/files_view/files_view.md)
 
