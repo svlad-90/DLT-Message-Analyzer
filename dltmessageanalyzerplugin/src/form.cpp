@@ -21,6 +21,7 @@
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
 #include "log/CConsoleCtrl.hpp"
+#include "uml/CUMLView.hpp"
 
 Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
     QWidget(parent),
@@ -36,6 +37,8 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
     consoleConfig.pConsoleTab = getConsoleViewTab();
     consoleConfig.pConsoleTextEdit = getConsoleView();
     NDLTMessageAnalyzer::NConsole::CConsoleCtrl::createInstance(consoleConfig);
+
+    mpUI->tabWidget->setFocusPolicy(Qt::ClickFocus);
 
     if(mpUI->tabWidget->count() > 0)
     {
@@ -198,6 +201,19 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
         contextMenu.addSeparator();
 
         {
+            QAction* pAction = new QAction("PlantUML", this);
+            connect(pAction, &QAction::triggered, [](bool checked)
+            {
+                CSettingsManager::getInstance()->setUML_FeatureActive(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(CSettingsManager::getInstance()->getUML_FeatureActive());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
             QAction* pAction = new QAction("RDP mode", this);
             connect(pAction, &QAction::triggered, [](bool checked)
             {
@@ -225,6 +241,52 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
                 }
             }
         });
+    }
+
+    if(nullptr != mpUI->PNG_UML_View
+    && nullptr != mpUI->createSequenceDiagram)
+    {
+        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationStarted, [this]()
+        {
+            mpUI->createSequenceDiagram->setText("Cancel");
+        });
+
+        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationFinished, [this](bool)
+        {
+            mpUI->createSequenceDiagram->setText("Create sequence diagram");
+        });
+
+        {
+            auto pUMLWidget = mpUI->tabWidget->findChild<QWidget*>(QString("UMLView"));
+
+            if(nullptr != pUMLWidget)
+            {
+                auto enableUMLWidget = [this, pUMLWidget](bool val)
+                {
+                    if(nullptr != mpUI && nullptr != mpUI->tabWidget)
+                    {
+                        if(mpUI->tabWidget->count() > 0)
+                        {
+                            if(true != val)
+                            {
+                                mpUI->tabWidget->removeTab(mpUI->tabWidget->indexOf(pUMLWidget));
+                            }
+                            else
+                            {
+                                mpUI->tabWidget->insertTab(3, pUMLWidget, "UML View");
+                            }
+                        }
+                    }
+                };
+
+                enableUMLWidget(CSettingsManager::getInstance()->getUML_FeatureActive());
+
+                connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [enableUMLWidget](bool val)
+                {
+                    enableUMLWidget(val);
+                });
+            }
+        }
     }
 
     QList<int> newSplitterSizes;
@@ -524,6 +586,30 @@ QLineEdit* Form::getConsoleViewInput()
     return pResult;
 }
 
+CUMLView* Form::getUMLView()
+{
+    CUMLView* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->PNG_UML_View;
+    }
+
+    return pResult;
+}
+
+QPushButton* Form::getCreateSequenceDiagramButton()
+{
+    QPushButton* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->createSequenceDiagram;
+    }
+
+    return pResult;
+}
+
 void Form::on_regex_returnPressed()
 {
     if(nullptr != mpDLTMessageAnalyzerPlugin)
@@ -651,5 +737,20 @@ void Form::on_filtersSearchInput_textChanged(const QString &filter)
     if(nullptr != mpDLTMessageAnalyzerPlugin)
     {
         mpDLTMessageAnalyzerPlugin->filterRegexTokens( filter );
+    }
+}
+
+void Form::on_createSequenceDiagram_clicked()
+{
+    if(nullptr != mpDLTMessageAnalyzerPlugin)
+    {
+        if(false == mpUI->PNG_UML_View->isDiagramGenerationInProgress())
+        {
+            mpDLTMessageAnalyzerPlugin->createSequenceDiagram();
+        }
+        else
+        {
+            mpUI->PNG_UML_View->cancelDiagramGeneration();
+        }
     }
 }

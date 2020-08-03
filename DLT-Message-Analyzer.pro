@@ -59,7 +59,11 @@ HEADERS += \
     \
     dltmessageanalyzerplugin/src/searchView/CSearchResultHighlightingDelegate.hpp \
     dltmessageanalyzerplugin/src/searchView/CSearchResultModel.hpp \
-    dltmessageanalyzerplugin/src/searchView/CSearchResultView.hpp
+    dltmessageanalyzerplugin/src/searchView/CSearchResultView.hpp\
+    \
+#    dltmessageanalyzerplugin/src/uml/CSVGView.hpp \
+    dltmessageanalyzerplugin/src/uml/CImageViewer.hpp \
+    dltmessageanalyzerplugin/src/uml/CUMLView.hpp
 
 # plugin source files
 SOURCES += \
@@ -103,7 +107,11 @@ SOURCES += \
     \
     dltmessageanalyzerplugin/src/searchView/CSearchResultHighlightingDelegate.cpp \
     dltmessageanalyzerplugin/src/searchView/CSearchResultModel.cpp \
-    dltmessageanalyzerplugin/src/searchView/CSearchResultView.cpp
+    dltmessageanalyzerplugin/src/searchView/CSearchResultView.cpp\
+    \
+#    dltmessageanalyzerplugin/src/uml/CSVGView.cpp \
+    dltmessageanalyzerplugin/src/uml/CImageViewer.cpp \
+    dltmessageanalyzerplugin/src/uml/CUMLView.cpp
 
 # plugin forms
 FORMS += \
@@ -133,3 +141,9 @@ win32 {
 
 RESOURCES += \
     dltmessageanalyzerplugin/src/resources/dltmessageanalyzer.qrc
+
+copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\thirdparty\plantuml\plantuml.jar)\" \"$$shell_path($$OUT_PWD\..\..\release\plugins)\"
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata

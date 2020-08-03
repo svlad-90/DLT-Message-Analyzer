@@ -36,6 +36,7 @@ class CSearchResultView;
 class CGroupedView;
 class CPatternsView;
 class CFiltersView;
+class CUMLView;
 
 namespace Ui {
     class Form;
@@ -72,6 +73,8 @@ public:
     CFiltersView* getFiltersView();
     QLineEdit* getFiltersSearchInput();
     QLineEdit* getConsoleViewInput();
+    CUMLView* getUMLView();
+    QPushButton* getCreateSequenceDiagramButton();
 
 private slots:
     void on_analyze_clicked();
@@ -83,12 +86,10 @@ private slots:
     void hidePatternLogic(bool userTriggered);
     void on_continuousAnalysis_clicked(bool checked);
     void on_numberOfThreads_currentIndexChanged(int index);
-
     void on_patternsSearchInput_textChanged(const QString& filter);
-
     void on_configComboBox_currentIndexChanged(int index);
-
     void on_filtersSearchInput_textChanged(const QString &filter);
+    void on_createSequenceDiagram_clicked();
 
 private:
     Ui::Form *mpUI;

@@ -63,6 +63,15 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
               .arg(mWorkerId));
 #endif
 
+    bool bAnalyzeUML = false;
+
+    if(true == CSettingsManager::getInstance()->getUML_FeatureActive() &&
+       true == regexMetadata.doesContainAnyUMLGroup() &&
+       true == regexMetadata.doesContainConsistentUMLData(false, tRegexScriptingMetadata::tCheckIDs()).first)
+    {
+        bAnalyzeUML = true;
+    }
+
     CDLTRegexAnalyzerWorker::ePortionAnalysisState portionAnalysisState = CDLTRegexAnalyzerWorker::ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL;
     tFoundMatchesPack foundMatchesPack;
 
@@ -100,7 +109,12 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
                 }
 
                 tItemMetadata itemMetadata = processingString.first;
-                itemMetadata.updateHighlightingInfo(foundMatches, mColors, regexMetadata);
+                auto pTree = itemMetadata.updateHighlightingInfo(foundMatches, mColors, regexMetadata);
+
+                if(true == bAnalyzeUML)
+                {
+                    itemMetadata.updateUMLInfo(foundMatches, regexMetadata, pTree);
+                }
 
                 foundMatchesPack.matchedItemVec.push_back( tFoundMatchesPackItem( std::move(itemMetadata), std::move(foundMatches) ) );
             }

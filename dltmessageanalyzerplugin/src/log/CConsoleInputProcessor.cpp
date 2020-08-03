@@ -37,6 +37,27 @@ static void clear()
     CLEAR_CONSOLE_VIEW();
 }
 
+static void UML_identifiers()
+{
+    SEND_MSG("UML regex group identifiers, which are supported by the plugin:");
+
+    for(const auto& item : s_UML_IDs_Map)
+    {
+        QString id_type_msg = QString("Type - ").append(getUMLIDTypeAsString(item.second.id_type));
+
+        if(item.second.id_type == eUML_ID_Type::e_RequestType)
+        {
+            id_type_msg.append(" - at least one of the request types should be filled in");
+        }
+
+        SEND_MSG(QString("[%1] : %2 | <%3>")
+                 .arg( getUMLIDAsString( item.first ) )
+                 .arg(item.second.description)
+                 .arg(id_type_msg));
+    }
+}
+
+
 static CConsoleInputProcessor::tScenariosMap createScenariosMap()
 {
     CConsoleInputProcessor::tScenariosMap result;
@@ -46,6 +67,7 @@ static CConsoleInputProcessor::tScenariosMap createScenariosMap()
     result.insert(std::make_pair( QString("support"), [](){support();} ));
     result.insert(std::make_pair( QString("version"), [](){version();} ));
     result.insert(std::make_pair( QString("web-link"), [](){webLink();} ));
+    result.insert(std::make_pair( QString("uml-id"), [](){UML_identifiers();} ));
 
     return result;
 }

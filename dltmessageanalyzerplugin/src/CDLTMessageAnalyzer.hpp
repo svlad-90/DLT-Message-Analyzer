@@ -39,6 +39,7 @@ class CFiltersView;
 class CFiltersModel;
 class CTableMemoryJumper;
 class CConsoleInputProcessor;
+class CUMLView;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -77,7 +78,7 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             QLineEdit* pPatternsSearchInput,
                             QComboBox* pRegexSelectionComboBox,
                             CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
-                            QLineEdit* pConsoleViewInput);
+                            QLineEdit* pConsoleViewInput, CUMLView* pUMLView);
 
         /**
          * Destructor
@@ -215,6 +216,11 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
          */
         void decodeMsg(QDltMsg& msg) const;
 
+        /**
+         * @brief createSequenceDiagram - trigger to create a sequence diagram
+         */
+        void createSequenceDiagram() const;
+
 signals:
         /**
          * @brief analysisStatusChanged - fired as soon as analysis status is changing
@@ -289,6 +295,8 @@ signals:
 
         CFiltersView* mpFiltersView;
         CFiltersModel* mpFiltersModel;
+
+        CUMLView* mpUMLView;
 
         // internal states
         tRangeProperty mSearchRange;

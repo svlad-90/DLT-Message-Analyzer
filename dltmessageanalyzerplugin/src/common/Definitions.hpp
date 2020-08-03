@@ -37,6 +37,44 @@ extern const std::map<QString, QColor> sColorsMap;
 extern const QString sVARPrefix;
 extern const QString sRegexScriptingDelimiter;
 
+////////////////////// UML DEFINITIONS //////////////////////
+
+enum class eUML_ID
+{
+    UML_SEQUENCE_ID = 0,
+    UML_CLIENT ,
+    UML_REQUEST,
+    UML_RESPONSE,
+    UML_EVENT,
+    UML_SERVICE,
+    UML_METHOD,
+    UML_ARGUMENTS
+};
+
+QString getUMLIDAsString( const eUML_ID& val );
+bool parseUMLIDFromString( const QString& data, eUML_ID& val );
+
+enum class eUML_ID_Type
+{
+    e_Optional,
+    e_Mandatory,
+    e_RequestType
+};
+
+QString getUMLIDTypeAsString( const eUML_ID_Type& val );
+
+struct tUML_ID_Item
+{
+    eUML_ID_Type id_type;
+    QString id_str;
+    QString description;
+};
+
+typedef std::map<eUML_ID, tUML_ID_Item> tUML_IDs_Map;
+extern const tUML_IDs_Map s_UML_IDs_Map;
+
+////////////////////// UML DEFINITIONS (END) //////////////////////
+
 typedef int tWorkerThreadCookie;
 
 typedef uint64_t tSettingsManagerVersion;
@@ -105,7 +143,8 @@ typedef std::set<tRange> tRangeSet;
  */
 enum class eSearchResultColumn : int
 {
-    Index = 0,
+    UML_Applicability = 0,
+    Index,
     Time,
     Timestamp,
     Count,
@@ -261,7 +300,6 @@ struct tHighlightingGradient
 // generates a set of colors from a gradient's definition
 QVector<QColor> generateColors( const tHighlightingGradient& gradient );
 
-typedef QMap<eSearchResultColumn, tRangeSet> tHighlightingInfo;
 typedef QMap<eSearchResultColumn, tHighlightingRangeSet> tHighlightingInfoMulticolor;
 typedef QMap<eSearchResultColumn, tRange> tFieldRanges;
 
@@ -334,6 +372,7 @@ typedef QVector<QColor> QColorVec;
 
 typedef QString tVarName;
 typedef QPair<bool, tVarName> tOptionalVarName;
+typedef QPair<bool, eUML_ID> tOptional_UML_ID;
 
 ///////////////////////////REGEX_SCRIPTING_METADATA/////////////////////////////////
 
@@ -349,6 +388,9 @@ public:
 
     // variable
     tOptionalVarName varName;
+
+    // UML_ID data
+    tOptional_UML_ID UML_ID;
 };
 
 typedef std::shared_ptr<tRegexScriptingMetadataItem> tRegexScriptingMetadataItemPtr;
@@ -365,15 +407,18 @@ Q_DECLARE_METATYPE( tRegexScriptingMetadataItemPtr )
  */
 struct tRegexScriptingMetadata
 {
-    bool parse(const QRegularExpression& regex);
+    bool parse(const QRegularExpression& regex, bool bParseUMLData);
     const tRegexScriptingMetadataItemPtrVec& getItemsVec() const;
+    typedef std::set<int> tCheckIDs;
+    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const;
+    bool doesContainAnyUMLGroup() const;
 
 private:
     tRegexScriptingMetadataItemPtrVec mItemsVec;
 };
 Q_DECLARE_METATYPE(tRegexScriptingMetadata)
 
-tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName );
+tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bool bParseUMLData );
 
 ////////////////////////////////////////////////////////////
 
@@ -406,6 +451,15 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
  */
 tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches );
 
+typedef std::map<eSearchResultColumn, tRange> tStringCoverageMap;
+typedef std::map<eUML_ID, tStringCoverageMap /*range of id-s in the searched string*/> tUMLDataMap;
+struct tUMLInfo
+{
+    bool bUMLConstraintsFulfilled = false;
+    bool bApplyForUMLCreation = false;
+    tUMLDataMap UMLDataMap;
+};
+
 struct tItemMetadata
 {
     tItemMetadata();
@@ -415,9 +469,13 @@ struct tItemMetadata
                    const int& strSize_,
                    const unsigned int& msgSize_,
                    const unsigned int& timeStamp_);
-    void updateHighlightingInfo( const tFoundMatches& foundMatches,
+    tTreeItemSharedPtr updateHighlightingInfo( const tFoundMatches& foundMatches,
                                  const QVector<QColor>& gradientColors,
-                                 const tRegexScriptingMetadata& regexScriptingMetadata);
+                                 const tRegexScriptingMetadata& regexScriptingMetadata,
+                                 tTreeItemSharedPtr pTree = nullptr);
+    tTreeItemSharedPtr updateUMLInfo(const tFoundMatches& foundMatches,
+                       const tRegexScriptingMetadata& regexScriptingMetadata,
+                       tTreeItemSharedPtr pTree = nullptr);
     tMsgId msgId;
     tMsgId msgIdFiltered;
     tHighlightingInfoMulticolor highlightingInfoMultiColor;
@@ -425,6 +483,7 @@ struct tItemMetadata
     int strSize;
     unsigned int msgSize;
     unsigned int timeStamp;
+    tUMLInfo UMLInfo;
 };
 
 typedef QPair<tItemMetadata, tQStringPtr> tProcessingStringItem;
@@ -438,6 +497,8 @@ struct tFoundMatchesPackItem
 
     const tItemMetadata& getItemMetadata() const;
     const tFoundMatches& getFoundMatches() const;
+    tItemMetadata& getItemMetadataWriteable();
+    tFoundMatches& getFoundMatchesWriteable();
 private:
     tItemMetadata mItemMetadata;
     tFoundMatches mFoundMatches;

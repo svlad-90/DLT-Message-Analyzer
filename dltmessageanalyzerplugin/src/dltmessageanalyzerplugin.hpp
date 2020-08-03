@@ -17,7 +17,7 @@
 #include "common/Definitions.hpp"
 
 #define DLT_MESSAGE_ANALYZER_NAME "DLT-Message-Analyzer"
-#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.22"
+#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.23"
 #define DLT_MESSAGE_ANALYZER_PLUGIN_AUTHOR "Vladyslav Goncharuk <svlad1990@gmail.com>"
 
 class CDLTMessageAnalyzer;
@@ -66,6 +66,7 @@ public:
 
     void filterPatterns( const QString& filter );
     void filterRegexTokens( const QString& filter );
+    void createSequenceDiagram();
 
 signals:
     void analysisWithEmptyStringRequested();

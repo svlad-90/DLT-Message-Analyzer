@@ -18,12 +18,12 @@ add_library(dltmessageanalyzerplugin MODULE
     CDLTMessageAnalyzer.cpp
     form.cpp
     settings/CSettingsManager.cpp
-	settings/ISettingItem.cpp
-	settings/CSettingItem.cpp
+    settings/ISettingItem.cpp
+    settings/CSettingItem.cpp
     logo/CLogo.cpp
     log/CConsoleCtrl.cpp
-	log/CConsoleView.cpp
-	log/CConsoleInputProcessor.cpp
+    log/CConsoleView.cpp
+    log/CConsoleInputProcessor.cpp
     analyzer/IDLTMessageAnalyzerController.cpp
     analyzer/IDLTMessageAnalyzerControllerConsumer.cpp
     analyzer/CMTAnalyzer.cpp
@@ -33,7 +33,7 @@ add_library(dltmessageanalyzerplugin MODULE
     common/Definitions.cpp
     common/CBGColorAnimation.cpp
     common/CRegexDirectoryMonitor.cpp
-	common/CTableMemoryJumper.cpp
+    common/CTableMemoryJumper.cpp
     dltWrappers/CDLTFileWrapper.cpp
     dltWrappers/CDLTMsgWrapper.cpp
     filtersView/CFiltersModel.cpp
@@ -45,11 +45,18 @@ add_library(dltmessageanalyzerplugin MODULE
     searchView/CSearchResultHighlightingDelegate.cpp
     searchView/CSearchResultModel.cpp
     searchView/CSearchResultView.cpp
+#    uml/CSVGView.hpp
+    uml/CUMLView.cpp
+    uml/CImageViewer.cpp
+    ${UI_HEADERS})
 
-                          	${UI_HEADERS})
+# Copy plantuml.jar after the build
+add_custom_command(TARGET dltmessageanalyzerplugin POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy
+                   ${CMAKE_CURRENT_SOURCE_DIR}/../../thirdparty/plantuml/plantuml.jar $<TARGET_FILE_DIR:dltmessageanalyzerplugin>/)
 
 # Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
-#target_compile_definitions(dltmessageanalyzerplugin PRIVATE -DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
+# target_compile_definitions(dltmessageanalyzerplugin PRIVATE -DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
 
 target_link_libraries(dltmessageanalyzerplugin qdlt Qt5::Widgets )
 install(TARGETS dltmessageanalyzerplugin DESTINATION deploy/plugins)

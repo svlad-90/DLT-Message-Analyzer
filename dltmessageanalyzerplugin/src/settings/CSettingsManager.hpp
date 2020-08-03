@@ -106,6 +106,11 @@ public:
     void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
     void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val);
     void setSubFilesHandlingStatus( const bool& val );
+    // this method can be called from context of multiple threads, thus it is designed as thread-safe
+    void setUML_FeatureActive(const bool& val);
+    void setUML_MaxNumberOfRowsInDiagram(const int& val);
+    void setUML_ShowArguments(const bool& val);
+    void setUML_WrapOutput(const bool& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -149,6 +154,11 @@ public:
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const;
     bool getSubFilesHandlingStatus() const;
+    // this method can be called from context of multiple threads, thus it is designed as thread-safe
+    const bool& getUML_FeatureActive() const;
+    const int& getUML_MaxNumberOfRowsInDiagram() const;
+    const bool& getUML_ShowArguments() const;
+    const bool& getUML_WrapOutput() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -186,6 +196,11 @@ signals:
     void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
     void groupedViewColumnsCopyPasteMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsCopyPasteMap);
     void subFilesHandlingStatusChanged(const bool& subFilesHandlingStatus);
+    void UML_FeatureActiveChanged(const bool& UML_FeatureActive);
+    void UML_MaxNumberOfRowsInDiagramChanged(const int& UML_MaxNumberOfRowsInDiagram);
+    void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
+    void UML_WrapOutputChanged(const bool& UML_WrapOutput);
+
 
 private: // methods
 
@@ -405,6 +420,13 @@ private: // fields
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsVisibilityMap;
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsCopyPasteMap;
     TSettingItem<bool> mSetting_SubFilesHandlingStatus;
+
+    // UML settings
+    std::recursive_mutex mUML_FeatureActiveProtector;
+    TSettingItem<bool> mSetting_UML_FeatureActive;
+    TSettingItem<int> mSetting_UML_MaxNumberOfRowsInDiagram;
+    TSettingItem<bool> mSetting_UML_ShowArguments;
+    TSettingItem<bool> mSetting_UML_WrapOutput;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
