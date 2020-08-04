@@ -1648,7 +1648,7 @@ void CDLTMessageAnalyzer::searchView_clicked_jumpTo_inMainTable(const QModelInde
 
         if(fileIdx >= 0)
         {
-            auto jumpIndex = mpMainTableView->model()->index( fileIdx, index.column() );
+            auto jumpIndex = mpMainTableView->model()->index( fileIdx, 0 );
             mpMainTableView->setFocus();
             mpMainTableView->scrollTo( jumpIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
             mpMainTableView->setCurrentIndex(jumpIndex);
