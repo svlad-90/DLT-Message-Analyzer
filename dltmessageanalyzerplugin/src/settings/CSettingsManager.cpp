@@ -686,13 +686,15 @@ TSettingItem<tSearchResultColumnsVisibilityMap> CSettingsManager::createSearchRe
 
     auto readFunc = [](const QJsonValueRef& JSONItem,
                        tSearchResultColumnsVisibilityMap& data,
-                       const tSearchResultColumnsVisibilityMap&)->bool
+                       const tSearchResultColumnsVisibilityMap& defaultValues)->bool
     {
         bool bResult = false;
 
         if(true == JSONItem.isArray())
         {
             data.clear();
+
+            auto defaultValuesCopy = defaultValues;
 
             auto searchResultColumnsVisibilityArray = JSONItem.toArray();
             for( const auto searchResultColumnsVisibilityObj : searchResultColumnsVisibilityArray )
@@ -719,7 +721,22 @@ TSettingItem<tSearchResultColumnsVisibilityMap> CSettingsManager::createSearchRe
 
                                     bool bIsVisible = foundVisibilityValue->toBool();
                                     data.insert(static_cast<eSearchResultColumn>(columnIdx), bIsVisible);
+
+                                    auto foundDefaultValue = defaultValuesCopy.find(static_cast<eSearchResultColumn>(columnIdx));
+
+                                    if(foundDefaultValue != defaultValuesCopy.end())
+                                    {
+                                        defaultValuesCopy.erase(foundDefaultValue);
+                                    }
                                 }
+                            }
+                        }
+
+                        if(false == defaultValuesCopy.empty()) // if there are some non-existing elements in the file
+                        {
+                            for(auto it = defaultValuesCopy.begin(); it != defaultValuesCopy.end(); ++it) // let's fill them in with default values
+                            {
+                                data.insert(static_cast<eSearchResultColumn>(it.key()), it.value());
                             }
                         }
                     }
