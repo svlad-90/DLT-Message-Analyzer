@@ -1801,71 +1801,63 @@ const tRegexScriptingMetadataItemPtrVec& tRegexScriptingMetadata::getItemsVec() 
 }
 
 std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg) const
+{
+    return doesContainConsistentUMLData(fillInStringMsg, tCheckIDs(), true);
+}
+
+std::pair<bool /*status*/, QString /*status description*/>
 tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const
+{
+    return doesContainConsistentUMLData(fillInStringMsg, checkIDs, false);
+}
+
+std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const
 {
     std::pair<bool /*status*/, QString /*status description*/> result;
     result.first = false;
-    result.second.append("UML parsing result: ");
 
-    tUML_IDs_Map mandatoryUMLElements;
-
-    for(const auto& element : s_UML_IDs_Map)
+    if(true == fillInStringMsg)
     {
-        if(element.second.id_type == eUML_ID_Type::e_Mandatory)
-        {
-            mandatoryUMLElements.insert(std::make_pair(element.first, element.second));
-        }
+        result.second.append("UML parsing result: ");
     }
 
-    tRegexScriptingMetadataItemPtrVec iterationVec;
-
-    if(true == checkIDs.empty())
+    if(false == bCheckAll && true == checkIDs.empty())
     {
-        iterationVec = mItemsVec;
+        if(true == fillInStringMsg)
+        {
+            result.second.append("No groups available. Result is \"false\"");
+        }
     }
     else
     {
-        for(const auto& checkId : checkIDs)
-        {
-            if(checkId >= 0 && checkId < mItemsVec.size())
-            {
-                iterationVec.push_back(mItemsVec[checkId]);
-            }
-        }
-    }
-
-    for(const auto& pElement : iterationVec)
-    {
-        if(nullptr != pElement)
-        {
-            if(true == pElement->UML_ID.first)
-            {
-                auto foundElement = mandatoryUMLElements.find(pElement->UML_ID.second);
-
-                if(foundElement != mandatoryUMLElements.end())
-                {
-                    mandatoryUMLElements.erase(foundElement);
-                }
-            }
-        }
-    }
-
-    auto checkRequestType = [&fillInStringMsg, &iterationVec](QString& msg) -> bool
-    {
-        bool bResult = false;
-
-        // get request type elements
-        tUML_IDs_Map requestTypeUMLElements;
+        tUML_IDs_Map mandatoryUMLElements;
 
         for(const auto& element : s_UML_IDs_Map)
         {
-            if(element.second.id_type == eUML_ID_Type::e_RequestType)
+            if(element.second.id_type == eUML_ID_Type::e_Mandatory)
             {
-                requestTypeUMLElements.insert(std::make_pair(element.first, element.second));
+                mandatoryUMLElements.insert(std::make_pair(element.first, element.second));
             }
         }
 
-        auto requestTypeColelctionInitialSize = requestTypeUMLElements.size();
+        tRegexScriptingMetadataItemPtrVec iterationVec;
+
+        if(true == bCheckAll)
+        {
+            iterationVec = mItemsVec;
+        }
+        else
+        {
+            for(const auto& checkId : checkIDs)
+            {
+                if(checkId >= 0 && checkId < mItemsVec.size())
+                {
+                    iterationVec.push_back(mItemsVec[checkId]);
+                }
+            }
+        }
 
         for(const auto& pElement : iterationVec)
         {
@@ -1873,68 +1865,102 @@ tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, cons
             {
                 if(true == pElement->UML_ID.first)
                 {
-                    auto foundElement = requestTypeUMLElements.find(pElement->UML_ID.second);
+                    auto foundElement = mandatoryUMLElements.find(pElement->UML_ID.second);
 
-                    if(foundElement != requestTypeUMLElements.end())
+                    if(foundElement != mandatoryUMLElements.end())
                     {
-                        requestTypeUMLElements.erase(foundElement);
+                        mandatoryUMLElements.erase(foundElement);
                     }
                 }
             }
         }
 
-        if(requestTypeUMLElements.size() < requestTypeColelctionInitialSize) // if at least one request type element was found
+        auto checkRequestType = [&fillInStringMsg, &iterationVec](QString& msg) -> bool
         {
-            bResult = true;
+            bool bResult = false;
+
+            // get request type elements
+            tUML_IDs_Map requestTypeUMLElements;
+
+            for(const auto& element : s_UML_IDs_Map)
+            {
+                if(element.second.id_type == eUML_ID_Type::e_RequestType)
+                {
+                    requestTypeUMLElements.insert(std::make_pair(element.first, element.second));
+                }
+            }
+
+            auto requestTypeColelctionInitialSize = requestTypeUMLElements.size();
+
+            for(const auto& pElement : iterationVec)
+            {
+                if(nullptr != pElement)
+                {
+                    if(true == pElement->UML_ID.first)
+                    {
+                        auto foundElement = requestTypeUMLElements.find(pElement->UML_ID.second);
+
+                        if(foundElement != requestTypeUMLElements.end())
+                        {
+                            requestTypeUMLElements.erase(foundElement);
+                        }
+                    }
+                }
+            }
+
+            if(requestTypeUMLElements.size() < requestTypeColelctionInitialSize) // if at least one request type element was found
+            {
+                bResult = true;
+            }
+            else
+            {
+                if(true == fillInStringMsg)
+                {
+                    QString subMsg;
+
+                    bool bFirstIteration = true;
+
+                    for(const auto& element : requestTypeUMLElements)
+                    {
+                        if(true == bFirstIteration)
+                        {
+                            bFirstIteration = false;
+                        }
+                        else
+                        {
+                            subMsg.append("|");
+                        }
+
+                        subMsg.append(QString("%1").arg(getUMLIDAsString(element.first)));
+                    }
+
+                    msg.append(QString(" <Request type elements (%1) not found>").arg(subMsg));
+                }
+            }
+
+            return bResult;
+        };
+
+        if(true == mandatoryUMLElements.empty()) // if all mandatory elements were found
+        {
+            result.first = checkRequestType(result.second); // proceed with analysis
         }
-        else
+        else // otherwise
         {
             if(true == fillInStringMsg)
             {
-                QString subMsg;
-
-                bool bFirstIteration = true;
-
-                for(const auto& element : requestTypeUMLElements)
+                // collect warning string
+                for(const auto& element : mandatoryUMLElements)
                 {
-                    if(true == bFirstIteration)
-                    {
-                        bFirstIteration = false;
-                    }
-                    else
-                    {
-                        subMsg.append("|");
-                    }
-
-                    subMsg.append(QString("%1").arg(getUMLIDAsString(element.first)));
+                    result.second.append(QString(" <Mandatory element %1 not found>").arg(getUMLIDAsString(element.first)));
                 }
-
-                msg.append(QString(" <Request type elements (%1) not found>").arg(subMsg));
             }
+
+            static_cast<void>(checkRequestType(result.second));
         }
-
-        return bResult;
-    };
-
-    if(true == mandatoryUMLElements.empty()) // if all mandatory elements were found
-    {
-        result.first = checkRequestType(result.second); // proceed with analysis
-    }
-    else // otherwise
-    {
-        if(true == fillInStringMsg)
-        {
-            // collect warning string
-            for(const auto& element : mandatoryUMLElements)
-            {
-                result.second.append(QString(" <Mandatory element %1 not found>").arg(getUMLIDAsString(element.first)));
-            }
-        }
-
-        static_cast<void>(checkRequestType(result.second));
     }
 
-    return result;
+        return result;
 }
 
 bool tRegexScriptingMetadata::doesContainAnyUMLGroup() const

@@ -50,7 +50,7 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tDLTFile
             {
                 if(true == regexMetadata.doesContainAnyUMLGroup()) // if has at least one UML group
                 {
-                    auto checkUMLDataResult = regexMetadata.doesContainConsistentUMLData(true, tRegexScriptingMetadata::tCheckIDs());
+                    auto checkUMLDataResult = regexMetadata.doesContainConsistentUMLData(true);
 
                     if(false == checkUMLDataResult.first) // let's check and trace the warnings
                     {

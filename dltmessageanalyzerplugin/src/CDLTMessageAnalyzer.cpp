@@ -505,6 +505,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         createSequenceDiagram();
     });
 
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_AutonumberChanged, [this](bool)
+    {
+        createSequenceDiagram();
+    });
+
     handleLoadedConfig();
     handleLoadedRegexConfig();
 

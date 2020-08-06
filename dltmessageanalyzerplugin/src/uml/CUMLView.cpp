@@ -247,6 +247,18 @@ mbDiagramGenerationInProgress(false)
                 }
 
                 {
+                    QAction* pAction = new QAction("Autonumber", this);
+                    connect(pAction, &QAction::triggered, [](bool checked)
+                    {
+                        CSettingsManager::getInstance()->setUML_Autonumber(checked);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(CSettingsManager::getInstance()->getUML_Autonumber());
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
                     QAction* pAction = new QAction("Max rows number ...", this);
                     connect(pAction, &QAction::triggered, []()
                     {

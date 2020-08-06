@@ -111,6 +111,7 @@ public:
     void setUML_MaxNumberOfRowsInDiagram(const int& val);
     void setUML_ShowArguments(const bool& val);
     void setUML_WrapOutput(const bool& val);
+    void setUML_Autonumber(const bool& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -159,6 +160,7 @@ public:
     const int& getUML_MaxNumberOfRowsInDiagram() const;
     const bool& getUML_ShowArguments() const;
     const bool& getUML_WrapOutput() const;
+    const bool& getUML_Autonumber() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -200,7 +202,7 @@ signals:
     void UML_MaxNumberOfRowsInDiagramChanged(const int& UML_MaxNumberOfRowsInDiagram);
     void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
     void UML_WrapOutputChanged(const bool& UML_WrapOutput);
-
+    void UML_AutonumberChanged(const bool& UML_Autonumber);
 
 private: // methods
 
@@ -427,6 +429,7 @@ private: // fields
     TSettingItem<int> mSetting_UML_MaxNumberOfRowsInDiagram;
     TSettingItem<bool> mSetting_UML_ShowArguments;
     TSettingItem<bool> mSetting_UML_WrapOutput;
+    TSettingItem<bool> mSetting_UML_Autonumber;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
