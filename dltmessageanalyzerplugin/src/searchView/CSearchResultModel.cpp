@@ -305,6 +305,12 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
     QString& outputString = result.second;
 
     outputString.append("@startuml\n");
+
+    if(true == CSettingsManager::getInstance()->getUML_Autonumber())
+    {
+        outputString.append("autonumber\n");
+    }
+
     outputString.append("skinparam backgroundColor white\n");
 
 #ifdef __linux__

@@ -4,6 +4,8 @@
  * @brief   Implementation of the CDLTMsgWrapper class
  */
 
+//#include <atomic>
+
 #include "QDebug"
 
 #include "dlt_protocol.h"
@@ -79,10 +81,12 @@ mInitialMsgSize(static_cast<unsigned int>(msg.getPayloadSize() + msg.getHeaderSi
 
     //static int counter = 0;
 
-    //if(!counter%1000)
+    //if(!counter%100000)
     //{
     //    dumpSize();
     //}
+
+    //++counter;
 }
 
 CDLTMsgWrapper::~CDLTMsgWrapper()

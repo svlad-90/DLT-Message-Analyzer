@@ -61,6 +61,7 @@ static const QString sUML_FeatureActiveKey = "UML_FeatureActive";
 static const QString sUML_MaxNumberOfRowsInDiagramKey = "UML_MaxNumberOfRowsInDiagram";
 static const QString sUML_ShowArgumentsKey = "UML_ShowArguments";
 static const QString sUML_WrapOutputKey = "UML_WrapOutput";
+static const QString sUML_AutonumberKey = "UML_Autonumber";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -331,6 +332,10 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){UML_WrapOutputChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mSetting_UML_Autonumber(createBooleanSettingsItem(sUML_AutonumberKey,
+        [this](const bool& data){UML_AutonumberChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -369,6 +374,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_UML_MaxNumberOfRowsInDiagram);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_ShowArguments);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_WrapOutput);
+    mUserSettingItemPtrVec.push_back(&mSetting_UML_Autonumber);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1424,6 +1430,11 @@ void CSettingsManager::setUML_WrapOutput(const bool& val)
     mSetting_UML_WrapOutput.setData(val);
 }
 
+void CSettingsManager::setUML_Autonumber(const bool& val)
+{
+    mSetting_UML_Autonumber.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1584,6 +1595,11 @@ const bool& CSettingsManager::getUML_ShowArguments() const
 const bool& CSettingsManager::getUML_WrapOutput() const
 {
     return mSetting_UML_WrapOutput.getData();
+}
+
+const bool& CSettingsManager::getUML_Autonumber() const
+{
+    return mSetting_UML_Autonumber.getData();
 }
 
 QString CSettingsManager::getRegexDirectory() const

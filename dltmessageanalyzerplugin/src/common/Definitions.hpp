@@ -410,8 +410,12 @@ struct tRegexScriptingMetadata
     bool parse(const QRegularExpression& regex, bool bParseUMLData);
     const tRegexScriptingMetadataItemPtrVec& getItemsVec() const;
     typedef std::set<int> tCheckIDs;
+    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg) const;
     std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const;
     bool doesContainAnyUMLGroup() const;
+
+private:
+    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const;
 
 private:
     tRegexScriptingMetadataItemPtrVec mItemsVec;

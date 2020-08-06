@@ -67,7 +67,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
 
     if(true == CSettingsManager::getInstance()->getUML_FeatureActive() &&
        true == regexMetadata.doesContainAnyUMLGroup() &&
-       true == regexMetadata.doesContainConsistentUMLData(false, tRegexScriptingMetadata::tCheckIDs()).first)
+       true == regexMetadata.doesContainConsistentUMLData(false).first)
     {
         bAnalyzeUML = true;
     }
