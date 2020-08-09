@@ -39,6 +39,7 @@ help -> get list of supported commands
 - support -> represent the support message
 - version -> represent the version of the plugin
 - web-link -> represent link to plugin's web-site
+- uml-id -> represent list of the supported UML types, which is used for cretion of the sequence diagrams
 
 List of the supported commands will be extended in future releases.
 

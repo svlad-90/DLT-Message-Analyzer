@@ -372,7 +372,20 @@ typedef QVector<QColor> QColorVec;
 
 typedef QString tVarName;
 typedef QPair<bool, tVarName> tOptionalVarName;
-typedef QPair<bool, eUML_ID> tOptional_UML_ID;
+
+struct tOptional_UML_ID_Item
+{
+    // optional string, which can be assigned by the user in form of e.g. <US_myService>.
+    // In above case this variable will be filled in with "myService" value
+    QString UML_Custom_Value;
+};
+
+typedef std::map<eUML_ID, tOptional_UML_ID_Item> tOptional_UML_IDMap;
+
+struct tOptional_UML_ID
+{
+    tOptional_UML_IDMap optional_UML_IDMap;
+};
 
 ///////////////////////////REGEX_SCRIPTING_METADATA/////////////////////////////////
 
@@ -390,7 +403,7 @@ public:
     tOptionalVarName varName;
 
     // UML_ID data
-    tOptional_UML_ID UML_ID;
+    tOptional_UML_ID optionalUML_ID;
 };
 
 typedef std::shared_ptr<tRegexScriptingMetadataItem> tRegexScriptingMetadataItemPtr;
@@ -426,7 +439,12 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
 
 ////////////////////////////////////////////////////////////
 
-typedef QPair<int, tHighlightingRangeSet> tCalcRangesCoverageMulticolorResult;
+struct tCalcRangesCoverageMulticolorResult
+{
+    tHighlightingRangeSet highlightingRangeSet;
+};
+
+typedef std::map<int /*group id*/, int /*gradient color id*/> tGroupIdToColorMap;
 
 /**
  * @brief calcRangesCoverageMulticolor - determines in which way set of ranges coveres the inputRange.
@@ -434,7 +452,7 @@ typedef QPair<int, tHighlightingRangeSet> tCalcRangesCoverageMulticolorResult;
  * @param inputRange - input range, which we try to analyze.
  * @param regexScriptingMetadata - regex scripting metadata, which contains colors, which were scripted by the user.
  * @param gradientColors - gradiant colors, which are assigned to ranges in case if there are no corresponding scripted colors. Scripted colors have higher priority.
- * @param prevColorCounter - previous color counhter, to be used within this call
+ * @param groupIdToColorMap - group ids to colors mapping
  * @return - QPair, with:
  * first - updated prevColorCounter value
  * second - set of ranges, which shows in which way rangeList coveres the inputRange.
@@ -444,7 +462,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                                                     const tRange& inputRange,
                                                     const tRegexScriptingMetadata& regexScriptingMetadata,
                                                     const QVector<QColor>& gradientColors,
-                                                    const int& prevColorCounter);
+                                                    const tGroupIdToColorMap& groupIdToColorMap);
 
 /**
  * @brief getMatchesTree - forms a tree from the found matches, which then can be used in other methods, like calcRangesCoverageMulticolor
@@ -455,8 +473,24 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
  */
 tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches );
 
-typedef std::map<eSearchResultColumn, tRange> tStringCoverageMap;
-typedef std::map<eUML_ID, tStringCoverageMap /*range of id-s in the searched string*/> tUMLDataMap;
+struct tStringCoverageItem
+{
+    tRange range;
+    /*whether we should add separator after the string*/
+    bool bAddSeparator = false;
+};
+
+typedef std::map<eSearchResultColumn, tStringCoverageItem> tStringCoverageMap;
+
+struct tUMLDataItem
+{
+    QString UML_Custom_Value;
+    tStringCoverageMap stringCoverageMap;
+};
+
+typedef std::vector<tUMLDataItem> tUMLDataItemsVec;
+
+typedef std::map<eUML_ID, tUMLDataItemsVec> tUMLDataMap;
 struct tUMLInfo
 {
     bool bUMLConstraintsFulfilled = false;

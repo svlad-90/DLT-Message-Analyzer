@@ -303,9 +303,9 @@ QPair<bool,QString> CFiltersModel::packRegex()
 
                     if(false == groupName.isEmpty())
                     {
-                        const eGroupSyntaxType& gorupSyntaxType = static_cast<eGroupSyntaxType>(pItem->data(static_cast<int>(eRegexFiltersColumn::GroupSyntaxType)).get<int>());
+                        const eGroupSyntaxType& groupSyntaxType = static_cast<eGroupSyntaxType>(pItem->data(static_cast<int>(eRegexFiltersColumn::GroupSyntaxType)).get<int>());
 
-                        switch(gorupSyntaxType)
+                        switch(groupSyntaxType)
                         {
                         case eGroupSyntaxType::SYNTAX_1:
                             regexStr.append("?<");
@@ -320,7 +320,7 @@ QPair<bool,QString> CFiltersModel::packRegex()
 
                         regexStr.append(groupName);
 
-                        switch(gorupSyntaxType)
+                        switch(groupSyntaxType)
                         {
                         case eGroupSyntaxType::SYNTAX_1:
                         case eGroupSyntaxType::SYNTAX_3:
@@ -772,6 +772,7 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                                         else
                                         {
                                             pCurrentParsingDataItem->name = "Group";
+                                            pCurrentParsingDataItem->value = pCurrentParsingDataItem->groupName;
                                         }
 
                                         pCurrentParsingDataItem->colorWrapper.optColor = pRegexMetadataItem->highlightingColor;

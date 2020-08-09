@@ -39,6 +39,7 @@ const QString s_UML_EVENT = "UEV"; // - mandatory
 const QString s_UML_SERVICE = "US"; // - mandatory
 const QString s_UML_METHOD = "UM"; // - mandatory
 const QString s_UML_ARGUMENTS = "UA"; // - optional
+const QString s_UML_ALIAS_DELIMITER = "_";
 
 static tUML_IDs_Map createUMLIDsMap()
 {
@@ -673,7 +674,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                                const tRange& inputRange,
                                const tRegexScriptingMetadata& regexScriptingMetadata,
                                const QVector<QColor>& gradientColors,
-                               const int& prevColorCounter )
+                               const tGroupIdToColorMap& groupIdToColorMap )
 {
 #ifdef DEBUG_CALC_RANGES
     QElapsedTimer timer;
@@ -685,34 +686,13 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
     if(true == gradientColors.empty()) // let's reject bad case, when collection of input colors is empty
     {
         tCalcRangesCoverageMulticolorResult dummyResult;
-        dummyResult.first = prevColorCounter;
         return dummyResult;
-    }
-
-    const auto maxColorsSize = gradientColors.size();
-
-    auto colorsCounter = 0;
-
-    if( prevColorCounter < 0 )
-    {
-        colorsCounter = 0;
-    }
-    else if( prevColorCounter >= maxColorsSize )
-    {
-       colorsCounter = maxColorsSize - 1;
-    }
-    else
-    {
-        colorsCounter = prevColorCounter;
     }
 
     tHighlightingRangeList resultList;
     resultList.reserve(static_cast<std::size_t>(regexScriptingMetadata.getItemsVec().size() + 10)); // +10 to cover overhead which might be caused with nested groups
 
-    tRange rangeToBeAdded; // used only within postVisitFunction
-                           // but created outside lambda to minimize reallocations
-
-    auto postVisitFunction = [&resultList, &inputRange, &maxColorsSize, &regexScriptingMetadata, &gradientColors, &colorsCounter, &rangeToBeAdded](tTreeItem* pItem)
+    auto postVisitFunction = [&resultList, &inputRange, &regexScriptingMetadata, &gradientColors, &groupIdToColorMap](tTreeItem* pItem)
     {
         const auto& match = *(pItem->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
 
@@ -722,31 +702,22 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
         //         .arg(match.range.to)
         //         .arg(*match.pMatchStr));
 
-        if( ( match.range.from < inputRange.from && match.range.to < inputRange.from ) )
+        if( ( match.range.from < inputRange.from && match.range.to < inputRange.from ) ||
+            ( match.range.from > inputRange.to && match.range.to > inputRange.to ) )
         {
             // we are outside target range.
             // We can skip further analysis of this match.
             return true;
         }
-        else if( match.range.from > inputRange.to && match.range.to > inputRange.to )
-        {
-            // we are outside target range and matches are beyond the range.
-            // We can skip further iteration over the tree.
-            return false;
-        }
 
         tAnalysisRange analysisRange( match.range, inputRange );
         const auto& matchIdx = match.idx;
-        bool bToShrinked = analysisRange.bToShrinked;
 
         auto getColor = [&regexScriptingMetadata,
                 &gradientColors,
-                &colorsCounter,
-                &maxColorsSize,
-                &matchIdx,
-                &bToShrinked]()->QPair<bool /*isExplicit*/, QColor>
+                &groupIdToColorMap,
+                &matchIdx]()->QPair<bool /*isExplicit*/, QColor>
         {
-
             QOptionalColor scriptedColor;
             scriptedColor.isSet = false;
 
@@ -765,13 +736,12 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
             }
             else
             {
-                color = gradientColors[colorsCounter];
-            }
+                auto foundGradientColor = groupIdToColorMap.find(matchIdx);
 
-            if( false == bToShrinked  )
-            {
-                ++colorsCounter;
-                colorsCounter %= maxColorsSize;
+                if( groupIdToColorMap.end() != foundGradientColor )
+                {
+                    color = gradientColors[foundGradientColor->second];
+                }
             }
 
             return QPair<bool /*isExplicit*/, QColor>(bIsExplicitColor, color);
@@ -793,9 +763,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 if( firstChildAnalysisRange.from > analysisRange.from ) // if there is room for additional range
                 {
                     // let's add it
-                    rangeToBeAdded.from = analysisRange.from;
-                    rangeToBeAdded.to = firstChildAnalysisRange.from - 1;
-
+                    tAnalysisRange rangeToBeAdded( tRange( analysisRange.from, firstChildAnalysisRange.from - 1 ), inputRange);
                     resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
@@ -816,9 +784,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
                     if((secondChildAnalysisRange.from - firstChildAnalysisRange.to) > 1)
                     {
-                        rangeToBeAdded.from = firstChildAnalysisRange.to+1;
-                        rangeToBeAdded.to = secondChildAnalysisRange.from-1;
-
+                        tAnalysisRange rangeToBeAdded( tRange( firstChildAnalysisRange.to+1, secondChildAnalysisRange.from-1 ), inputRange);
                         resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                                   rangeToBeAdded.to,
                                                                   selectedColor.second,
@@ -836,9 +802,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 if( analysisRange.to > lastChildAnalysisRange.to ) // if there is room for additional range
                 {
                     // let's add it
-                    rangeToBeAdded.from = lastChildAnalysisRange.to + 1;
-                    rangeToBeAdded.to = analysisRange.to;
-
+                    tAnalysisRange rangeToBeAdded( tRange( lastChildAnalysisRange.to + 1, analysisRange.to ), inputRange);
                     resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
@@ -873,9 +837,8 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
     tCalcRangesCoverageMulticolorResult result;
 
-    result.first = colorsCounter;
 
-    result.second.insert(resultList.begin(), resultList.end());
+    result.highlightingRangeSet.insert(resultList.begin(), resultList.end());
 
     //for( const auto& resultItem : resultList )
     //{
@@ -932,22 +895,72 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
                                                           const tRegexScriptingMetadata& regexScriptingMetadata,
                                                           tTreeItemSharedPtr pTree)
 {
-    QElapsedTimer timer;
-    timer.start();
+    //QElapsedTimer timer;
+    //timer.start();
 
-    auto colorsCounter = 0;
+    auto createColorsMappingTable = [&foundMatches, &gradientColors]()->tGroupIdToColorMap
+    {
+        tGroupIdToColorMap result;
+
+        auto maxGradientColorsSize = gradientColors.size();
+        int gradientColorsCounter = 0;
+
+        struct tSortedMatchKey
+        {
+            tSortedMatchKey(const int& from_, const int& size_):
+            from(from_),
+            size(size_)
+            {}
+
+            bool operator< (const tSortedMatchKey& rVal) const
+            {
+                bool bResult = false;
+
+                if(from != rVal.from)
+                {
+                    bResult = from < rVal.from;
+                }
+                else
+                {
+                    bResult = size < rVal.size;
+                }
+
+                return bResult;
+            }
+
+            int from;
+            int size;
+        };
+
+        typedef std::map<tSortedMatchKey, const tFoundMatch*> tSortedMatches;
+        tSortedMatches sortedMatches;
+
+        for(const auto& match : foundMatches)
+        {
+            sortedMatches.insert(std::make_pair(tSortedMatchKey(match.range.from, match.range.to - match.range.from), &match));
+        }
+
+        for(const auto& match : sortedMatches)
+        {
+            if(nullptr != match.second->pMatchStr && false == match.second->pMatchStr->isEmpty())
+            {
+                result.insert(std::make_pair( match.second->idx, gradientColorsCounter % maxGradientColorsSize ));
+                ++gradientColorsCounter;
+            }
+        }
+
+        return result;
+    };
 
     auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
 
     for( auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it )
     {
-        auto highlightingRangesMulticolorRes = calcRangesCoverageMulticolor( pMatchesTree, it.value(), regexScriptingMetadata, gradientColors, colorsCounter );
+        auto highlightingRangesMulticolorRes = calcRangesCoverageMulticolor( pMatchesTree, it.value(), regexScriptingMetadata, gradientColors, createColorsMappingTable() );
 
-        colorsCounter = highlightingRangesMulticolorRes.first;
-
-        if(false == highlightingRangesMulticolorRes.second.empty())
+        if(false == highlightingRangesMulticolorRes.highlightingRangeSet.empty())
         {
-            highlightingInfoMultiColor.insert( it.key(), highlightingRangesMulticolorRes.second );
+            highlightingInfoMultiColor.insert( it.key(), highlightingRangesMulticolorRes.highlightingRangeSet );
         }
     }
 
@@ -1010,9 +1023,9 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                 // That can be done with checking each tree element against regexScriptingMetadata
 
                 // lambda, which checks whether specific match is representing a UML data
-                auto isUMLData = [&match, &regexScriptingMetadata]()->std::pair<bool, eUML_ID>
+                auto isUMLData = [&match, &regexScriptingMetadata]()->std::pair<bool, tOptional_UML_IDMap*>
                 {
-                    std::pair<bool, eUML_ID> result;
+                    std::pair<bool, tOptional_UML_IDMap*> result;
                     result.first = false;
 
                     auto groupIdx = match.idx;
@@ -1022,10 +1035,11 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                     {
                         const auto& pGroupMetadata = groups[groupIdx];
 
-                        if(nullptr != pGroupMetadata && true == pGroupMetadata->UML_ID.first)
+                        if(nullptr != pGroupMetadata &&
+                           ( false == pGroupMetadata->optionalUML_ID.optional_UML_IDMap.empty() ) )
                         {
                             result.first = true; // we got the UML data
-                            result.second = pGroupMetadata->UML_ID.second;
+                            result.second = &pGroupMetadata->optionalUML_ID.optional_UML_IDMap;
                         }
                     }
 
@@ -1037,29 +1051,39 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                 if(true == UMLDataRes.first) // if we have a UML data
                 {
                     // let's check and fill in the areas of the string, in which it is located.
-                    for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
+
+                    for(const auto& UML_IDItem : *(UMLDataRes.second))
                     {
-                        const auto& fieldRange = *it;
-
-                        bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
-                                           (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
-
-                        if(true == insideRange) // if group is even partially inside the range
+                        if(true == UML_IDItem.second.UML_Custom_Value.isEmpty()) // if there is no client's custom value
                         {
-                            auto foundUML_ID = UMLInfo.UMLDataMap.find(UMLDataRes.second);
+                            //let's grab groups content
+                            tUMLDataItem UMLDataItem;
 
-                            if(foundUML_ID != UMLInfo.UMLDataMap.end())
+                            for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
                             {
-                                foundUML_ID->second[it.key()] = tRange( std::max(fieldRange.from, match.range.from),
-                                                                        std::min( fieldRange.to, match.range.to ) );
+                                const auto& fieldRange = *it;
+
+                                bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
+                                        (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
+
+                                if(true == insideRange) // if group is even partially inside the range
+                                {
+                                    tStringCoverageItem stringCoverageItem;
+                                    stringCoverageItem.range = tRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
+                                                                       std::min( fieldRange.to, match.range.to ) - fieldRange.from );
+                                    stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
+                                    UMLDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
+                                }
                             }
-                            else
-                            {
-                                tStringCoverageMap coverageMap;
-                                coverageMap[it.key()] = tRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
-                                                                std::min( fieldRange.to, match.range.to ) - fieldRange.from );
-                                UMLInfo.UMLDataMap[UMLDataRes.second] = coverageMap;
-                            }
+
+                            UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                        }
+                        else // otherwise
+                        {
+                            // let's directly assign custom client's value
+                            tUMLDataItem UMLDataItem;
+                            UMLDataItem.UML_Custom_Value = UML_IDItem.second.UML_Custom_Value;
+                            UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
                         }
                     }
                 }
@@ -1585,7 +1609,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
             }
         }
 
-        resultRegex.append(")$");
+        resultRegex.append(QString(")[%1]{0,1}([\\w\\d]*)$").arg(s_UML_ALIAS_DELIMITER));
 
         return resultRegex;
     };
@@ -1620,7 +1644,6 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
     optVarName.first = false;
 
     tOptional_UML_ID optUML_ID;
-    optUML_ID.first = false;
 
     for( const auto& groupNamePart : splitGroupName )
     {
@@ -1734,41 +1757,42 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
         if(true == bParseUMLData)
         {
             // parse UML data
-            if(false == optUML_ID.first)
+            QRegularExpressionMatch varMatch = UMLRegex.match(groupNamePart);
+
+            if(varMatch.hasMatch())
             {
-                QRegularExpressionMatch varMatch = UMLRegex.match(groupNamePart);
+                bool b_UML_ID_Found = varMatch.lastCapturedIndex() >= 1;               // if 1 or more groups found
 
-                if(varMatch.hasMatch())
+                if(true == b_UML_ID_Found)
                 {
-                    bool UML_ID_Found = varMatch.lastCapturedIndex() == 1;               // if 1 group found
+                    eUML_ID UML_ID = eUML_ID::UML_EVENT; // any value
+                    bool bUML_ID_Parsed = parseUMLIDFromString( varMatch.captured(1), UML_ID );
 
-                    if(true == UML_ID_Found)
+                    if(true == bUML_ID_Parsed)
                     {
-                        eUML_ID UML_ID = eUML_ID::UML_EVENT; // any value
-                        bool bUML_ID_Parsed = parseUMLIDFromString( varMatch.captured(1), UML_ID );
+                        const auto& key = UML_ID;
+                        auto& value = optUML_ID.optional_UML_IDMap[key].UML_Custom_Value;
 
-                        if(true == bUML_ID_Parsed)
+                        if(varMatch.lastCapturedIndex() == 2) // if 2 groups found
                         {
-                            optUML_ID.first = true;
-                            optUML_ID.second = UML_ID;
+                            QString capturedString = varMatch.captured(2);
+                            bool b_UML_Custom_Value_Found = false == capturedString.isEmpty();     // if 2 groups found
+
+                            if(true == b_UML_Custom_Value_Found)
+                            {
+                                value = capturedString;
+                            }
                         }
                     }
                 }
             }
-        }
-
-        if(true == optVarName.first
-        && true == optColor.isSet
-        && ( !bParseUMLData || true == optUML_ID.first ) ) // if we've found everything, lets break the loop
-        {
-            break;
         }
     }
 
     tRegexScriptingMetadataItemPtr pItem = std::make_shared<tRegexScriptingMetadataItem>();
     pItem->highlightingColor = optColor;
     pItem->varName = optVarName;
-    pItem->UML_ID = optUML_ID;
+    pItem->optionalUML_ID = optUML_ID;
 
     return pItem;
 }
@@ -1863,13 +1887,21 @@ tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, cons
         {
             if(nullptr != pElement)
             {
-                if(true == pElement->UML_ID.first)
+                if(false == pElement->optionalUML_ID.optional_UML_IDMap.empty())
                 {
-                    auto foundElement = mandatoryUMLElements.find(pElement->UML_ID.second);
-
-                    if(foundElement != mandatoryUMLElements.end())
+                    for(const auto& UML_IDItem : pElement->optionalUML_ID.optional_UML_IDMap)
                     {
-                        mandatoryUMLElements.erase(foundElement);
+                        auto foundElement = mandatoryUMLElements.find(UML_IDItem.first);
+
+                        if(foundElement != mandatoryUMLElements.end())
+                        {
+                            mandatoryUMLElements.erase(foundElement);
+
+                            if(true == mandatoryUMLElements.empty())
+                            {
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -1896,13 +1928,21 @@ tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, cons
             {
                 if(nullptr != pElement)
                 {
-                    if(true == pElement->UML_ID.first)
+                    if(false == pElement->optionalUML_ID.optional_UML_IDMap.empty())
                     {
-                        auto foundElement = requestTypeUMLElements.find(pElement->UML_ID.second);
-
-                        if(foundElement != requestTypeUMLElements.end())
+                        for(const auto& UML_IDItem : pElement->optionalUML_ID.optional_UML_IDMap)
                         {
-                            requestTypeUMLElements.erase(foundElement);
+                            auto foundElement = requestTypeUMLElements.find(UML_IDItem.first);
+
+                            if(foundElement != requestTypeUMLElements.end())
+                            {
+                                requestTypeUMLElements.erase(foundElement);
+
+                                if(true == requestTypeUMLElements.empty())
+                                {
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -1969,14 +2009,17 @@ bool tRegexScriptingMetadata::doesContainAnyUMLGroup() const
 
     for(const auto& element : mItemsVec)
     {
-        if(true == element->UML_ID.first)
+        if(false == element->optionalUML_ID.optional_UML_IDMap.empty())
         {
-            auto foundElement = s_UML_IDs_Map.find(element->UML_ID.second);
-
-            if(foundElement != s_UML_IDs_Map.end()) // match found
+            for(const auto& UML_IDItem : element->optionalUML_ID.optional_UML_IDMap)
             {
-                bResult = true;
-                break;
+                auto foundElement = s_UML_IDs_Map.find(UML_IDItem.first);
+
+                if(foundElement != s_UML_IDs_Map.end()) // match found
+                {
+                    bResult = true;
+                    break;
+                }
             }
         }
     }
