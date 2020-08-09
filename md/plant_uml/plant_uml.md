@@ -66,7 +66,7 @@ In case if provided regex will contain ALL mandatory fields, the plugin will con
 
 ----
 
-## Example
+## Simple example
 
 Let's provide an example.
 Imagine that we have the following 3 messages, which represent the communication between components "Alice" and "Bob":
@@ -74,7 +74,7 @@ Imagine that we have the following 3 messages, which represent the communication
 ![Screenshot of messages between Alice and Bob components](./plant_uml_alice_bob_messages.png)
 
 The above way of tracing is unified and contains all required parts to create a sequence out of it. 
-We can use the following regex expression for sequence creation:
+We can use the following regex expression for creation of the sequence diagram:
 <pre>^(SYS).*?: Informational: (?&lt;UCL&gt;[\w]+):.*?((?&lt;URT&gt;RQ)|(?&lt;URS&gt;RP)|(?&lt;UEV&gt;EV)).*?(to|from) (?&lt;US&gt;[\w]+) - (?&lt;UM&gt;.*?)\((?&lt;UA&gt;.*?)\)</pre>
 
 Result of search would look like:
@@ -111,6 +111,71 @@ Use the following context menu item to trigger save operation:
 
 ![Screenshot of "Save as ..." context menu item](./plant_uml_save_diagram.png)
 
+----
+
+## Advanced example
+
+First example was quite simple, as log has contained all required parts.
+But what if you need a sequence for a set of the messages, which does not contain all required parts? 
+E.g. there is no service name, client name or method name.
+
+Still, as a develoepr you might understand the context, and want to fulfil the missing parts and have a sequence without modification of logs.
+Fortunately, the DLT-Message-Analyzer allows you to do this.
+
+Imagine that we have the following 3 messages, which represent the communication between components "Alice" and "Bob":
+
+![Screenshot of another set of messages between Alice and Bob components](./plant_uml_alice_bob_messages_advanced.png)
+
+Let's also imagine that result diagram should have actor Alex instead of actor Alice.
+The above way of tracing is not quite unified and does not contain all required parts to create a sequence out of it. 
+Also it contains a typo - Alice instead of Alex.
+Still, we can use the following regex expression for sequence creation:
+
+<pre>^(SYS).*?: Informational: ((?&lt;UCL_Alex&gt;CAlice):.*?(?&lt;US_Bob&gt;(?&lt;UM_sayMyName&gt;(?&lt;URT&gt;sentName)|(?&lt;URS&gt;response))).*?\((?&lt;UA&gt;.*)\)|(?&lt;UCL_AND_US&gt;Bob): (?&lt;URT&gt;processRequest)\("(?&lt;UM&gt;[\w]+)"\))</pre>
+
+Specific parts of behavior:
+
+- UCL_Alex will replace CAlice to Alex in the diagram's content
+- US_Bob will add Bob service, despite, that it is not presented in the message
+- UM_sayMyName will add sayMyName method, despite that it is not presented in the message
+- URT & URP are stick to the parts of the message, which only indirectly show whether it is request or response
+- UCL_AND_US will add Bob client and service, despite that it is not part of the message
+
+Result of search would look like:
+
+![Screenshot of the result, which contains UML items](./plant_uml_search_result_advanced.png)
+
+As you can see above, all found messages have active checkbox items in the "UML" column.
+It means, that they can be used for diagram creation.
+Let's select those rows:
+
+![Screenshot of the result with selected UML items](./plant_uml_search_result_advanced_selected_UML_items.png)
+
+Now, let's switch to the "UML view" and trigger diagram creation:
+
+![Screenshot of triggering creation of UML sequence diagram](./plant_uml_trigger_creation_of_diagram.png)
+
+The resulting diagram looks like this:
+
+![Screenshot of the created UML sequences diagram](./plant_uml_alice_bob_diagram_advanced.png)
+
+----
+> **Note!**
+>
+> There is a possibility to combine multiple UML items in the name of one group. 
+> E.g. US_AND_UCL, or US_Alex_AND_UCL_Alex.
+>
+> Still, there is no possibility to mention the same UML item type in same group name more than once. 
+> E.g. in case of US_Alex_AND_US_Alice "last win" strategy is applied, meaning that US_Alice will win.
+----
+
+----
+> **Note!**
+>
+> Imagine the case, when one UML type is specified in one regex more than once:
+> <pre>(?&lt;UM_one&gt;[\w]+):(?&lt;UM__two&gt;[\w]+)</pre>
+> In such case, if one UML type will be found in a result log more than once, all found results of the same type will be concatenated. 
+> With above example result qould be: "one_two".
 ----
 
 ## Settings

@@ -205,6 +205,11 @@ QString CSearchResultModel::getDataStrFromMsg(const QModelIndex& modelIndex, con
             strRes = pMsg->getPayload();
         }
             break;
+        case eSearchResultColumn::UML_Applicability:
+        {
+            strRes = ""; // no string value provided for this column
+        }
+            break;
         case eSearchResultColumn::Last:
         {
             strRes = "Unhandled field type!";
@@ -347,42 +352,82 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
                 if(foundUMLDataItem != itemMetadata.UMLInfo.UMLDataMap.end())
                 {
-                    for(const auto& fieldRange : foundUMLDataItem->second)
+                    for(const auto& item : foundUMLDataItem->second)
                     {
-                        QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(fieldRange.first));
-                        QString message = getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column()));
-
-                        auto messageSize = message.size();
-                        if(fieldRange.second.from >= 0 && fieldRange.second.from < messageSize &&
-                           fieldRange.second.to >= 0 && fieldRange.second.to < messageSize )
+                        if(true == item.UML_Custom_Value.isEmpty()) // if there is no client-defined value
                         {
-                            switch(UML_ID)
+                            // let's use value from the corresponding group
+                            for(const auto& stringCoverageMapItem : item.stringCoverageMap)
                             {
-                                case eUML_ID::UML_REQUEST:
-                                    UMLRepresentationResult.second.append("->");
-                                    break;
-                                case eUML_ID::UML_RESPONSE:
-                                case eUML_ID::UML_EVENT:
-                                    UMLRepresentationResult.second.append("<-");
-                                    break;
-                                case eUML_ID::UML_ARGUMENTS:
+                                QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(stringCoverageMapItem.first));
+                                QString message = getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column()));
+
+                                auto messageSize = message.size();
+                                const auto& range = stringCoverageMapItem.second.range;
+
+                                if(range.from >= 0 && range.from < messageSize &&
+                                   range.to >= 0 && range.to < messageSize )
                                 {
-                                    int numberOfCharacters = fieldRange.second.to - fieldRange.second.from + 1;
-                                    QString argString = message.mid(fieldRange.second.from, numberOfCharacters);
-                                    argString.replace("[[", "[ [");
-                                    argString.replace("]]", "] ]");
-                                    UMLRepresentationResult.second.append(argString);
+                                    switch(UML_ID)
+                                    {
+                                        case eUML_ID::UML_REQUEST:
+                                            UMLRepresentationResult.second.append("->");
+                                            break;
+                                        case eUML_ID::UML_RESPONSE:
+                                        case eUML_ID::UML_EVENT:
+                                            UMLRepresentationResult.second.append("<-");
+                                            break;
+                                        case eUML_ID::UML_ARGUMENTS:
+                                        {
+                                            int numberOfCharacters = range.to - range.from + 1;
+                                            QString argString = message.mid(range.from, numberOfCharacters);
+                                            argString.replace("[[", "[ [");
+                                            argString.replace("]]", "] ]");
+                                            UMLRepresentationResult.second.append(argString);
+
+                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                            {
+                                                UMLRepresentationResult.second.append(" ");
+                                            }
+                                        }
+                                            break;
+                                        case eUML_ID::UML_CLIENT:
+                                        case eUML_ID::UML_SERVICE:
+                                        {
+                                            QString str;
+                                            str.append(message.mid(range.from, range.to - range.from + 1));
+
+                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                            {
+                                                str.append(" ");
+                                            }
+
+                                            str.replace(" ", "_");
+                                            UMLRepresentationResult.second.append(str);
+                                        }
+                                            break;
+                                        default:
+                                        {
+                                            UMLRepresentationResult.second.append(message.mid(range.from, range.to - range.from + 1));
+
+                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                            {
+                                                UMLRepresentationResult.second.append(" ");
+                                            }
+                                        }
+                                            break;
+                                    }
                                 }
-                                    break;
-                                default:
-                                {
-                                    UMLRepresentationResult.second.append(message.mid(fieldRange.second.from, fieldRange.second.to - fieldRange.second.from + 1));
-                                }
-                                    break;
+
+                                UMLRepresentationResult.first = true;
                             }
                         }
-
-                        UMLRepresentationResult.first = true;
+                        else // otherwise
+                        {
+                            // let's directly use client-defined value, ignoring value from the group
+                            UMLRepresentationResult.first = true;
+                            UMLRepresentationResult.second.append(item.UML_Custom_Value);
+                        }
                     }
                 }
 
