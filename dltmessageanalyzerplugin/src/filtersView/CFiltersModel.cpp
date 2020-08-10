@@ -359,7 +359,7 @@ QPair<bool,QString> CFiltersModel::packRegex()
             return true;
         };
 
-        mpRootItem->visit(preVisitFunction, postVisitFunction, false);
+        mpRootItem->visit(preVisitFunction, postVisitFunction, false, true, false);
 
         SEND_MSG(regexStr);
 
