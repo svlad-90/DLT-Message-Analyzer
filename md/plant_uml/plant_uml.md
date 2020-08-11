@@ -9,6 +9,17 @@ PlantUML is used to generate different types of UML diagrams out of their textua
 This plugin is using the PlantUML syntax in order to generate sequence diagrams out of the logs.
 
 ----
+> **Note!**
+>
+> For majority of its features PlantUML is using Graphwiz as its dependency.
+> Still, for creation of sequence dieagrams Graphwiz is not used. Thus there is no need to install any additional SW on your PC.
+> And plantuml.jar itself is distributed together with the plugin's source-code.
+> It will be automatically copied to the build directory as part of the CMake or QTCreator build. 
+> 
+> In other words - this feature should work out of the box.
+----
+
+----
 
 ## Motivation
 

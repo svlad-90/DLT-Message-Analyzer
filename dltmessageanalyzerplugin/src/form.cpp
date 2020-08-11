@@ -21,7 +21,7 @@
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
 #include "log/CConsoleCtrl.hpp"
-#include "uml/CUMLView.hpp"
+#include "plant_uml/CUMLView.hpp"
 
 Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
     QWidget(parent),
@@ -171,7 +171,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
                     if(true == ok)
                     {
-                        auto maxSize = maxSizeStr.toInt(&ok);
+                        auto maxSize = static_cast<uint32_t>(maxSizeStr.toInt(&ok));
 
                         if(true == ok)
                         {

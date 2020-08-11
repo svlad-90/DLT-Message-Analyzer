@@ -46,8 +46,8 @@ add_library(dltmessageanalyzerplugin MODULE
     searchView/CSearchResultModel.cpp
     searchView/CSearchResultView.cpp
 #    uml/CSVGView.hpp
-    uml/CUMLView.cpp
-    uml/CImageViewer.cpp
+    plant_uml/CUMLView.cpp
+    plant_uml/CImageViewer.cpp
     ${UI_HEADERS})
 
 # Copy plantuml.jar after the build

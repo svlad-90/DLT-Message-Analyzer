@@ -69,7 +69,7 @@ and many other features
 
 ----
 
-## Development documentation
+## Development documentation ( under construction )
 
 ### [Read it here](./md/dev_docs/dev_docs.md)
 
