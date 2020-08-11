@@ -47,7 +47,7 @@
 #include "log/CConsoleCtrl.hpp"
 #include "common/CTableMemoryJumper.hpp"
 #include "log/CConsoleInputProcessor.hpp"
-#include "uml/CUMLView.hpp"
+#include "plant_uml/CUMLView.hpp"
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,

@@ -61,9 +61,9 @@ HEADERS += \
     dltmessageanalyzerplugin/src/searchView/CSearchResultModel.hpp \
     dltmessageanalyzerplugin/src/searchView/CSearchResultView.hpp\
     \
-#    dltmessageanalyzerplugin/src/uml/CSVGView.hpp \
-    dltmessageanalyzerplugin/src/uml/CImageViewer.hpp \
-    dltmessageanalyzerplugin/src/uml/CUMLView.hpp
+#   dltmessageanalyzerplugin/src/plant_uml/CSVGView.hpp \
+    dltmessageanalyzerplugin/src/plant_uml/CImageViewer.hpp \
+    dltmessageanalyzerplugin/src/plant_uml/CUMLView.hpp
 
 # plugin source files
 SOURCES += \
@@ -109,9 +109,9 @@ SOURCES += \
     dltmessageanalyzerplugin/src/searchView/CSearchResultModel.cpp \
     dltmessageanalyzerplugin/src/searchView/CSearchResultView.cpp\
     \
-#    dltmessageanalyzerplugin/src/uml/CSVGView.cpp \
-    dltmessageanalyzerplugin/src/uml/CImageViewer.cpp \
-    dltmessageanalyzerplugin/src/uml/CUMLView.cpp
+#   dltmessageanalyzerplugin/src/plant_uml/CSVGView.cpp \
+    dltmessageanalyzerplugin/src/plant_uml/CImageViewer.cpp \
+    dltmessageanalyzerplugin/src/plant_uml/CUMLView.cpp
 
 # plugin forms
 FORMS += \
