@@ -98,7 +98,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultCopyPasteMap()
 {
     tSearchResultColumnsVisibilityMap result;
 
-    // fields, which are visible by default
+    // fields, which are copied by default
     result.insert(eSearchResultColumn::Index, true);
     result.insert(eSearchResultColumn::Timestamp, true);
     result.insert(eSearchResultColumn::Ecuid, true);
@@ -106,7 +106,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultCopyPasteMap()
     result.insert(eSearchResultColumn::Ctid, true);
     result.insert(eSearchResultColumn::Payload, true);
 
-    // fields, which are not visible by default
+    // fields, which are not copied by default
     result.insert(eSearchResultColumn::UML_Applicability, false);
     result.insert(eSearchResultColumn::Time, false);
     result.insert(eSearchResultColumn::Count, false);
@@ -1830,7 +1830,7 @@ void CSettingsManager::resetSearchResultColumnsVisibilityMap()
 
 void CSettingsManager::resetSearchResultColumnsCopyPasteMap()
 {
-    setSearchResultColumnsCopyPasteMap(sDefaultSearchResultColumnsVisibilityMap);
+    setSearchResultColumnsCopyPasteMap(sDefaultSearchResultColumnsCopyPasteMap);
 }
 
 void CSettingsManager::resetPatternsColumnsVisibilityMap()

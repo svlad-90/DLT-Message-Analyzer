@@ -34,6 +34,7 @@ add_library(dltmessageanalyzerplugin MODULE
     common/CBGColorAnimation.cpp
     common/CRegexDirectoryMonitor.cpp
     common/CTableMemoryJumper.cpp
+	common/OSHelper.cpp
     dltWrappers/CDLTFileWrapper.cpp
     dltWrappers/CDLTMsgWrapper.cpp
     filtersView/CFiltersModel.cpp

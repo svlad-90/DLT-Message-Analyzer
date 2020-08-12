@@ -16,12 +16,15 @@
 #include "QInputDialog"
 #include "QSequentialAnimationGroup"
 #include "QPropertyAnimation"
+#include "QFormLayout"
+#include "QDialogButtonBox"
 
 #include "settings/CSettingsManager.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
 #include "log/CConsoleCtrl.hpp"
 #include "plant_uml/CUMLView.hpp"
+#include "common/OSHelper.hpp"
 
 Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
     QWidget(parent),
@@ -160,24 +163,9 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
                 QString msg = QString("Set cache size (cur. value - %1 Mb) ...").arg(CSettingsManager::getInstance()->getCacheMaxSizeMB());
 
                 QAction* pAction = new QAction(msg, this);
-                connect(pAction, &QAction::triggered, []()
+                connect(pAction, &QAction::triggered, [this]()
                 {
-                    bool ok;
-
-                    QString maxSizeStr = QInputDialog::getText(  nullptr, "Set cache size",
-                               "Provide max size of cache in Mb:",
-                               QLineEdit::Normal,
-                               QString::number(CSettingsManager::getInstance()->getCacheMaxSizeMB()), &ok );
-
-                    if(true == ok)
-                    {
-                        auto maxSize = static_cast<uint32_t>(maxSizeStr.toInt(&ok));
-
-                        if(true == ok)
-                        {
-                            CSettingsManager::getInstance()->setCacheMaxSizeMB(maxSize);
-                        }
-                    }
+                    getUserCacheSize();
                 });
                 contextMenu.addAction(pAction);
             }
@@ -751,6 +739,86 @@ void Form::on_createSequenceDiagram_clicked()
         else
         {
             mpUI->PNG_UML_View->cancelDiagramGeneration();
+        }
+    }
+}
+
+void Form::getUserCacheSize()
+{
+    uint32_t maxRAMSize = 0;
+
+    if(getRAMSize(maxRAMSize))
+    {
+        uint32_t minOverallVal = 0;
+        uint32_t maxOverallVal = maxRAMSize;
+        auto currentVal = CSettingsManager::getInstance()->getCacheMaxSizeMB();
+
+        QDialog dialog(this);
+        QFormLayout form(&dialog);
+        form.addRow(new QLabel("Please, specify cache size:"));
+
+        QString labelFrom = QString("Cache size ( from %1 to %2 Mb ):").arg(minOverallVal).arg(maxOverallVal);
+        QLineEdit *pCacheSizeLineEdit = new QLineEdit(&dialog);
+        pCacheSizeLineEdit->setText(QString::number(currentVal));
+        form.addRow(labelFrom, pCacheSizeLineEdit);
+
+        // Add some standard buttons (Cancel/Ok) at the bottom of the dialog
+        QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                   Qt::Horizontal, &dialog);
+
+        auto acceptHandler = [&dialog,
+                &pCacheSizeLineEdit,
+                &minOverallVal,
+                &maxOverallVal,
+                &currentVal]()
+        {
+            bool bIsCacheSizeADigit = false;
+
+            auto cacheSize = static_cast<uint32_t>(pCacheSizeLineEdit->text().toInt( &bIsCacheSizeADigit ));
+
+            bool bIsCacheSizeInMinRange = static_cast<int32_t>(cacheSize) >= static_cast<int32_t>(minOverallVal);
+            bool bIsCacheSizeInMaxRange = static_cast<int32_t>(cacheSize) <= static_cast<int32_t>(maxOverallVal);
+
+            bool areAllValuesValid = bIsCacheSizeADigit &&
+                                     bIsCacheSizeInMinRange &&
+                                     bIsCacheSizeInMaxRange;
+
+            if(true == areAllValuesValid)
+            {
+                dialog.accept();
+            }
+            else
+            {
+                if(false == bIsCacheSizeADigit)
+                {
+                    pCacheSizeLineEdit->setText( QString::number(currentVal) );
+                }
+                else if(false == bIsCacheSizeInMinRange)
+                {
+                    pCacheSizeLineEdit->setText( QString::number(minOverallVal) );
+                }
+                else if(false == bIsCacheSizeInMaxRange)
+                {
+                    pCacheSizeLineEdit->setText( QString::number(maxOverallVal) );
+                }
+            }
+        };
+
+        auto rejectHandler = [&dialog]()
+        {
+            dialog.reject();
+        };
+
+        form.addRow(&buttonBox);
+        QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, acceptHandler);
+        QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, rejectHandler);
+
+        // Show the dialog as modal
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            bool isCacheSizeADigit = false;
+            auto cacheSize = static_cast<uint32_t>(pCacheSizeLineEdit->text().toUInt( &isCacheSizeADigit ));
+            CSettingsManager::getInstance()->setCacheMaxSizeMB(cacheSize);
         }
     }
 }

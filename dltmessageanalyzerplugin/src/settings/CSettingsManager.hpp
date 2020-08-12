@@ -358,7 +358,7 @@ private: // methods
     TSettingItem<T> createIntegralSettingsItem(const QString& key,
                                                  const typename TSettingItem<T>::tUpdateDataFunc& updateDataFunc,
                                                  const typename TSettingItem<T>::tUpdateSettingsFileFunc& updateFileFunc,
-                                                      const T& defaultValue) const
+                                                 const T& defaultValue) const
     {
         auto writeFunc = [&key](const T& value)->QJsonObject
         {

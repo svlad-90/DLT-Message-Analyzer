@@ -44,6 +44,7 @@ HEADERS += \
     dltmessageanalyzerplugin/src/common/variant/variant.hpp \
     dltmessageanalyzerplugin/src/common/CBGColorAnimation.hpp \
     dltmessageanalyzerplugin/src/common/CRegexDirectoryMonitor.hpp \
+    dltmessageanalyzerplugin/src/common/OSHelper.hpp \
     \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTFileWrapper.hpp \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTMsgWrapper.hpp \
@@ -92,6 +93,7 @@ SOURCES += \
     dltmessageanalyzerplugin/src/common/Definitions.cpp \
     dltmessageanalyzerplugin/src/common/CBGColorAnimation.cpp \
     dltmessageanalyzerplugin/src/common/CRegexDirectoryMonitor.cpp \
+    dltmessageanalyzerplugin/src/common/OSHelper.cpp \
     \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTFileWrapper.cpp \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTMsgWrapper.cpp \

@@ -92,6 +92,9 @@ private slots:
     void on_createSequenceDiagram_clicked();
 
 private:
+    void getUserCacheSize();
+
+private:
     Ui::Form *mpUI;
     DLTMessageAnalyzerPlugin* mpDLTMessageAnalyzerPlugin;
 
