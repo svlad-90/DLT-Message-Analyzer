@@ -454,7 +454,7 @@ struct tParsingDataItem
     QString name;
     QString value;
     tColorWrapper colorWrapper;
-    tRange range;
+    tIntRange range;
     eRegexFiltersRowType rowType = eRegexFiltersRowType::Text;
     bool isFiltered = false;
     QString groupName;

@@ -152,7 +152,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                     tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
                     tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
 
-                    tRangeProperty prop;
+                    tIntRangeProperty prop;
                     prop.isSet = true;
                     prop.from = from;
                     prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
@@ -179,7 +179,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         QAction* pAction = new QAction(msg, this);
                         connect(pAction, &QAction::triggered, [this, targetMsgId]()
                         {
-                            tRangeProperty prop;
+                            tIntRangeProperty prop;
                             prop.isSet = true;
                             prop.from = targetMsgId;
 
@@ -213,7 +213,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         QAction* pAction = new QAction(msg, this);
                         connect(pAction, &QAction::triggered, [this, targetMsgId]()
                         {
-                            tRangeProperty prop;
+                            tIntRangeProperty prop;
                             prop.isSet = true;
                             prop.from = mSearchRange.from;
                             prop.to = ( targetMsgId >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : targetMsgId;
@@ -236,7 +236,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         QAction* pAction = new QAction(msg, this);
                         connect(pAction, &QAction::triggered, [this]()
                         {
-                            mSearchRange = tRangeProperty();
+                            mSearchRange = tIntRangeProperty();
                             searchRangeChanged( mSearchRange, true );
                         });
                         contextMenu.addAction(pAction);
@@ -719,7 +719,7 @@ void CSearchResultView::getUserSearchRange()
         int to = fields[1]->text().toInt( &isToADigit );
 
         // validation done in acceptHandler, so here no need to duplicate it
-        tRangeProperty prop;
+        tIntRangeProperty prop;
         prop.isSet = true;
         prop.from = from;
         prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
@@ -731,7 +731,7 @@ void CSearchResultView::getUserSearchRange()
 
 void CSearchResultView::setFile( const tDLTFileWrapperPtr& pFile )
 {
-    mSearchRange = tRangeProperty();
+    mSearchRange = tIntRangeProperty();
     searchRangeChanged( mSearchRange, true );
 
     mpFile = pFile;
@@ -983,7 +983,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [&clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [&clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field
@@ -1055,10 +1055,10 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                             {
                                 if(0 != range.from)
                                 {
-                                    attachText( tRange(0, range.from - 1 ), nonHighlightedColor, false );
+                                    attachText( tIntRange(0, range.from - 1 ), nonHighlightedColor, false );
                                 }
 
-                                attachText( tRange( range.from, range.to ), getHighlightedColor(*it), true );
+                                attachText( tIntRange( range.from, range.to ), getHighlightedColor(*it), true );
                             }
                             else if(0 < counter)
                             {
@@ -1068,17 +1068,17 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
                                 if(prevRange.to < range.from)
                                 {
-                                    attachText( tRange(prevRange.to + 1, range.from - 1), nonHighlightedColor, false );
+                                    attachText( tIntRange(prevRange.to + 1, range.from - 1), nonHighlightedColor, false );
                                 }
 
-                                attachText( tRange( range.from, range.to ), getHighlightedColor(*it), true );
+                                attachText( tIntRange( range.from, range.to ), getHighlightedColor(*it), true );
                             }
 
                             if(counter == static_cast<int>(foundHighlightingItem->size() - 1)) // last element
                             {
                                 if( range.to < columnStr.size() - 1 )
                                 {
-                                    attachText( tRange(range.to + 1, columnStr.size() - 1), nonHighlightedColor, false );
+                                    attachText( tIntRange(range.to + 1, columnStr.size() - 1), nonHighlightedColor, false );
                                 }
                             }
 
@@ -1087,17 +1087,17 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                     }
                     else
                     {
-                        attachText( tRange(0, columnStr.size() - 1), nonHighlightedColor, false );
+                        attachText( tIntRange(0, columnStr.size() - 1), nonHighlightedColor, false );
                     }
                 }
                 else
                 {
-                    attachText( tRange(0, columnStr.size() - 1), nonHighlightedColor, false );
+                    attachText( tIntRange(0, columnStr.size() - 1), nonHighlightedColor, false );
                 }
             }
             else
             {
-                attachText( tRange(0, columnStr.size() - 1), nonHighlightedColor, false );
+                attachText( tIntRange(0, columnStr.size() - 1), nonHighlightedColor, false );
             }
         }
 
@@ -1239,13 +1239,13 @@ void CSearchResultView::copyMessageFiles()
                 tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
                 tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
 
-                tRangeProperty prop;
+                tIntRangeProperty prop;
                 prop.isSet = true;
                 prop.from = from;
                 prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
                 prop = mpFile->normalizeSearchRange( prop );
 
-                mpFile->copyFileNamesToClipboard(tRange(prop.from, prop.to));
+                mpFile->copyFileNamesToClipboard(tIntRange(prop.from, prop.to));
             }
             else if(selectedRowsSize == 1)
             {

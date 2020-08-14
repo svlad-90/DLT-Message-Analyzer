@@ -20,18 +20,6 @@
 
 //#define DEBUG_BUILD
 
-namespace cpp_14
-{
-    template<bool C, class T = void>
-    using enable_if_t = typename std::enable_if<C, T>::type;
-
-    template<typename T, typename... Args>
-    std::unique_ptr<T> make_unique(Args&&... args)
-    {
-        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-    }
-}
-
 extern const std::map<QString, QColor> sColorsMap;
 
 extern const QString sVARPrefix;
@@ -111,31 +99,70 @@ struct tHighlightingRange
 typedef std::vector<tHighlightingRange> tHighlightingRangeList;
 typedef std::set<tHighlightingRange> tHighlightingRangeSet;
 
-typedef int tRangeItem;
-
+template <typename T>
 struct tRange
 {
-    tRange();
-    tRange( const tRangeItem& from_, const tRangeItem& to_ );
-    bool operator== ( const tRange& rVal ) const;
-    bool operator< ( const tRange& rVal ) const;
+    typedef T tRangeItem;
+
+    tRange( const tRangeItem& from_, const tRangeItem& to_ ):
+    from(from_), to(to_)
+    {}
+
+    tRange():
+    from(0), to(0)
+    {}
+
+    bool operator< ( const tRange& rVal ) const
+    {
+        bool bResult = false;
+
+        if( from < rVal.from )
+        {
+            bResult = true;
+        }
+        else if( from > rVal.from )
+        {
+            bResult = false;
+        }
+        else // if from == rVal.from
+        {
+            if( to < rVal.to )
+            {
+                bResult = true;
+            }
+            else
+            {
+                bResult = false;
+            }
+        }
+
+        return bResult;
+    }
+
+    bool operator== ( const tRange& rVal ) const
+    {
+        return ( from == rVal.from && to == rVal.to );
+    }
+
     tRangeItem from;
     tRangeItem to;
 };
 
-Q_DECLARE_METATYPE(tRange)
+typedef tRange<int> tIntRange;
 
-struct tRangePtrWrapper
+Q_DECLARE_METATYPE(tIntRange)
+
+struct tIntRangePtrWrapper
 {
-    bool operator== ( const tRangePtrWrapper& rVal ) const;
-    bool operator< ( const tRangePtrWrapper& rVal ) const;
-    const tRange* pRange = nullptr;
+    bool operator== ( const tIntRangePtrWrapper& rVal ) const;
+    bool operator< ( const tIntRangePtrWrapper& rVal ) const;
+    const tIntRange* pRange = nullptr;
 };
 
-Q_DECLARE_METATYPE(tRangePtrWrapper)
+Q_DECLARE_METATYPE(tIntRangePtrWrapper)
 
-typedef QVector<tRange> tRangeList;
-typedef std::set<tRange> tRangeSet;
+typedef QVector<tIntRange> tIntRangeList;
+typedef std::set<tIntRange> tIntRangeSet;
 
 /**
  * @brief The eSearchResultColumn enum
@@ -258,7 +285,7 @@ enum class eRegexFiltersColumn : int
     ItemType, /*QString*/
     AfterLastVisible, /*empty string*/
     Color, /*tColorWrapper*/
-    Range, /*tRange*/
+    Range, /*tIntRange*/
     RowType, /*eRegexFiltersRowType*/
     IsFiltered, /*bool*/
     GroupName, /*QString*/
@@ -301,13 +328,13 @@ struct tHighlightingGradient
 QVector<QColor> generateColors( const tHighlightingGradient& gradient );
 
 typedef QMap<eSearchResultColumn, tHighlightingRangeSet> tHighlightingInfoMulticolor;
-typedef QMap<eSearchResultColumn, tRange> tFieldRanges;
+typedef QMap<eSearchResultColumn, tIntRange> tFieldRanges;
 
 struct tFoundMatch
 {
     tFoundMatch();
     tFoundMatch( const tQStringPtr& pMatchStr_,
-                 const tRange& range_,
+                 const tIntRange& range_,
                  const int& idx_,
                  const unsigned int& msgSizeBytes_,
                  const unsigned int& timeStamp_,
@@ -322,7 +349,7 @@ struct tFoundMatch
     bool operator< (const tFoundMatch& rhs) const;
 
     tQStringPtr pMatchStr;
-    tRange range;
+    tIntRange range;
     int idx;
     unsigned int msgSizeBytes;
     unsigned int timeStamp;
@@ -356,10 +383,10 @@ typedef nonstd::variant<QString,
                         int,
                         double,
                         tGroupedViewMetadata,
-                        tRangePtrWrapper,
+                        tIntRangePtrWrapper,
                         const tFoundMatch*,
                         tColorWrapper,
-                        tRange,
+                        tIntRange,
                         eRegexFiltersRowType> tTreeDataItem;
 typedef tTreeDataItem tDataItem; // just to refactor less code
 QVariant toQVariant(const tDataItem& item);
@@ -459,7 +486,7 @@ typedef std::map<int /*group id*/, int /*gradient color id*/> tGroupIdToColorMap
  * Result of returned ranges will be sorted.
  */
 tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeItemSharedPtr& pMatchesTree,
-                                                    const tRange& inputRange,
+                                                    const tIntRange& inputRange,
                                                     const tRegexScriptingMetadata& regexScriptingMetadata,
                                                     const QVector<QColor>& gradientColors,
                                                     const tGroupIdToColorMap& groupIdToColorMap);
@@ -475,7 +502,7 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches );
 
 struct tStringCoverageItem
 {
-    tRange range;
+    tIntRange range;
     /*whether we should add separator after the string*/
     bool bAddSeparator = false;
 };
@@ -580,12 +607,10 @@ typedef uint64_t tCacheSizeB;
 tCacheSizeB MBToB( const tCacheSizeMB& mb );
 tCacheSizeMB BToMB( const tCacheSizeB& b );
 
-struct tRangeProperty
+struct tIntRangeProperty : public tIntRange
 {
     bool isSet = false;
     bool isFiltered = false;
-    int from = 0;
-    int to = 0;
     int fromFiltered = 0;
     int toFiltered = 0;
 };

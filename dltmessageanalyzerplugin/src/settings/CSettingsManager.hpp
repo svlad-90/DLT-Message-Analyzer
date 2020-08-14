@@ -14,9 +14,10 @@
 #include "QVector"
 #include "QPair"
 #include "QColor"
+#include "QVariant"
 
 #include "../common/Definitions.hpp"
-
+#include "../common/cpp_extensions.hpp"
 #include "TSettingItem.hpp"
 
 class CSettingsManager;
@@ -354,8 +355,8 @@ private: // methods
                                                  const TSettingItem<QString>::tUpdateSettingsFileFunc& updateFileFunc,
                                                  const QString& defaultValue) const;
 
-    template<typename T, typename = cpp_14::enable_if_t<std::is_integral<T>::value>>
-    TSettingItem<T> createIntegralSettingsItem(const QString& key,
+    template<typename T, typename = cpp_14::enable_if_t<std::is_arithmetic<T>::value>>
+    TSettingItem<T> createArithmeticSettingsItem(const QString& key,
                                                  const typename TSettingItem<T>::tUpdateDataFunc& updateDataFunc,
                                                  const typename TSettingItem<T>::tUpdateSettingsFileFunc& updateFileFunc,
                                                  const T& defaultValue) const
@@ -383,24 +384,62 @@ private: // methods
         };
 
         return TSettingItem<T>(key,
-                                 defaultValue,
-                                 writeFunc,
-                                 readFunc,
-                                 updateDataFunc,
-                                 updateFileFunc);
+                               defaultValue,
+                               writeFunc,
+                               readFunc,
+                               updateDataFunc,
+                               updateFileFunc);
+    }
+
+    template<typename T, typename = cpp_14::enable_if_t<std::is_arithmetic<T>::value>>
+    TRangedSettingItem<T> createRangedArithmeticSettingsItem(const QString& key,
+                                                 const typename TRangedSettingItem<T>::tUpdateDataFunc& updateDataFunc,
+                                                 const typename TRangedSettingItem<T>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const typename TRangedSettingItem<T>::tOptionalAllowedRange& allowedRange,
+                                                 const T& defaultValue) const
+    {
+        auto writeFunc = [&key](const T& value)->QJsonObject
+        {
+            QJsonObject result;
+            result.insert( key, QJsonValue( static_cast<double>(value) ) );
+            return result;
+        };
+
+        auto readFunc = [](const QJsonValueRef& JSONItem,
+                           T& data,
+                           const T&)->bool
+        {
+            bool bResult = false;
+
+            if(true == JSONItem.isDouble())
+            {
+                data = static_cast<T>(JSONItem.toDouble());
+                bResult = true;
+            }
+
+            return bResult;
+        };
+
+        return TRangedSettingItem<T>(key,
+                               defaultValue,
+                               allowedRange,
+                               writeFunc,
+                               readFunc,
+                               updateDataFunc,
+                               updateFileFunc);
     }
 
 private: // fields
 
     TSettingItem<tSettingsManagerVersion> mSetting_SettingsManagerVersion;
     TSettingItem<tAliasItemVec> mSetting_Aliases;
-    TSettingItem<int> mSetting_NumberOfThreads;
+    TRangedSettingItem<int> mSetting_NumberOfThreads;
     TSettingItem<bool> mSetting_ContinuousSearch;
     TSettingItem<bool> mSetting_CopySearchResultAsHTML;
     TSettingItem<bool> mSetting_MinimizePatternsViewOnSelection;
     TSettingItem<bool> mSetting_WriteSettingsOnEachUpdate;
     TSettingItem<bool> mSetting_CacheEnabled;
-    TSettingItem<tCacheSizeMB> mSetting_CacheMaxSizeMB;
+    TRangedSettingItem<tCacheSizeMB> mSetting_CacheMaxSizeMB;
     TSettingItem<bool> mSetting_RDPMode;
     TSettingItem<QColor> mSetting_RegexMonoHighlightingColor;
     TSettingItem<bool> mSetting_HighlightActivePatterns;

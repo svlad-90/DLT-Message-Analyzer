@@ -2,6 +2,10 @@
 #define TSETTINGITEM_HPP
 
 #include <QString>
+
+#include "../common/Definitions.hpp"
+#include "../common/cpp_extensions.hpp"
+#include "../common/TOptional.hpp"
 #include "CSettingItem.hpp"
 
 template<typename T>
@@ -16,16 +20,21 @@ class TSettingItem : public CSettingItem
     typedef std::function<bool(const QJsonValueRef&, tData&, const tData& /*def value*/)> tReadDataFunction;
 
     /**
-     * @brief TSettingItem - constructor of setting item
-     * @param key - key, which should be used to read and write the data
+     * @brief TSettingItem - constructor
+     * @param key - key of the setting
+     * @param defaultValue - default value of the setting
+     * @param writeDataFunc - function, which writes item to JSON
+     * @param readDataFunc - function, which reads data from JSON
+     * @param updateDataFunc - function which updates data to interested client's within the system
+     * @param updateFileFunc - function which triggers update of the corresponding file
      */
     TSettingItem ( const QString& key,
                    const tData& defaultValue,
                    const tWriteDataFunction& writeDataFunc,
                    const tReadDataFunction& readDataFunc,
                    const tUpdateDataFunc& updateDataFunc,
-                   const tUpdateSettingsFileFunc& updateFieFunc ):
-        CSettingItem(key, updateFieFunc),
+                   const tUpdateSettingsFileFunc& updateFileFunc ):
+        CSettingItem(key, updateFileFunc),
         mDefaultValue(defaultValue),
         mData(defaultValue),
         mUpdateDataFunc(updateDataFunc),
@@ -86,7 +95,7 @@ class TSettingItem : public CSettingItem
      * Calls the update data func & update file func.
      * @param data - data to be remembered.
      */
-    void setData( const tData& data )
+    virtual void setData( const tData& data )
     {
         bool bUpdate = mData != data;
 
@@ -113,7 +122,7 @@ class TSettingItem : public CSettingItem
      * Does not neither the update data func nor the update file func.
      * @param data - data to be remembered.
      */
-    void setDataSilent( const tData& data )
+    virtual void setDataSilent( const tData& data )
     {
         bool bUpdate = mData != data;
 
@@ -132,13 +141,143 @@ class TSettingItem : public CSettingItem
         return mData;
     }
 
-    private:
+    protected:
 
     tData mDefaultValue;
     tData mData;
     tUpdateDataFunc mUpdateDataFunc;
     tWriteDataFunction mWriteDataFunc;
     tReadDataFunction mReadDataFunc;
+};
+
+template<typename T>
+class TRangedSettingItem: public TSettingItem<T>
+{
+public:
+
+    typedef TSettingItem<T> tParent;
+
+    typedef T tData;
+    typedef typename tParent::tUpdateDataFunc tUpdateDataFunc;
+    typedef typename tParent::tWriteDataFunction tWriteDataFunction;
+    typedef typename tParent::tReadDataFunction tReadDataFunction;
+    typedef CSettingItem::tUpdateSettingsFileFunc tUpdateSettingsFileFunc;
+
+    typedef tRange<T> tAllowedRange;
+    typedef TOptional<tAllowedRange> tOptionalAllowedRange;
+
+    /**
+     * @brief TSettingItem - constructor
+     * @param key - key of the setting
+     * @param defaultValue - default value of the setting
+     * @param allowedRange - allowed range of the setting
+     * @param writeDataFunc - function, which writes item to JSON
+     * @param readDataFunc - function, which reads data from JSON
+     * @param updateDataFunc - function which updates data to interested client's within the system
+     * @param updateFileFunc - function which triggers update of the corresponding file
+     */
+
+    TRangedSettingItem ( const QString& key,
+                   const tData& defaultValue,
+                   const tOptionalAllowedRange& allowedRange,
+                   const tWriteDataFunction& writeDataFunc,
+                   const tReadDataFunction& readDataFunc,
+                   const tUpdateDataFunc& updateDataFunc,
+                   const tUpdateSettingsFileFunc& updateFileFunc ):
+        tParent(key, defaultValue, writeDataFunc, readDataFunc, updateDataFunc, updateFileFunc),
+        mAllowedRange(allowedRange)
+    {}
+
+    /**
+     * @brief readData - ( implementation of ISettingItem ) - reads data from QJsonObject instance
+     * @param setting - JSON setting, from which we should read the data.
+     */
+    bool readData( const QJsonValueRef& setting ) override
+    {
+        bool bResult = false;
+
+        if(tParent::mReadDataFunc)
+        {
+            bResult = tParent::mReadDataFunc(setting, tParent::mData, tParent::mDefaultValue);
+
+            if(true == bResult)
+            {
+                tParent::mData = normalizeData(tParent::mData);
+            }
+        }
+
+        return bResult;
+    }
+
+    /**
+     * @brief setData - sets the data to memory.
+     * Calls the update data func & update file func.
+     * @param data - data to be remembered.
+     */
+    void setData( const typename tParent::tData& data ) override
+    {
+        bool bUpdate = tParent::mData != data;
+
+        if(true == bUpdate)
+        {
+            const auto& normalizedValue = normalizeData(data);
+
+            tParent::mData = normalizedValue;
+
+            if(tParent::mUpdateDataFunc)
+            {
+                tParent::mUpdateDataFunc(tParent::mData);
+            }
+        }
+
+        const auto updateFileFunc = tParent::getUpdateFileFunc();
+
+        if(updateFileFunc)
+        {
+            updateFileFunc();
+        }
+    }
+
+    /**
+     * @brief setDataSilent - sets the data to memory without emitting any signals.
+     * Does not neither the update data func nor the update file func.
+     * @param data - data to be remembered.
+     */
+    void setDataSilent( const typename tParent::tData& data ) override
+    {
+        bool bUpdate = tParent::mData != data;
+
+        if(true == bUpdate)
+        {
+            const auto& normalizedValue = normalizeData(data);
+            tParent::mData = normalizedValue;
+        }
+    }
+
+private:
+
+    const T& normalizeData(const T& val)
+    {
+        if(true == mAllowedRange.isSet())
+        {
+            const auto& value = mAllowedRange.getValue();
+
+            if(val < value.from)
+            {
+                return value.from;
+            }
+            else if(val > value.to)
+            {
+                return value.to;
+            }
+        }
+
+        return val;
+    }
+
+private:
+
+    tOptionalAllowedRange mAllowedRange;
 };
 
 #endif // TSETTINGITEM_HPP

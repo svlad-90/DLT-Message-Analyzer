@@ -155,7 +155,7 @@ public:
      * @return - true, if caching was successfully done.
      * False otherwise - if cache is disables or overflowed.
      */
-    bool cacheMsgByRange( const tRange& msgRange );
+    bool cacheMsgByRange( const tIntRange& msgRange );
 
     /**
      * @brief resetCache - resets the cache
@@ -170,7 +170,7 @@ public:
      * @param inputRange - range in absolute indexes
      * @return - range in relative indexes
      */
-    tRangeProperty normalizeSearchRange( const tRangeProperty& inputRange);
+    tIntRangeProperty normalizeSearchRange( const tIntRangeProperty& inputRange);
 
     /**
      * @brief formCacheStatusString - forms cache status string to be shown in UI
@@ -208,7 +208,7 @@ public:
      * @return  - instance of the vector, which lists ranges of messages in each physical file
      * Note! This functionality works ONLY if subFilesHandlingStatus was switched to "ON".
      */
-    tRangeList getSubFilesSizeRanges() const;
+    tIntRangeList getSubFilesSizeRanges() const;
 
     /**
      * @brief copyFileNameToClipboard - copies file name associated with provided msgId to clipboard
@@ -222,7 +222,7 @@ public:
      * @param msgsRange - range of messages to be checked
      * Note! This functionality works ONLY if subFilesHandlingStatus was switched to "ON".
      */
-    void copyFileNamesToClipboard( const tRange& msgsRange ) const;
+    void copyFileNamesToClipboard( const tIntRange& msgsRange ) const;
 
 signals:
     /**
@@ -293,9 +293,9 @@ private:
             void setFile( QDltFile* pFile );
             void setSubFilesHandlingStatus(const bool& value);
             bool getSubFilesHandlingStatus() const;
-            tRangeList getSubFilesSizeRanges() const;
+            tIntRangeList getSubFilesSizeRanges() const;
             void copyFileNameToClipboard( const int& msgId ) const;
-            void copyFileNamesToClipboard( const tRange& msgsRange ) const;
+            void copyFileNamesToClipboard( const tIntRange& msgsRange ) const;
 
         private:
             void updateSubFiles();

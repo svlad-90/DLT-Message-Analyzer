@@ -11,7 +11,7 @@ UI_DIR      = build/ui
 # DEFINES += PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 
 # target name
-TARGET = $$qtLibraryTarget(dltmessageanalyzerplugin)
+# TARGET = $$qtLibraryTarget(dltmessageanalyzerplugin)
 
 INCLUDEPATH+=dltmessageanalyzerplugin/src
 
@@ -45,6 +45,8 @@ HEADERS += \
     dltmessageanalyzerplugin/src/common/CBGColorAnimation.hpp \
     dltmessageanalyzerplugin/src/common/CRegexDirectoryMonitor.hpp \
     dltmessageanalyzerplugin/src/common/OSHelper.hpp \
+    dltmessageanalyzerplugin/src/common/TOptional.hpp \
+    dltmessageanalyzerplugin/src/common/cpp_extensions.hpp \
     \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTFileWrapper.hpp \
     dltmessageanalyzerplugin/src/dltWrappers/CDLTMsgWrapper.hpp \

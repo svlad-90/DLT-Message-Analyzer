@@ -17,6 +17,7 @@
 #include "IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "../dltWrappers/CDLTMsgWrapper.hpp"
 #include "../log/CConsoleCtrl.hpp"
+#include "../common/cpp_extensions.hpp"
 
 //#define DEBUG_MESSAGES
 
@@ -180,9 +181,9 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
                     QString ctId = pMsg->getCtid();
 
                     auto appIdSize = appId.size();
-                    tRange appRange( 0, appIdSize - 1 );
+                    tIntRange appRange( 0, appIdSize - 1 );
                     auto ctIdSize = ctId.size();
-                    tRange ctRange( appRange.to + 2, appRange.to + 2 + ctIdSize - 1 );
+                    tIntRange ctRange( appRange.to + 2, appRange.to + 2 + ctIdSize - 1 );
 
                     QString payloadStr = pMsg->getPayload();
                     auto payloadSize = payloadStr.size();
@@ -191,7 +192,7 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
                     pStr->reserve(appId.size() + ctId.size() + payloadStr.size() + 2);
                     pStr->append( appId ).append(" ").append( ctId ).append(" ").append(payloadStr);
 
-                    tRange payloadRange( ctRange.to + 2, ctRange.to + 2 + payloadSize - 1 );
+                    tIntRange payloadRange( ctRange.to + 2, ctRange.to + 2 + payloadSize - 1 );
 
                     tFieldRanges fieldRanges;
 

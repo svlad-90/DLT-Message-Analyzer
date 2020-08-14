@@ -45,9 +45,8 @@ It allows you to:
 > **Note!**
 >
 > Be aware, that the actual RAM consumption of the cache is ~X*2.5 from what the status is showing.
-> The thing is that the cache size in the status message is measured as the sum of payloads and headers of all the messages. While the cache is stored in a slightly different data-structure.
->
-> It is one of the TODO-s to minimize this difference, but for sure it will never become 0.
+> The thing is that the cache size in the status message is measured as the sum of the sizes of the all fetched payloads and headers, which are stored as blobs. 
+> But the cache itself is stored in a slightly different, non-blob data-structure, which cause additional RAM consumption.
 
 ----
 
@@ -65,10 +64,10 @@ It allows you to:
 
 > **Note!**
 >
-> Currently plugin does not check the provided cache limit against the actual amount of RAM on the client's machine.
-> Thus, make sure that you've provide the valid input data! 
->
->Otherwise, you will reach "out of RAM" and dlt-viewer will crash ☺
+> Plugin checks the provided cache limit against the actual amount of RAM on the client's machine.
+> Still cache does not monitor the currently available amount of RAM.
+> Thus, if you will specify e.g. 32Gb as cache size having 32Gb on your machine, it might happen that you will face lack of RAM use-case and dlt-viewer will crash.
+> Be aware of that.
 
 ----
 

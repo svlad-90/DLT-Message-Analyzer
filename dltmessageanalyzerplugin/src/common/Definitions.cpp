@@ -419,50 +419,8 @@ bool tHighlightingRange::operator< ( const tHighlightingRange& rVal ) const
    return bResult;
 }
 
-/// tRange
-tRange::tRange( const tRangeItem& from_, const tRangeItem& to_ ):
-from(from_), to(to_)
-{}
-
-tRange::tRange():
-from(0), to(0)
-{}
-
-bool tRange::operator< ( const tRange& rVal ) const
-{
-    bool bResult = false;
-
-    if( from < rVal.from )
-    {
-        bResult = true;
-    }
-    else if( from > rVal.from )
-    {
-        bResult = false;
-    }
-    else // if from == rVal.from
-    {
-        if( to < rVal.to )
-        {
-            bResult = true;
-        }
-        else
-        {
-            bResult = false;
-        }
-    }
-
-    return bResult;
-}
-
-bool tRange::operator== ( const tRange& rVal ) const
-{
-    return ( from == rVal.from && to == rVal.to );
-}
-
-
-/////////////////////////////tRangePtrWrapper/////////////////////////////
-bool tRangePtrWrapper::operator< ( const tRangePtrWrapper& rVal ) const
+/////////////////////////////tIntRangePtrWrapper/////////////////////////////
+bool tIntRangePtrWrapper::operator< ( const tIntRangePtrWrapper& rVal ) const
 {
     bool bResult = false;
 
@@ -498,7 +456,7 @@ bool tRangePtrWrapper::operator< ( const tRangePtrWrapper& rVal ) const
     return bResult;
 }
 
-bool tRangePtrWrapper::operator== ( const tRangePtrWrapper& rVal ) const
+bool tIntRangePtrWrapper::operator== ( const tIntRangePtrWrapper& rVal ) const
 {
     if(pRange == nullptr && rVal.pRange != nullptr)
         return false;
@@ -513,8 +471,8 @@ bool tRangePtrWrapper::operator== ( const tRangePtrWrapper& rVal ) const
 
 struct tAnalysisRange
 {
-    tAnalysisRange(const tRange& inputRange,
-                   const tRange& shrinkToRange):
+    tAnalysisRange(const tIntRange& inputRange,
+                   const tIntRange& shrinkToRange):
         bFromShrinked(false),
         bToShrinked(false)
     {
@@ -539,9 +497,9 @@ struct tAnalysisRange
         }
     }
 
-    tRangeItem from;
+    tIntRange::tRangeItem from;
     bool bFromShrinked;
-    tRangeItem to;
+    tIntRange::tRangeItem to;
     bool bToShrinked;
 };
 
@@ -609,7 +567,7 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches )
 
             assert(false == data.empty());
 
-            tRangePtrWrapper rangePtrWrapper;
+            tIntRangePtrWrapper rangePtrWrapper;
             rangePtrWrapper.pRange = &match.range;
             tDataItem rangeVariant( rangePtrWrapper );
             auto* pAddedChild = pCurrentItem->appendChild(rangeVariant, data);
@@ -671,7 +629,7 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches )
 }
 
 tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeItemSharedPtr& pMatchesTree,
-                               const tRange& inputRange,
+                               const tIntRange& inputRange,
                                const tRegexScriptingMetadata& regexScriptingMetadata,
                                const QVector<QColor>& gradientColors,
                                const tGroupIdToColorMap& groupIdToColorMap )
@@ -763,7 +721,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 if( firstChildAnalysisRange.from > analysisRange.from ) // if there is room for additional range
                 {
                     // let's add it
-                    tAnalysisRange rangeToBeAdded( tRange( analysisRange.from, firstChildAnalysisRange.from - 1 ), inputRange);
+                    tAnalysisRange rangeToBeAdded( tIntRange( analysisRange.from, firstChildAnalysisRange.from - 1 ), inputRange);
                     resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
@@ -784,7 +742,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
                     if((secondChildAnalysisRange.from - firstChildAnalysisRange.to) > 1)
                     {
-                        tAnalysisRange rangeToBeAdded( tRange( firstChildAnalysisRange.to+1, secondChildAnalysisRange.from-1 ), inputRange);
+                        tAnalysisRange rangeToBeAdded( tIntRange( firstChildAnalysisRange.to+1, secondChildAnalysisRange.from-1 ), inputRange);
                         resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                                   rangeToBeAdded.to,
                                                                   selectedColor.second,
@@ -802,7 +760,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 if( analysisRange.to > lastChildAnalysisRange.to ) // if there is room for additional range
                 {
                     // let's add it
-                    tAnalysisRange rangeToBeAdded( tRange( lastChildAnalysisRange.to + 1, analysisRange.to ), inputRange);
+                    tAnalysisRange rangeToBeAdded( tIntRange( lastChildAnalysisRange.to + 1, analysisRange.to ), inputRange);
                     resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
@@ -1069,7 +1027,7 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                                 if(true == insideRange) // if group is even partially inside the range
                                 {
                                     tStringCoverageItem stringCoverageItem;
-                                    stringCoverageItem.range = tRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
+                                    stringCoverageItem.range = tIntRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
                                                                        std::min( fieldRange.to, match.range.to ) - fieldRange.from );
                                     stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
                                     UMLDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
@@ -1109,7 +1067,7 @@ msgId(0)
 {}
 
 tFoundMatch::tFoundMatch( const tQStringPtr& pMatchStr_,
-                          const tRange& range_,
+                          const tIntRange& range_,
                           const int& idx_,
                           const unsigned int& msgSizeBytes_,
                           const unsigned int& timeStamp_,
@@ -2073,9 +2031,9 @@ QVariant toQVariant(const tDataItem& item)
     {
         result.setValue(item.get<tGroupedViewMetadata>());
     }
-    else if(item.index() == tDataItem::index_of<tRangePtrWrapper>())
+    else if(item.index() == tDataItem::index_of<tIntRangePtrWrapper>())
     {
-        result.setValue(item.get<tRangePtrWrapper>());
+        result.setValue(item.get<tIntRangePtrWrapper>());
     }
     else if(item.index() == tDataItem::index_of<tFoundMatch*>())
     {
@@ -2085,9 +2043,9 @@ QVariant toQVariant(const tDataItem& item)
     {
         result.setValue(item.get<tColorWrapper>());
     }
-    else if(item.index() == tDataItem::index_of<tRange>())
+    else if(item.index() == tDataItem::index_of<tIntRange>())
     {
-        result.setValue(item.get<tRange>());
+        result.setValue(item.get<tIntRange>());
     }
     else if(item.index() == tDataItem::index_of<eRegexFiltersRowType>())
     {
@@ -2126,7 +2084,7 @@ tDataItem toRegexDataItem(const QVariant& variant, const eRegexFiltersColumn& co
             break;
         case eRegexFiltersColumn::Range:
         {
-            result = variant.value<tRange>();
+            result = variant.value<tIntRange>();
         }
             break;
         case eRegexFiltersColumn::RowType:

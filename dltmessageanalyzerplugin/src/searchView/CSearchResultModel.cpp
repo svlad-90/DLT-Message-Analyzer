@@ -266,9 +266,9 @@ Qt::ItemFlags CSearchResultModel::flags(const QModelIndex &index) const
     return result;
 }
 
-std::pair<bool, tRange> CSearchResultModel::addNextMessageIdxVec(const tFoundMatchesPack &foundMatchesPack)
+std::pair<bool, tIntRange> CSearchResultModel::addNextMessageIdxVec(const tFoundMatchesPack &foundMatchesPack)
 {
-    std::pair<bool, tRange> result;
+    std::pair<bool, tIntRange> result;
 
     if(false == foundMatchesPack.matchedItemVec.empty())
     {
@@ -340,8 +340,8 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
             // Result string - <UCL> <URT|URS|UE> <US> : [timestamp] <USID><UM>(<UA>)
 
-            tRange insertMethodFormattingRange;
-            tRange insertMethodFormattingOffset;
+            tIntRange insertMethodFormattingRange;
+            tIntRange insertMethodFormattingOffset;
 
             auto getUMLItemRepresentation = [this, &itemMetadata, &pMsg](const eUML_ID& UML_ID)->std::pair<bool, QString>
             {

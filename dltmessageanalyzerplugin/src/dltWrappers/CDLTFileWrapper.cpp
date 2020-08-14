@@ -379,7 +379,7 @@ bool CDLTFileWrapper::cacheMsgByIndexes( const QSet<tMsgId> msgIdSet )
     return bResult;
 }
 
-bool CDLTFileWrapper::cacheMsgByRange( const tRange& msgRange )
+bool CDLTFileWrapper::cacheMsgByRange( const tIntRange& msgRange )
 {
     bool bResult = true;
 
@@ -484,9 +484,9 @@ int CDLTFileWrapper::binarySearch(bool isFrom, const int& fromIdx, const int& to
     return (true == isFrom) ? std::min(fromIdx, toIdx) : std::max(fromIdx, toIdx);
 }
 
-tRangeProperty CDLTFileWrapper::normalizeSearchRange( const tRangeProperty& inputRange)
+tIntRangeProperty CDLTFileWrapper::normalizeSearchRange( const tIntRangeProperty& inputRange)
 {
-    tRangeProperty result;
+    tIntRangeProperty result;
 
     if(false == inputRange.isSet)
     {
@@ -532,9 +532,9 @@ QString CDLTFileWrapper::getCacheStatusAsString() const
 }
 
 
-tRangeList CDLTFileWrapper::getSubFilesSizeRanges() const
+tIntRangeList CDLTFileWrapper::getSubFilesSizeRanges() const
 {
-    tRangeList result;
+    tIntRangeList result;
 
     if(nullptr != mpSubFilesHandler && true == mpSubFilesHandler->getSubFilesHandlingStatus())
     {
@@ -572,7 +572,7 @@ void CDLTFileWrapper::copyFileNameToClipboard( const int& msgId ) const
     }
 }
 
-void CDLTFileWrapper::copyFileNamesToClipboard( const tRange& msgsRange ) const
+void CDLTFileWrapper::copyFileNamesToClipboard( const tIntRange& msgsRange ) const
 {
     if(nullptr != mpSubFilesHandler)
     {
@@ -655,9 +655,9 @@ void CDLTFileWrapper::CSubFilesHandler::setSubFilesHandlingStatus(const bool& va
     }
 }
 
-tRangeList CDLTFileWrapper::CSubFilesHandler::getSubFilesSizeRanges() const
+tIntRangeList CDLTFileWrapper::CSubFilesHandler::getSubFilesSizeRanges() const
 {
-    tRangeList result;
+    tIntRangeList result;
 
     if(true == mbSubFilesInitialized)
     {
@@ -667,7 +667,7 @@ tRangeList CDLTFileWrapper::CSubFilesHandler::getSubFilesSizeRanges() const
 
         for(const auto& item : mSubFilesMap)
         {
-            tRange analyzedRange;
+            tIntRange analyzedRange;
             analyzedRange.from = processedIndexes + 1;
             analyzedRange.to += processedIndexes + 1 + item.second->size() - 1;
             result.push_back(analyzedRange);
@@ -708,7 +708,7 @@ void CDLTFileWrapper::CSubFilesHandler::copyFileNameToClipboard( const int& msgI
     }
 }
 
-void CDLTFileWrapper::CSubFilesHandler::copyFileNamesToClipboard( const tRange& msgsRange ) const
+void CDLTFileWrapper::CSubFilesHandler::copyFileNamesToClipboard( const tIntRange& msgsRange ) const
 {
     if( nullptr != mpFile && true == mbSubFilesInitialized )
     {
