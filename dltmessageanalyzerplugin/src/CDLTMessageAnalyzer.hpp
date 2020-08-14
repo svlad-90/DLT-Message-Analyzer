@@ -299,7 +299,7 @@ signals:
         CUMLView* mpUMLView;
 
         // internal states
-        tRangeProperty mSearchRange;
+        tIntRangeProperty mSearchRange;
         tRequestId mRequestId;
         int mNumberOfDots;
         bool mbIsConnected;

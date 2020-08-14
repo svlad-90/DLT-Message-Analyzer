@@ -104,8 +104,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpConsoleInputProcessor(std::make_shared<CConsoleInputProcessor>(pConsoleViewInput))
 {
     //////////////METATYPES_REGISTRATION/////////////////////
-    qRegisterMetaType<tRangePtrWrapper>("tRangePtrWrapper");
-    qRegisterMetaType<tRange>("tRange");
+    qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
+    qRegisterMetaType<tIntRange>("tIntRange");
     qRegisterMetaType<const tFoundMatch*>("const tFoundMatch*");
 
     qRegisterMetaType<eRegexFiltersRowType>("eRegexFiltersRowType");
@@ -375,7 +375,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             static_cast<void>(analyze());
         });
 
-        connect( mpSearchResultTableView, &CSearchResultView::searchRangeChanged, [this](const tRangeProperty& searchRange, bool bReset)
+        connect( mpSearchResultTableView, &CSearchResultView::searchRangeChanged, [this](const tIntRangeProperty& searchRange, bool bReset)
         {
             if(false == bReset)
             {
@@ -683,7 +683,7 @@ void CDLTMessageAnalyzer::resetSearchRange()
         }
     }
 
-    mSearchRange = tRangeProperty();
+    mSearchRange = tIntRangeProperty();
 }
 
 void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
@@ -850,7 +850,7 @@ bool CDLTMessageAnalyzer::analyze()
             return false;
         }
 
-        tRange requestedMessages;
+        tIntRange requestedMessages;
 
         if(true == mSearchRange.isSet)
         {

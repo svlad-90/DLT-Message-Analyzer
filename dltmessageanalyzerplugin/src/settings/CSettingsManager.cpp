@@ -10,11 +10,11 @@
 #include <QJsonObject>
 #include <QDir>
 #include "QCoreApplication"
-
+#include <QThread>
 #include "QDebug"
 
 #include "../log/CConsoleCtrl.hpp"
-
+#include "../common/OSHelper.hpp"
 #include "CSettingsManager.hpp"
 
 static const QString sSettingsManager_Directory = QString("plugins") + QDir::separator() + "DLTMessageAnalyzerConfig";
@@ -194,7 +194,7 @@ static const tGroupedViewColumnsVisibilityMap sDefaultGroupedViewColumnsVisibili
 = fillInDefaultGroupedViewColumnsVisibilityMap();
 
 CSettingsManager::CSettingsManager():
-    mSetting_SettingsManagerVersion(createIntegralSettingsItem<tSettingsManagerVersion>(sSettingsManagerVersionKey,
+    mSetting_SettingsManagerVersion(createArithmeticSettingsItem<tSettingsManagerVersion>(sSettingsManagerVersionKey,
         [this](const tSettingsManagerVersion& data){settingsManagerVersionChanged(data);},
         [this](){tryStoreRootConfig();},
         sDefaultSettingsManagerVersion)),
@@ -206,10 +206,11 @@ CSettingsManager::CSettingsManager():
             storeRegexConfigCustomPath(regexSettingsFilePath);
         },
                                                    tAliasItemVec())),
-    mSetting_NumberOfThreads(createIntegralSettingsItem<int>(sNumberOfThreadsKey,
+    mSetting_NumberOfThreads(createRangedArithmeticSettingsItem<int>(sNumberOfThreadsKey,
         [this](const int& data){numberOfThreadsChanged(data);},
         [this](){tryStoreSettingsConfig();},
-        true)),
+        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(1, QThread::idealThreadCount())),
+        1)),
     mSetting_ContinuousSearch(createBooleanSettingsItem(sIsContinuousSearchKey,
         [this](const bool& data){continuousSearchChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -230,10 +231,11 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){cacheEnabledChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
-    mSetting_CacheMaxSizeMB(createIntegralSettingsItem<tCacheSizeMB>(sCacheMaxSizeMBKey,
+    mSetting_CacheMaxSizeMB(createRangedArithmeticSettingsItem<tCacheSizeMB>(sCacheMaxSizeMBKey,
         [this](const tCacheSizeMB& data){cacheMaxSizeMBChanged(data);},
         [this](){tryStoreSettingsConfig();},
-        500)),
+        TRangedSettingItem<tCacheSizeMB>::tOptionalAllowedRange(TRangedSettingItem<tCacheSizeMB>::tAllowedRange(0, getRAMSizeUnchecked())),
+        512)),
     mSetting_RDPMode(createBooleanSettingsItem(sRDPModeKey,
         [this](const bool& data){RDPModeChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -320,7 +322,7 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){UML_FeatureActiveChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
-    mSetting_UML_MaxNumberOfRowsInDiagram(createIntegralSettingsItem<int>(sUML_MaxNumberOfRowsInDiagramKey,
+    mSetting_UML_MaxNumberOfRowsInDiagram(createArithmeticSettingsItem<int>(sUML_MaxNumberOfRowsInDiagramKey,
         [this](const int& data){UML_MaxNumberOfRowsInDiagramChanged(data);},
         [this](){tryStoreRootConfig();},
         1000)),

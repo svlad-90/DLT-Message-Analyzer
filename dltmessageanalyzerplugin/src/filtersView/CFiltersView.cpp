@@ -476,7 +476,7 @@ void CFiltersView::currentChanged(const QModelIndex &current, const QModelIndex 
         if(nullptr != pTreeItem &&
            nullptr != mpRegexInputField)
         {
-            auto range = pTreeItem->data(static_cast<int>(eRegexFiltersColumn::Range)).get<tRange>();
+            auto range = pTreeItem->data(static_cast<int>(eRegexFiltersColumn::Range)).get<tIntRange>();
             mpRegexInputField->setSelection(range.from, range.to - range.from);
         }
     }

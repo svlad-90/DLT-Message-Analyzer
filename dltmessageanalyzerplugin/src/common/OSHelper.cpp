@@ -44,3 +44,17 @@ bool getRAMSize(uint32_t& val)
 
     return bResult;
 }
+
+uint32_t getRAMSizeUnchecked()
+{
+    uint32_t result = 0;
+
+    bool bOperationResult = getRAMSize(result);
+
+    if(false == bOperationResult)
+    {
+        result = 0;
+    }
+
+    return result;
+}

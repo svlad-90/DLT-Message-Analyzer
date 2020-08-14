@@ -31,7 +31,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
-    std::pair<bool, tRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack);
+    std::pair<bool, tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack);
     std::pair<int /*rowNumber*/, QString /*diagramContent*/> getUMLDiagramContent() const;
 
     const tFoundMatchesPackItem& getFoundMatchesItemPack( const QModelIndex& modelIndex ) const;

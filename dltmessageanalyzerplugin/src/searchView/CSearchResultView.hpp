@@ -26,7 +26,7 @@ public:
     void copySelectionToClipboard( bool copyAsHTML, bool copyOnlyPayload ) const;
 
 signals:
-    void searchRangeChanged( const tRangeProperty& searchRange, bool bReset );
+    void searchRangeChanged( const tIntRangeProperty& searchRange, bool bReset );
     void clearSearchResultsRequested();
     void restartSearch();
 
@@ -53,7 +53,7 @@ private:
     eUpdateRequired mWidthUpdateRequired;
     bool mbIsVerticalScrollBarVisible;
     tDLTFileWrapperPtr mpFile;
-    tRangeProperty mSearchRange;
+    tIntRangeProperty mSearchRange;
     CSearchResultModel* mpSpecificModel;
 };
 

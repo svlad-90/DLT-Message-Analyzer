@@ -99,7 +99,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
                         if(0 != matchItem.size())
                         {
                             foundMatches.push_back( tFoundMatch( std::make_shared<QString>(matchItem),
-                                                                 tRange( match.capturedStart(i), match.capturedEnd(i) - 1 ),
+                                                                 tIntRange( match.capturedStart(i), match.capturedEnd(i) - 1 ),
                                                                  i,
                                                                  processingString.first.msgSize,
                                                                  processingString.first.timeStamp,
