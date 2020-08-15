@@ -146,7 +146,7 @@ win32 {
 RESOURCES += \
     dltmessageanalyzerplugin/src/resources/dltmessageanalyzer.qrc
 
-copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\thirdparty\plantuml\plantuml.jar)\" \"$$shell_path($$OUT_PWD\..\..\release\plugins)\"
+copydata.commands = $(COPY_FILE) \"$$shell_path($$PWD\thirdparty\plantuml\plantuml.jar)\" \"$$shell_path($$OUT_PWD/$(DESTDIR))\"
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)

@@ -58,6 +58,7 @@ private:
     tProcessPtr mpSaveSVGSubProcess;
     QString mDiagramContent;
     bool mbDiagramGenerationInProgress;
+    QString mLastSelectedFolder;
 };
 
 #endif // CUMLVIEW_H
