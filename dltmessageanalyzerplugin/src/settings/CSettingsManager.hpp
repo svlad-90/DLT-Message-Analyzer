@@ -69,6 +69,7 @@ public:
     void resetGroupedViewColumnsCopyPasteMap();
     QString getRegexDirectory() const;
     QString getRegexDirectoryFull() const;
+    QString getSettingsFilepath() const;
     QString getUserSettingsFilepath() const;
     QString getRootSettingsFilepath() const;
 

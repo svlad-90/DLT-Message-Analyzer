@@ -12,12 +12,13 @@
 #include "QCoreApplication"
 #include <QThread>
 #include "QDebug"
+#include <QStandardPaths>
 
 #include "../log/CConsoleCtrl.hpp"
 #include "../common/OSHelper.hpp"
 #include "CSettingsManager.hpp"
 
-static const QString sSettingsManager_Directory = QString("plugins") + QDir::separator() + "DLTMessageAnalyzerConfig";
+static const QString sSettingsManager_Directory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QDir::separator() + ".DLT-Message-Analyzer";
 static const QString sSettingsManager_Regex_SubDirectory = "regexes";
 static const QString sSettingsManager_User_SettingsFile = "user_settings.json";
 static const QString sSettingsManager_Root_SettingsFile = "root_settings.json";
@@ -1172,7 +1173,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
         SEND_MSG(QString("[CSettingsManager] Performing backward compatibility iteration from V0 to V1"));
 
         QDir dir;
-        QString configDirPath = QCoreApplication::applicationDirPath() + QDir::separator() + sSettingsManager_Directory;
+        QString configDirPath = sSettingsManager_Directory;
 
         // let's create config dir
         if(true == dir.mkpath(configDirPath))
@@ -1606,29 +1607,30 @@ const bool& CSettingsManager::getUML_Autonumber() const
 
 QString CSettingsManager::getRegexDirectory() const
 {
-    return QCoreApplication::applicationDirPath() + QDir::separator() +
-           sSettingsManager_Directory + QDir::separator() +
+    return sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Regex_SubDirectory;
 }
 
 QString CSettingsManager::getRegexDirectoryFull() const
 {
-    return QDir::toNativeSeparators( QCoreApplication::applicationDirPath() ) + QDir::separator() +
-           sSettingsManager_Directory + QDir::separator() +
+    return sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Regex_SubDirectory;
+}
+
+QString CSettingsManager::getSettingsFilepath() const
+{
+    return sSettingsManager_Directory;
 }
 
 QString CSettingsManager::getUserSettingsFilepath() const
 {
-    return QCoreApplication::applicationDirPath() + QDir::separator() +
-           sSettingsManager_Directory + QDir::separator() +
+    return sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_User_SettingsFile;
 }
 
 QString CSettingsManager::getRootSettingsFilepath() const
 {
-    return QCoreApplication::applicationDirPath() + QDir::separator() +
-           sSettingsManager_Directory + QDir::separator() +
+    return sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Root_SettingsFile;
 }
 

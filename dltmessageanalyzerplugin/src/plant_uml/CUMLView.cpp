@@ -118,7 +118,8 @@ mpImageViewer(nullptr),
 mpDiagramCreationSubProcess(nullptr),
 mpSaveSVGSubProcess(nullptr),
 mDiagramContent(),
-mbDiagramGenerationInProgress(false)
+mbDiagramGenerationInProgress(false),
+mLastSelectedFolder(QString(".") + QDir::separator())
 {
     mpImageViewer = new CImageViewer(this);
     setWidget(mpImageViewer);
@@ -132,7 +133,7 @@ mbDiagramGenerationInProgress(false)
             connect(pAction, &QAction::triggered, [this]()
             {
                 QString targetFilePath = QFileDialog::getSaveFileName(this, tr("Save as"),
-                                                                get_UML_File_Name(),
+                                                                mLastSelectedFolder + get_UML_File_Name(),
                                                                 tr("Portable network graphics (*.png);;"
                                                                    "Plantuml (*.puml);;"
                                                                    "Scalable vector graphics (*.svg)"));
@@ -146,6 +147,7 @@ mbDiagramGenerationInProgress(false)
                     // try to remove the file if it exists
                     if(fileInfo.exists())
                     {
+                        mLastSelectedFolder = fileInfo.dir().path() + QDir::separator();
                         QFile::remove(targetFilePath);
                     }
 

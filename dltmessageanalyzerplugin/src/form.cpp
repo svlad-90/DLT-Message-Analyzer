@@ -18,6 +18,7 @@
 #include "QPropertyAnimation"
 #include "QFormLayout"
 #include "QDialogButtonBox"
+#include "QDesktopServices"
 
 #include "settings/CSettingsManager.hpp"
 #include "common/CBGColorAnimation.hpp"
@@ -196,6 +197,20 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
             });
             pAction->setCheckable(true);
             pAction->setChecked(CSettingsManager::getInstance()->getUML_FeatureActive());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Open settings folder", this);
+            connect(pAction, &QAction::triggered, []()
+            {
+                SEND_MSG(QString("[Form]: Attempt to open path - \"%1\"")
+                         .arg(CSettingsManager::getInstance()->getSettingsFilepath()));
+
+                QDesktopServices::openUrl( QUrl::fromLocalFile( CSettingsManager::getInstance()->getSettingsFilepath() ) );
+            });
             contextMenu.addAction(pAction);
         }
 
