@@ -21,6 +21,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QDialogButtonBox>
+#include <QFontDialog>
 
 #include "../common/Definitions.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"
@@ -51,6 +52,12 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             {
                 copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), false );
             });
+
+            if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
             contextMenu.addAction(pAction);
         }
 
@@ -61,6 +68,52 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             {
                 copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), true );
             });
+
+            if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        {
+            QAction* pAction = new QAction("Select all", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+A")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                selectAll();
+            });
+
+            if(0 == model()->rowCount())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        if(model()->rowCount() > 0)
+        {
+            QAction* pAction = new QAction("Clear search results", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+Space")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                clearSearchResultsRequested();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Copy as HTML", this);
+            connect(pAction, &QAction::triggered, [](bool checked)
+            {
+                CSettingsManager::getInstance()->setCopySearchResultAsHTML(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(CSettingsManager::getInstance()->getCopySearchResultAsHTML());
             contextMenu.addAction(pAction);
         }
 
@@ -74,6 +127,17 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                                                 [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
         auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
                                                 [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+
+        {
+            QAction* pAction = new QAction("Monitor sub-files", this);
+            connect(pAction, &QAction::triggered, [](bool checked)
+            {
+                CSettingsManager::getInstance()->setSubFilesHandlingStatus(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
+            contextMenu.addAction(pAction);
+        }
 
         {
             if(nullptr != mpFile && true == mpFile->getSubFilesHandlingStatus())
@@ -93,48 +157,14 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             }
         }
 
-        {
-            QAction* pAction = new QAction("Monitor sub-files", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setSubFilesHandlingStatus(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Select all", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+A")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                selectAll();
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        if(model()->rowCount() > 0)
-        {
-            QAction* pAction = new QAction("Clear search results", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+Space")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                clearSearchResultsRequested();
-            });
-            contextMenu.addAction(pAction);
-        }
-
         contextMenu.addSeparator();
 
         {
             if(nullptr != mpFile)
             {
                 contextMenu.addSeparator();
+
+                QMenu* pSubMenu = new QMenu("Search range settings", this);
 
                 {
                     QString msg = QString("Set search range ...");
@@ -144,7 +174,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                     {
                        getUserSearchRange();
                     });
-                    contextMenu.addAction(pAction);
+                    pSubMenu->addAction(pAction);
                 }
 
                 if(selectedRowsSize >= 2)
@@ -166,7 +196,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                         mSearchRange = prop;
                         searchRangeChanged( mSearchRange, false );
                     });
-                    contextMenu.addAction(pAction);
+                    pSubMenu->addAction(pAction);
                 }
                 else if(selectedRowsSize == 1)
                 {
@@ -204,7 +234,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                             mSearchRange = prop;
                             searchRangeChanged( mSearchRange, false );
                         });
-                        contextMenu.addAction(pAction);
+                        pSubMenu->addAction(pAction);
                     }
 
                     {
@@ -222,12 +252,12 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                             mSearchRange = prop;
                             searchRangeChanged( mSearchRange, false );
                         });
-                        contextMenu.addAction(pAction);
+                        pSubMenu->addAction(pAction);
                     }
                 }
 
                 {
-                    contextMenu.addSeparator();
+                    pSubMenu->addSeparator();
 
                     if(true == mSearchRange.isSet)
                     {
@@ -239,246 +269,8 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                             mSearchRange = tIntRangeProperty();
                             searchRangeChanged( mSearchRange, true );
                         });
-                        contextMenu.addAction(pAction);
-                    }
-                }
-            }
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Copy as HTML", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setCopySearchResultAsHTML(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getCopySearchResultAsHTML());
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Visible columns", this);
-
-            {
-                const auto& searchResultColumnsVisibilityMap =
-                        CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
-
-                for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
-                     i < static_cast<int>(eSearchResultColumn::Last);
-                     ++i)
-                {
-                    auto foundItem = searchResultColumnsVisibilityMap.find(static_cast<eSearchResultColumn>(i));
-
-                    if(foundItem != searchResultColumnsVisibilityMap.end())
-                    {
-                        QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                        connect(pAction, &QAction::triggered, [i](bool checked)
-                        {
-                            auto searchResultColumnsVisibilityMapInner =
-                                    CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
-
-                            auto foundItemInner = searchResultColumnsVisibilityMapInner.find(static_cast<eSearchResultColumn>(i));
-
-                            if(foundItemInner != searchResultColumnsVisibilityMapInner.end()) // if item is in the map
-                            {
-                                foundItemInner.value() = checked; // let's update visibility value
-                                CSettingsManager::getInstance()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMapInner);
-                            }
-                        });
-                        pAction->setCheckable(true);
-                        pAction->setChecked(foundItem.value());
-
-                        if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                        && false == CSettingsManager::getInstance()->getUML_FeatureActive())
-                        {
-                            pAction->setEnabled(false);
-                        }
-
                         pSubMenu->addAction(pAction);
                     }
-                }
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        {
-            QAction* pAction = new QAction("Reset visible columns", this);
-            connect(pAction, &QAction::triggered, []()
-            {
-                CSettingsManager::getInstance()->resetSearchResultColumnsVisibilityMap();
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Copy columns", this);
-
-            {
-                const auto& searchResultColumnsCopyPasteMap =
-                        CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
-
-                for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
-                     i < static_cast<int>(eSearchResultColumn::Last);
-                     ++i)
-                {
-                    auto foundItem = searchResultColumnsCopyPasteMap.find(static_cast<eSearchResultColumn>(i));
-
-                    if(foundItem != searchResultColumnsCopyPasteMap.end())
-                    {
-                        QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                        connect(pAction, &QAction::triggered, [i](bool checked)
-                        {
-                            auto searchResultColumnsCopyPasteMapInner =
-                                    CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
-
-                            auto foundItemInner = searchResultColumnsCopyPasteMapInner.find(static_cast<eSearchResultColumn>(i));
-
-                            if(foundItemInner != searchResultColumnsCopyPasteMapInner.end()) // if item is in the map
-                            {
-                                foundItemInner.value() = checked; // let's update copy paste value
-                                CSettingsManager::getInstance()->setSearchResultColumnsCopyPasteMap(searchResultColumnsCopyPasteMapInner);
-                            }
-                        });
-                        pAction->setCheckable(true);
-                        pAction->setChecked(foundItem.value());
-
-                        if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                        && false == CSettingsManager::getInstance()->getUML_FeatureActive())
-                        {
-                            pAction->setEnabled(false);
-                        }
-
-                        pSubMenu->addAction(pAction);
-                    }
-                }
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        {
-            QAction* pAction = new QAction("Reset copy columns", this);
-            connect(pAction, &QAction::triggered, []()
-            {
-                CSettingsManager::getInstance()->resetSearchResultColumnsCopyPasteMap();
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Highlight with single color", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setSearchResultMonoColorHighlighting(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting());
-            contextMenu.addAction(pAction);
-        }
-
-        if(true == CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting())
-        {
-            {
-                QAction* pAction = new QAction("Highlighting color ...", this);
-                connect(pAction, &QAction::triggered, [this]()
-                {
-                    QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getRegexMonoHighlightingColor(), this );
-                    if( color.isValid() )
-                    {
-                        CSettingsManager::getInstance()->setRegexMonoHighlightingColor(color);
-                    }
-                });
-                contextMenu.addAction(pAction);
-            }
-
-            contextMenu.addSeparator();
-        }
-        else
-        {
-            {
-                QMenu* pSubMenu = new QMenu("Gradient highlighting", this);
-
-                {
-                    QAction* pAction = new QAction("Set \"from\" color ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                        QColor color = QColorDialog::getColor( currentGradientValue.from, this );
-                        if( color.isValid() )
-                        {
-                            CSettingsManager::getInstance()->
-                            setSearchResultHighlightingGradient( tHighlightingGradient( color, currentGradientValue.to, currentGradientValue.numberOfColors ) );
-                        }
-                    });
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Set \"to\" color ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                        QColor color = QColorDialog::getColor( currentGradientValue.to, this );
-                        if( color.isValid() )
-                        {
-                            CSettingsManager::getInstance()->
-                            setSearchResultHighlightingGradient( tHighlightingGradient( currentGradientValue.from, color, currentGradientValue.numberOfColors ) );
-                        }
-                    });
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-                    QString msg = QString("Set number of colors ( cur. val. - %1 ) ...").arg(currentGradientValue.numberOfColors);
-
-                    QAction* pAction = new QAction(msg, this);
-                    connect(pAction, &QAction::triggered, []()
-                    {
-                        bool ok;
-
-                        const auto& currentGradientValue_ = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                        QString numberOfColorsStr = QInputDialog::getText(  nullptr, "Set number of gradient colors",
-                                   "Provide number of gradient colors ( from 2 to 100 ):",
-                                   QLineEdit::Normal,
-                                   QString::number(currentGradientValue_.numberOfColors), &ok );
-
-                        if(true == ok)
-                        {
-                            auto numberOfColors = numberOfColorsStr.toInt(&ok);
-
-                            if(true == ok)
-                            {
-                                if(numberOfColors < 2)
-                                {
-                                    numberOfColors = 2;
-                                }
-                                else if( numberOfColors > 100 )
-                                {
-                                    numberOfColors = 100;
-                                }
-
-                                CSettingsManager::getInstance()->
-                                        setSearchResultHighlightingGradient(
-                                            tHighlightingGradient(
-                                                currentGradientValue_.from, currentGradientValue_.to, numberOfColors
-                                                ));
-                            }
-                        }
-                    });
-                    pSubMenu->addAction(pAction);
                 }
 
                 contextMenu.addMenu(pSubMenu);
@@ -487,10 +279,262 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
         contextMenu.addSeparator();
 
+        {
+            QMenu* pSubMenu = new QMenu("Columns settings", this);
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
+
+                {
+                    const auto& searchResultColumnsVisibilityMap =
+                            CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
+
+                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
+                         i < static_cast<int>(eSearchResultColumn::Last);
+                         ++i)
+                    {
+                        auto foundItem = searchResultColumnsVisibilityMap.find(static_cast<eSearchResultColumn>(i));
+
+                        if(foundItem != searchResultColumnsVisibilityMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            {
+                                auto searchResultColumnsVisibilityMapInner =
+                                        CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
+
+                                auto foundItemInner = searchResultColumnsVisibilityMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                                if(foundItemInner != searchResultColumnsVisibilityMapInner.end()) // if item is in the map
+                                {
+                                    foundItemInner.value() = checked; // let's update visibility value
+                                    CSettingsManager::getInstance()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMapInner);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+
+                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                            && false == CSettingsManager::getInstance()->getUML_FeatureActive())
+                            {
+                                pAction->setEnabled(false);
+                            }
+
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset visible columns", this);
+                connect(pAction, &QAction::triggered, []()
+                {
+                    CSettingsManager::getInstance()->resetSearchResultColumnsVisibilityMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Copy columns", this);
+
+                {
+                    const auto& searchResultColumnsCopyPasteMap =
+                            CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
+
+                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
+                         i < static_cast<int>(eSearchResultColumn::Last);
+                         ++i)
+                    {
+                        auto foundItem = searchResultColumnsCopyPasteMap.find(static_cast<eSearchResultColumn>(i));
+
+                        if(foundItem != searchResultColumnsCopyPasteMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            {
+                                auto searchResultColumnsCopyPasteMapInner =
+                                        CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
+
+                                auto foundItemInner = searchResultColumnsCopyPasteMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                                if(foundItemInner != searchResultColumnsCopyPasteMapInner.end()) // if item is in the map
+                                {
+                                    foundItemInner.value() = checked; // let's update copy paste value
+                                    CSettingsManager::getInstance()->setSearchResultColumnsCopyPasteMap(searchResultColumnsCopyPasteMapInner);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+
+                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                            && false == CSettingsManager::getInstance()->getUML_FeatureActive())
+                            {
+                                pAction->setEnabled(false);
+                            }
+
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset copy columns", this);
+                connect(pAction, &QAction::triggered, []()
+                {
+                    CSettingsManager::getInstance()->resetSearchResultColumnsCopyPasteMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
+                QAction* pAction = new QAction("Mark timestamp with bold", this);
+                connect(pAction, &QAction::triggered, [](bool checked)
+                {
+                    CSettingsManager::getInstance()->setMarkTimeStampWithBold(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(CSettingsManager::getInstance()->getMarkTimeStampWithBold());
+                pSubMenu->addAction(pAction);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Highlighting settings", this);
+
+            {
+                QAction* pAction = new QAction("Highlight with single color", this);
+                connect(pAction, &QAction::triggered, [](bool checked)
+                {
+                    CSettingsManager::getInstance()->setSearchResultMonoColorHighlighting(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting());
+                pSubMenu->addAction(pAction);
+            }
+
+            if(true == CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting())
+            {
+                {
+                    QAction* pAction = new QAction("Highlighting color ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getRegexMonoHighlightingColor(), this );
+                        if( color.isValid() )
+                        {
+                            CSettingsManager::getInstance()->setRegexMonoHighlightingColor(color);
+                        }
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+
+                pSubMenu->addSeparator();
+            }
+            else
+            {
+                {
+                    QMenu* pSubSubMenu = new QMenu("Gradient highlighting", this);
+
+                    {
+                        QAction* pAction = new QAction("Set \"from\" color ...", this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
+
+                            QColor color = QColorDialog::getColor( currentGradientValue.from, this );
+                            if( color.isValid() )
+                            {
+                                CSettingsManager::getInstance()->
+                                setSearchResultHighlightingGradient( tHighlightingGradient( color, currentGradientValue.to, currentGradientValue.numberOfColors ) );
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Set \"to\" color ...", this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
+
+                            QColor color = QColorDialog::getColor( currentGradientValue.to, this );
+                            if( color.isValid() )
+                            {
+                                CSettingsManager::getInstance()->
+                                setSearchResultHighlightingGradient( tHighlightingGradient( currentGradientValue.from, color, currentGradientValue.numberOfColors ) );
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
+                        QString msg = QString("Set number of colors ( cur. val. - %1 ) ...").arg(currentGradientValue.numberOfColors);
+
+                        QAction* pAction = new QAction(msg, this);
+                        connect(pAction, &QAction::triggered, []()
+                        {
+                            bool ok;
+
+                            const auto& currentGradientValue_ = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
+
+                            QString numberOfColorsStr = QInputDialog::getText(  nullptr, "Set number of gradient colors",
+                                       "Provide number of gradient colors ( from 2 to 100 ):",
+                                       QLineEdit::Normal,
+                                       QString::number(currentGradientValue_.numberOfColors), &ok );
+
+                            if(true == ok)
+                            {
+                                auto numberOfColors = numberOfColorsStr.toInt(&ok);
+
+                                if(true == ok)
+                                {
+                                    if(numberOfColors < 2)
+                                    {
+                                        numberOfColors = 2;
+                                    }
+                                    else if( numberOfColors > 100 )
+                                    {
+                                        numberOfColors = 100;
+                                    }
+
+                                    CSettingsManager::getInstance()->
+                                            setSearchResultHighlightingGradient(
+                                                tHighlightingGradient(
+                                                    currentGradientValue_.from, currentGradientValue_.to, numberOfColors
+                                                    ));
+                                }
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.addSeparator();
+
         if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
         {
             {
-                QMenu* pSubMenu = new QMenu("UML options", this);
+                QMenu* pSubMenu = new QMenu("UML settings", this);
                 pSubMenu->setToolTipsVisible(true);
 
                 {
@@ -545,15 +589,33 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             contextMenu.addSeparator();
         }
 
+        contextMenu.addSeparator();
+
+        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
         {
-            QAction* pAction = new QAction("Mark timestamp with bold", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
             {
-                CSettingsManager::getInstance()->setMarkTimeStampWithBold(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getMarkTimeStampWithBold());
-            contextMenu.addAction(pAction);
+                QMenu* pSubMenu = new QMenu("Font settings", this);
+                pSubMenu->setToolTipsVisible(true);
+
+                {
+                    QAction* pAction = new QAction("Select font ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        bool ok;
+                        QFont selectedFont = QFontDialog::getFont(&ok, font(), this);
+                        if (ok)
+                        {
+                            CSettingsManager::getInstance()->setFont_SearchView( selectedFont );
+                        }
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
         }
 
         contextMenu.exec(mapToGlobal(pos));
@@ -562,6 +624,22 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [this](bool)
     {
         updateColumnsVisibility();
+    });
+
+    connect(CSettingsManager::getInstance().get(), &CSettingsManager::font_SearchViewChanged, [this](const QFont& font)
+    {
+        setFont(font);
+
+        QFontMetrics fontMetrics( font );
+        auto additional_size = static_cast<int>(fontMetrics.height() * 0.1);
+
+        if(additional_size < 2)
+        {
+            additional_size = 2;
+        }
+
+        verticalHeader()->setDefaultSectionSize(fontMetrics.height() + additional_size);
+        updateWidth();
     });
 
     connect(this, &QTableView::clicked, [this](const QModelIndex &index)
@@ -599,7 +677,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 void CSearchResultView::getUserSearchRange()
 {
     auto minOverallVal = 0;
-    auto maxOverallVal = mpFile->sizeNonFiltered() - 1;
+    auto maxOverallVal = mpFile->sizeNonFiltered() != 0 ? mpFile->sizeNonFiltered() - 1 : 0;
     auto minCurrentVal = ( mSearchRange.isSet ? mSearchRange.from : minOverallVal );
     auto maxCurrentVal = ( mSearchRange.isSet ? mSearchRange.to: maxOverallVal );
 
@@ -737,6 +815,27 @@ void CSearchResultView::setFile( const tDLTFileWrapperPtr& pFile )
     mpFile = pFile;
 }
 
+void CSearchResultView::updateWidth()
+{
+    int widthWithoutPayload = 0;
+
+    for(int i = 0; i < static_cast<int>(eSearchResultColumn::Last); ++i)
+    {
+        if(eSearchResultColumn::Payload != static_cast<eSearchResultColumn>(i))
+        {
+            if(false == isColumnHidden(i))
+            {
+                resizeColumnToContents(i);
+                widthWithoutPayload += columnWidth(i);
+            }
+        }
+    }
+
+    auto payloadWidth = viewport()->size().width() - widthWithoutPayload;
+
+    setColumnWidth( static_cast<int>(eSearchResultColumn::Payload), payloadWidth );
+}
+
 void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
     tParent::dataChanged(topLeft,bottomRight,roles);
@@ -759,27 +858,6 @@ void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelInde
             }
         }
     }
-
-    auto updateWidth = [this]()
-    {
-        int widthWithoutPayload = 0;
-
-        for(int i = 0; i < static_cast<int>(eSearchResultColumn::Last); ++i)
-        {
-            if(eSearchResultColumn::Payload != static_cast<eSearchResultColumn>(i))
-            {
-                if(false == isColumnHidden(i))
-                {
-                    resizeColumnToContents(i);
-                    widthWithoutPayload += columnWidth(i);
-                }
-            }
-        }
-
-        auto payloadWidth = viewport()->size().width() - widthWithoutPayload;
-
-        setColumnWidth( static_cast<int>(eSearchResultColumn::Payload), payloadWidth );
-    };
 
     bool bUpdated = false;
 
@@ -854,8 +932,23 @@ void CSearchResultView::setModel(QAbstractItemModel *model)
     updateColumnsVisibility();
 
     QHeaderView *verticalHeader = tParent::verticalHeader();
-    verticalHeader->resizeSections(QHeaderView::Fixed);
-    verticalHeader->setDefaultSectionSize(17);
+
+    {
+        //restore font from persistency
+        const auto& usedFont = CSettingsManager::getInstance()->getFont_SearchView();
+        setFont(usedFont);
+        verticalHeader->resizeSections(QHeaderView::Fixed);
+        QFontMetrics fontMetrics( usedFont );
+
+        auto additional_size = static_cast<int>(fontMetrics.height() * 0.1);
+
+        if(additional_size < 2)
+        {
+            additional_size = 2;
+        }
+
+        verticalHeader->setDefaultSectionSize(fontMetrics.height() + additional_size);
+    }
 
     QHeaderView *horizontalHeader = tParent::horizontalHeader();
 

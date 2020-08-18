@@ -389,51 +389,57 @@ CFiltersView::CFiltersView(QWidget *parent):
         contextMenu.addSeparator();
 
         {
-            QMenu* pSubMenu = new QMenu("Visible columns", this);
+            QMenu* pSubMenu = new QMenu("Columns settings", this);
 
             {
-                const auto& regexFiltersColumnsVisibilityMap =
-                        CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
+                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
 
-                for( int i = static_cast<int>(eRegexFiltersColumn::Value);
-                     i < static_cast<int>(eRegexFiltersColumn::AfterLastVisible);
-                     ++i)
                 {
-                    auto foundItem = regexFiltersColumnsVisibilityMap.find(static_cast<eRegexFiltersColumn>(i));
+                    const auto& regexFiltersColumnsVisibilityMap =
+                            CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
 
-                    if(foundItem != regexFiltersColumnsVisibilityMap.end())
+                    for( int i = static_cast<int>(eRegexFiltersColumn::Value);
+                         i < static_cast<int>(eRegexFiltersColumn::AfterLastVisible);
+                         ++i)
                     {
-                        QAction* pAction = new QAction(getName(static_cast<eRegexFiltersColumn>(i)), this);
-                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        auto foundItem = regexFiltersColumnsVisibilityMap.find(static_cast<eRegexFiltersColumn>(i));
+
+                        if(foundItem != regexFiltersColumnsVisibilityMap.end())
                         {
-                            auto regexFiltersColumnsVisibilityMap_ =
-                                    CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
-
-                            auto foundItem_ = regexFiltersColumnsVisibilityMap_.find(static_cast<eRegexFiltersColumn>(i));
-
-                            if(foundItem_ != regexFiltersColumnsVisibilityMap_.end()) // if item is in the map
+                            QAction* pAction = new QAction(getName(static_cast<eRegexFiltersColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [i](bool checked)
                             {
-                                foundItem_.value() = checked; // let's update visibility value
-                                CSettingsManager::getInstance()->setRegexFiltersColumnsVisibilityMap(regexFiltersColumnsVisibilityMap_);
-                            }
-                        });
-                        pAction->setCheckable(true);
-                        pAction->setChecked(foundItem.value());
-                        pSubMenu->addAction(pAction);
+                                auto regexFiltersColumnsVisibilityMap_ =
+                                        CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
+
+                                auto foundItem_ = regexFiltersColumnsVisibilityMap_.find(static_cast<eRegexFiltersColumn>(i));
+
+                                if(foundItem_ != regexFiltersColumnsVisibilityMap_.end()) // if item is in the map
+                                {
+                                    foundItem_.value() = checked; // let's update visibility value
+                                    CSettingsManager::getInstance()->setRegexFiltersColumnsVisibilityMap(regexFiltersColumnsVisibilityMap_);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+                            pSubSubMenu->addAction(pAction);
+                        }
                     }
                 }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset visible columns", this);
+                connect(pAction, &QAction::triggered, []()
+                {
+                    CSettingsManager::getInstance()->resetRegexFiltersColumnsVisibilityMap();
+                });
+                pSubMenu->addAction(pAction);
             }
 
             contextMenu.addMenu(pSubMenu);
-        }
-
-        {
-            QAction* pAction = new QAction("Reset visible columns", this);
-            connect(pAction, &QAction::triggered, []()
-            {
-                CSettingsManager::getInstance()->resetRegexFiltersColumnsVisibilityMap();
-            });
-            contextMenu.addAction(pAction);
         }
 
         contextMenu.exec(mapToGlobal(pos));

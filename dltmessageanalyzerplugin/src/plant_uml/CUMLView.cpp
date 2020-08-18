@@ -20,7 +20,7 @@
 
 static QString get_UML_Storage_Path()
 {
-    static const QString result( QCoreApplication::applicationDirPath() + QString("/plugins/DLTMessageAnalyzerConfig/uml/") );
+    static const QString result( CSettingsManager::getInstance()->getSettingsFilepath() + QString("/uml/") );
     return result;
 }
 
