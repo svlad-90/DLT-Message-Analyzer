@@ -41,6 +41,7 @@ private:
     void copyMessageFiles();
     void switchToNextUMLItem(bool bNext);
     void selectAllUMLItems(bool select);
+    void updateWidth();
 
 private:
     enum class eUpdateRequired

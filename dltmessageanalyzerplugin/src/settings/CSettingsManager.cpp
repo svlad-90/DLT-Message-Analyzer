@@ -57,6 +57,7 @@ static const QString sSelectedRegexFile = "selectedRegexFile";
 static const QString sGroupedViewColumnsVisibilityMapKey = "GroupedViewColumnsVisibilityMap";
 static const QString sGroupedViewColumnsCopyPasteMapKey = "GroupedViewColumnsCopyPasteMap";
 static const QString sSubFilesHandlingStatusKey = "SubFilesHandlingStatus";
+static const QString sFont_SearchView = "FontSearchView";
 
 static const QString sUML_FeatureActiveKey = "UML_FeatureActive";
 static const QString sUML_MaxNumberOfRowsInDiagramKey = "UML_MaxNumberOfRowsInDiagram";
@@ -318,6 +319,10 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){subFilesHandlingStatusChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mSetting_Font_SearchView(createFontSettingsItem(sFont_SearchView,
+        [this](const QFont& data){font_SearchViewChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        QFont("sans-serif", 9))),
     mUML_FeatureActiveProtector(),
     mSetting_UML_FeatureActive(createBooleanSettingsItem(sUML_FeatureActiveKey,
         [this](const bool& data){UML_FeatureActiveChanged(data);},
@@ -373,6 +378,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewColumnsCopyPasteMap);
     mUserSettingItemPtrVec.push_back(&mSetting_SubFilesHandlingStatus);
+    mUserSettingItemPtrVec.push_back(&mSetting_Font_SearchView);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_FeatureActive);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_MaxNumberOfRowsInDiagram);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_ShowArguments);
@@ -1039,6 +1045,47 @@ TSettingItem<QString> CSettingsManager::createStringSettingsItem(const QString& 
                              updateFileFunc);
 }
 
+TSettingItem<QFont> CSettingsManager::createFontSettingsItem(const QString& key,
+                                             const TSettingItem<QFont>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<QFont>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const QFont& defaultValue) const
+{
+    auto writeFunc = [&key](const QFont& value)->QJsonObject
+    {
+        QJsonObject result;
+        result.insert( key, QJsonValue( value.toString() ) );
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       QFont& data,
+                       const QFont& defaultValue_)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isString())
+        {
+            bool bReadResult = data.fromString( JSONItem.toString() );
+
+            if(false == bReadResult) // if parsing of the font data has failed
+            {
+                data = defaultValue_; // let's do a fallback to the default value
+            }
+
+            bResult = true;
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<QFont>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
 CSettingsManager::tOperationResult CSettingsManager::loadRootConfig()
 {
     CSettingsManager::tOperationResult result;
@@ -1412,6 +1459,11 @@ void CSettingsManager::setSubFilesHandlingStatus( const bool& val )
     mSetting_SubFilesHandlingStatus.setData(val);
 }
 
+void CSettingsManager::setFont_SearchView( const QFont& val )
+{
+    mSetting_Font_SearchView.setData(val);
+}
+
 void CSettingsManager::setUML_FeatureActive(const bool& val)
 {
     std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mUML_FeatureActiveProtector));
@@ -1577,6 +1629,11 @@ const tGroupedViewColumnsVisibilityMap& CSettingsManager::getGroupedViewColumnsC
 bool CSettingsManager::getSubFilesHandlingStatus() const
 {
     return mSetting_SubFilesHandlingStatus.getData();
+}
+
+const QFont& CSettingsManager::getFont_SearchView() const
+{
+    return mSetting_Font_SearchView.getData();
 }
 
 const bool& CSettingsManager::getUML_FeatureActive() const

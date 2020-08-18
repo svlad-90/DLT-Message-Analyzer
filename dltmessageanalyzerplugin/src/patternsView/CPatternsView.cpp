@@ -407,18 +407,6 @@ CPatternsView::CPatternsView(QWidget *parent):
                 contextMenu.addAction(pAction);
             }
 
-            {
-                QAction* pAction = new QAction("Delete ...", this);
-                pAction->setShortcut(QKeySequence(Qt::Key_Delete));
-                connect(pAction, &QAction::triggered, [this]()
-                {
-                    deletePatternTriggered();
-                });
-                contextMenu.addAction(pAction);
-            }
-
-            contextMenu.addSeparator();
-
             auto selectedRow = selectionModel()->selectedRows().operator[](0);
 
             if(ePatternsRowType::ePatternsRowType_Alias ==
@@ -430,9 +418,19 @@ CPatternsView::CPatternsView(QWidget *parent):
                     overwriteFromInputFieldTriggered();
                 });
                 contextMenu.addAction(pAction);
-
-                contextMenu.addSeparator();
             }
+
+            {
+                QAction* pAction = new QAction("Delete ...", this);
+                pAction->setShortcut(QKeySequence(Qt::Key_Delete));
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    deletePatternTriggered();
+                });
+                contextMenu.addAction(pAction);
+            }
+
+            contextMenu.addSeparator();
         }
 
         {
@@ -442,6 +440,12 @@ CPatternsView::CPatternsView(QWidget *parent):
             {
                 copySelectedRow();
             });
+
+            if(true == selectionModel()->selectedRows().isEmpty())
+            {
+                pAction->setEnabled(false);
+            }
+
             contextMenu.addAction(pAction);
         }
 
@@ -452,6 +456,12 @@ CPatternsView::CPatternsView(QWidget *parent):
             {
                 pasteSelectedRow();
             });
+
+            if(true == selectionModel()->selectedRows().isEmpty())
+            {
+                pAction->setEnabled(false);
+            }
+
             contextMenu.addAction(pAction);
         }
 
@@ -482,185 +492,203 @@ CPatternsView::CPatternsView(QWidget *parent):
         }
 
         {
-            if(true == mpModel->areAnyCombinedPatternsAvailable())
+            QMenu* pSubMenu = new QMenu("Combination settings", this);
+
             {
-                QAction* pAction = new QAction("Run combination", this);
-                pAction->setShortcut(QKeySequence(Qt::Key_Enter));
+                if(true == mpModel->areAnyCombinedPatternsAvailable())
+                {
+                    QAction* pAction = new QAction("Run combination", this);
+                    pAction->setShortcut(QKeySequence(Qt::Key_Enter));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        QString finalRegex = createCombinedRegex();
+                        patternSelected( finalRegex );
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+            }
+
+            {
+                auto selectedRows = selectionModel()->selectedRows(static_cast<int>(ePatternsColumn::Regex));
+                if(false == selectedRows.empty())
+                {
+                    QAction* pAction = new QAction("Run selected item ( double click )", this);
+                    connect(pAction, &QAction::triggered, [this, selectedRows]()
+                    {
+                        patternSelected( selectedRows[0].data().value<QString>() );
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+            }
+
+            {
+                QAction* pAction = new QAction("Reset \"comb.\" patterns to default", this);
+                pAction->setShortcut(QKeySequence(tr("Ctrl+R")));
                 connect(pAction, &QAction::triggered, [this]()
                 {
-                    QString finalRegex = createCombinedRegex();
-                    patternSelected( finalRegex );
-                });
-                contextMenu.addAction(pAction);
-            }
-        }
-
-        {
-            auto selectedRows = selectionModel()->selectedRows(static_cast<int>(ePatternsColumn::Regex));
-            if(false == selectedRows.empty())
-            {
-                QAction* pAction = new QAction("Run selected item ( double click )", this);
-                connect(pAction, &QAction::triggered, [this, selectedRows]()
-                {
-                    patternSelected( selectedRows[0].data().value<QString>() );
-                });
-                contextMenu.addAction(pAction);
-            }
-        }
-
-        {
-            QAction* pAction = new QAction("Reset \"comb.\" patterns to default", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+R")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                if(nullptr != mpModel)
-                {
-                    mpModel->resetPatternsToDefault();
-                }
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        {
-            QAction* pAction = new QAction("Clear \"comb.\" patterns", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                if(nullptr != mpModel)
-                {
-                    mpModel->clearSelectedPatterns();
-                }
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Visible columns", this);
-
-            {
-                const auto& patternsColumnsVisibilityMap =
-                        CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
-
-                for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
-                     i < static_cast<int>(ePatternsColumn::AfterLastVisible);
-                     ++i)
-                {
-                    auto foundItem = patternsColumnsVisibilityMap.find(static_cast<ePatternsColumn>(i));
-
-                    if(foundItem != patternsColumnsVisibilityMap.end())
+                    if(nullptr != mpModel)
                     {
-                        QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
-                        connect(pAction, &QAction::triggered, [i](bool checked)
-                        {
-                            auto patternsColumnsVisibilityMap_ =
-                                    CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
-
-                            auto foundItem_ = patternsColumnsVisibilityMap_.find(static_cast<ePatternsColumn>(i));
-
-                            if(foundItem_ != patternsColumnsVisibilityMap_.end()) // if item is in the map
-                            {
-                                foundItem_.value() = checked; // let's update visibility value
-                                CSettingsManager::getInstance()->setPatternsColumnsVisibilityMap(patternsColumnsVisibilityMap_);
-                            }
-                        });
-                        pAction->setCheckable(true);
-                        pAction->setChecked(foundItem.value());
-                        pSubMenu->addAction(pAction);
+                        mpModel->resetPatternsToDefault();
                     }
-                }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Clear \"comb.\" patterns", this);
+                pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+R")));
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    if(nullptr != mpModel)
+                    {
+                        mpModel->clearSelectedPatterns();
+                    }
+                });
+                pSubMenu->addAction(pAction);
             }
 
             contextMenu.addMenu(pSubMenu);
         }
 
-        {
-            QAction* pAction = new QAction("Reset visible columns", this);
-            connect(pAction, &QAction::triggered, []()
-            {
-                CSettingsManager::getInstance()->resetPatternsColumnsVisibilityMap();
-            });
-            contextMenu.addAction(pAction);
-        }
-
         contextMenu.addSeparator();
 
         {
-            QMenu* pSubMenu = new QMenu("Copy columns", this);
+            QMenu* pSubMenu = new QMenu("Columns settings", this);
 
             {
-                const auto& patternsColumnsCopyPasteMap =
-                        CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
 
-                for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
-                     i < static_cast<int>(ePatternsColumn::AfterLastVisible);
-                     ++i)
                 {
-                    auto foundItem = patternsColumnsCopyPasteMap.find(static_cast<ePatternsColumn>(i));
+                    const auto& patternsColumnsVisibilityMap =
+                            CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
 
-                    if(foundItem != patternsColumnsCopyPasteMap.end())
+                    for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
+                         i < static_cast<int>(ePatternsColumn::AfterLastVisible);
+                         ++i)
                     {
-                        QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
-                        connect(pAction, &QAction::triggered, [i](bool checked)
+                        auto foundItem = patternsColumnsVisibilityMap.find(static_cast<ePatternsColumn>(i));
+
+                        if(foundItem != patternsColumnsVisibilityMap.end())
                         {
-                            auto patternsColumnsCopyPasteMap_ =
-                                    CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
-
-                            auto foundItem_ = patternsColumnsCopyPasteMap_.find(static_cast<ePatternsColumn>(i));
-
-                            if(foundItem_ != patternsColumnsCopyPasteMap_.end()) // if item is in the map
+                            QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [i](bool checked)
                             {
-                                foundItem_.value() = checked; // let's update copy paste value
-                                CSettingsManager::getInstance()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
-                            }
-                        });
-                        pAction->setCheckable(true);
-                        pAction->setChecked(foundItem.value());
-                        pSubMenu->addAction(pAction);
+                                auto patternsColumnsVisibilityMap_ =
+                                        CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
+
+                                auto foundItem_ = patternsColumnsVisibilityMap_.find(static_cast<ePatternsColumn>(i));
+
+                                if(foundItem_ != patternsColumnsVisibilityMap_.end()) // if item is in the map
+                                {
+                                    foundItem_.value() = checked; // let's update visibility value
+                                    CSettingsManager::getInstance()->setPatternsColumnsVisibilityMap(patternsColumnsVisibilityMap_);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+                            pSubSubMenu->addAction(pAction);
+                        }
                     }
                 }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset visible columns", this);
+                connect(pAction, &QAction::triggered, []()
+                {
+                    CSettingsManager::getInstance()->resetPatternsColumnsVisibilityMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Copy columns", this);
+
+                {
+                    const auto& patternsColumnsCopyPasteMap =
+                            CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+
+                    for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
+                         i < static_cast<int>(ePatternsColumn::AfterLastVisible);
+                         ++i)
+                    {
+                        auto foundItem = patternsColumnsCopyPasteMap.find(static_cast<ePatternsColumn>(i));
+
+                        if(foundItem != patternsColumnsCopyPasteMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            {
+                                auto patternsColumnsCopyPasteMap_ =
+                                        CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+
+                                auto foundItem_ = patternsColumnsCopyPasteMap_.find(static_cast<ePatternsColumn>(i));
+
+                                if(foundItem_ != patternsColumnsCopyPasteMap_.end()) // if item is in the map
+                                {
+                                    foundItem_.value() = checked; // let's update copy paste value
+                                    CSettingsManager::getInstance()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset copy columns", this);
+                connect(pAction, &QAction::triggered, []()
+                {
+                    CSettingsManager::getInstance()->resetPatternsColumnsCopyPasteMap();
+                });
+                pSubMenu->addAction(pAction);
             }
 
             contextMenu.addMenu(pSubMenu);
         }
 
-        {
-            QAction* pAction = new QAction("Reset copy columns", this);
-            connect(pAction, &QAction::triggered, []()
-            {
-                CSettingsManager::getInstance()->resetPatternsColumnsCopyPasteMap();
-            });
-            contextMenu.addAction(pAction);
-        }
-
         contextMenu.addSeparator();
 
         {
-            QAction* pAction = new QAction("Highlight \"combined\" patterns", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setHighlightActivePatterns(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getHighlightActivePatterns());
-            contextMenu.addAction(pAction);
-        }
+            QMenu* pSubMenu = new QMenu("Highlighting settings", this);
 
-        {
-            if(true == CSettingsManager::getInstance()->getHighlightActivePatterns())
             {
-                QAction* pAction = new QAction("Highlighting color ...", this);
-                connect(pAction, &QAction::triggered, [this]()
+                QAction* pAction = new QAction("Highlight \"combined\" patterns", this);
+                connect(pAction, &QAction::triggered, [](bool checked)
                 {
-                    QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getPatternsHighlightingColor(), this );
-                    if( color.isValid() )
-                    {
-                        CSettingsManager::getInstance()->setPatternsHighlightingColor(color);
-                    }
+                    CSettingsManager::getInstance()->setHighlightActivePatterns(checked);
                 });
-                contextMenu.addAction(pAction);
+                pAction->setCheckable(true);
+                pAction->setChecked(CSettingsManager::getInstance()->getHighlightActivePatterns());
+                pSubMenu->addAction(pAction);
             }
+
+            {
+                if(true == CSettingsManager::getInstance()->getHighlightActivePatterns())
+                {
+                    QAction* pAction = new QAction("Highlighting color ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getPatternsHighlightingColor(), this );
+                        if( color.isValid() )
+                        {
+                            CSettingsManager::getInstance()->setPatternsHighlightingColor(color);
+                        }
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
         }
 
         contextMenu.addSeparator();

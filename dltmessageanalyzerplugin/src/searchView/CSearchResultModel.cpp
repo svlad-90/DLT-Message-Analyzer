@@ -86,7 +86,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
             case eSearchResultColumn::Subtype: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Mode: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Args: { alignment = Qt::AlignCenter; } break;
-            case eSearchResultColumn::Payload: { alignment = Qt::AlignLeft; } break;
+            case eSearchResultColumn::Payload: { alignment = static_cast<Qt::AlignmentFlag>((Qt::AlignLeft | Qt::AlignVCenter).operator QFlags<Qt::AlignmentFlag>::Int()); } break;
             case eSearchResultColumn::Last: { alignment = Qt::AlignCenter; } break;
         }
 

@@ -15,6 +15,7 @@
 #include "QPair"
 #include "QColor"
 #include "QVariant"
+#include "QFont"
 
 #include "../common/Definitions.hpp"
 #include "../common/cpp_extensions.hpp"
@@ -108,6 +109,7 @@ public:
     void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
     void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val);
     void setSubFilesHandlingStatus( const bool& val );
+    void setFont_SearchView( const QFont& val );
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
     void setUML_FeatureActive(const bool& val);
     void setUML_MaxNumberOfRowsInDiagram(const int& val);
@@ -157,6 +159,7 @@ public:
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
     const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const;
     bool getSubFilesHandlingStatus() const;
+    const QFont& getFont_SearchView() const;
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
     const bool& getUML_FeatureActive() const;
     const int& getUML_MaxNumberOfRowsInDiagram() const;
@@ -200,6 +203,7 @@ signals:
     void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
     void groupedViewColumnsCopyPasteMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsCopyPasteMap);
     void subFilesHandlingStatusChanged(const bool& subFilesHandlingStatus);
+    void font_SearchViewChanged(const QFont& font_SearchView);
     void UML_FeatureActiveChanged(const bool& UML_FeatureActive);
     void UML_MaxNumberOfRowsInDiagramChanged(const int& UML_MaxNumberOfRowsInDiagram);
     void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
@@ -356,6 +360,11 @@ private: // methods
                                                  const TSettingItem<QString>::tUpdateSettingsFileFunc& updateFileFunc,
                                                  const QString& defaultValue) const;
 
+    TSettingItem<QFont> createFontSettingsItem(const QString& key,
+                                                 const TSettingItem<QFont>::tUpdateDataFunc& updateDataFunc,
+                                                 const TSettingItem<QFont>::tUpdateSettingsFileFunc& updateFileFunc,
+                                                 const QFont& defaultValue) const;
+
     template<typename T, typename = cpp_14::enable_if_t<std::is_arithmetic<T>::value>>
     TSettingItem<T> createArithmeticSettingsItem(const QString& key,
                                                  const typename TSettingItem<T>::tUpdateDataFunc& updateDataFunc,
@@ -462,6 +471,9 @@ private: // fields
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsVisibilityMap;
     TSettingItem<tGroupedViewColumnsVisibilityMap> mSetting_GroupedViewColumnsCopyPasteMap;
     TSettingItem<bool> mSetting_SubFilesHandlingStatus;
+
+    // font settings
+    TSettingItem<QFont> mSetting_Font_SearchView;
 
     // UML settings
     std::recursive_mutex mUML_FeatureActiveProtector;
