@@ -1464,6 +1464,36 @@ QString getName(eRegexFiltersRowType val)
             result = "Non-capturing group";
         }
             break;
+        case eRegexFiltersRowType::AtomicGroup:
+        {
+            result = "Atomic group";
+        }
+            break;
+        case eRegexFiltersRowType::PositiveLookahead:
+        {
+            result = "Positive lookahead";
+        }
+            break;
+        case eRegexFiltersRowType::NegativeLookahead:
+        {
+            result = "Negative lookahead";
+        }
+            break;
+        case eRegexFiltersRowType::PositiveLookbehind:
+        {
+            result = "Positive lookbehind";
+        }
+            break;
+        case eRegexFiltersRowType::NegativeLookbehind:
+        {
+            result = "Negative lookbehind";
+        }
+            break;
+        case eRegexFiltersRowType::BranchResetGroup:
+        {
+            result = "Branch reset group";
+        }
+            break;
     }
 
     return result;

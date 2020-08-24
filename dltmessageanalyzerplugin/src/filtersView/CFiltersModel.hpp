@@ -19,6 +19,9 @@ public:
     void resetData();
     void setUsedRegex(const QString& regexStr);
 
+    void addCompletionData( const tFoundMatches& foundMatches );
+    void resetCompletionData();
+
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
