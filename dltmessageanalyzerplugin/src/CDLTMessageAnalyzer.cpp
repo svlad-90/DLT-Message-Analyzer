@@ -803,7 +803,8 @@ bool CDLTMessageAnalyzer::analyze()
             nullptr == mpGroupedViewModel ||
             nullptr == mpNumberOfThreadsCombobBox ||
             nullptr == mpSearchResultModel ||
-            nullptr == mpContinuousSearchCheckBox )
+            nullptr == mpContinuousSearchCheckBox ||
+            nullptr == mpFiltersView )
     {
         return false;
     }
@@ -827,6 +828,8 @@ bool CDLTMessageAnalyzer::analyze()
     mpSearchResultModel->setFile(mpFile);
 
     mpGroupedViewModel->resetData();
+
+    mpFiltersModel->resetCompletionData();
 
     QString regex;
 
@@ -1051,7 +1054,8 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
     if(mRequestId == requestId)
     {
         if( nullptr == mpGroupedViewModel ||
-                nullptr == mpSearchResultModel )
+            nullptr == mpSearchResultModel ||
+            nullptr == mpFiltersModel )
         {
             return;
         }
@@ -1064,9 +1068,9 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
             {
                 for(auto foundMatchesIt = processedMatches.matchedItemVec.begin(); foundMatchesIt != processedMatches.matchedItemVec.end(); ++foundMatchesIt)
                 {
-                    auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
                     auto endIt = processedMatches.matchedItemVec.end();
-                    mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
+                    mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+                    mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 
                 updateProgress(progress, requestState, false);
@@ -1104,9 +1108,9 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
                     foundMatchesIt != processedMatches.matchedItemVec.end();
                     ++foundMatchesIt)
                 {
-                    auto foundMatchesCopy = foundMatchesIt->getFoundMatches();
                     auto endIt = processedMatches.matchedItemVec.end();
-                    mpGroupedViewModel->addMatches(foundMatchesCopy, foundMatchesIt == --(endIt));
+                    mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+                    mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 
                 updateProgress(progress, requestState, false);

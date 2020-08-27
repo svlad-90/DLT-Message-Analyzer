@@ -20,7 +20,7 @@ public:
     explicit CGroupedViewModel(QObject *parent = nullptr);
     ~CGroupedViewModel() override;
 
-    void addMatches( tFoundMatches& matches, bool update );
+    void addMatches( const tFoundMatches& matches, bool update );
     void resetData();
     void setUsedRegex(const QString& regex);
 

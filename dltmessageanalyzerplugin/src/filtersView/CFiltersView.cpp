@@ -170,6 +170,12 @@ private:
             result = QColor("#B3A7B8");
                 break;
             case eRegexFiltersRowType::NonCapturingGroup:
+            case eRegexFiltersRowType::AtomicGroup:
+            case eRegexFiltersRowType::PositiveLookahead:
+            case eRegexFiltersRowType::NegativeLookahead:
+            case eRegexFiltersRowType::PositiveLookbehind:
+            case eRegexFiltersRowType::NegativeLookbehind:
+            case eRegexFiltersRowType::BranchResetGroup:
             result = QColor("#7E7383");
                 break;
         }

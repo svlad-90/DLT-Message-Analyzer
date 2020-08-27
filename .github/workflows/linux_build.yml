@@ -13,6 +13,11 @@ jobs:
 
     steps:
 
+    # Install uuid-dev
+    - name: Install uuid-dev
+      run: sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
+      shell: bash
+
     # Cache Qt
     - name: Cache Qt
       id: cache-qt
@@ -53,7 +58,7 @@ jobs:
       working-directory: ./plugin
 
     # Create build directory
-    - name: Creation of the "./build" directory
+    - name: Creation of the "../build" directory
       run: mkdir ../build
       shell: bash
       working-directory: ./

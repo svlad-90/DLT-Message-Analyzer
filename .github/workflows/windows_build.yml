@@ -49,6 +49,10 @@ jobs:
            Invoke-WebRequest http://download.qt.io/official_releases/jom/jom.zip -OutFile ..\downloads\jom.zip
            Expand-Archive '..\downloads\jom.zip' '..\tools\jom' 
       shell: powershell
+      
+    # Add jom to path
+    - name: Add jom to path
+      run: echo "::add-path::D:/a/DLT-Message-Analyzer/tools/jom/"
 
     # Checkout dlt-viewer's revision 2.20.
     - name: Checkout of the dlt-viewer
@@ -65,9 +69,22 @@ jobs:
         path: .\plugin\DLT-Message-Analyzer
         ref: ${{ github.ref }}
         
-    # Adjust dlt-viewer's plugin.pro file to sub-include DLT-Message-Analyzer
-    - name: Patch dlt-viewer's plugin.pro
-      run: ((Get-Content -path .\plugin.pro -Raw) -replace '(SUBDIRS.*\+=)','$1 DLT-Message-Analyzer') | Set-Content -Path .\plugin.pro
+    # Adjust dlt-viewer's  main CMakeLists.txt in order to avoid setting gcc specific compiler flags
+    - name: Patch dlt-viewer's CMakeLists.txt
+      run: |
+         $filePath = ".\CMakeLists.txt"
+         $find_1 = "add_definitions( ""-Wall"" )"
+         $replace_1 = "if(NOT CMAKE_CXX_COMPILER_ID MATCHES ""MSVC""){0}add_definitions( ""-Wextra"" )" -f [environment]::NewLine
+         (Get-Content $filePath).Replace( $find_1 , $replace_1 ) | Set-Content $filePath
+         $find_2 = "add_definitions( ""-Wno-strict-aliasing"" )"
+         $replace_2 = "add_definitions( ""-Wno-strict-aliasing"" ){0}endif()" -f [environment]::NewLine
+         (Get-Content $filePath).Replace( $find_2 , $replace_2 ) | Set-Content $filePath
+      
+      shell: powershell
+        
+    # Adjust dlt-viewer's plugin CMakeLists.txt file to sub-include DLT-Message-Analyzer
+    - name: Patch dlt-viewer's plugin CMakeLists.txt
+      run: Add-Content .\CMakeLists.txt "`nadd_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)"
       shell: powershell
       working-directory: .\plugin
 
@@ -77,18 +94,25 @@ jobs:
       shell: cmd
       working-directory: .\
 
-    # QMake for dlt-viewer, including the DLT-Message_analyzer plugin
-    - name: QMake
+    #CMake for dlt-viewer, including the DLT-Message_analyzer plugin
+    - name: CMake
       run: |
-        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        qmake ..\DLT-Message-Analyzer\BuildDltViewer.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
+        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
+        cmake ..\DLT-Message-Analyzer\ "-GCodeBlocks - NMake Makefiles JOM" "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_PREFIX_PATH:STRING=../Qt/Qt/5.15.0/msvc2019_64" "-DQT_QMAKE_EXECUTABLE:STRING=../Qt/Qt/5.15.0/msvc2019_64/bin/qmake.exe"
+      shell: cmd
+      working-directory: ..\build
+    
+    #List files in build folder
+    - name: List files in build folder
+      run: |
+        dir
       shell: cmd
       working-directory: ..\build
     
     # Build of the project
     - name: Jom
       run: |
-        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        ..\tools\jom\jom.exe -j8
+        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
+        jom.exe -j8
       shell: cmd
       working-directory: ..\build

@@ -335,7 +335,37 @@ QPair<bool,QString> CFiltersModel::packRegex()
                     break;
                 case eRegexFiltersRowType::NonCapturingGroup:
                 {
+                    regexStr.append("(?:");
+                }
+                    break;
+                case eRegexFiltersRowType::AtomicGroup:
+                {
                     regexStr.append("(?>");
+                }
+                    break;
+                case eRegexFiltersRowType::PositiveLookahead:
+                {
+                    regexStr.append("(?=");
+                }
+                    break;
+                case eRegexFiltersRowType::NegativeLookahead:
+                {
+                    regexStr.append("(?!");
+                }
+                    break;
+                case eRegexFiltersRowType::PositiveLookbehind:
+                {
+                    regexStr.append("(?<=");
+                }
+                    break;
+                case eRegexFiltersRowType::NegativeLookbehind:
+                {
+                    regexStr.append("(?<!");
+                }
+                    break;
+                case eRegexFiltersRowType::BranchResetGroup:
+                {
+                    regexStr.append("(?|");
                 }
                     break;
             }
@@ -348,9 +378,15 @@ QPair<bool,QString> CFiltersModel::packRegex()
             switch( pItem->data(static_cast<int>(eRegexFiltersColumn::RowType)).get<eRegexFiltersRowType>() )
             {
                 case eRegexFiltersRowType::Text:{} break;
-                case eRegexFiltersRowType::NonCapturingGroup:
                 case eRegexFiltersRowType::NonVarGroup:
                 case eRegexFiltersRowType::VarGroup:
+                case eRegexFiltersRowType::NonCapturingGroup:
+                case eRegexFiltersRowType::AtomicGroup:
+                case eRegexFiltersRowType::PositiveLookahead:
+                case eRegexFiltersRowType::NegativeLookahead:
+                case eRegexFiltersRowType::PositiveLookbehind:
+                case eRegexFiltersRowType::NegativeLookbehind:
+                case eRegexFiltersRowType::BranchResetGroup:
                 {
                     regexStr.append(")");
                 }
@@ -438,7 +474,7 @@ enum class eGroupNameAnalysisState
     AnalyzedNotFound
 };
 
-enum class eGroupNonCapturingAnalysisState
+enum class eGroupTypeAnalysisState
 {
     NotAnalyzed,
     AnalyzedFound,
@@ -463,7 +499,7 @@ struct tParsingDataItem
     // internal fields
     bool isRoot = false;
     eGroupNameAnalysisState groupNameAnalysisState = eGroupNameAnalysisState::NotAnalyzed;
-    eGroupNonCapturingAnalysisState groupNonCapturingAnalysisState = eGroupNonCapturingAnalysisState::NotAnalyzed;
+    eGroupTypeAnalysisState groupNonCapturingAnalysisState = eGroupTypeAnalysisState::NotAnalyzed;
 };
 
 void CFiltersModel::setUsedRegex(const QString& regexStr)
@@ -542,7 +578,7 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                             break;
                         case eRegexFiltersRowType::VarGroup:
                         {
-                            pCurrentParsingDataItem->name = QString("VarGroup");
+                            pCurrentParsingDataItem->name = QString("Var group");
                         }
                             break;
                         case eRegexFiltersRowType::NonVarGroup:
@@ -552,7 +588,37 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                             break;
                         case eRegexFiltersRowType::NonCapturingGroup:
                         {
-                            pCurrentParsingDataItem->name = QString("NonCapturingGroup");
+                            pCurrentParsingDataItem->name = QString("Non-capturing group");
+                        }
+                            break;
+                        case eRegexFiltersRowType::AtomicGroup:
+                        {
+                            pCurrentParsingDataItem->name = QString("Atomic group");
+                        }
+                            break;
+                        case eRegexFiltersRowType::PositiveLookahead:
+                        {
+                            pCurrentParsingDataItem->name = QString("Positive lookahead");
+                        }
+                            break;
+                        case eRegexFiltersRowType::NegativeLookahead:
+                        {
+                            pCurrentParsingDataItem->name = QString("Negative lookahead");
+                        }
+                            break;
+                        case eRegexFiltersRowType::PositiveLookbehind:
+                        {
+                            pCurrentParsingDataItem->name = QString("Positive lookbehind");
+                        }
+                            break;
+                        case eRegexFiltersRowType::NegativeLookbehind:
+                        {
+                            pCurrentParsingDataItem->name = QString("Negative lookbehind");
+                        }
+                            break;
+                        case eRegexFiltersRowType::BranchResetGroup:
+                        {
+                            pCurrentParsingDataItem->name = QString("Branch reset group");
                         }
                             break;
                     }
@@ -654,20 +720,127 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                 return bResult;
             };
 
-            auto checkNonCapturingGroup = [&regexStr, &symbolCounter]() -> bool
+            auto checkGroupType = [&regexStr, &symbolCounter](eRegexFiltersRowType& rowType) -> bool
             {
                 bool bResult = false;
 
-                // if there are at least 2 symbols available - symbolCounter & symbolCounter + 1 - we can check whether group is non-captirung
-                if( (symbolCounter + 1) < regexStr.size())
                 {
-                    bResult = ( regexStr[symbolCounter] == '?'
-                            && regexStr[symbolCounter + 1] == '>' );
-
-                    if(true == bResult) // in case if non-capturing group was found
+                    // check atomic group
+                    if( (symbolCounter + 1) < regexStr.size())
                     {
-                        // we should skip 2 symbols.
-                        symbolCounter += 2;
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '>' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::AtomicGroup;
+                            // we should skip 2 symbols.
+                            symbolCounter += 2;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check non-capturing group
+                    if( (symbolCounter + 1) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == ':' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::NonCapturingGroup;
+                            // we should skip 2 symbols.
+                            symbolCounter += 2;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check positive lookahead
+                    if( (symbolCounter + 1) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '=' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::PositiveLookahead;
+                            // we should skip 2 symbols.
+                            symbolCounter += 2;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check negative lookahead
+                    if( (symbolCounter + 1) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '!' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::NegativeLookahead;
+                            // we should skip 2 symbols.
+                            symbolCounter += 2;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check positive lookbehind
+                    if( (symbolCounter + 2) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '<'
+                                && regexStr[symbolCounter + 2] == '=' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::PositiveLookbehind;
+                            // we should skip 3 symbols.
+                            symbolCounter += 3;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check negative lookbehind
+                    if( (symbolCounter + 2) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '<'
+                                && regexStr[symbolCounter + 2] == '!' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::NegativeLookbehind;
+                            // we should skip 3 symbols.
+                            symbolCounter += 3;
+                        }
+                    }
+                }
+
+                if(false == bResult)
+                {
+                    // check branch reset group
+                    if( (symbolCounter + 1) < regexStr.size())
+                    {
+                        bResult = ( regexStr[symbolCounter] == '?'
+                                && regexStr[symbolCounter + 1] == '|' );
+
+                        if(true == bResult)
+                        {
+                            rowType = eRegexFiltersRowType::BranchResetGroup;
+                            // we should skip 3 symbols.
+                            symbolCounter += 2;
+                        }
                     }
                 }
 
@@ -858,6 +1031,12 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                             break;
                         case eRegexFiltersRowType::VarGroup:
                         case eRegexFiltersRowType::NonCapturingGroup:
+                        case eRegexFiltersRowType::AtomicGroup:
+                        case eRegexFiltersRowType::PositiveLookahead:
+                        case eRegexFiltersRowType::NegativeLookahead:
+                        case eRegexFiltersRowType::PositiveLookbehind:
+                        case eRegexFiltersRowType::NegativeLookbehind:
+                        case eRegexFiltersRowType::BranchResetGroup:
                         {
                             // As in this case group's name was already analyzed and parsed, we are searching only for:
                             // - entering sub-group
@@ -893,18 +1072,16 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                             // - leaving the group
                             // If group name analysis finished - we are parsing the name in order to find out VarName and color.
 
-                            if( eGroupNonCapturingAnalysisState::NotAnalyzed == pCurrentParsingDataItem->groupNonCapturingAnalysisState )
+                            if( eGroupTypeAnalysisState::NotAnalyzed == pCurrentParsingDataItem->groupNonCapturingAnalysisState )
                             {
                                 // first of all, let's see whether it is a non-capturing group or not.
-                                if(true == checkNonCapturingGroup())
+                                if(true == checkGroupType(pCurrentParsingDataItem->rowType))
                                 {
-                                    // In such case we need to update the group type
-                                    pCurrentParsingDataItem->rowType = eRegexFiltersRowType::NonCapturingGroup;
-                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupNonCapturingAnalysisState::AnalyzedFound;
+                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupTypeAnalysisState::AnalyzedFound;
                                 }
                                 else
                                 {
-                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupNonCapturingAnalysisState::AnalyzedNotFound;
+                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupTypeAnalysisState::AnalyzedNotFound;
                                 }
                             }
                             else
@@ -1174,4 +1351,14 @@ void CFiltersModel::filterRegexTokensInternal()
     }
 
     //SEND_MSG(QString("~3 [CFiltersModel][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(time.elapsed()));
+}
+
+void CFiltersModel::addCompletionData( const tFoundMatches& )
+{
+
+}
+
+void CFiltersModel::resetCompletionData()
+{
+
 }

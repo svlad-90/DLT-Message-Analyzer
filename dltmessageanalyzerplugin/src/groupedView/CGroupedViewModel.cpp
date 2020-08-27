@@ -505,7 +505,7 @@ QVariant CGroupedViewModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-void CGroupedViewModel::addMatches( tFoundMatches& matches, bool update )
+void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
 {
     if(mpRootItem)
     {   
