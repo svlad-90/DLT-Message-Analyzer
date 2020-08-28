@@ -1,3 +1,6 @@
+#include "QStyleFactory"
+#include "QApplication"
+
 #include "../common/Definitions.hpp"
 
 #include "../dltmessageanalyzerplugin.hpp"
@@ -16,6 +19,19 @@ static void supportedColors()
     for(const auto& colorItem : sColorsMap)
     {
         SEND_MSG_COLORED(colorItem.first, colorItem.second);
+    }
+}
+
+static void supportedStyles()
+{
+    SEND_MSG( QString("Current style: %1").arg(QApplication::style()->objectName()) );
+
+    SEND_MSG("Supported styles:");
+
+    const QStringList styles = QStyleFactory::keys();
+    for(QString style : styles)
+    {
+        SEND_MSG(QString("- ").append(style));
     }
 }
 
@@ -68,6 +84,7 @@ static CConsoleInputProcessor::tScenariosMap createScenariosMap()
     result.insert(std::make_pair( QString("version"), [](){version();} ));
     result.insert(std::make_pair( QString("web-link"), [](){webLink();} ));
     result.insert(std::make_pair( QString("uml-id"), [](){UML_identifiers();} ));
+    result.insert(std::make_pair( QString("styles"), [](){supportedStyles();} ));
 
     return result;
 }

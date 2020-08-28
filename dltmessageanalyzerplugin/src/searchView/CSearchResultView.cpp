@@ -654,7 +654,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             if(nullptr != mpSpecificModel)
             {
                 auto siblingIdx = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
-                mpSpecificModel->setUML_Applicability(index, !siblingIdx.data().value<bool>());
+                mpSpecificModel->setUML_Applicability(index, !siblingIdx.data(Qt::CheckStateRole).value<bool>());
             }
         }
     });
@@ -1281,13 +1281,13 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
 
                     if(true == bTargetIndexFound)
                     {
-                        auto targetValue = !(targetIndex.sibling(targetIndex.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<bool>());
+                        auto targetValue = !(targetIndex.sibling(targetIndex.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data(Qt::CheckStateRole).value<bool>());
 
                         for(const auto& selectedRow : selectedRows)
                         {
                             auto siblingIdx = selectedRow.sibling(selectedRow.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
 
-                            if(siblingIdx.data().value<bool>() != targetValue)
+                            if(siblingIdx.data(Qt::CheckStateRole).value<bool>() != targetValue)
                             {
                                 mpSpecificModel->setUML_Applicability(selectedRow, targetValue);
                             }
@@ -1439,7 +1439,7 @@ void CSearchResultView::selectAllUMLItems(bool select)
 
             if(true == bUsedForUML)
             {
-                if(checkIndex.data().value<bool>() != select)
+                if(checkIndex.data(Qt::CheckStateRole).value<bool>() != select)
                 {
                     mpSpecificModel->setUML_Applicability(checkIndex, select);
                 }

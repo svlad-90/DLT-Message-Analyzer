@@ -326,6 +326,8 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
     if(nullptr != pModel)
     {
+        painter->save();
+
         auto stringData = pModel->data(index, Qt::DisplayRole).value<QString>();
 
         QStyleOptionViewItem opt = option;
@@ -385,6 +387,8 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             }
             break;
         }
+
+        painter->restore();
     }
 }
 

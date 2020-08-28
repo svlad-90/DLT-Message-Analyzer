@@ -100,7 +100,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
             result = getDataStrFromMsg(index, pMsg, static_cast<eSearchResultColumn>(index.column()));
         }
     }
-    else if( ( role == Qt::DisplayRole || role == Qt::CheckStateRole ) && ( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
+    else if( role == Qt::CheckStateRole && ( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
     {
         const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
 
