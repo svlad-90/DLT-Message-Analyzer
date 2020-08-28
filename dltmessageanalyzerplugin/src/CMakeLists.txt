@@ -41,6 +41,8 @@ add_library(antlr4_PCRE_static STATIC
 )
 
 set_property(TARGET antlr4_PCRE_static PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
 ################### ANTLR ( END ) #########################
 
 ################### CLANG_TIDY ############################
@@ -56,8 +58,15 @@ endif()
 ################### DLT_MESSAGE_ANALYZER ##################
 QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
 
-add_library(DLT-Message-Analyzer MODULE 
-    dltmessageanalyzerplugin.cpp 
+set(TURN_OFF_RCC OFF)
+
+if(NOT CMAKE_AUTORCC)
+    set(CMAKE_AUTORCC ON)
+    set(TURN_OFF_RCC ON)
+endif()
+
+add_library(DLT-Message-Analyzer MODULE
+    dltmessageanalyzerplugin.cpp
     CDLTMessageAnalyzer.cpp
     form.cpp
     settings/CSettingsManager.cpp
@@ -81,7 +90,7 @@ add_library(DLT-Message-Analyzer MODULE
     dltWrappers/CDLTFileWrapper.cpp
     dltWrappers/CDLTMsgWrapper.cpp
     filtersView/CFiltersModel.cpp
-    filtersView/CFiltersView.cpp 
+    filtersView/CFiltersView.cpp
     groupedView/CGroupedView.cpp
     groupedView/CGroupedViewModel.cpp
     patternsView/CPatternsModel.cpp
@@ -92,7 +101,13 @@ add_library(DLT-Message-Analyzer MODULE
 #    uml/CSVGView.hpp
     plant_uml/CUMLView.cpp
     plant_uml/CImageViewer.cpp
-    ${UI_HEADERS})
+    ${UI_HEADERS}
+    resources/dltmessageanalyzer.qrc)
+
+if(TURN_OFF_RCC)
+    set(CMAKE_AUTORCC OFF)
+    set(TURN_OFF_RCC OFF)
+endif()
 ################### DLT_MESSAGE_ANALYZER ( END ) ##########
 
 ################### ANTLR_LINKAGE #########################

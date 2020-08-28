@@ -75,6 +75,12 @@ and many other features
 
 ----
 
+## Troubleshooting
+
+### [Read it here](./md/troubleshooting/troubleshooting.md)
+
+----
+
 ## Screenshots:
 
 ![Screenshot of DLT Message Analyzer plugin - Filters view](./md/DLTMessageAnalyzer_screenshot_FilterView.png)
