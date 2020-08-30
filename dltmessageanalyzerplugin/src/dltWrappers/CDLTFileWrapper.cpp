@@ -12,7 +12,7 @@
 #include "CDLTFileWrapper.hpp"
 #include "CDLTMsgWrapper.hpp"
 
-#include "log/CConsoleCtrl.hpp"
+#include "../log/CConsoleCtrl.hpp"
 
 #include "qdlt.h"
 

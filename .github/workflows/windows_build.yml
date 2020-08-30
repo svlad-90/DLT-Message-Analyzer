@@ -54,12 +54,12 @@ jobs:
     - name: Add jom to path
       run: echo "::add-path::D:/a/DLT-Message-Analyzer/tools/jom/"
 
-    # Checkout dlt-viewer's revision 2.20.
+    # Checkout dlt-viewer's revision 2.20.1
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v2
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.20.0
+        ref: v2.20.1
 
     # Checkout DLT-Message-Analyzer's revision, which is pushed
     - name: Checkout of the DLT-Message-Analyzer
@@ -73,13 +73,12 @@ jobs:
     - name: Patch dlt-viewer's CMakeLists.txt
       run: |
          $filePath = ".\CMakeLists.txt"
-         $find_1 = "add_definitions( ""-Wall"" )"
-         $replace_1 = "if(NOT CMAKE_CXX_COMPILER_ID MATCHES ""MSVC""){0}add_definitions( ""-Wextra"" )" -f [environment]::NewLine
+         $find_1 = "SET(CMAKE_C_FLAGS  ""`${CMAKE_C_FLAGS} -std=gnu99"")"
+         $replace_1 = "{0}if(NOT CMAKE_CXX_COMPILER_ID MATCHES ""MSVC""){1}{2}" -f [environment]::NewLine, [environment]::NewLine, $find_1
          (Get-Content $filePath).Replace( $find_1 , $replace_1 ) | Set-Content $filePath
          $find_2 = "add_definitions( ""-Wno-strict-aliasing"" )"
-         $replace_2 = "add_definitions( ""-Wno-strict-aliasing"" ){0}endif()" -f [environment]::NewLine
+         $replace_2 = "{0}{1}endif()" -f $find_2, [environment]::NewLine
          (Get-Content $filePath).Replace( $find_2 , $replace_2 ) | Set-Content $filePath
-      
       shell: powershell
         
     # Adjust dlt-viewer's plugin CMakeLists.txt file to sub-include DLT-Message-Analyzer

@@ -10,9 +10,13 @@
 
 > **Note!**
 > 
-> Currently plugin can be built against the v2.20.0 release. So, be sure, that you've checked out the compatible base-line. 
+> Currently plugin can be built against the v2.20.1 release.
+>
+> The build under the v2.20.0 is also supported.
 >
 > The build under the v2.19.0 is also supported in the compatibility mode. Such option is described below. Search for PLUGIN_INTERFACE_VERSION.
+>
+> So, be sure, that you've checked out the compatible base-line. 
 
 ----
 
@@ -32,6 +36,8 @@ Afterward, open the dlt-viewer's CMake project, which is located in the root of 
 > Open the same file, which is mentioned in previous screenshot in the text editor, and add the following 2 lines:
 > 
 > if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC") # new line
+>
+> SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=gnu99")
 >
 > add_definitions( "-Wall" )
 >
