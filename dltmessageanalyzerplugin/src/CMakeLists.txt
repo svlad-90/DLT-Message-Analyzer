@@ -3,6 +3,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ################### CPP ( END ) ###########################
 
+################### COMPATIBILITY #########################
+# Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
+# add_definitions(-DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
+################### COMPATIBILITY ( END ) #################
+
 ################### ANTLR #################################
 # minimum required CMAKE version
 CMAKE_MINIMUM_REQUIRED(VERSION 3.7 FATAL_ERROR)
@@ -65,44 +70,37 @@ if(NOT CMAKE_AUTORCC)
     set(TURN_OFF_RCC ON)
 endif()
 
+add_subdirectory(analyzer)
+add_subdirectory(common)
+add_subdirectory(searchView)
+add_subdirectory(plant_uml)
+add_subdirectory(log)
+add_subdirectory(settings)
+add_subdirectory(logo)
+add_subdirectory(dltWrappers)
+add_subdirectory(filtersView)
+add_subdirectory(groupedView)
+add_subdirectory(patternsView)
+
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp
     CDLTMessageAnalyzer.cpp
     form.cpp
-    settings/CSettingsManager.cpp
-    settings/ISettingItem.cpp
-    settings/CSettingItem.cpp
-    logo/CLogo.cpp
-    log/CConsoleCtrl.cpp
-    log/CConsoleView.cpp
-    log/CConsoleInputProcessor.cpp
-    analyzer/IDLTMessageAnalyzerController.cpp
-    analyzer/IDLTMessageAnalyzerControllerConsumer.cpp
-    analyzer/CMTAnalyzer.cpp
-    analyzer/CContinuousAnalyzer.cpp
-    analyzer/CDLTRegexAnalyzerWorker.cpp
-    common/CTreeItem.cpp
-    common/Definitions.cpp
-    common/CBGColorAnimation.cpp
-    common/CRegexDirectoryMonitor.cpp
-    common/CTableMemoryJumper.cpp
-    common/OSHelper.cpp
-    dltWrappers/CDLTFileWrapper.cpp
-    dltWrappers/CDLTMsgWrapper.cpp
-    filtersView/CFiltersModel.cpp
-    filtersView/CFiltersView.cpp
-    groupedView/CGroupedView.cpp
-    groupedView/CGroupedViewModel.cpp
-    patternsView/CPatternsModel.cpp
-    patternsView/CPatternsView.cpp
-    searchView/CSearchResultHighlightingDelegate.cpp
-    searchView/CSearchResultModel.cpp
-    searchView/CSearchResultView.cpp
-#    uml/CSVGView.hpp
-    plant_uml/CUMLView.cpp
-    plant_uml/CImageViewer.cpp
     ${UI_HEADERS}
     resources/dltmessageanalyzer.qrc)
+
+target_link_libraries(DLT-Message-Analyzer
+    DMA_analyzer
+    DMA_common
+    DMA_searchView
+    DMA_plant_uml
+    DMA_log
+    DMA_settings
+    DMA_logo
+    DMA_dltWrappers
+    DMA_filtersView
+    DMA_groupedView
+    DMA_patternsView)
 
 if(TURN_OFF_RCC)
     set(CMAKE_AUTORCC OFF)
@@ -122,11 +120,6 @@ add_custom_command(TARGET DLT-Message-Analyzer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy
                    ${CMAKE_CURRENT_SOURCE_DIR}/../../thirdparty/plantuml/plantuml.jar $<TARGET_FILE_DIR:DLT-Message-Analyzer>/)
 ################### PLANTUML ( END ) ######################
-
-################### COMPATIBILITY #########################
-# Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
-# target_compile_definitions(DLT-Message-Analyzer PRIVATE -DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
-################### COMPATIBILITY ( END ) #################
 
 ################### QT ####################################
 target_link_libraries(DLT-Message-Analyzer qdlt Qt5::Widgets )

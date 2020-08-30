@@ -269,7 +269,7 @@ enum class eGroupSyntaxType
 {
     SYNTAX_1 = 0,  /*?<name>*/
     SYNTAX_2 = 1,  /*?'name'*/
-    SYNTAX_3 = 3   /*?P<name>*/
+    SYNTAX_3 = 2   /*?P<name>*/
 };
 
 //////////////////////FILTERS VIEW DEFINITIONS//////////////////////
