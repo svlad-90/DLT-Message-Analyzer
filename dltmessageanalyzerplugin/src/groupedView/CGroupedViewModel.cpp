@@ -10,7 +10,7 @@
 #include "QDateTime"
 
 #include "CGroupedViewModel.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
 static const QString sRootItemName = "Root";

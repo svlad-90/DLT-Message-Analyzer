@@ -14,7 +14,7 @@
 #include "QDebug"
 #include <QStandardPaths>
 
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "../common/OSHelper.hpp"
 #include "CSettingsManager.hpp"
 

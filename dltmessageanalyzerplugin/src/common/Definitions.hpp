@@ -302,14 +302,7 @@ enum class eRegexFiltersRowType
 {
     VarGroup = 0, // variable group
     NonVarGroup, // non-variable group
-    Text, // text
-    NonCapturingGroup, // non-capturing group
-    AtomicGroup,
-    PositiveLookahead,
-    NegativeLookahead,
-    PositiveLookbehind,
-    NegativeLookbehind,
-    BranchResetGroup
+    Text // text
 };
 
 Q_DECLARE_METATYPE( eRegexFiltersRowType )

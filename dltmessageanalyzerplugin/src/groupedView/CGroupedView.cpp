@@ -17,7 +17,7 @@
 
 #include "CGroupedView.hpp"
 #include "../common/CTreeItem.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
 class CDoubleDelegate: public QStyledItemDelegate

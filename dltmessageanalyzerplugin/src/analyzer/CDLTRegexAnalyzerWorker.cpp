@@ -15,7 +15,7 @@
 #endif
 
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
 Q_DECLARE_METATYPE(CDLTRegexAnalyzerWorker::ePortionAnalysisState)

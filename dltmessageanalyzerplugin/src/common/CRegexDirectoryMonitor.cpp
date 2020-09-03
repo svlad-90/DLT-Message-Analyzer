@@ -5,7 +5,7 @@
 
 // project includes
 #include "Definitions.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 // self-includes
 #include "CRegexDirectoryMonitor.hpp"

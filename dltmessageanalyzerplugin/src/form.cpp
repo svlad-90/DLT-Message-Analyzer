@@ -24,6 +24,7 @@
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
 #include "log/CConsoleCtrl.hpp"
+#include "log/CLog.hpp"
 #include "plant_uml/CUMLView.hpp"
 #include "common/OSHelper.hpp"
 

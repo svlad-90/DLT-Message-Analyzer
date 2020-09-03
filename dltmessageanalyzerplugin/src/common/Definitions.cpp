@@ -17,7 +17,7 @@
 #include "QRegularExpression"
 #include "QTextStream"
 
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "CTreeItem.hpp"
 
 Q_DECLARE_METATYPE(eRequestState)
@@ -1457,41 +1457,6 @@ QString getName(eRegexFiltersRowType val)
         case eRegexFiltersRowType::NonVarGroup:
         {
             result = "Group";
-        }
-            break;
-        case eRegexFiltersRowType::NonCapturingGroup:
-        {
-            result = "Non-capturing group";
-        }
-            break;
-        case eRegexFiltersRowType::AtomicGroup:
-        {
-            result = "Atomic group";
-        }
-            break;
-        case eRegexFiltersRowType::PositiveLookahead:
-        {
-            result = "Positive lookahead";
-        }
-            break;
-        case eRegexFiltersRowType::NegativeLookahead:
-        {
-            result = "Negative lookahead";
-        }
-            break;
-        case eRegexFiltersRowType::PositiveLookbehind:
-        {
-            result = "Positive lookbehind";
-        }
-            break;
-        case eRegexFiltersRowType::NegativeLookbehind:
-        {
-            result = "Negative lookbehind";
-        }
-            break;
-        case eRegexFiltersRowType::BranchResetGroup:
-        {
-            result = "Branch reset group";
         }
             break;
     }

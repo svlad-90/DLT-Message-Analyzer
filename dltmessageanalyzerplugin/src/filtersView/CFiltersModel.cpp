@@ -8,9 +8,14 @@
 #include "QDateTime"
 #include "QRegularExpression"
 
+#ifdef DEBUG_BUILD
+#include "QElapsedTimer"
+#endif
+
 #include "../settings/CSettingsManager.hpp"
 #include "CFiltersModel.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
+#include "../common/PCRE/PCREHelper.hpp"
 
 CFiltersModel::CFiltersModel(QObject *parent)
     : QAbstractItemModel(parent),
@@ -121,7 +126,12 @@ CFiltersModel::CFiltersModel(QObject *parent)
         filterRegexTokensInternal();
     });
 
-    mpRootItem = new tTreeItem(nullptr, static_cast<int>(mSortingColumn),
+    resetRootItem();
+}
+
+void CFiltersModel::resetRootItem()
+{
+    mpRootItem = std::make_shared<tTreeItem>(nullptr, static_cast<int>(mSortingColumn),
                                mSortingHandler,
                                CTreeItem::tHandleDuplicateFunc(),
                                CTreeItem::tFindItemFunc());
@@ -136,15 +146,6 @@ CFiltersModel::CFiltersModel(QObject *parent)
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupName) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupSyntaxType) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Last) );
-}
-
-CFiltersModel::~CFiltersModel()
-{
-    if(nullptr != mpRootItem)
-    {
-        delete mpRootItem;
-        mpRootItem = nullptr;
-    }
 }
 
 QModelIndex CFiltersModel::rootIndex() const
@@ -166,7 +167,7 @@ QModelIndex CFiltersModel::index(int row, int column, const QModelIndex &parent)
     tTreeItemPtr pParentItem;
 
     if (parent == rootIndex())
-        pParentItem = mpRootItem;
+        pParentItem = mpRootItem.get();
     else
         pParentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
@@ -184,7 +185,7 @@ QModelIndex CFiltersModel::parent(const QModelIndex &index) const
     tTreeItem *childItem = static_cast<tTreeItemPtr>(index.internalPointer());
     tTreeItem *parentItem = childItem->getParent();
 
-    if (parentItem == mpRootItem)
+    if (parentItem == mpRootItem.get())
         return rootIndex();
     else
         return createIndex(parentItem->row(), 0, parentItem);
@@ -195,7 +196,7 @@ int CFiltersModel::rowCount(const QModelIndex &parent) const
      tTreeItem *parentItem;
 
     if (parent == rootIndex())
-        parentItem = mpRootItem;
+        parentItem = mpRootItem.get();
     else
         parentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
@@ -333,41 +334,6 @@ QPair<bool,QString> CFiltersModel::packRegex()
                     }
                 }
                     break;
-                case eRegexFiltersRowType::NonCapturingGroup:
-                {
-                    regexStr.append("(?:");
-                }
-                    break;
-                case eRegexFiltersRowType::AtomicGroup:
-                {
-                    regexStr.append("(?>");
-                }
-                    break;
-                case eRegexFiltersRowType::PositiveLookahead:
-                {
-                    regexStr.append("(?=");
-                }
-                    break;
-                case eRegexFiltersRowType::NegativeLookahead:
-                {
-                    regexStr.append("(?!");
-                }
-                    break;
-                case eRegexFiltersRowType::PositiveLookbehind:
-                {
-                    regexStr.append("(?<=");
-                }
-                    break;
-                case eRegexFiltersRowType::NegativeLookbehind:
-                {
-                    regexStr.append("(?<!");
-                }
-                    break;
-                case eRegexFiltersRowType::BranchResetGroup:
-                {
-                    regexStr.append("(?|");
-                }
-                    break;
             }
 
             return true;
@@ -380,13 +346,6 @@ QPair<bool,QString> CFiltersModel::packRegex()
                 case eRegexFiltersRowType::Text:{} break;
                 case eRegexFiltersRowType::NonVarGroup:
                 case eRegexFiltersRowType::VarGroup:
-                case eRegexFiltersRowType::NonCapturingGroup:
-                case eRegexFiltersRowType::AtomicGroup:
-                case eRegexFiltersRowType::PositiveLookahead:
-                case eRegexFiltersRowType::NegativeLookahead:
-                case eRegexFiltersRowType::PositiveLookbehind:
-                case eRegexFiltersRowType::NegativeLookbehind:
-                case eRegexFiltersRowType::BranchResetGroup:
                 {
                     regexStr.append(")");
                 }
@@ -444,69 +403,14 @@ QVariant CFiltersModel::headerData(int section, Qt::Orientation orientation,
 void CFiltersModel::resetData()
 {
     beginResetModel();
-    if(mpRootItem)
-        delete mpRootItem;
-    mpRootItem = new tTreeItem(nullptr,
-                               static_cast<int>(mSortingColumn),
-                               mSortingHandler,
-                               CTreeItem::tHandleDuplicateFunc(),
-                               CTreeItem::tFindItemFunc());
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Value) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Index) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::ItemType) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::AfterLastVisible) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Color) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Range) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::RowType) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::IsFiltered) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupName) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupSyntaxType) );
-    mpRootItem->appendColumn( getName(eRegexFiltersColumn::Last) );
-
+    resetRootItem();
     endResetModel();
     updateView();
 }
 
-enum class eGroupNameAnalysisState
-{
-    NotAnalyzed,
-    AnalyzedFound,
-    AnalyzedNotFound
-};
-
-enum class eGroupTypeAnalysisState
-{
-    NotAnalyzed,
-    AnalyzedFound,
-    AnalyzedNotFound
-};
-
-struct tParsingDataItem
-{
-    tTreeItemPtr pTreeItem = nullptr;
-
-    // data fields
-    int index;
-    QString name;
-    QString value;
-    tColorWrapper colorWrapper;
-    tIntRange range;
-    eRegexFiltersRowType rowType = eRegexFiltersRowType::Text;
-    bool isFiltered = false;
-    QString groupName;
-    eGroupSyntaxType groupSyntaxType;
-
-    // internal fields
-    bool isRoot = false;
-    eGroupNameAnalysisState groupNameAnalysisState = eGroupNameAnalysisState::NotAnalyzed;
-    eGroupTypeAnalysisState groupNonCapturingAnalysisState = eGroupTypeAnalysisState::NotAnalyzed;
-};
-
 void CFiltersModel::setUsedRegex(const QString& regexStr)
 {
     QString regex_ = QString("(?J)").append(regexStr);
-
-    typedef std::stack<tParsingDataItem> tParsingStateStack;
 
     // we should reset a group
     resetData();
@@ -514,623 +418,53 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
     //we need to parse regex into a set of groups here.
     if(nullptr != mpRootItem)
     {
+#ifdef DEBUG_BUILD
+        QElapsedTimer timer;
+        timer.start();
+#endif
+
         QRegularExpression regex(regex_);
+
+#ifdef DEBUG_BUILD
+        SEND_MSG(QString("[CFiltersModel][%1] It took %2 ms to create check regex")
+                 .arg(__FUNCTION__)
+                 .arg(timer.elapsed()));
+#endif
 
         if(true == regex.isValid()) // let's use more deep functionality in order to check correctness of passed regex
         {
-            tParsingStateStack parsingStateStack;  // stack of parsing states
-            tParsingDataItem rootDataItem;
-            rootDataItem.pTreeItem = mpRootItem;
-            rootDataItem.isRoot = true;
-            parsingStateStack.push(rootDataItem); // we should have only this item on the stack at the end of the parsing
+            // parse regex
+#ifdef DEBUG_BUILD
+            timer.restart();
+#endif
 
-            tParsingDataItem* pCurrentParsingDataItem = &parsingStateStack.top();
+            resetRootItem();
 
-            mRegex = regexStr;
-            const auto stringSize = regexStr.size();
+#ifdef DEBUG_BUILD
+            SEND_MSG(QString("[CFiltersModel][%1] It took %2 ms to reset root item")
+                     .arg(__FUNCTION__)
+                     .arg(timer.elapsed()));
 
-            int symbolCounter = 0;
-            int toRange = 0;
-            int indexCounter = 0;
+            timer.restart();
+#endif
 
-            auto pushParsingItem = [&indexCounter, &pCurrentParsingDataItem, &symbolCounter, &parsingStateStack]( eRegexFiltersRowType rowType )
-            {
-                // let's create a parsing item and fill as many fields as possible
-                tParsingDataItem newParsingDataItem;
-                newParsingDataItem.index = indexCounter;
-                ++indexCounter;
-                newParsingDataItem.rowType = rowType;
-                newParsingDataItem.isRoot = false;
-                newParsingDataItem.range.from = symbolCounter; // range start
-                // create new tree node. As of now with empty data. It will be filled in afterwards.
-                newParsingDataItem.pTreeItem = pCurrentParsingDataItem->pTreeItem->appendChild( symbolCounter, CTreeItem::tData() );
-                parsingStateStack.push(newParsingDataItem);
+            parseRegexFiltersView(mpRootItem, regexStr);
 
-                //SEND_MSG(QString("[CFiltersModel][%1] Parent |%2| assigned to child |%3|")
-                //         .arg(__FUNCTION__)
-                //         .arg(pCurrentParsingDataItem->index)
-                //         .arg(newParsingDataItem.index));
+#ifdef DEBUG_BUILD
+            SEND_MSG(QString("[CFiltersModel][%1] It took %2 ms to parse regex")
+                     .arg(__FUNCTION__)
+                     .arg(timer.elapsed()));
 
-                pCurrentParsingDataItem = &parsingStateStack.top();
-            };
-
-            auto popParsingItem = [this, &pCurrentParsingDataItem, &symbolCounter, &parsingStateStack, &indexCounter, &toRange]()
-            {
-                assert(parsingStateStack.size() > 1);
-
-                // let's update missing fields and pop item out of the stack, as work with it is finished.
-                pCurrentParsingDataItem->range.to = toRange;
-                if(pCurrentParsingDataItem->rowType != eRegexFiltersRowType::Text)
-                {
-                    // expand range to cover "()" signs
-                    pCurrentParsingDataItem->range.from -= 1;
-                    pCurrentParsingDataItem->range.to += 1;
-                }
-
-                if( true == pCurrentParsingDataItem->name.isEmpty() )
-                {
-                    switch( pCurrentParsingDataItem->rowType )
-                    {
-                        case eRegexFiltersRowType::Text:
-                        {
-                            pCurrentParsingDataItem->name = QString("Text");
-                        }
-                            break;
-                        case eRegexFiltersRowType::VarGroup:
-                        {
-                            pCurrentParsingDataItem->name = QString("Var group");
-                        }
-                            break;
-                        case eRegexFiltersRowType::NonVarGroup:
-                        {
-                            pCurrentParsingDataItem->name = QString("Group");
-                        }
-                            break;
-                        case eRegexFiltersRowType::NonCapturingGroup:
-                        {
-                            pCurrentParsingDataItem->name = QString("Non-capturing group");
-                        }
-                            break;
-                        case eRegexFiltersRowType::AtomicGroup:
-                        {
-                            pCurrentParsingDataItem->name = QString("Atomic group");
-                        }
-                            break;
-                        case eRegexFiltersRowType::PositiveLookahead:
-                        {
-                            pCurrentParsingDataItem->name = QString("Positive lookahead");
-                        }
-                            break;
-                        case eRegexFiltersRowType::NegativeLookahead:
-                        {
-                            pCurrentParsingDataItem->name = QString("Negative lookahead");
-                        }
-                            break;
-                        case eRegexFiltersRowType::PositiveLookbehind:
-                        {
-                            pCurrentParsingDataItem->name = QString("Positive lookbehind");
-                        }
-                            break;
-                        case eRegexFiltersRowType::NegativeLookbehind:
-                        {
-                            pCurrentParsingDataItem->name = QString("Negative lookbehind");
-                        }
-                            break;
-                        case eRegexFiltersRowType::BranchResetGroup:
-                        {
-                            pCurrentParsingDataItem->name = QString("Branch reset group");
-                        }
-                            break;
-                    }
-                }
-
-                // check for empty group. Implicitly add empty text to it
-                if(pCurrentParsingDataItem->rowType != eRegexFiltersRowType::Text)
-                {
-                    if(pCurrentParsingDataItem->pTreeItem->childCount() == 0)
-                    {
-                        CTreeItem::tData data;
-
-                        data.push_back(tDataItem(QString()));
-                        data.push_back(tDataItem(indexCounter++));
-                        data.push_back(tDataItem(QString("Text")));
-                        data.push_back(tDataItem(QString()));
-                        data.push_back(tDataItem(tColorWrapper()));
-                        data.push_back(tDataItem(pCurrentParsingDataItem->range));
-                        data.push_back(tDataItem(eRegexFiltersRowType::Text));
-                        data.push_back(tDataItem(false));
-                        data.push_back(tDataItem(QString()));
-                        data.push_back(tDataItem(0));
-
-                        pCurrentParsingDataItem->pTreeItem->appendChild( symbolCounter, data );
-                    }
-                }
-
-                // fill in the tree item
-
-                auto pParent = pCurrentParsingDataItem->pTreeItem->getParent();
-
-                if(nullptr != pParent)
-                {
-                    CTreeItem::tData data;
-
-                    data.push_back(tDataItem(pCurrentParsingDataItem->value));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->index));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->name));
-                    data.push_back(tDataItem(QString()));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->colorWrapper));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->range));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->rowType));
-                    data.push_back(tDataItem(false));
-                    data.push_back(tDataItem(pCurrentParsingDataItem->groupName));
-                    data.push_back(tDataItem(static_cast<int>(pCurrentParsingDataItem->groupSyntaxType)));
-
-                    pCurrentParsingDataItem->pTreeItem->setData(data);
-
-                    pParent->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
-                    pCurrentParsingDataItem->pTreeItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
-
-                    auto parentIdx = createIndexInternal(pParent->getIdx(), 0, pParent);
-
-                    beginInsertRows(parentIdx, 0, pCurrentParsingDataItem->pTreeItem->getIdx());
-
-                    //SEND_MSG(QString("[CFiltersModel][%1] Finish processing of item |%2|%3|%4|")
-                    //         .arg(__FUNCTION__)
-                    //         .arg(pCurrentParsingDataItem->index)
-                    //         .arg(pCurrentParsingDataItem->name)
-                    //         .arg(pCurrentParsingDataItem->value));
-
-                    parsingStateStack.pop();
-                    pCurrentParsingDataItem = &parsingStateStack.top();
-
-                    endInsertRows();
-                }
-            };
-
-            auto checkGroup = [&regexStr, &symbolCounter, &toRange](bool checkLeavingGroup) -> bool
-            {
-                bool bResult = false;
-
-                QChar checkChar = false == checkLeavingGroup ? '(' : ')';
-
-                if(0 == symbolCounter && false == regexStr.isEmpty())
-                {
-                    bResult = regexStr[symbolCounter] == checkChar;
-                }
-                else if(symbolCounter >= 2)
-                {
-                    bResult = ( regexStr[symbolCounter - 2] == '\\'
-                            && regexStr[symbolCounter - 1] == '\\'
-                            && regexStr[symbolCounter] == checkChar )
-                            ||
-                            ( regexStr[symbolCounter - 1] != '\\'
-                              && regexStr[symbolCounter] == checkChar );
-                }
-                else if(symbolCounter == 1)
-                {
-                    bResult = ( regexStr[symbolCounter - 1] != '\\' && regexStr[symbolCounter] == checkChar ) ;
-                }
-
-                if(true == bResult)
-                {
-                    toRange = symbolCounter;
-                    ++symbolCounter;
-                }
-
-                return bResult;
-            };
-
-            auto checkGroupType = [&regexStr, &symbolCounter](eRegexFiltersRowType& rowType) -> bool
-            {
-                bool bResult = false;
-
-                {
-                    // check atomic group
-                    if( (symbolCounter + 1) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '>' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::AtomicGroup;
-                            // we should skip 2 symbols.
-                            symbolCounter += 2;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check non-capturing group
-                    if( (symbolCounter + 1) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == ':' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::NonCapturingGroup;
-                            // we should skip 2 symbols.
-                            symbolCounter += 2;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check positive lookahead
-                    if( (symbolCounter + 1) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '=' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::PositiveLookahead;
-                            // we should skip 2 symbols.
-                            symbolCounter += 2;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check negative lookahead
-                    if( (symbolCounter + 1) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '!' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::NegativeLookahead;
-                            // we should skip 2 symbols.
-                            symbolCounter += 2;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check positive lookbehind
-                    if( (symbolCounter + 2) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '<'
-                                && regexStr[symbolCounter + 2] == '=' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::PositiveLookbehind;
-                            // we should skip 3 symbols.
-                            symbolCounter += 3;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check negative lookbehind
-                    if( (symbolCounter + 2) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '<'
-                                && regexStr[symbolCounter + 2] == '!' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::NegativeLookbehind;
-                            // we should skip 3 symbols.
-                            symbolCounter += 3;
-                        }
-                    }
-                }
-
-                if(false == bResult)
-                {
-                    // check branch reset group
-                    if( (symbolCounter + 1) < regexStr.size())
-                    {
-                        bResult = ( regexStr[symbolCounter] == '?'
-                                && regexStr[symbolCounter + 1] == '|' );
-
-                        if(true == bResult)
-                        {
-                            rowType = eRegexFiltersRowType::BranchResetGroup;
-                            // we should skip 3 symbols.
-                            symbolCounter += 2;
-                        }
-                    }
-                }
-
-                return bResult;
-            };
-
-            auto checkGroupName = [&regexStr, &symbolCounter, &pCurrentParsingDataItem]()
-            {
-                // we will use this one to:
-                // - check availability of the name
-                // - if name exist - get the whole name, increasing the symbolCounter locally
-                // - if name exist - we will parse it in order to identify var and color
-                // - if var and color exist - we will assign them to the current parsing data item
-                // When this method is called cursor should be one symbol AFTER the '(' character. We can validate this to be on the safe side
-                if( symbolCounter > 0                   // if we have analyzed at least 1 symbol
-                 && regexStr.size() > 1                 // and size of provided regex is bigger than 1 symbol
-                 && regexStr[symbolCounter-1] == '(')  // and previous analyzed symbol is '('
-                {
-                    // we can move on with checking the '?' '<' sequence
-                    // we should have at least one more symbol after cursor's position to succeed.
-                    if( (symbolCounter + 2) < regexStr.size() )
-                    {
-                        QChar groupLeavingChar;
-                        bool bEntranceToGroupNameFound = false;
-
-                        if( regexStr[symbolCounter] == '?'
-                         && regexStr[symbolCounter+1] == '<' )
-                        {
-                            pCurrentParsingDataItem->groupSyntaxType = eGroupSyntaxType::SYNTAX_1;
-                            bEntranceToGroupNameFound = true;
-                            groupLeavingChar = '>';
-
-                            // we have a group name. Need to step over "group entering" entering characters
-                            symbolCounter += 2;
-                        }
-
-                        if( regexStr[symbolCounter] == '?'
-                         && regexStr[symbolCounter+1] == '\'' )
-                        {
-                            pCurrentParsingDataItem->groupSyntaxType = eGroupSyntaxType::SYNTAX_2;
-                            bEntranceToGroupNameFound = true;
-                            groupLeavingChar = '\'';
-
-                            // we have a group name. Need to step over "group entering" entering characters
-                            symbolCounter += 2;
-                        }
-
-                        if( regexStr[symbolCounter] == '?'
-                         && regexStr[symbolCounter+1] == 'P'
-                         && regexStr[symbolCounter+2] == '<' )
-                        {
-                            pCurrentParsingDataItem->groupSyntaxType = eGroupSyntaxType::SYNTAX_3;
-                            bEntranceToGroupNameFound = true;
-                            groupLeavingChar = '>';
-
-                            // we have a group name. Need to step over "group entering" entering characters
-                            symbolCounter += 2;
-                        }
-
-
-                        if( true == bEntranceToGroupNameFound )
-                        {
-                            bool groupNameEndFound = false;
-                            QString groupName;
-                            groupName.reserve(100);
-
-                            if(symbolCounter < regexStr.size()) // if something left to be parsed
-                            {
-                                while( symbolCounter < regexStr.size() ) // let's fetch the group name out of the string
-                                {
-                                    const QChar& currentSymbol = regexStr[symbolCounter];
-
-                                    if(currentSymbol == groupLeavingChar)
-                                    {
-                                        // we've found end of the group name
-                                        ++symbolCounter;
-                                        groupNameEndFound = true;
-                                        break;           // break the loop, as further iteration is not needed
-                                    }
-                                    else
-                                    {
-                                        groupName.append(currentSymbol);
-                                        ++symbolCounter;
-                                    }
-                                }
-
-                                if(true == groupNameEndFound) // if we've found ending of group name without reaching the end of the regex
-                                {
-                                    // let's store group name
-                                    pCurrentParsingDataItem->groupName = groupName;
-
-                                    // let's parse the name and update the attribute of the analysis item
-                                    auto pRegexMetadataItem = parseRegexGroupName(groupName, false);
-
-                                    if(nullptr != pRegexMetadataItem)
-                                    {
-                                        if(true == pRegexMetadataItem->varName.first)
-                                        {
-                                            pCurrentParsingDataItem->rowType = eRegexFiltersRowType::VarGroup;
-                                            pCurrentParsingDataItem->value = pRegexMetadataItem->varName.second;
-                                        }
-                                        else
-                                        {
-                                            pCurrentParsingDataItem->name = "Group";
-                                            pCurrentParsingDataItem->value = pCurrentParsingDataItem->groupName;
-                                        }
-
-                                        pCurrentParsingDataItem->colorWrapper.optColor = pRegexMetadataItem->highlightingColor;
-                                    }
-                                }
-                            }
-                            else // we do not have a group name
-                            {
-                                pCurrentParsingDataItem->groupNameAnalysisState = eGroupNameAnalysisState::AnalyzedNotFound;
-                            }
-
-                        }
-                        else // we do not have a group name
-                        {
-                            pCurrentParsingDataItem->groupNameAnalysisState = eGroupNameAnalysisState::AnalyzedNotFound;
-                        }
-                    }
-                    else // group does not have a name
-                    {
-                        pCurrentParsingDataItem->groupNameAnalysisState = eGroupNameAnalysisState::AnalyzedNotFound;
-                    }
-                }
-                else // group does not have a name
-                {
-                    pCurrentParsingDataItem->groupNameAnalysisState = eGroupNameAnalysisState::AnalyzedNotFound;
-                }
-            };
-
-            for( ; symbolCounter < stringSize; ) // let's parse the regex manually searching for the groups
-            {
-                const QChar& symbol = regexStr[symbolCounter];
-
-                //   (       - in the group                         - covered
-                //   \(      - ignore                               - covered
-                //   \\(     - in the group                         - covered
-                //   (?>     - in the non capturing group           - covered
-                //   ?<name> or ?'name' or ?P<name> - name          - next
-                //   )       - out of the group                     - covered
-                //   \)      - ignore                               - covered
-                //   \\)     - out of the group                     - covered
-                //   ?< after ( or \\( - start of regex name        - next
-                //   > after ?< - end of regex name                 - next
-
-                if( true == pCurrentParsingDataItem->isRoot ) // we are at the top of the analysis stack. Here we are searching for entering the group or for a text.
-                {
-                    if(true == checkGroup( false )) // we are entering the group
-                    {
-                        pushParsingItem(eRegexFiltersRowType::NonVarGroup); // add non var group
-                    }
-                    else // we've found a text
-                    {
-                        pushParsingItem(eRegexFiltersRowType::Text); // add text
-                        pCurrentParsingDataItem->value.append(symbol); // append character to a value
-                        ++symbolCounter;
-                    }
-                }
-                else
-                {
-                    switch(pCurrentParsingDataItem->rowType)
-                    {
-                        case eRegexFiltersRowType::Text:
-                        {
-                            // here we can found entering a group or another text
-                            // if group is found - it becomes a sibling of current analysis item.
-                            // so we should first pop current analysis item and append new child to its parent.
-                            if(true == checkGroup( false )) // we are entering the group
-                            {
-                                popParsingItem();
-                                pushParsingItem(eRegexFiltersRowType::NonVarGroup); // add non var group
-                            }
-                            else if(true == checkGroup(true)) // also inside the text we can find leaving the parent group.
-                            {
-                                // in such case we should pop-out 2 items out of the analysis stack - text and group.
-                                popParsingItem();
-                                popParsingItem();
-                            }
-                            else // we've found another text char
-                            {
-                                pCurrentParsingDataItem->value.append(symbol); // append character to a value
-                                ++symbolCounter;
-                            }
-                        }
-                            break;
-                        case eRegexFiltersRowType::VarGroup:
-                        case eRegexFiltersRowType::NonCapturingGroup:
-                        case eRegexFiltersRowType::AtomicGroup:
-                        case eRegexFiltersRowType::PositiveLookahead:
-                        case eRegexFiltersRowType::NegativeLookahead:
-                        case eRegexFiltersRowType::PositiveLookbehind:
-                        case eRegexFiltersRowType::NegativeLookbehind:
-                        case eRegexFiltersRowType::BranchResetGroup:
-                        {
-                            // As in this case group's name was already analyzed and parsed, we are searching only for:
-                            // - entering sub-group
-                            // - leaving the group
-                            // - text
-
-                            if(true == checkGroup( false )) // we are entering the sub-group
-                            {
-                                pushParsingItem(eRegexFiltersRowType::NonVarGroup); // add non var group
-                            }
-                            else if(true == checkGroup( true )) // we are leaving the group
-                            {
-                                popParsingItem();
-                            }
-                            else // we've found a text
-                            {
-                                pushParsingItem(eRegexFiltersRowType::Text); // add text
-                                pCurrentParsingDataItem->value.append(symbol); // append character to a value
-                                ++symbolCounter;
-                            }
-                        }
-                            break;
-                        case eRegexFiltersRowType::NonVarGroup:
-                        {
-                            // Hardest case
-                            // we are searching for:
-                            // - non-capturing sign
-                            // - group name
-                            // - end of group name, if we are inside a group name
-                            // - in case if we've reached end of the group name - we should parse it
-                            // - entering sub-group
-                            // - text
-                            // - leaving the group
-                            // If group name analysis finished - we are parsing the name in order to find out VarName and color.
-
-                            if( eGroupTypeAnalysisState::NotAnalyzed == pCurrentParsingDataItem->groupNonCapturingAnalysisState )
-                            {
-                                // first of all, let's see whether it is a non-capturing group or not.
-                                if(true == checkGroupType(pCurrentParsingDataItem->rowType))
-                                {
-                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupTypeAnalysisState::AnalyzedFound;
-                                }
-                                else
-                                {
-                                    pCurrentParsingDataItem->groupNonCapturingAnalysisState = eGroupTypeAnalysisState::AnalyzedNotFound;
-                                }
-                            }
-                            else
-                            {
-                                // at this point we know that we are not inside the non-capturing group.
-                                // we are inside the capturing group.
-                                // We should check the group name if it was not checked yet and parse it
-
-                                if(pCurrentParsingDataItem->groupNameAnalysisState == eGroupNameAnalysisState::NotAnalyzed)
-                                {
-                                    checkGroupName();
-                                }
-                                else
-                                {
-                                    // at this section analysis is similar to the other parts of groups
-                                    if(true == checkGroup( false )) // we are entering the sub-group
-                                    {
-                                        pushParsingItem(eRegexFiltersRowType::NonVarGroup); // add non var group
-                                    }
-                                    else if(true == checkGroup( true )) // we are leaving the group
-                                    {
-                                        popParsingItem();
-                                    }
-                                    else // we've found a text
-                                    {
-                                        pushParsingItem(eRegexFiltersRowType::Text); // add text
-                                        pCurrentParsingDataItem->value.append(symbol); // append character to a value
-                                        ++symbolCounter;
-                                    }
-                                }
-
-                            }
-                        }
-                            break;
-                    }
-                }
-            }
-
-            // Analysis is over. Let's finalize filling in the tree items.
-            while(parsingStateStack.size() > 1)
-            {
-                popParsingItem();
-            }
-
-            mpRootItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
-
-            updateView();
+            timer.restart();
+#endif
 
             filterRegexTokensInternal();
+
+#ifdef DEBUG_BUILD
+            SEND_MSG(QString("[CFiltersModel][%1] It took %2 ms to filter the tokens")
+                     .arg(__FUNCTION__)
+                     .arg(timer.elapsed()));
+#endif
         }
     }
 }
@@ -1154,7 +488,7 @@ QModelIndex CFiltersModel::createIndexInternal(int arow, int acolumn, void *adat
     QModelIndex result;
 
     // root node's index should be invalid
-    if(reinterpret_cast<CTreeItem*>(adata) != mpRootItem)
+    if(reinterpret_cast<CTreeItem*>(adata) != mpRootItem.get())
     {
         result = createIndex(arow, acolumn, adata);
     }
@@ -1194,7 +528,6 @@ void CFiltersModel::filterRegexTokensInternal()
                     if(true == bFilterVariables)
                     {
                         auto rowType = pItem->data(static_cast<int>(eRegexFiltersColumn::RowType)).get<eRegexFiltersRowType>();
-
                         bFiltered = rowType != eRegexFiltersRowType::VarGroup;
                     }
 
@@ -1218,6 +551,18 @@ void CFiltersModel::filterRegexTokensInternal()
                                 }
                             }
                         }
+                        else
+                        {
+                            if(true == bFilterVariables)
+                            {
+                                auto rowType = pItem->data(static_cast<int>(eRegexFiltersColumn::RowType)).get<eRegexFiltersRowType>();
+                                bFiltered = rowType != eRegexFiltersRowType::VarGroup;
+                            }
+                            else
+                            {
+                                bFiltered = false;
+                            }
+                        }
                     }
 
                     pItem->getWriteableData(static_cast<int>(eRegexFiltersColumn::IsFiltered)) = bFiltered;
@@ -1231,7 +576,7 @@ void CFiltersModel::filterRegexTokensInternal()
                 return true;
             };
 
-            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false);
+            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
         }
 
         {
@@ -1239,7 +584,7 @@ void CFiltersModel::filterRegexTokensInternal()
             {
                 auto pParent = pItem->getParent();
 
-                if(nullptr != pParent && pParent != mpRootItem)
+                if(nullptr != pParent && pParent != mpRootItem.get())
                 {
                     bool bIsParentFiltered = pParent->getWriteableData(static_cast<int>(eRegexFiltersColumn::IsFiltered)).get<bool>();
                     bool bIsItemFiltered = pItem->getWriteableData(static_cast<int>(eRegexFiltersColumn::IsFiltered)).get<bool>();
@@ -1255,7 +600,7 @@ void CFiltersModel::filterRegexTokensInternal()
                 return true;
             };
 
-            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false);
+            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
         }
 
         //SEND_MSG(QString("~1 [CFiltersModel][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(time.elapsed()));
@@ -1344,7 +689,7 @@ void CFiltersModel::filterRegexTokensInternal()
                 mpRootItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
             }
 
-            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false);
+            mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
 
             filteredEntriesChanged(filteredEntryVec, true );
         }

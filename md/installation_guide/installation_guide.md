@@ -12,11 +12,11 @@
 > 
 > Currently plugin can be built against the v2.20.1 release.
 >
-> The build under the v2.20.0 is also supported.
+> The build under the v2.20.1 is also supported.
 >
-> The build under the v2.19.0 is also supported in the compatibility mode. Such option is described below. Search for PLUGIN_INTERFACE_VERSION.
+> The build under the v2.19.0 is also supported. But you will need to use the compatibility mode. Such option is described below. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
 >
-> So, be sure, that you've checked out the compatible base-line. 
+> Be sure, that you've checked out the compatible base-line and used needed options. 
 
 ----
 
@@ -86,13 +86,13 @@ As of now, they are Linux and Windows.
 
 ----
 
-## CMake-specific part of the guide
-
 - modify also the **"./dlt-viewer/plugin/CMakeLists.txt"**:
 
 <pre>add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)</pre>
 
 ![Screenshot of plugin.pro cmakelists.txt modification](./installation_guide_cmakelists_modification.png)
+
+----
 
 ### Linux console build
 
@@ -137,7 +137,7 @@ make -j4
 
 ----
 
-- Proceed to the build artifact's folder and run the dlt-viewer, including the dynamic library of the DLT-Message-Analyzer plugin
+- Proceed to the build artifact's folder and run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
 - Enable and show the DLT-Message-Analyzer plugin:
 
 ![Screenshot of enabling the plugin](./installation_guide_enable_plugin.png)

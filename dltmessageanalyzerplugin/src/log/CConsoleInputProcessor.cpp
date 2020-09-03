@@ -5,7 +5,7 @@
 
 #include "../dltmessageanalyzerplugin.hpp"
 #include "CConsoleInputProcessor.hpp"
-#include "CConsoleCtrl.hpp"
+#include "CLog.hpp"
 
 static void webLink()
 {
