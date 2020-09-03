@@ -16,7 +16,7 @@
 #include "../dltWrappers/CDLTFileWrapper.hpp"
 #include "IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "../dltWrappers/CDLTMsgWrapper.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 #include "../common/cpp_extensions.hpp"
 
 //#define DEBUG_MESSAGES

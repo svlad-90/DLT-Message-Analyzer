@@ -14,7 +14,6 @@ class CFiltersModel : public QAbstractItemModel
 
 public:
     explicit CFiltersModel(QObject *parent = nullptr);
-    ~CFiltersModel() override;
 
     void resetData();
     void setUsedRegex(const QString& regexStr);
@@ -59,6 +58,7 @@ private:
     QModelIndex rootIndex() const;
 
     QPair<bool,QString> packRegex();
+    void resetRootItem();
 
     CFiltersModel(const CFiltersModel&) = delete;
     CFiltersModel& operator=(const CFiltersModel&) = delete;
@@ -67,7 +67,7 @@ private:
 
 private:
 
-    tTreeItemPtr mpRootItem;
+    tTreeItemSharedPtr mpRootItem;
     QString mRegex;
     eRegexFiltersColumn mSortingColumn;
     Qt::SortOrder mSortOrder;

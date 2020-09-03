@@ -44,7 +44,7 @@
 #include "patternsView/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 #include "filtersView/CFiltersModel.hpp"
-#include "log/CConsoleCtrl.hpp"
+#include "log/CLog.hpp"
 #include "common/CTableMemoryJumper.hpp"
 #include "log/CConsoleInputProcessor.hpp"
 #include "plant_uml/CUMLView.hpp"

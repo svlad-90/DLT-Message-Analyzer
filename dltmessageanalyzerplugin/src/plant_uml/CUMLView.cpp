@@ -16,7 +16,7 @@
 #include "CImageViewer.hpp"
 #include "CUMLView.hpp"
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 static QString get_UML_Storage_Path()
 {

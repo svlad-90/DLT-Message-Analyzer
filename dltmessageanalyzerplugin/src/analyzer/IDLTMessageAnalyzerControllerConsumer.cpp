@@ -9,7 +9,7 @@
 #include "qdlt.h"
 
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 //IDLTMessageAnalyzerControllerConsumer
 IDLTMessageAnalyzerControllerConsumer::~IDLTMessageAnalyzerControllerConsumer()

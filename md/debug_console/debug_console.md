@@ -34,12 +34,13 @@ Besides that, there is an input field, which allows you to get some useful infor
 Supported commands are:
 
 help -> get list of supported commands
-- clear -> clear console view
-- color-aliases -> show list of the color aliases, which can be used within the regex name scripting
-- support -> represent the support message
-- version -> represent the version of the plugin
-- web-link -> represent link to plugin's web-site
-- uml-id -> represent list of the supported UML types, which is used for cretion of the sequence diagrams
+- clear -> clears console view
+- color-aliases -> shows list of the color aliases, which can be used within the regex name scripting
+- styles -> represents Qt styles available on target OS. Reference information, which can be used to run dlt-viewer with one of the supported styles.
+- support -> represents the support message
+- version -> represents the version of the plugin
+- web-link -> represents link to plugin's web-site
+- uml-id -> represents list of the supported UML types, which is used for cretion of the sequence diagrams
 
 List of the supported commands will be extended in future releases.
 

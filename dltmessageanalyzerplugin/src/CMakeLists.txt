@@ -34,6 +34,7 @@ find_package(ANTLR REQUIRED)
 
 # Call macro to add lexer and grammar to your build dependencies.
 antlr_target(PCRE ${CMAKE_CURRENT_SOURCE_DIR}/../../thirdparty/pcre-parser/src/main/antlr4/nl/bigo/pcreparser/PCRE.g4
+             LEXER PARSER LISTENER VISITOR
              PACKAGE pcre_parser)
 
 # include generated files in project environment
@@ -51,10 +52,10 @@ TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
 ################### ANTLR ( END ) #########################
 
 ################### CLANG_TIDY ############################
-if( DMA_CLANG_TIDY_BUILD ) 
+if( DMA_CLANG_TIDY_BUILD )
     message("-- [DLT-Message-Analyzer]: clang-tidy build.")
     set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
-    list(APPEND CMAKE_CXX_CLANG_TIDY 
+    list(APPEND CMAKE_CXX_CLANG_TIDY
     "-format-style='file'"
     "-warnings-as-errors=*" )
 endif()
@@ -100,7 +101,8 @@ target_link_libraries(DLT-Message-Analyzer
     DMA_dltWrappers
     DMA_filtersView
     DMA_groupedView
-    DMA_patternsView)
+    DMA_patternsView
+    DMA_PCRE)
 
 if(TURN_OFF_RCC)
     set(CMAKE_AUTORCC OFF)
@@ -109,7 +111,6 @@ endif()
 ################### DLT_MESSAGE_ANALYZER ( END ) ##########
 
 ################### ANTLR_LINKAGE #########################
-# add generated grammar to demo binary target
 target_link_libraries(DLT-Message-Analyzer antlr4_PCRE_static)
 target_link_libraries(DLT-Message-Analyzer antlr4_static)
 ################### ANTLR_LINKAGE ( END ) #################

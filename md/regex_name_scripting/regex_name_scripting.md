@@ -99,6 +99,23 @@ All the above parameters are case insensitive.
 
 ----
 
+> **Note!**
+>
+> Just small piece of interesting information. 
+>
+> In order to parse the regex and fill in the "filters view" ( the view which works with the variables - I guess you see those yellow-orange screenshots on this page ) it is not enough to use Qt's QRegularExpression class.
+> Qt API does not provide information about hierarchy of the groups. 
+>
+> To reach the goal, we've used the antlr4 parsers generator - https://github.com/antlr/antlr4
+>
+> And the PCRE grammar, provided by the following repo - https://github.com/bkiers/pcre-parser
+>
+> We've modified above-mentioned grammar to allow faster parsing - https://github.com/svlad-90/DLT-Message-Analyzer/blob/master/thirdparty/pcre-parser/src/main/antlr4/nl/bigo/pcreparser/PCRE.g4
+>
+> The call to antlr generator is automated and is part of the CMake build.
+
+----
+
 # AND operator
 
 If needed, "color" and "variable" scripting options can be combined together with the help of the "_AND_" operator. This operator is case insensitive, so you can use also "_and_", "_AnD_", etc:

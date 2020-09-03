@@ -7,7 +7,7 @@
 #include <stack>
 
 #include "CTreeItem.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 //CTreeItem
 void CTreeItem::visit( const tVisitFunction& preVisitFunction,

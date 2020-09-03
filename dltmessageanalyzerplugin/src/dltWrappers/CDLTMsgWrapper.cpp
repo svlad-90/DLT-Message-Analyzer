@@ -11,7 +11,7 @@
 #include "dlt_protocol.h"
 #include "dlt_common.h"
 
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 #include "CDLTMsgWrapper.hpp"
 

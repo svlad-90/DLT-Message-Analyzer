@@ -9,10 +9,11 @@
 #include "QStyledItemDelegate"
 #include "QClipboard"
 #include "QLineEdit"
+#include "QKeyEvent"
 
 #include "CFiltersModel.hpp"
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 #include "CFiltersView.hpp"
 
@@ -168,15 +169,6 @@ private:
                 break;
             case eRegexFiltersRowType::NonVarGroup:
             result = QColor("#B3A7B8");
-                break;
-            case eRegexFiltersRowType::NonCapturingGroup:
-            case eRegexFiltersRowType::AtomicGroup:
-            case eRegexFiltersRowType::PositiveLookahead:
-            case eRegexFiltersRowType::NegativeLookahead:
-            case eRegexFiltersRowType::PositiveLookbehind:
-            case eRegexFiltersRowType::NegativeLookbehind:
-            case eRegexFiltersRowType::BranchResetGroup:
-            result = QColor("#7E7383");
                 break;
         }
 
@@ -489,7 +481,7 @@ void CFiltersView::currentChanged(const QModelIndex &current, const QModelIndex 
            nullptr != mpRegexInputField)
         {
             auto range = pTreeItem->data(static_cast<int>(eRegexFiltersColumn::Range)).get<tIntRange>();
-            mpRegexInputField->setSelection(range.from, range.to - range.from);
+            mpRegexInputField->setSelection(range.from, range.to - range.from + 1);
         }
     }
 

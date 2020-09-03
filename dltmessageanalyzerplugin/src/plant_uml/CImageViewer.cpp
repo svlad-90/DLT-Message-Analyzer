@@ -4,7 +4,7 @@
 #include <QPainter>
 
 #include "CImageViewer.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 CImageViewer::CImageViewer(QWidget *parent)
    : QWidget(parent)

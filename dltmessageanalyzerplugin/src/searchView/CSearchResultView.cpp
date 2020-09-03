@@ -28,7 +28,7 @@
 #include "CSearchResultModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"
-#include "../log/CConsoleCtrl.hpp"
+#include "../log/CLog.hpp"
 
 
 CSearchResultView::CSearchResultView(QWidget *parent):
