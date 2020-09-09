@@ -51,13 +51,21 @@ public:
     CParseFiltersViewVisitor(const tTreeItemSharedPtr& pFiltersViewTree, const QString& regex):
         mParsingStateStack(),
         mpFiltersViewTree(pFiltersViewTree),
-        mRegex(regex)
+        mRegex(regex),
+        mGroupIndex(0)
     {
         if(nullptr != pFiltersViewTree)
         {
             tParsingDataItem rootDataItem;
             rootDataItem.pTreeItem = pFiltersViewTree.get();
             rootDataItem.isRoot = true;
+
+            if(false == regex.isEmpty())
+            {
+                rootDataItem.range = tIntRange(0, regex.size() - 1);
+                rootDataItem.contentRange = tIntRange(0, regex.size() - 1);
+            }
+
             mParsingStateStack.push_back(rootDataItem);
         }
     }
@@ -84,7 +92,7 @@ public:
         {
             assert(mParsingStateStack.size() == 1);
 
-            afterChildrenVisited(true, mParsingStateStack[0].range);
+            afterChildrenVisited(-1, true, mParsingStateStack[0].range);
         }
 
         return result;
@@ -92,6 +100,8 @@ public:
 
     virtual antlrcpp::Any visitCapture(PCREParser::CaptureContext *ctx) override
     {
+        auto groupIndex = ++mGroupIndex;
+
         // before visiting the children
         if(nullptr != ctx)
         {
@@ -122,6 +132,7 @@ public:
                     //        IsFiltered, /*bool*/                                              // OK
                     //        GroupName, /*QString*/                                            // OK
                     //        GroupSyntaxType, /*int ... enough of enums in our variant*/       // OK
+                    //        GroupIndex,      /*index of the group, if item is group.*/        // OK
                     //        Last /*nothing*/                                                  // OK
                     //    };
 
@@ -206,7 +217,8 @@ public:
 
             if(nullptr != pAlternation)
             {
-                afterChildrenVisited(pAlternation != nullptr,
+                afterChildrenVisited(groupIndex,
+                                     pAlternation != nullptr,
                                      pAlternation != nullptr ? tIntRange( static_cast<int>(pAlternation->getStart()->getStartIndex()),
                                                                           static_cast<int>(pAlternation->getStop()->getStopIndex())) : tIntRange());
             }
@@ -467,7 +479,7 @@ public:
 
 private:
 
-    void afterChildrenVisited(bool useFullRange, const tIntRange& fullRange)
+    void afterChildrenVisited(const int& groupIndex, bool useFullRange, const tIntRange& fullRange)
     {
         assert(false == mParsingStateStack.empty());
 
@@ -489,6 +501,7 @@ private:
             data.push_back(tDataItem(false));
             data.push_back(tDataItem(currentParsingItem.groupName));
             data.push_back(tDataItem(static_cast<int>(currentParsingItem.groupSyntaxType)));
+            data.push_back(tDataItem(groupIndex));
 
             currentParsingItem.pTreeItem->setData(data);
         }
@@ -513,6 +526,7 @@ private:
             data_.push_back(tDataItem(false));                                                       // OK
             data_.push_back(tDataItem(QString()));                                                   // OK
             data_.push_back(tDataItem(0));                                                           // OK
+            data_.push_back(tDataItem(-1));                                                          // OK
 
             pTreeItem->setData(data_);
         };
@@ -573,6 +587,7 @@ private:
     tParsingStateStack mParsingStateStack;
     tTreeItemSharedPtr mpFiltersViewTree;
     QString mRegex;
+    int mGroupIndex;
 };
 
 void parseRegexFiltersView( const tTreeItemSharedPtr& pFiltersViewTree, const QString& regex )

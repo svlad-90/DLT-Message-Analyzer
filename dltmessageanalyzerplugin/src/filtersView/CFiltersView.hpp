@@ -6,7 +6,7 @@
 #include "../common/Definitions.hpp"
 
 class CFiltersModel;
-class CRegexTreeRepresentationDelegate;
+class CFilterItemDelegate;
 
 class CFiltersView : public QTreeView
 {
@@ -45,10 +45,10 @@ private: // fields
 
     eUpdateRequired mWidthUpdateRequired;
     bool mbIsVerticalScrollBarVisible;
-    CRegexTreeRepresentationDelegate * mpRepresentationDelegate;
     bool mbResizeOnExpandCollapse;
     bool mbSkipFirstUpdateWidth;
     QLineEdit* mpRegexInputField;
+    CFilterItemDelegate* mpFilerItemDelegate;
 };
 
 #endif // CFILTERSVIEW_HPP

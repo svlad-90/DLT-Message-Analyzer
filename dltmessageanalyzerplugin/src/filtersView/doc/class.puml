@@ -1,0 +1,65 @@
+@startuml
+
+'left to right direction
+
+'QT's classes
+package "Qt" #DDDDDD 
+{
+    class QCompleter
+    class QLineEdit
+    
+    class QStyledItemDelegate
+    {
+        +{abstract} virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    }
+    
+    class QTreeView
+    class QAbstractItemModel
+}
+
+'Plugin's classes
+package "DMA base" #DDDDDD 
+{
+    class Form
+    class CDLTMessageAnalyzer{}
+}
+
+package "DMA filters view" #DDDDDD 
+{
+    class CFiltersModel
+    {
+        --public API--
+        +void addCompletionData( const tFoundMatches& )
+        +void resetCompletionData()
+        +QStringList getCompletionData( const int& groupIndex, const QString& input, const int& maxNumberOfSuggestions, const int& maxLengthOfSuggestions )
+        --signals--
+        +void completionDataChanged();
+    }
+    
+    class CFiltersView {} 
+    
+    class CFilerItemDelegate
+    {
+        +{abstract} virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    }
+}
+
+'Inheritance section
+QStyledItemDelegate <|-- CFilerItemDelegate : extends
+QTreeView <|-- CFiltersView : extends
+QAbstractItemModel <|-- CFiltersModel : extends
+
+'Composition section
+Form "1" *-- "1" CFiltersView : contains
+CDLTMessageAnalyzer "1" *--- "1" CFiltersModel : contains
+CFiltersView "1" *- "1" CFilerItemDelegate : contains and uses
+CFilerItemDelegate "1" *-- "1" QCompleter : creates and provides
+QLineEdit "1" -* "1" QCompleter : gets and uses
+
+'Agregation section
+CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
+CFiltersView "1" o-- "1" CFiltersModel : uses
+CFilerItemDelegate "1" o-- "1" CFiltersModel : uses
+CFilerItemDelegate "1" o-- "1" QLineEdit : creates and provides
+
+@enduml

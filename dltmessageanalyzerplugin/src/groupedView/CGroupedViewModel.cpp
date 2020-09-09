@@ -13,7 +13,7 @@
 #include "../log/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
-static const QString sRootItemName = "Root";
+static const tQStringPtr sRootItemName = std::make_shared<QString>("Root");
 
 CGroupedViewModel::CGroupedViewModel(QObject *parent)
     : QAbstractItemModel(parent),
@@ -515,7 +515,7 @@ void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
 
             {
                 CTreeItem::tData data;
-                data.push_back(sRootItemName); /*SubString*/
+                data.push_back( tQStringPtrWrapper(sRootItemName) ); /*SubString*/
                 data.push_back(tDataItem(1)); /*Messages*/
                 data.push_back(tDataItem(0)); /*MessagesPercantage*/
                 data.push_back(tDataItem(0)); /*MessagesPerSecond*/
@@ -533,7 +533,7 @@ void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
             for(const auto& match : matches)
             {
                 CTreeItem::tData data;
-                data.push_back(*match.pMatchStr); /*SubString*/
+                data.push_back( tQStringPtrWrapper(match.pMatchStr) ); /*SubString*/
                 data.push_back(tDataItem(1)); /*Messages*/
                 data.push_back(tDataItem(0)); /*MessagesPercantage*/
                 data.push_back(tDataItem(0)); /*MessagesPerSecond*/

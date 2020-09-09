@@ -4,7 +4,8 @@ add_library(DMA_common STATIC
     CBGColorAnimation.cpp
     CRegexDirectoryMonitor.cpp
     CTableMemoryJumper.cpp
-    OSHelper.cpp)
+    OSHelper.cpp
+    CQtHelper.cpp)
 
 add_subdirectory(PCRE)
 

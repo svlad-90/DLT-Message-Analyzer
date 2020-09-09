@@ -81,6 +81,18 @@ extern const QString sDefaultStatusText;
 extern const QString sDefaultRegexFileName;
 
 typedef std::shared_ptr<QString> tQStringPtr;
+
+struct tQStringPtrWrapper
+{
+    tQStringPtrWrapper();
+    tQStringPtrWrapper(const tQStringPtr& pString_);
+    bool operator== ( const tQStringPtrWrapper& rVal ) const;
+    bool operator< ( const tQStringPtrWrapper& rVal ) const;
+    tQStringPtr pString = nullptr;
+};
+
+Q_DECLARE_METATYPE(tQStringPtrWrapper)
+
 typedef int tMsgId;
 extern const tMsgId INVALID_MSG_ID;
 
@@ -290,6 +302,7 @@ enum class eRegexFiltersColumn : int
     IsFiltered, /*bool*/
     GroupName, /*QString*/
     GroupSyntaxType, /*int ... enough of enums in our variant*/
+    GroupIndex,      /*index of the group, if item is group. If item is text - filled in with -1*/
     Last /*nothing*/
 };
 
@@ -376,6 +389,7 @@ Q_DECLARE_METATYPE( tColorWrapper )
 
 ////////////////// TREE ITEM ////////////////
 typedef nonstd::variant<QString,
+                        tQStringPtrWrapper,
                         Qt::CheckState,
                         ePatternsRowType,
                         bool,

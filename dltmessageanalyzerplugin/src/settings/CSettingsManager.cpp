@@ -65,6 +65,12 @@ static const QString sUML_ShowArgumentsKey = "UML_ShowArguments";
 static const QString sUML_WrapOutputKey = "UML_WrapOutput";
 static const QString sUML_AutonumberKey = "UML_Autonumber";
 
+static const QString sFiltersCompletion_CaseSensitiveKey = "FiltersCompletion_CaseSensitive";
+static const QString sFiltersCompletion_MaxNumberOfSuggestionsKey = "FiltersCompletion_MaxNumberOfSuggestions";
+static const QString sFiltersCompletion_MaxCharactersInSuggestionKey = "FiltersCompletion_MaxCharactersInSuggestion";
+static const QString sFiltersCompletion_CompletionPopUpWidthKey = "FiltersCompletion_CompletionPopUpWidth";
+static const QString sFiltersCompletion_SearchPolicyKey = "FiltersCompletion_SearchPolicy";
+
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
 
@@ -344,6 +350,29 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){UML_AutonumberChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mSetting_FiltersCompletion_CaseSensitive(createBooleanSettingsItem(sFiltersCompletion_CaseSensitiveKey,
+       [this](const bool& data){filtersCompletion_CaseSensitiveChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       false)),
+    mSetting_FiltersCompletion_MaxNumberOfSuggestions(createRangedArithmeticSettingsItem<int>(sFiltersCompletion_MaxNumberOfSuggestionsKey,
+       [this](const int& data){filtersCompletion_MaxNumberOfSuggestionsChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(1, 1000)),
+       200)),
+    mSetting_FiltersCompletion_MaxCharactersInSuggestion(createRangedArithmeticSettingsItem<int>(sFiltersCompletion_MaxCharactersInSuggestionKey,
+       [this](const int& data){filtersCompletion_MaxCharactersInSuggestionChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(1, 1000)),
+       200)),
+    mSetting_FiltersCompletion_CompletionPopUpWidth(createRangedArithmeticSettingsItem<int>(sFiltersCompletion_CompletionPopUpWidthKey,
+       [this](const int& data){filtersCompletion_CompletionPopUpWidthChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(100, 1000)),
+       400)),
+    mSetting_FiltersCompletion_SearchPolicy(createBooleanSettingsItem(sFiltersCompletion_SearchPolicyKey,
+       [this](const bool& data){filtersCompletion_SearchPolicyChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       false)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -384,6 +413,11 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_UML_ShowArguments);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_WrapOutput);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_Autonumber);
+    mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CaseSensitive);
+    mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxNumberOfSuggestions);
+    mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxCharactersInSuggestion);
+    mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CompletionPopUpWidth);
+    mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_SearchPolicy);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1490,6 +1524,31 @@ void CSettingsManager::setUML_Autonumber(const bool& val)
     mSetting_UML_Autonumber.setData(val);
 }
 
+void CSettingsManager::setFiltersCompletion_CaseSensitive(const bool& val)
+{
+    mSetting_FiltersCompletion_CaseSensitive.setData(val);
+}
+
+void CSettingsManager::setFiltersCompletion_MaxNumberOfSuggestions(const int& val)
+{
+    mSetting_FiltersCompletion_MaxNumberOfSuggestions.setData(val);
+}
+
+void CSettingsManager::setFiltersCompletion_MaxCharactersInSuggestion(const int& val)
+{
+    mSetting_FiltersCompletion_MaxCharactersInSuggestion.setData(val);
+}
+
+void CSettingsManager::setFiltersCompletion_CompletionPopUpWidth(const int& val)
+{
+    mSetting_FiltersCompletion_CompletionPopUpWidth.setData(val);
+}
+
+void CSettingsManager::setFiltersCompletion_SearchPolicy(const bool& val)
+{
+    mSetting_FiltersCompletion_SearchPolicy.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1660,6 +1719,31 @@ const bool& CSettingsManager::getUML_WrapOutput() const
 const bool& CSettingsManager::getUML_Autonumber() const
 {
     return mSetting_UML_Autonumber.getData();
+}
+
+const bool& CSettingsManager::getFiltersCompletion_CaseSensitive() const
+{
+    return mSetting_FiltersCompletion_CaseSensitive.getData();
+}
+
+const int& CSettingsManager::getFiltersCompletion_MaxNumberOfSuggestions() const
+{
+    return mSetting_FiltersCompletion_MaxNumberOfSuggestions.getData();
+}
+
+const int& CSettingsManager::getFiltersCompletion_MaxCharactersInSuggestion() const
+{
+    return mSetting_FiltersCompletion_MaxCharactersInSuggestion.getData();
+}
+
+const int& CSettingsManager::getFiltersCompletion_CompletionPopUpWidth() const
+{
+    return mSetting_FiltersCompletion_CompletionPopUpWidth.getData();
+}
+
+const bool& CSettingsManager::getFiltersCompletion_SearchPolicy() const
+{
+    return mSetting_FiltersCompletion_SearchPolicy.getData();
 }
 
 QString CSettingsManager::getRegexDirectory() const
@@ -1917,4 +2001,29 @@ void CSettingsManager::resetGroupedViewColumnsVisibilityMap()
 void CSettingsManager::resetGroupedViewColumnsCopyPasteMap()
 {
     setGroupedViewColumnsCopyPasteMap(sDefaultGroupedViewColumnsVisibilityMap);
+}
+
+const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getSetting_NumberOfThreads_AllowedRange() const
+{
+    return mSetting_NumberOfThreads.getAllowedTange();
+}
+
+const TRangedSettingItem<tCacheSizeMB>::tOptionalAllowedRange& CSettingsManager::getSetting_CacheMaxSizeMB_AllowedRange() const
+{
+    return mSetting_CacheMaxSizeMB.getAllowedTange();
+}
+
+const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange() const
+{
+    return mSetting_FiltersCompletion_MaxNumberOfSuggestions.getAllowedTange();
+}
+
+const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange() const
+{
+    return mSetting_FiltersCompletion_MaxCharactersInSuggestion.getAllowedTange();
+}
+
+const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getFiltersCompletion_CompletionPopUpWidth_AllowedRange() const
+{
+    return mSetting_FiltersCompletion_CompletionPopUpWidth.getAllowedTange();
 }

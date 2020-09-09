@@ -100,6 +100,7 @@ target_link_libraries(DLT-Message-Analyzer
     DMA_logo
     DMA_dltWrappers
     DMA_filtersView
+    DMA_filtersView_no_clang_tidy
     DMA_groupedView
     DMA_patternsView
     DMA_PCRE)
@@ -126,6 +127,4 @@ add_custom_command(TARGET DLT-Message-Analyzer POST_BUILD
 target_link_libraries(DLT-Message-Analyzer qdlt Qt5::Widgets )
 ################### QT ( END ) ############################
 
-################### INSTALLATION ##########################
-install(TARGETS DLT-Message-Analyzer DESTINATION deploy/plugins)
-################### INSTALLATION ( END ) ##################
+add_plugin(DLT-Message-Analyzer)

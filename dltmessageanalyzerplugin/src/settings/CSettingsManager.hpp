@@ -116,6 +116,11 @@ public:
     void setUML_ShowArguments(const bool& val);
     void setUML_WrapOutput(const bool& val);
     void setUML_Autonumber(const bool& val);
+    void setFiltersCompletion_CaseSensitive(const bool& val);
+    void setFiltersCompletion_MaxNumberOfSuggestions(const int& val);
+    void setFiltersCompletion_MaxCharactersInSuggestion(const int& val);
+    void setFiltersCompletion_CompletionPopUpWidth(const int& val);
+    void setFiltersCompletion_SearchPolicy(const bool& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -166,6 +171,18 @@ public:
     const bool& getUML_ShowArguments() const;
     const bool& getUML_WrapOutput() const;
     const bool& getUML_Autonumber() const;
+    const bool& getFiltersCompletion_CaseSensitive() const;
+    const int& getFiltersCompletion_MaxNumberOfSuggestions() const;
+    const int& getFiltersCompletion_MaxCharactersInSuggestion() const;
+    const int& getFiltersCompletion_CompletionPopUpWidth() const;
+    const bool& getFiltersCompletion_SearchPolicy() const;
+
+    // allowed ranges
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const;
+    const TRangedSettingItem<tCacheSizeMB>::tOptionalAllowedRange& getSetting_CacheMaxSizeMB_AllowedRange() const;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange() const;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange() const;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_CompletionPopUpWidth_AllowedRange() const;
 
 ////////////////////////NOTIFICATIONS/////////////////////////////
 
@@ -209,6 +226,11 @@ signals:
     void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
     void UML_WrapOutputChanged(const bool& UML_WrapOutput);
     void UML_AutonumberChanged(const bool& UML_Autonumber);
+    void filtersCompletion_CaseSensitiveChanged(const bool& filtersCompletion_CaseSensitive);
+    void filtersCompletion_MaxNumberOfSuggestionsChanged(const int& filtersCompletion_MaxNumberOfSuggestions);
+    void filtersCompletion_MaxCharactersInSuggestionChanged(const int& filtersCompletion_MaxCharactersInSuggestion);
+    void filtersCompletion_CompletionPopUpWidthChanged(const int& filtersCompletion_CompletionPopUpWidth);
+    void filtersCompletion_SearchPolicyChanged(const bool& filtersCompletion_SearchPolicy);
 
 private: // methods
 
@@ -482,6 +504,13 @@ private: // fields
     TSettingItem<bool> mSetting_UML_ShowArguments;
     TSettingItem<bool> mSetting_UML_WrapOutput;
     TSettingItem<bool> mSetting_UML_Autonumber;
+
+    // Filters view completion settinfs
+    TSettingItem<bool> mSetting_FiltersCompletion_CaseSensitive;
+    TRangedSettingItem<int> mSetting_FiltersCompletion_MaxNumberOfSuggestions;
+    TRangedSettingItem<int> mSetting_FiltersCompletion_MaxCharactersInSuggestion;
+    TRangedSettingItem<int> mSetting_FiltersCompletion_CompletionPopUpWidth;
+    TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

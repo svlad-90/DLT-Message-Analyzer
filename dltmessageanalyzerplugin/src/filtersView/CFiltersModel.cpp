@@ -23,7 +23,8 @@ CFiltersModel::CFiltersModel(QObject *parent)
       mSortingColumn(eRegexFiltersColumn::Index),
       mSortOrder(Qt::SortOrder::AscendingOrder),
       mSortingHandler(),
-      mFilter()
+      mFilter(),
+      mCompletionCache()
 {
     mSortingHandler = [](const QVector<tTreeItemPtr>& children,
                             const int& sortingColumn,
@@ -145,6 +146,7 @@ void CFiltersModel::resetRootItem()
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::IsFiltered) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupName) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupSyntaxType) );
+    mpRootItem->appendColumn( getName(eRegexFiltersColumn::GroupIndex) );
     mpRootItem->appendColumn( getName(eRegexFiltersColumn::Last) );
 }
 
@@ -356,8 +358,6 @@ QPair<bool,QString> CFiltersModel::packRegex()
 
         mpRootItem->visit(preVisitFunction, postVisitFunction, false, true, false);
 
-        SEND_MSG(regexStr);
-
         QRegularExpression regex( QString("(?J)").append( regexStr ) );
 
         result.first = regex.isValid();
@@ -368,6 +368,8 @@ QPair<bool,QString> CFiltersModel::packRegex()
         }
         else
         {
+            SEND_ERR(QString("Pack regex: regex - %1").arg(regexStr));
+            SEND_ERR(QString("Pack regex: error - %1").arg(regex.errorString()));
             result.second = regex.errorString();
         }
     }
@@ -698,12 +700,61 @@ void CFiltersModel::filterRegexTokensInternal()
     //SEND_MSG(QString("~3 [CFiltersModel][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(time.elapsed()));
 }
 
-void CFiltersModel::addCompletionData( const tFoundMatches& )
+void CFiltersModel::addCompletionData( const tFoundMatches& foundMatches)
 {
-
+    for(const auto& foundMatch : foundMatches)
+    {
+        mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+    }
 }
 
 void CFiltersModel::resetCompletionData()
 {
+    mCompletionCache.clear();
+}
 
+QStringList CFiltersModel::getCompletionData( const int& groupIndex,
+                                              const QString& input,
+                                              const int& maxNumberOfSuggestions,
+                                              const int& maxLengthOfSuggestions )
+{
+    QStringList result;
+
+    auto foundCompletionSet = mCompletionCache.find(groupIndex);
+
+    if(foundCompletionSet != mCompletionCache.end())
+    {
+        int numberOfSuggestions = 0;
+
+        for(const auto& completionItem : foundCompletionSet->second)
+        {
+            auto caseSensitiveOption = CSettingsManager::getInstance()->getFiltersCompletion_CaseSensitive() ?
+                        Qt::CaseSensitive :
+                        Qt::CaseInsensitive;
+
+            bool bStringFound = false;
+
+            if(false == CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy())
+            {
+                bStringFound = completionItem.pString->startsWith(input, caseSensitiveOption);
+            }
+            else
+            {
+                bStringFound = completionItem.pString->contains(input, caseSensitiveOption);
+            }
+
+            if(completionItem.pString && bStringFound)
+            {
+                result.push_back(completionItem.pString->mid(0, maxLengthOfSuggestions));
+                ++numberOfSuggestions;
+            }
+
+            if(numberOfSuggestions >= maxNumberOfSuggestions)
+            {
+                break;
+            }
+        }
+    }
+
+    return result;
 }

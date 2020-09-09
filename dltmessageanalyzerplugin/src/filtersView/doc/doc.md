@@ -2,7 +2,7 @@
 
 ----
 
-![test plant-uml diagram](../../../../md/dev_docs/TO_DO.svg)
+![Class diagram](./class.svg)
 
 ----
 

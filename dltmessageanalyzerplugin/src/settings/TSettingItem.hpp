@@ -254,6 +254,11 @@ public:
         }
     }
 
+    const tOptionalAllowedRange& getAllowedTange() const
+    {
+        return mAllowedRange;
+    }
+
 private:
 
     const T& normalizeData(const T& val)
