@@ -105,6 +105,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
+    qRegisterMetaType<tQStringPtrWrapper>("tQStringPtrWrapper");
     qRegisterMetaType<tIntRange>("tIntRange");
     qRegisterMetaType<const tFoundMatch*>("const tFoundMatch*");
 

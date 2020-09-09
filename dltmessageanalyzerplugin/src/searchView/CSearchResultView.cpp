@@ -631,14 +631,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
         setFont(font);
 
         QFontMetrics fontMetrics( font );
-        auto additional_size = static_cast<int>(fontMetrics.height() * 0.1);
-
-        if(additional_size < 2)
-        {
-            additional_size = 2;
-        }
-
-        verticalHeader()->setDefaultSectionSize(fontMetrics.height() + additional_size);
+        verticalHeader()->setDefaultSectionSize(fontMetrics.height());
         updateWidth();
     });
 
@@ -939,15 +932,7 @@ void CSearchResultView::setModel(QAbstractItemModel *model)
         setFont(usedFont);
         verticalHeader->resizeSections(QHeaderView::Fixed);
         QFontMetrics fontMetrics( usedFont );
-
-        auto additional_size = static_cast<int>(fontMetrics.height() * 0.1);
-
-        if(additional_size < 2)
-        {
-            additional_size = 2;
-        }
-
-        verticalHeader->setDefaultSectionSize(fontMetrics.height() + additional_size);
+        verticalHeader->setDefaultSectionSize(fontMetrics.height());
     }
 
     QHeaderView *horizontalHeader = tParent::horizontalHeader();

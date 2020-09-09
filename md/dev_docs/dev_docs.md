@@ -20,7 +20,7 @@ It's main purposes is to:
 #### [Analyzer ( under construction )](../../dltmessageanalyzerplugin/src/analyzer/doc/doc.md)
 #### [Common ( under construction )](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
 #### [DLT wrappers ( under construction )](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
-#### [Filters view ( under construction )](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)
+#### [Filters view](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)
 #### [Grouped view ( under construction )](../../dltmessageanalyzerplugin/src/groupedView/doc/doc.md)
 #### [Log ( under construction )](../../dltmessageanalyzerplugin/src/log/doc/doc.md)
 #### [Logo ( under construction )](../../dltmessageanalyzerplugin/src/logo/doc/doc.md)

@@ -255,7 +255,9 @@ static void drawHighlightedText(eSearchResultColumn field,
                     //qDebug() << "rect.left() - " << rect.left() << "; drawDataPack.baseShift - " << drawDataPack.baseShift << "; drawDataItem.shift - " << drawDataItem.shift;
 
                     painter->drawText(QRect(rect.left()+drawDataPack.baseShift+drawDataItem.shift, rect.top(), rect.width(), rect.height()),
-                                      drawDataPack.alignment == Qt::AlignCenter ? Qt::AlignLeft : drawDataPack.alignment, drawDataItem.subStr);
+                                      drawDataPack.alignment == Qt::AlignCenter ?
+                                                                static_cast<Qt::AlignmentFlag>((Qt::AlignLeft | Qt::AlignVCenter).operator QFlags<Qt::AlignmentFlag>::Int()) :
+                                                                drawDataPack.alignment, drawDataItem.subStr);
                 }
             };
 
@@ -378,7 +380,7 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
                 const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
                 QRect newRect = QStyle::alignedRect(viewItemOption.direction, Qt::AlignCenter,
-                                                    QSize(viewItemOption.decorationSize.width() + 5,option.decorationSize.height()),
+                                                    QSize(viewItemOption.decorationSize.width() + 5, option.decorationSize.height()),
                                                     QRect(viewItemOption.rect.x() + textMargin, option.rect.y(),
                                                           viewItemOption.rect.width() - (2 * textMargin), viewItemOption.rect.height()));
                 viewItemOption.rect = newRect;

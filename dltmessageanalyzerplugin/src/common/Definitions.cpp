@@ -469,6 +469,47 @@ bool tIntRangePtrWrapper::operator== ( const tIntRangePtrWrapper& rVal ) const
 }
 //////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////tQStringPtrWrapper///////////////////////////
+tQStringPtrWrapper::tQStringPtrWrapper(): pString(nullptr)
+{}
+
+tQStringPtrWrapper::tQStringPtrWrapper(const tQStringPtr& pString_): pString(pString_)
+{}
+
+bool tQStringPtrWrapper::operator< ( const tQStringPtrWrapper& rVal ) const
+{
+    bool bResult = false;
+
+    if(pString == nullptr && rVal.pString != nullptr)
+        bResult = true;
+    else if(pString != nullptr && rVal.pString == nullptr)
+        bResult = false;
+    else if(pString == nullptr && rVal.pString == nullptr)
+        bResult = true;
+    else
+    {
+        if( *pString < *rVal.pString )
+        {
+            bResult = true;
+        }
+    }
+
+    return bResult;
+}
+
+bool tQStringPtrWrapper::operator== ( const tQStringPtrWrapper& rVal ) const
+{
+    if(pString == nullptr && rVal.pString != nullptr)
+        return false;
+    else if(pString != nullptr && rVal.pString == nullptr)
+        return false;
+    else if(pString == nullptr && rVal.pString == nullptr)
+        return true;
+
+    return ( *pString != *rVal.pString );
+}
+//////////////////////////////////////////////////////////////////////////
+
 struct tAnalysisRange
 {
     tAnalysisRange(const tIntRange& inputRange,
@@ -1423,6 +1464,11 @@ QString getName(eRegexFiltersColumn val)
             result = "Group Syntax type";
         }
             break;
+        case eRegexFiltersColumn::GroupIndex:
+        {
+            result = "Group index";
+        }
+            break;
         case eRegexFiltersColumn::Last:
         {
             result = "Last";
@@ -2046,6 +2092,10 @@ QVariant toQVariant(const tDataItem& item)
     {
         result.setValue(item.get<eRegexFiltersRowType>());
     }
+    else if(item.index() == tDataItem::index_of<tQStringPtrWrapper>())
+    {
+        result.setValue(*item.get<tQStringPtrWrapper>().pString);
+    }
 
     return result;
 }
@@ -2098,6 +2148,7 @@ tDataItem toRegexDataItem(const QVariant& variant, const eRegexFiltersColumn& co
         }
             break;
         case eRegexFiltersColumn::GroupSyntaxType:
+        case eRegexFiltersColumn::GroupIndex:
         {
             result = variant.value<int>();
         }

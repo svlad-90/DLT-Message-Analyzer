@@ -44,6 +44,8 @@ public:
     };
     typedef std::vector<tFilteredEntry> tFilteredEntryVec;
 
+    QStringList getCompletionData( const int& groupIndex, const QString& input, const int& maxNumberOfSuggestions, const int& maxLengthOfSuggestions );
+
 signals:
     void filteredEntriesChanged(const tFilteredEntryVec& filteredEntryVec, bool expandVisible);
     void regexUpdatedByUser( const QString& regex );
@@ -73,6 +75,10 @@ private:
     Qt::SortOrder mSortOrder;
     CTreeItem::tSortingFunction mSortingHandler;
     QString mFilter;
+
+    typedef std::set<tQStringPtrWrapper> tStringPtrWrapperSet;
+    typedef std::map<int /*group id*/, tStringPtrWrapperSet> tCompletionCache;
+    tCompletionCache mCompletionCache;
 };
 
 Q_DECLARE_METATYPE(CFiltersModel::tFilteredEntryVec)

@@ -35,10 +35,14 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 - Allows you to easily form groups of the repetitive messages and check trace-spam cases, request-response pairs, number of message occurrences, etc.
 
-### [Regex name scripting](./md/regex_name_scripting/regex_name_scripting.md)
+### [Filters view](./md/filters_view/filters_view.md)
+
+- Allows you to quickly get access to the defined "key regex groups" and change their content
+- Provides auto-completion functionality
+
+### [Advanced highlighting](./md/advanced_highlighting/advanced_highlighting.md)
 
 - Advanced highlighting of regex groups
-- "Filters view". Allows you to quickly get access to the defined "key regex groups" and change their content
 - Possibility to copy-paste highlighted content into your emails in order to increase its readability
 
 ### [Patterns view](./md/patterns_view/patterns_view.md)

@@ -14,7 +14,9 @@
 #include "CFiltersModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../log/CLog.hpp"
+#include "../common/CQtHelper.hpp"
 
+#include "CFilterItemDelegate.hpp"
 #include "CFiltersView.hpp"
 
 namespace NShortcuts
@@ -30,298 +32,14 @@ namespace NShortcuts
     }
 }
 
-class CRegexTreeRepresentationDelegate : public QStyledItemDelegate
-{
-public:
-    CRegexTreeRepresentationDelegate(QTreeView* pParentTree)
-        : QStyledItemDelegate(pParentTree),
-          mRowAnimationDataMap(),
-          mTime(),
-          mUpdateTimer(),
-          mpParentTree(pParentTree)
-    {
-        mTime.start();
-    }
-
-    void animateRows(const QVector<QModelIndex>& rows, const QColor& color, const int64_t& duration)
-    {
-        mRowAnimationDataMap.clear();
-
-        const auto columnsNumber = mpParentTree->model()->columnCount();
-
-        for(const auto& row : rows)
-        {
-            int64_t startTime = mTime.elapsed();
-
-            for(int columnId = 0; columnId < columnsNumber; ++columnId)
-            {
-                if(false == mpParentTree->isColumnHidden(columnId))
-                {
-                    auto animatedIdx = row.sibling(row.row(), columnId);
-                    QColor initialColor = getColor(animatedIdx);
-                    mRowAnimationDataMap.insert( animatedIdx, tRowAnimationData(initialColor, color, startTime, startTime + duration) );
-                }
-            }
-        }
-
-        auto updateAnimatedRows = [this, columnsNumber]()
-        {
-            for( auto it = mRowAnimationDataMap.begin(); it != mRowAnimationDataMap.end(); ++it )
-            {
-                for(int columnId = 0; columnId < columnsNumber; ++columnId)
-                {
-                    if(false == mpParentTree->isColumnHidden(columnId))
-                    {
-                        QModelIndex updateIdx = it.key().sibling(it.key().row(), columnId);
-                        mpParentTree->update( updateIdx );
-                    }
-                }
-            }
-        };
-
-        if(nullptr != mpParentTree)
-        {
-            updateAnimatedRows();
-            mUpdateTimer.start(16);
-        }
-
-        connect(&mUpdateTimer, &QTimer::timeout, [this, updateAnimatedRows]()
-        {
-            if(false == mRowAnimationDataMap.empty())
-            {
-                if(nullptr != mpParentTree)
-                {
-                    updateAnimatedRows();
-                    mUpdateTimer.start(16);
-                }
-
-                 excludeAnimatedRows();
-            }
-        });
-    }
-
-private:
-
-    // as only visible rows are rendered, we need to exclude some of them on each timer hit
-    // otherwise the high CPU load is observed in case if some of animated rows are outside the visible area
-    void excludeAnimatedRows()
-    {
-        for( auto it = mRowAnimationDataMap.begin(); it != mRowAnimationDataMap.end(); )
-        {
-            auto& animatedObject = *it;
-
-            auto nowToStartDiff = mTime.elapsed() - animatedObject.startTime;
-            auto endToStartDiff = animatedObject.endTime - animatedObject.startTime;
-
-            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
-
-            if(passedTimePercantage > 100)
-            {
-                it = mRowAnimationDataMap.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-
-    QColor getColor( const QModelIndex& index ) const
-    {
-        QColor result;
-
-        auto rowType = index.sibling( index.row(), static_cast<int>(eRegexFiltersColumn::RowType) ).data().value<eRegexFiltersRowType>();
-
-        auto parentIdx = index.parent();
-
-        bool bParentExist = false;
-        auto parentRowType = eRegexFiltersRowType::Text;
-
-        if( parentIdx.isValid() )
-        {
-            bParentExist = true;
-            parentRowType = parentIdx.sibling( parentIdx.row(), static_cast<int>(eRegexFiltersColumn::RowType) ).data().value<eRegexFiltersRowType>();
-        }
-
-        switch(rowType)
-        {
-            case eRegexFiltersRowType::Text:
-            {
-                if(true == bParentExist)
-                {
-                    if(parentRowType == eRegexFiltersRowType::VarGroup)
-                    {
-                        result = QColor("#F9F871");
-                    }
-                    else
-                    {
-                        result = QColor("#B3A7B8");
-                    }
-                }
-                else
-                {
-                    result = QColor("#B3A7B8");
-                }
-            }
-                break;
-            case eRegexFiltersRowType::VarGroup:
-            result = QColor("#FFC04A");
-                break;
-            case eRegexFiltersRowType::NonVarGroup:
-            result = QColor("#B3A7B8");
-                break;
-        }
-
-        return result;
-    }
-
-    void drawText(const QString& inputStr,
-                  const QStyleOptionViewItem& opt,
-                  QPainter *painter,
-                  bool bold) const
-    {
-        int baseShift = 0;
-
-        if(Qt::AlignmentFlag::AlignLeft == opt.displayAlignment)
-        {
-            baseShift = 2;
-        }
-
-        QRect rect = opt.rect;
-
-        //set pen color
-        if (opt.state & QStyle::State_Selected)
-        {
-            painter->fillRect(opt.rect, opt.palette.highlight());
-
-            QPalette::ColorGroup cg = QPalette::Normal;
-            painter->setPen(opt.palette.color(cg, QPalette::HighlightedText));
-        }
-        else
-        {
-            QPalette::ColorGroup cg = QPalette::Normal;
-            painter->setPen(opt.palette.color(cg, QPalette::Text));
-
-            if(true == bold)
-            {
-                if(false == painter->font().bold())
-                {
-                    auto font = painter->font();
-                    font.setBold(true);
-                    painter->setFont(font);
-                }
-            }
-            else
-            {
-                if(true == painter->font().bold())
-                {
-                    auto font = painter->font();
-                    font.setBold(false);
-                    painter->setFont(font);
-                }
-            }
-        }
-
-        painter->drawText(QRect(rect.left()+baseShift, rect.top(), rect.width(), rect.height()),
-                                 opt.displayAlignment, inputStr);
-    }
-
-    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
-    {
-        if(nullptr == painter)
-        {
-            return;
-        }
-
-        painter->save();
-
-        QStyleOptionViewItem viewItemOption = option;
-
-        auto foundAnimatedObject = const_cast<tRowAnimationDataMap*>(&mRowAnimationDataMap)->find( index );
-
-        if(foundAnimatedObject != mRowAnimationDataMap.end())
-        {
-            auto nowToStartDiff = mTime.elapsed() - foundAnimatedObject->startTime;
-            auto endToStartDiff = foundAnimatedObject->endTime - foundAnimatedObject->startTime;
-
-            auto passedTimePercantage = static_cast<int>( 100 * ( static_cast<double>(nowToStartDiff) / endToStartDiff ) );
-
-            if( passedTimePercantage >= 100.0 ) // last frame
-            {
-                painter->fillRect( viewItemOption.rect, foundAnimatedObject.value().startColor );
-                const_cast<tRowAnimationDataMap*>(&mRowAnimationDataMap)->erase(foundAnimatedObject);
-            }
-            else
-            {
-                auto calcColor = [](const QColor& fromColor, const QColor& toColor, const int& percentage)->QColor
-                {
-                    double x = percentage / 100.0;
-                    double factor = 4 * -(x*x) + 4*x;
-
-                    int rDifference = ( toColor.red() - fromColor.red() );
-                    int r = fromColor.red() + static_cast<int>( rDifference * factor );
-                    int gDifference = ( toColor.green() - fromColor.green() );
-                    int g = fromColor.green() + static_cast<int>( gDifference * factor );
-                    int bDifference = ( toColor.blue() - fromColor.blue() );
-                    int b = fromColor.blue() + static_cast<int>( bDifference * factor );
-
-                    //SEND_MSG(QString("~~~ percentage - %1; factor - %2").arg(percentage).arg(factor));
-
-                    return QColor( r, g, b );
-                };
-
-                QColor color = calcColor(foundAnimatedObject->startColor, foundAnimatedObject->intermediateColor, passedTimePercantage);
-
-                painter->fillRect( viewItemOption.rect, color );
-            }
-        }
-        else
-        {
-            painter->fillRect( viewItemOption.rect, getColor(index) );
-        }
-
-        painter->restore();
-
-#ifdef __linux__
-        drawText( index.data().value<QString>(), viewItemOption, painter, true );
-#else
-        QStyledItemDelegate::paint(painter, viewItemOption, index);
-#endif
-    }
-
-    struct tRowAnimationData
-    {
-        tRowAnimationData(const QColor& startColor_,
-                          const QColor& intermediateColor_,
-                          const int64_t& startTime_,
-                          const int64_t& endTime_):
-            startColor(startColor_),
-            intermediateColor(intermediateColor_),
-            startTime(startTime_),
-            endTime(endTime_)
-        {}
-
-        QColor startColor;
-        QColor intermediateColor;
-        int64_t startTime;
-        int64_t endTime;
-    };
-
-    typedef QMap<QModelIndex, tRowAnimationData> tRowAnimationDataMap;
-    tRowAnimationDataMap mRowAnimationDataMap;
-    QElapsedTimer mTime;
-    QTimer mUpdateTimer;
-    QTreeView* mpParentTree;
-};
-
 CFiltersView::CFiltersView(QWidget *parent):
     QTreeView(parent),
     mpModel(nullptr),
     mWidthUpdateRequired(eUpdateRequired::eUpdateRequired_NO),
     mbIsVerticalScrollBarVisible(false),
-    mpRepresentationDelegate(new CRegexTreeRepresentationDelegate(this)),
     mbResizeOnExpandCollapse(true),
-    mbSkipFirstUpdateWidth(true)
+    mbSkipFirstUpdateWidth(true),
+    mpFilerItemDelegate(new CFilterItemDelegate(this))
 {
     header()->setDefaultAlignment(Qt::AlignCenter);
     header()->setSectionsMovable(false);
@@ -440,6 +158,155 @@ CFiltersView::CFiltersView(QWidget *parent):
             contextMenu.addMenu(pSubMenu);
         }
 
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Completion settings", this);
+
+//            TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
+
+            {
+                QAction* pAction = new QAction("Case sensitive", this);
+                connect(pAction, &QAction::triggered, [](bool checked)
+                {
+                    CSettingsManager::getInstance()->setFiltersCompletion_CaseSensitive(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(CSettingsManager::getInstance()->getFiltersCompletion_CaseSensitive());
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Max number of suggestions...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           CSettingsManager::getInstance()->getFiltersCompletion_MaxNumberOfSuggestions(),
+                                                                           this,
+                                                                           "max number of suggestions",
+                                                                           "Max number of suggestions",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            CSettingsManager::getInstance()->setFiltersCompletion_MaxNumberOfSuggestions(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Max characters in suggestion...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           CSettingsManager::getInstance()->getFiltersCompletion_MaxCharactersInSuggestion(),
+                                                                           this,
+                                                                           "max characters in suggestion",
+                                                                           "Max characters in suggestion",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            CSettingsManager::getInstance()->setFiltersCompletion_MaxCharactersInSuggestion(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Pop-up width...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_CompletionPopUpWidth_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           CSettingsManager::getInstance()->getFiltersCompletion_CompletionPopUpWidth(),
+                                                                           this,
+                                                                           "pop up width",
+                                                                           "Pop up width",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            CSettingsManager::getInstance()->setFiltersCompletion_CompletionPopUpWidth(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Search policy", this);
+
+                QActionGroup* pActionGroup = new QActionGroup(this);
+                pActionGroup->setExclusive(true);
+
+                {
+                    QAction* pAction = new QAction("\"Starts with\" strategy", this);
+                    connect(pAction, &QAction::triggered, []()
+                    {
+                        CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(false);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(!CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy());
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("\"Contains\" strategy", this);
+                    connect(pAction, &QAction::triggered, []()
+                    {
+                        CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(true);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy());
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
         contextMenu.exec(mapToGlobal(pos));
     };
 
@@ -453,7 +320,7 @@ CFiltersView::CFiltersView(QWidget *parent):
         updateWidth();
     });
 
-    setItemDelegate(mpRepresentationDelegate);
+    setItemDelegate(mpFilerItemDelegate);
 }
 
 void CFiltersView::setRegexInputField(QLineEdit* pRegexInputField)
@@ -490,10 +357,10 @@ void CFiltersView::currentChanged(const QModelIndex &current, const QModelIndex 
 
 CFiltersView::~CFiltersView()
 {
-    if(nullptr != mpRepresentationDelegate)
+    if(nullptr != mpFilerItemDelegate)
     {
-        delete mpRepresentationDelegate;
-        mpRepresentationDelegate = nullptr;
+        delete mpFilerItemDelegate;
+        mpFilerItemDelegate = nullptr;
     }
 }
 
@@ -540,11 +407,11 @@ void CFiltersView::updateColumnsVisibility()
 
 void CFiltersView::highlightInvalidRegex(const QModelIndex &index)
 {
-    if(true == index.isValid() && nullptr != mpRepresentationDelegate)
+    if(true == index.isValid() && nullptr != mpFilerItemDelegate)
     {
         QVector<QModelIndex> animatedRows;
         animatedRows.push_back(index);
-        mpRepresentationDelegate->animateRows(animatedRows, QColor(255,0,0), 300);
+        mpFilerItemDelegate->animateRows(animatedRows, QColor(255,0,0), 300);
     }
 }
 
@@ -553,6 +420,11 @@ void CFiltersView::setSpecificModel( CFiltersModel* pModel )
     if(nullptr != pModel)
     {
         mpModel = pModel;
+
+        if(nullptr != mpFilerItemDelegate)
+        {
+            mpFilerItemDelegate->setSpecificModel(mpModel);
+        }
 
         connect( mpModel, &CFiltersModel::filteredEntriesChanged, this,
                  [this](const CFiltersModel::tFilteredEntryVec& filteredEntries,
