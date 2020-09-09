@@ -107,7 +107,7 @@ You can type in the characters in order to filter out specific suggestions:
 
 ![Screenshot of the filtered completion list for "APPLICATION" var](./var_completion_list_application_filtered.png)
 
-As we work with regexes, you might want to select more than one autocomplete value. In this case, once first element is selected, enter the pipe ( "|" ) to search again without discarding the previoud input:
+As we work with regexes, you might want to select more than one autocomplete value. In this case, once first element is selected, enter the pipe ( "|" ) to search again without discarding the previous input:
 
 ![Screenshot of the completion list for "APPLICATION" var with usage of pipe](./var_completion_list_application_pipe.png)
 
@@ -118,10 +118,10 @@ Auto-completion supports different kinds of settings, which can be changed by th
 ![Screenshot of the completion settings](./var_completion_settings.png)
 
 - **Case sensitive** - whether suggestions filtering is case sensitive or not
-- **Max number of suggestions** - maximum number of suggestions, which is proposed to the user for specific input
+- **Max number of suggestions** - maximum number of suggestions, which is proposed to the user regarding its specific input
 - **Max characters in suggestion** - maximum number of characters in the suggestion. If proposed string contains more characters, they will be cut off
 - **Pop-up width** - width of the completion pop-up in pixels
-- **Search policy** - policy used to filter out suggestions. Either "starts with" or "contains"
+- **Search policy** - policy used to filter out the suggestions. Either "starts with" or "contains"
 
 ----
 

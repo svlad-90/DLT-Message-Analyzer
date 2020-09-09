@@ -43,7 +43,7 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 ### [Advanced highlighting](./md/advanced_highlighting/advanced_highlighting.md)
 
 - Advanced highlighting of regex groups
-- Possibility to copy-paste highlighted content into your emails in order to increase its readability
+- Possibility to copy-paste highlighted content into your emails in order to increase their readability
 
 ### [Patterns view](./md/patterns_view/patterns_view.md)
 
@@ -82,6 +82,26 @@ and many other features
 ## Troubleshooting
 
 ### [Read it here](./md/troubleshooting/troubleshooting.md)
+
+----
+
+## Repo size:
+
+Baseline: https://github.com/svlad-90/DLT-Message-Analyzer/commit/7c7319e444771a8ff7444085ec3dc59c17c98a54
+
+| Language     | files | blank | comment | code |
+| ---- | ---- | ---- | ---- | ---- |
+| C++          | 38 | 3394 | 584 | 16703 |
+| C/C++ Header   | 43 | 1321 | 1189 | 4598 |
+| Markdown       | 26 | 677 | 0 | 1327 |
+| Qt             | 1 | 8 | 0 | 1183 |
+| CMake          | 15 | 76 | 71 | 404 |
+| ANTLR Grammar  | 1 | 46 | 291 | 400 |
+| YAML           | 4 | 46 | 33 | 206 |
+| Java           | 3 | 46 | 9 | 125 |
+| Maven          | 1 | 15 | 0 | 112 |
+| HTML           | 1 | 0 | 0 | 1 |
+| SUM:           | 133 | 5629 | 2177 | 25059 |
 
 ----
 

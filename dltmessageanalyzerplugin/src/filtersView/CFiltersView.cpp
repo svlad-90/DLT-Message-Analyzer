@@ -276,7 +276,7 @@ CFiltersView::CFiltersView(QWidget *parent):
                 pActionGroup->setExclusive(true);
 
                 {
-                    QAction* pAction = new QAction("\"Starts with\" strategy", this);
+                    QAction* pAction = new QAction("\"Starts with\"", this);
                     connect(pAction, &QAction::triggered, []()
                     {
                         CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(false);
@@ -289,7 +289,7 @@ CFiltersView::CFiltersView(QWidget *parent):
                 }
 
                 {
-                    QAction* pAction = new QAction("\"Contains\" strategy", this);
+                    QAction* pAction = new QAction("\"Contains\"", this);
                     connect(pAction, &QAction::triggered, []()
                     {
                         CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(true);
