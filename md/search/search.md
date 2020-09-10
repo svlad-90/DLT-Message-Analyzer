@@ -69,11 +69,13 @@ The changed setting would be persisted and applied to all the next search operat
 
 ## Regex errors handling
 
-In case if user makes a mistake in the provided regex, the plugin will give a status bar notification with description of the error, which is provided by the used regex engine:
+In case if user makes a mistake in the provided regex, the plugin will give a status bar notification with description of the error, which was provided by the used regex engine:
 
 ![Screenshot of the attempt to apply regex which contains the error](./regex_with_error.png)
 
-The same kind of error handling is also supported in the other menus, where user can enter the patterns-related regexes, e.g. during the edit operation: 
+Notification message contains the col number, at which an error has occured. In addition to that, the regex line edit will jump to the error location and will select the col number character, which contains error. 
+
+The same kind of error handling is also supported in the other menus, where user can enter the regexes, e.g. during the edit operation of the previously saved pattern: 
 
 ![Screenshot of the attempt to save the regex which contains the error](./regex_with_error_in_edit_mode.png)
 

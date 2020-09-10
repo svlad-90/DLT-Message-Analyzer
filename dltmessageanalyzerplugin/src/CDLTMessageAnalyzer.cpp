@@ -634,11 +634,11 @@ std::shared_ptr<QRegularExpression> CDLTMessageAnalyzer::createRegex( const QStr
                                                                       const QString& onSuccessMessages,
                                                                       const QString& onFailureMessages,
                                                                       bool appendRegexError,
+                                                                      QLineEdit* pRegexLineEdit,
                                                                       QWidget* pErrorAnimationWidget
                                                                       )
 {
-    //each regex is prefixed with "(?J)" in order to allow duplicated group names
-    QString regex_ = QString("(?J)").append(regex);
+    QString regex_ = addRegexOptions( regex );
 
     auto caseSensitiveOption = CSettingsManager::getInstance()->getCaseSensitiveRegex() ?
                 QRegularExpression::NoPatternOption:
@@ -659,10 +659,17 @@ std::shared_ptr<QRegularExpression> CDLTMessageAnalyzer::createRegex( const QStr
 
             if(true == appendRegexError)
             {
-                error.append(pResult->errorString());
+                error.append(getFormattedRegexError(*pResult));
             }
 
             updateStatusLabel( error, true );
+
+            if( nullptr != pRegexLineEdit)
+            {
+                pRegexLineEdit->setFocus();
+                auto errorColumn = getRegexErrorColumn(*pResult);
+                pRegexLineEdit->setSelection(errorColumn, 1);
+            }
 
             if(nullptr != pErrorAnimationWidget)
             {
@@ -841,7 +848,7 @@ bool CDLTMessageAnalyzer::analyze()
 
     if(0 != regex.size())
     {
-        auto pRegex = createRegex( regex, sDefaultStatusText, "Regex error: ", true, mpRegexLineEdit );
+        auto pRegex = createRegex( regex, sDefaultStatusText, "Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
 
         if(nullptr == pRegex || false == pRegex->isValid())
         {
@@ -912,13 +919,15 @@ void CDLTMessageAnalyzer::cancel()
 {
     if( nullptr == mpProgressBar ||
             nullptr == mpGroupedViewModel ||
-            nullptr == mpSearchResultModel )
+            nullptr == mpSearchResultModel ||
+            nullptr == mpFiltersModel )
     {
         return;
     }
 
     mpGroupedViewModel->resetData();
     mpSearchResultModel->resetData();
+    mpFiltersModel->resetCompletionData();
 
     updateProgress(0, eRequestState::SUCCESSFUL, true);
 
@@ -1229,7 +1238,7 @@ void CDLTMessageAnalyzer::addPattern(const QString& pattern)
 
     bool ok;
 
-    auto pRegex = createRegex( pattern, sDefaultStatusText, "Pattern not saved. Regex error: ", true, mpRegexLineEdit );
+    auto pRegex = createRegex( pattern, sDefaultStatusText, "Pattern not saved. Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
 
     if(true == pRegex->isValid())
     {
@@ -1496,7 +1505,7 @@ void CDLTMessageAnalyzer::overwritePattern()
 
         QString alias = selectedRow.data().value<QString>();
         QString regex = mpRegexLineEdit->text();
-        auto pParsedRegex = createRegex( regex, sDefaultStatusText, "Pattern not updated. Regex error: ", true, mpRegexLineEdit );
+        auto pParsedRegex = createRegex( regex, sDefaultStatusText, "Pattern not updated. Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
 
         if(nullptr != pParsedRegex && true == pParsedRegex->isValid())
         {
@@ -1573,7 +1582,7 @@ void CDLTMessageAnalyzer::editPattern()
         {
             if(nullptr != pRegexLineEdit)
             {
-                auto pRegex = createRegex( pRegexLineEdit->text(), sDefaultStatusText, "Pattern not updated. Regex error: ", true, pRegexLineEdit );
+                auto pRegex = createRegex( pRegexLineEdit->text(), sDefaultStatusText, "Pattern not updated. Regex error: ", true, pRegexLineEdit, pRegexLineEdit );
 
                 if(nullptr != pRegex && true == pRegex->isValid())
                 {

@@ -505,7 +505,7 @@ private: // fields
     TSettingItem<bool> mSetting_UML_WrapOutput;
     TSettingItem<bool> mSetting_UML_Autonumber;
 
-    // Filters view completion settinfs
+    // Filters view completion settings
     TSettingItem<bool> mSetting_FiltersCompletion_CaseSensitive;
     TRangedSettingItem<int> mSetting_FiltersCompletion_MaxNumberOfSuggestions;
     TRangedSettingItem<int> mSetting_FiltersCompletion_MaxCharactersInSuggestion;

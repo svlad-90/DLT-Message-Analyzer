@@ -40,6 +40,7 @@ const QString s_UML_SERVICE = "US"; // - mandatory
 const QString s_UML_METHOD = "UM"; // - mandatory
 const QString s_UML_ARGUMENTS = "UA"; // - optional
 const QString s_UML_ALIAS_DELIMITER = "_";
+const QString s_Regex_options = "(?J)";
 
 static tUML_IDs_Map createUMLIDsMap()
 {
@@ -2251,4 +2252,26 @@ QString rgb2hex(const QColor& color, bool with_head)
 #endif
 
     return result;
+}
+
+QString addRegexOptions( const QString& regex )
+{
+    QString result;
+    result.append(s_Regex_options).append(regex);
+    return result;
+}
+
+int getRegexOptionsCharSize()
+{
+    return s_Regex_options.size();
+}
+
+QString getFormattedRegexError(const QRegularExpression& regex)
+{
+    return QString().append(QString("<col:%1> %2").arg(getRegexErrorColumn(regex)).arg(regex.errorString()));
+}
+
+int getRegexErrorColumn(const QRegularExpression& regex)
+{
+    return regex.patternErrorOffset() - getRegexOptionsCharSize();
 }
