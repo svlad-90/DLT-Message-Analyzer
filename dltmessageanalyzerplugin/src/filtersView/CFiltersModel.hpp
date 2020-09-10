@@ -62,6 +62,8 @@ private:
     QPair<bool,QString> packRegex();
     void resetRootItem();
 
+    void updateVarGroupsMap();
+
     CFiltersModel(const CFiltersModel&) = delete;
     CFiltersModel& operator=(const CFiltersModel&) = delete;
     CFiltersModel(const CFiltersModel&&) = delete;
@@ -79,6 +81,9 @@ private:
     typedef std::set<tQStringPtrWrapper> tStringPtrWrapperSet;
     typedef std::map<int /*group id*/, tStringPtrWrapperSet> tCompletionCache;
     tCompletionCache mCompletionCache;
+
+    typedef std::set<int /*group id*/> tVarGroupsMap;
+    tVarGroupsMap mVarGroupsMap;
 };
 
 Q_DECLARE_METATYPE(CFiltersModel::tFilteredEntryVec)

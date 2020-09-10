@@ -70,8 +70,8 @@ If needed it is possible to switch from visualization of "Variables ONLY" to vis
 
 Plugin's implementation supports auto-complete functionality for the "filters view".
 All found regex captures are cached and used to help the user to go from the general to the specific queries.
-Auto-completion functionality works for all "Group->Text" parts of the fiters view's tree.
-The restriction is that the target group should have 1 single text child node. Otherwise auto-completion will not be applied.
+Auto-completion functionality works for all "VarGroup->Text" parts of the fiters view's tree.
+The restriction is that the target var group should have 1 single text child node. Otherwise auto-completion will not be applied.
 
 How it works?
 

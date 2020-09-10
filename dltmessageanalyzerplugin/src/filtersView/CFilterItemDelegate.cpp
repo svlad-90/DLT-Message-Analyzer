@@ -170,7 +170,7 @@ void CFilterItemDelegate::updateSuggestions(const QString& input)
                 {
                     auto parentRowType = parentIndex.sibling(parentIndex.row(), static_cast<int>(eRegexFiltersColumn::RowType)).data().value<eRegexFiltersRowType>();
 
-                    if(parentRowType != eRegexFiltersRowType::Text) // if parent is not a text
+                    if(parentRowType == eRegexFiltersRowType::VarGroup) // if parent is var
                     {
                         auto groupIndex = parentIndex.sibling(parentIndex.row(), static_cast<int>(eRegexFiltersColumn::GroupIndex)).data().value<int>();
 

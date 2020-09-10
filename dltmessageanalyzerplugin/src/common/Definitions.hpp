@@ -638,4 +638,9 @@ Qt::CheckState V_2_CS( const QVariant& val );
 
 QString rgb2hex(const QColor& color, bool with_head = true);
 
+QString addRegexOptions( const QString& regex );
+int getRegexOptionsCharSize();
+QString getFormattedRegexError(const QRegularExpression& regex);
+int getRegexErrorColumn(const QRegularExpression& regex);
+
 #endif // DEFINITIONS_HPP

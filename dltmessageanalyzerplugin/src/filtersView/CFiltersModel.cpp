@@ -24,7 +24,8 @@ CFiltersModel::CFiltersModel(QObject *parent)
       mSortOrder(Qt::SortOrder::AscendingOrder),
       mSortingHandler(),
       mFilter(),
-      mCompletionCache()
+      mCompletionCache(),
+      mVarGroupsMap()
 {
     mSortingHandler = [](const QVector<tTreeItemPtr>& children,
                             const int& sortingColumn,
@@ -358,7 +359,7 @@ QPair<bool,QString> CFiltersModel::packRegex()
 
         mpRootItem->visit(preVisitFunction, postVisitFunction, false, true, false);
 
-        QRegularExpression regex( QString("(?J)").append( regexStr ) );
+        QRegularExpression regex( addRegexOptions( regexStr ) );
 
         result.first = regex.isValid();
 
@@ -370,7 +371,7 @@ QPair<bool,QString> CFiltersModel::packRegex()
         {
             SEND_ERR(QString("Pack regex: regex - %1").arg(regexStr));
             SEND_ERR(QString("Pack regex: error - %1").arg(regex.errorString()));
-            result.second = regex.errorString();
+            result.second = getFormattedRegexError( regex );
         }
     }
 
@@ -412,7 +413,7 @@ void CFiltersModel::resetData()
 
 void CFiltersModel::setUsedRegex(const QString& regexStr)
 {
-    QString regex_ = QString("(?J)").append(regexStr);
+    QString regex_ = addRegexOptions( regexStr );
 
     // we should reset a group
     resetData();
@@ -460,6 +461,16 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
             timer.restart();
 #endif
 
+            updateVarGroupsMap();
+
+#ifdef DEBUG_BUILD
+            SEND_MSG(QString("[CFiltersModel][%1] It took %2 ms to update var group map")
+                     .arg(__FUNCTION__)
+                     .arg(timer.elapsed()));
+
+            timer.restart();
+#endif
+
             filterRegexTokensInternal();
 
 #ifdef DEBUG_BUILD
@@ -468,6 +479,31 @@ void CFiltersModel::setUsedRegex(const QString& regexStr)
                      .arg(timer.elapsed()));
 #endif
         }
+    }
+}
+
+void CFiltersModel::updateVarGroupsMap()
+{
+    if(nullptr != mpRootItem)
+    {
+        mVarGroupsMap.clear();
+
+        auto preVisitFunction = [this](tTreeItem* pItem)
+        {
+            if(nullptr != pItem)
+            {
+                bool bIsVar = eRegexFiltersRowType::VarGroup == pItem->data(static_cast<int>(eRegexFiltersColumn::RowType)).get<eRegexFiltersRowType>();
+
+                if(true == bIsVar)
+                {
+                    mVarGroupsMap.insert( pItem->data(static_cast<int>(eRegexFiltersColumn::GroupIndex)).get<int>() );
+                }
+            }
+
+            return true;
+        };
+
+        mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
     }
 }
 
@@ -700,11 +736,16 @@ void CFiltersModel::filterRegexTokensInternal()
     //SEND_MSG(QString("~3 [CFiltersModel][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(time.elapsed()));
 }
 
-void CFiltersModel::addCompletionData( const tFoundMatches& foundMatches)
+void CFiltersModel::addCompletionData( const tFoundMatches& foundMatches )
 {
     for(const auto& foundMatch : foundMatches)
     {
-        mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+        auto foundVarGroup = mVarGroupsMap.find(foundMatch.idx);
+
+        if(foundVarGroup != mVarGroupsMap.end())
+        {
+            mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+        }
     }
 }
 

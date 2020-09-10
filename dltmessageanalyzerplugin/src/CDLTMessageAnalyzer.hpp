@@ -247,7 +247,8 @@ signals:
                                                          const QString& onSuccessMessages,
                                                          const QString& onFailureMessages,
                                                          bool appendRegexError,
-                                                         QWidget* pErrorAnimationWidget = nullptr );
+                                                         QLineEdit* pRegexLineEdit,
+                                                         QWidget* pErrorAnimationWidget = nullptr);
 
         void updateStatusLabel( const QString& text, bool isError = false );
         void processOverwritePattern(const QString& alias, const QString checkedRegex, const QModelIndex editItem = QModelIndex());
