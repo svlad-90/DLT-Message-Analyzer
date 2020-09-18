@@ -19,6 +19,9 @@
 #include "patternsView/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 
+#include "common/DMA_Plantuml/DMA_Plantuml.hpp"
+#include "log/CLog.hpp"
+
 Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
 
 DLTMessageAnalyzerPlugin::DLTMessageAnalyzerPlugin():
@@ -36,6 +39,47 @@ mbAnalysisRunning(false)
 {
     //qDebug() << "DLTMessageAnalyzerPlugin lives in thread - " << QThread::currentThreadId();
     qRegisterMetaType<tDltMsgWrapperPtr>("tDLTMsgWrapperPtr");
+
+    DMA::PlantUML::Creator::getInstance().initialize();
+
+//    {
+//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
+
+//        if(true == diagramResult.bIsSuccessful)
+//        {
+//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+//        }
+//        else
+//        {
+//            SEND_ERR(QString::fromStdString(diagramResult.error));
+//        }
+//    }
+
+//    {
+//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram("test_main");
+
+//        if(true == diagramResult.bIsSuccessful)
+//        {
+//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+//        }
+//        else
+//        {
+//            SEND_ERR(QString::fromStdString(diagramResult.error));
+//        }
+//    }
+
+//    {
+//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram("test_main", true);
+
+//        if(true == diagramResult.bIsSuccessful)
+//        {
+//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+//        }
+//        else
+//        {
+//            SEND_ERR(QString::fromStdString(diagramResult.error));
+//        }
+//    }
 }
 
 DLTMessageAnalyzerPlugin::~DLTMessageAnalyzerPlugin()

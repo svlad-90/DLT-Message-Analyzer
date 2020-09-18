@@ -108,6 +108,4 @@ private: //fields
     tRequestId mRequestIdCounter;
 };
 
-
-
 #endif // CDLTMESSAGEANALYZERCONTROLLER_HPP
