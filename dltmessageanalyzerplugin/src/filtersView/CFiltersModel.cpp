@@ -253,7 +253,7 @@ bool CFiltersModel::setData(const QModelIndex &index, const QVariant &value, int
     if(role == Qt::EditRole)
     {
         auto pItem = static_cast<CTreeItem*>(index.internalPointer());
-        const auto currentValue = pItem->data(index.column());
+        const auto& currentValue = pItem->data(index.column());
         auto newValue = toRegexDataItem(value, static_cast<eRegexFiltersColumn>(index.column()));
 
         if(currentValue != newValue)

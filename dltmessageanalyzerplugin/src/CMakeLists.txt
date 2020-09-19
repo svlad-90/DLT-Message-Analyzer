@@ -46,6 +46,8 @@ add_library(antlr4_PCRE_static STATIC
     ${ANTLR_PCRE_CXX_OUTPUTS}
 )
 
+add_definitions(-DPUML_ENABLED)
+
 set_property(TARGET antlr4_PCRE_static PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
@@ -103,7 +105,8 @@ target_link_libraries(DLT-Message-Analyzer
     DMA_filtersView_no_clang_tidy
     DMA_groupedView
     DMA_patternsView
-    DMA_PCRE)
+    DMA_PCRE
+    DMA_Plantuml)
 
 if(TURN_OFF_RCC)
     set(CMAKE_AUTORCC OFF)

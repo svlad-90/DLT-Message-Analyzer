@@ -20,7 +20,9 @@ jobs:
 
     # Install uuid-dev
     - name: Install uuid-dev
-      run: sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
+      run: |
+           sudo apt update
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
       shell: bash
 
     # Cache Qt

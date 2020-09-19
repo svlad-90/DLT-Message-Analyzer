@@ -39,6 +39,8 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
     mpUI->setupUi(this);
 
     NDLTMessageAnalyzer::NConsole::tConsoleConfig consoleConfig;
+    consoleConfig.maxMsgSize = 10240;
+    consoleConfig.logSize = 1000;
     consoleConfig.pTabWidget = getMainTabWidget();
     consoleConfig.pConsoleTab = getConsoleViewTab();
     consoleConfig.pConsoleTextEdit = getConsoleView();

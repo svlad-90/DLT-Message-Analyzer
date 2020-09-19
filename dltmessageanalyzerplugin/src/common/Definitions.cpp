@@ -507,7 +507,7 @@ bool tQStringPtrWrapper::operator== ( const tQStringPtrWrapper& rVal ) const
     else if(pString == nullptr && rVal.pString == nullptr)
         return true;
 
-    return ( *pString != *rVal.pString );
+    return ( *pString == *rVal.pString );
 }
 //////////////////////////////////////////////////////////////////////////
 

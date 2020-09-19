@@ -101,8 +101,8 @@ public:
                 return bResult_;
             };
 
-            const auto pMyElement = static_cast<tTreeItemPtr>(mModelIndex.internalPointer());
-            const auto pValElement = static_cast<tTreeItemPtr>(val.mModelIndex.internalPointer());
+            auto* const pMyElement = static_cast<tTreeItemPtr>(mModelIndex.internalPointer());
+            auto* const pValElement = static_cast<tTreeItemPtr>(val.mModelIndex.internalPointer());
 
             if(myLevel < valLevel)
             {

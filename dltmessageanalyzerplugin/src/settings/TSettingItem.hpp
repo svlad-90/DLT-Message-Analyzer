@@ -109,7 +109,7 @@ class TSettingItem : public CSettingItem
             }
         }
 
-        const auto updateFileFunc = getUpdateFileFunc();
+        const auto& updateFileFunc = getUpdateFileFunc();
 
         if(updateFileFunc)
         {
@@ -230,7 +230,7 @@ public:
             }
         }
 
-        const auto updateFileFunc = tParent::getUpdateFileFunc();
+        const auto& updateFileFunc = tParent::getUpdateFileFunc();
 
         if(updateFileFunc)
         {

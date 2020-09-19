@@ -204,7 +204,10 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
         }
         else
         {
-            QString messageEscaped = message.toHtmlEscaped();
+
+            QString messageEscaped = message. toHtmlEscaped();
+            messageEscaped.replace("\n", "<br/>");
+            messageEscaped.replace(" ", "&nbsp;");
             QString HTMLMessage;
 
             if(true == messageSettings.bCustomColor)

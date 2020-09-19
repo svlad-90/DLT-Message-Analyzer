@@ -366,7 +366,7 @@ bool CDLTFileWrapper::cacheMsgByIndexes( const QSet<tMsgId> msgIdSet )
 {
     bool bResult = true;
 
-    for( const auto msgId : msgIdSet )
+    for( const auto& msgId : msgIdSet )
     {
         bResult = cacheMsgByIndex(msgId);
 
