@@ -13,21 +13,28 @@ It's main purposes is to:
 
 ----
 
-### Table of contents
+## Table of contents
 
-#### [General](../../dltmessageanalyzerplugin/src/doc/doc.md)
+
+#### [DMA_Root](../../dltmessageanalyzerplugin/src/doc/doc.md)
 ----
-#### [Analyzer ( under construction )](../../dltmessageanalyzerplugin/src/analyzer/doc/doc.md)
-#### [Common ( under construction )](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
-#### [DLT wrappers ( under construction )](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
-#### [Filters view](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)
-#### [Grouped view ( under construction )](../../dltmessageanalyzerplugin/src/groupedView/doc/doc.md)
-#### [Log ( under construction )](../../dltmessageanalyzerplugin/src/log/doc/doc.md)
-#### [Logo ( under construction )](../../dltmessageanalyzerplugin/src/logo/doc/doc.md)
-#### [Patterns view ( under construction )](../../dltmessageanalyzerplugin/src/patternsView/doc/doc.md)
-#### [Search view ( under construction )](../../dltmessageanalyzerplugin/src/searchView/doc/doc.md)
-#### [Settings ( under construction )](../../dltmessageanalyzerplugin/src/settings/doc/doc.md)
-#### [PlantUML](../../dltmessageanalyzerplugin/src/plant_uml/doc/doc.md)
+#### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/analyzer/doc/doc.md)
+#### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
+#### [DMA_DLTWrappers](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
+#### [DMA_FiltersView](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)
+#### [DMA_GroupedView](../../dltmessageanalyzerplugin/src/groupedView/doc/doc.md)
+#### [DMA_Log](../../dltmessageanalyzerplugin/src/log/doc/doc.md)
+#### [DMA_Logo](../../dltmessageanalyzerplugin/src/logo/doc/doc.md)
+#### [DMA_PatternsView](../../dltmessageanalyzerplugin/src/patternsView/doc/doc.md)
+#### [DMA_PlantUML](../../dltmessageanalyzerplugin/src/plant_uml/doc/doc.md)
+#### [DMA_SearchView](../../dltmessageanalyzerplugin/src/searchView/doc/doc.md)
+#### [DMA_Settings](../../dltmessageanalyzerplugin/src/settings/doc/doc.md)
+----
+
+### Dependencies
+
+#### [Qt](./qt.md)
+#### [DLT](./dlt.md)
 
 ----
 

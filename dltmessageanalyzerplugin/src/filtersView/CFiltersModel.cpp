@@ -17,6 +17,8 @@
 #include "../log/CLog.hpp"
 #include "../common/PCRE/PCREHelper.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 CFiltersModel::CFiltersModel(QObject *parent)
     : QAbstractItemModel(parent),
       mRegex(),
@@ -799,3 +801,10 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
 
     return result;
 }
+
+PUML_PACKAGE_BEGIN(DMA_FiltersView)
+    PUML_CLASS_BEGIN_CHECKED(CFiltersModel)
+        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

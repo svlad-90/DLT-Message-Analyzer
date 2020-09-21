@@ -1,0 +1,59 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_PlantUML" #DDDDDD
+{
+
+class "CImageViewer"
+{
+}
+
+class "CUMLView"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QImage"
+{
+}
+
+class "QProcess"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QWidget <|-- CImageViewer : extends
+QWidget <|-- CUMLView : extends
+
+'====================Dependencies section====================
+CImageViewer "1" *-- "1" QImage : contains
+CUMLView "1" *-- "1" CImageViewer : contains
+CUMLView "1" *-- "2" QProcess : contains
+CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
+Ui::Form "1" *-- "1" CUMLView : contains
+
+@enduml

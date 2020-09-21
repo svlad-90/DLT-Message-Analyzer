@@ -15,6 +15,8 @@
 #include "../common/CTreeItem.hpp"
 #include "../settings/CSettingsManager.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 Q_DECLARE_METATYPE(CPatternsModel::tFilteredEntry)
 
 static const char* sTreeLevelSeparator = "_";
@@ -1457,3 +1459,10 @@ void CPatternsModel::filterPatterns( const QString& filter )
     mFilter = filter;
     filterPatternsInternal(true);
 }
+
+PUML_PACKAGE_BEGIN(DMA_PatternsView)
+    PUML_CLASS_BEGIN_CHECKED(CPatternsModel)
+        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

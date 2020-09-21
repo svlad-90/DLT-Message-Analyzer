@@ -3,6 +3,8 @@
 
 #include "CConsoleView.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 namespace NShortcuts
 {
     static bool isClearShortcut( QKeyEvent * pEvent )
@@ -47,3 +49,9 @@ void CConsoleView::keyPressEvent ( QKeyEvent* pEvent )
         tParent::keyPressEvent(pEvent);
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Log)
+    PUML_CLASS_BEGIN_CHECKED(CConsoleView)
+        PUML_INHERITANCE_CHECKED(QPlainTextEdit, extends)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

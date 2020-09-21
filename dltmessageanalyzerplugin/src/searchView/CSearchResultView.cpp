@@ -30,6 +30,7 @@
 #include "../dltWrappers/CDLTFileWrapper.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
 
 CSearchResultView::CSearchResultView(QWidget *parent):
     tParent(parent),
@@ -1432,3 +1433,11 @@ void CSearchResultView::selectAllUMLItems(bool select)
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_SearchView)
+    PUML_CLASS_BEGIN_CHECKED(CSearchResultView)
+        PUML_INHERITANCE_CHECKED(QTableView, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

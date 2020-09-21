@@ -1,0 +1,82 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CTreeItem"
+{
+}
+
+}
+
+package "DMA_FiltersView" #DDDDDD
+{
+
+class "CFilterItemDelegate"
+{
+}
+
+class "CFiltersModel"
+{
+}
+
+class "CFiltersView"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QLineEdit"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QStyledItemDelegate <|-- CFilterItemDelegate : extends
+QAbstractItemModel <|-- CFiltersModel : implements
+QTreeView <|-- CFiltersView : implements
+
+'====================Dependencies section====================
+CFilterItemDelegate "1" o-- "1" CFiltersModel : uses
+CFilterItemDelegate "1" o-- "1" QCompleter : uses
+CFilterItemDelegate "1" o-- "1" QTreeView : parent view
+CFiltersModel "1" *-- "*" CTreeItem : contains
+CFiltersView "1" *-- "1" CFilterItemDelegate : contains
+CFiltersView "1" o-- "1" CFiltersModel : uses
+CFiltersView "1" o-- "1" QLineEdit : regex input field
+CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
+Ui::Form "1" *-- "1" CFiltersView : contains
+
+@enduml

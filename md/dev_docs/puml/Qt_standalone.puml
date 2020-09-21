@@ -1,0 +1,74 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+abstract class "QAbstractTableModel"
+{
+}
+
+class "QElapsedTimer"
+{
+}
+
+class "QImage"
+{
+}
+
+class "QLineEdit"
+{
+}
+
+class "QObject"
+{
+}
+
+class "QPlainTextEdit"
+{
+}
+
+class "QProcess"
+{
+}
+
+class "QPushButton"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTabWidget"
+{
+}
+
+class "QTableView"
+{
+}
+
+class "QThread"
+{
+}
+
+class "QTimer"
+{
+}
+
+class "QTreeView"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+@enduml

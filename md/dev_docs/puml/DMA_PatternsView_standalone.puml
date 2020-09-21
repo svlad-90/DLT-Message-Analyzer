@@ -1,0 +1,25 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_PatternsView" #DDDDDD
+{
+
+class "CPatternsModel"
+{
+}
+
+class "CPatternsView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QAbstractItemModel <|-- CPatternsModel : implements
+QTreeView <|-- CPatternsView : extends
+
+'====================Dependencies section====================
+CPatternsView "1" o-- "1" CPatternsModel : uses
+
+@enduml

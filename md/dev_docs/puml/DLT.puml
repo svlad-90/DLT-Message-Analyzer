@@ -1,0 +1,89 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+class "QDltFile"
+{
+}
+
+class "QDltMsg"
+{
+}
+
+class "QDltPlugin"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+class "QDltPluginManager"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+class "QFileSystemWatcher"
+{
+}
+
+}
+
+package "DMA_Common" #DDDDDD
+{
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+}
+
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+class "CDLTMsgWrapper"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
+
+'====================Dependencies section====================
+CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
+CDLTFileWrapper "1" o-- "1" QDltFile : uses
+CDLTMsgWrapper "1" --> "1" QDltMsg : uses
+CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
+CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
+
+@enduml

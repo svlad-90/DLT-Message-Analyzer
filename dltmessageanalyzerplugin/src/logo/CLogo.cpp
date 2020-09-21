@@ -8,6 +8,8 @@
 #include "QPainter"
 #include "CLogo.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 CLogo::CLogo( QWidget* pParent ):
     tParent(pParent)
 {
@@ -25,3 +27,9 @@ void CLogo::paintEvent(QPaintEvent *ev)
     painter.setPen(QPen(QColor(255,255,255), border_width));
     painter.drawRect(QRect(ev->rect().x() + 1, ev->rect().y() + 1, ev->rect().width() - 2, ev->rect().height() - 2));
 }
+
+PUML_PACKAGE_BEGIN(DMA_Logo)
+    PUML_CLASS_BEGIN_CHECKED(CLogo)
+        PUML_INHERITANCE_CHECKED(QPushButton, extends)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

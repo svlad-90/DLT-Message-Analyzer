@@ -16,7 +16,11 @@
 #include "QtWidgets/QComboBox"
 
 #include "plugininterface.h"
+
+#ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 #include "qdltpluginmanager.h"
+#endif
+
 
 #include "common/Definitions.hpp"
 #include "analyzer/IDLTMessageAnalyzerControllerConsumer.hpp"
@@ -310,8 +314,8 @@ signals:
         QDltMessageDecoder* mpMessageDecoder;
 #else
         tPluginPtrList mDecoderPluginsList;
-#endif
         QDltPluginManager mPluginManager;
+#endif
         std::shared_ptr<CRegexDirectoryMonitor> mpRegexDirectoryMonitor;
 
         // timers

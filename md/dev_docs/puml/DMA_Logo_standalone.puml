@@ -1,0 +1,17 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Logo" #DDDDDD
+{
+
+class "CLogo"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QPushButton <|-- CLogo : extends
+
+@enduml

@@ -12,6 +12,8 @@
 #include "../dltWrappers/CDLTMsgWrapper.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 CSearchResultModel::CSearchResultModel(QObject *):
     mFoundMatchesPack(), mpFile(nullptr)
 {
@@ -553,3 +555,10 @@ void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool ch
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_SearchView)
+    PUML_CLASS_BEGIN_CHECKED(CSearchResultModel)
+        PUML_INHERITANCE_CHECKED(QAbstractTableModel, implements)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

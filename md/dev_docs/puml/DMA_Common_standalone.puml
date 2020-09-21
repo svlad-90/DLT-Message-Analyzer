@@ -1,0 +1,33 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CBGColorAnimation"
+{
+}
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+class "CTableMemoryJumper"
+{
+}
+
+class "CTreeItem"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CBGColorAnimation : extends
+QObject <|-- CRegexDirectoryMonitor : extends
+
+'====================Dependencies section====================
+CTreeItem "1" *-- "*" CTreeItem : contains
+
+@enduml

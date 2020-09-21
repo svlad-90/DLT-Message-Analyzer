@@ -19,8 +19,10 @@
 #include "patternsView/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 
-#include "common/DMA_Plantuml/DMA_Plantuml.hpp"
+#include "DMA_Plantuml.hpp"
 #include "log/CLog.hpp"
+
+#include "DMA_Plantuml.hpp"
 
 Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
 
@@ -41,45 +43,6 @@ mbAnalysisRunning(false)
     qRegisterMetaType<tDltMsgWrapperPtr>("tDLTMsgWrapperPtr");
 
     DMA::PlantUML::Creator::getInstance().initialize();
-
-//    {
-//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
-
-//        if(true == diagramResult.bIsSuccessful)
-//        {
-//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
-//        }
-//        else
-//        {
-//            SEND_ERR(QString::fromStdString(diagramResult.error));
-//        }
-//    }
-
-//    {
-//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram("test_main");
-
-//        if(true == diagramResult.bIsSuccessful)
-//        {
-//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
-//        }
-//        else
-//        {
-//            SEND_ERR(QString::fromStdString(diagramResult.error));
-//        }
-//    }
-
-//    {
-//        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram("test_main", true);
-
-//        if(true == diagramResult.bIsSuccessful)
-//        {
-//            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
-//        }
-//        else
-//        {
-//            SEND_ERR(QString::fromStdString(diagramResult.error));
-//        }
-//    }
 }
 
 DLTMessageAnalyzerPlugin::~DLTMessageAnalyzerPlugin()
@@ -545,3 +508,16 @@ void DLTMessageAnalyzerPlugin::analysisTrigger()
 #ifndef QT5
 Q_EXPORT_PLUGIN2(dltmessageanalyzerplugin, DLTMessageAnalyzerPlugin);
 #endif
+
+PUML_PACKAGE_BEGIN(DMA_Root)
+    PUML_CLASS_BEGIN_CHECKED(DLTMessageAnalyzerPlugin)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_INHERITANCE_CHECKED(QDLTPluginInterface, implements)
+        PUML_INHERITANCE_CHECKED(QDltPluginViewerInterface, implements)
+        PUML_INHERITANCE_CHECKED(QDltPluginControlInterface, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(Form, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMessageAnalyzer, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

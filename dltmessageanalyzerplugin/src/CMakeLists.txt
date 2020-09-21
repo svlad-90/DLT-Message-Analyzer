@@ -73,6 +73,8 @@ if(NOT CMAKE_AUTORCC)
     set(TURN_OFF_RCC ON)
 endif()
 
+include_directories(../../thirdparty/DMA_Plantuml/src)
+
 add_subdirectory(analyzer)
 add_subdirectory(common)
 add_subdirectory(searchView)
@@ -84,6 +86,8 @@ add_subdirectory(dltWrappers)
 add_subdirectory(filtersView)
 add_subdirectory(groupedView)
 add_subdirectory(patternsView)
+
+add_subdirectory(../../thirdparty/DMA_Plantuml DMA_Plantuml)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp

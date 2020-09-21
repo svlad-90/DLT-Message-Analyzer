@@ -2,6 +2,8 @@
 
 #include "CTableMemoryJumper.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 static const CTableMemoryJumper::tRowKey sInvalidRowKey = -1;
 
 CTableMemoryJumper::CTableMemoryJumper(QTableView* pTargetTable):
@@ -41,3 +43,9 @@ void CTableMemoryJumper::checkRows( const tCheckSet& checkSet )
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Common)
+    PUML_CLASS_BEGIN_CHECKED(CTableMemoryJumper)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTableView, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

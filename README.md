@@ -73,7 +73,7 @@ and many other features
 
 ----
 
-## Development documentation ( under construction )
+## Development documentation
 
 ### [Read it here](./md/dev_docs/dev_docs.md)
 
@@ -87,21 +87,21 @@ and many other features
 
 ## Repo size:
 
-Baseline: https://github.com/svlad-90/DLT-Message-Analyzer/commit/7c7319e444771a8ff7444085ec3dc59c17c98a54
+Baseline: https://github.com/svlad-90/DLT-Message-Analyzer/commit/7005e44fad183699be6df82831917e9ce71945dc
 
 | Language     | files | blank | comment | code |
 | ---- | ---- | ---- | ---- | ---- |
-| C++          | 38 | 3394 | 584 | 16703 |
-| C/C++ Header   | 43 | 1321 | 1189 | 4598 |
-| Markdown       | 26 | 677 | 0 | 1327 |
+| C++          | 39 | 3572 | 637 | 17495 |
+| C/C++ Header   | 44 | 1385 | 1562 | 4872 |
+| Markdown       | 26 | 682 | 0 | 1344 |
 | Qt             | 1 | 8 | 0 | 1183 |
-| CMake          | 15 | 76 | 71 | 404 |
+| CMake          | 16 | 78 | 71 | 410 |
 | ANTLR Grammar  | 1 | 46 | 291 | 400 |
-| YAML           | 4 | 46 | 33 | 206 |
+| YAML           | 4 | 46 | 33 | 210 |
 | Java           | 3 | 46 | 9 | 125 |
 | Maven          | 1 | 15 | 0 | 112 |
 | HTML           | 1 | 0 | 0 | 1 |
-| SUM:           | 133 | 5629 | 2177 | 25059 |
+| SUM:           | 136 | 5878 | 2603 | 26152 |
 
 ----
 

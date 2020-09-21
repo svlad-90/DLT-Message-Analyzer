@@ -1,0 +1,44 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Settings" #DDDDDD
+{
+
+abstract class "CSettingItem"
+{
+    + virtual const QString& getKey() override
+    + virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() override
+}
+
+class "CSettingsManager"<< (S,#FF7700) Singleton >>
+{
+}
+
+abstract class "ISettingItem"
+{
+    + {abstract} virtual QJsonObject writeData() const = 0
+    + {abstract} virtual bool readData( const QJsonValueRef& setting ) = 0
+    + {abstract} virtual const QString& getKey() = 0
+    + {abstract} virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() = 0
+    + {abstract} virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() = 0
+}
+
+class "TSettingItem<T>" as TSettingItem_T_
+{
+    + virtual QJsonObject writeData() const override
+    + virtual bool readData( const QJsonValueRef& setting ) override
+    + virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() override
+}
+
+}
+
+'====================Inheritance section====================
+ISettingItem <|-- CSettingItem : partially implements
+QObject <|-- CSettingsManager : extends
+CSettingItem <|-- TSettingItem_T_ : extends
+
+'====================Dependencies section====================
+CSettingsManager "1" *-- "*" TSettingItem_T_ : contains
+
+@enduml

@@ -1,0 +1,32 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_FiltersView" #DDDDDD
+{
+
+class "CFilterItemDelegate"
+{
+}
+
+class "CFiltersModel"
+{
+}
+
+class "CFiltersView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QStyledItemDelegate <|-- CFilterItemDelegate : extends
+QAbstractItemModel <|-- CFiltersModel : implements
+QTreeView <|-- CFiltersView : implements
+
+'====================Dependencies section====================
+CFilterItemDelegate "1" o-- "1" CFiltersModel : uses
+CFiltersView "1" *-- "1" CFilterItemDelegate : contains
+CFiltersView "1" o-- "1" CFiltersModel : uses
+
+@enduml

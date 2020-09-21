@@ -1,0 +1,73 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Log" #DDDDDD
+{
+
+class "CConsoleCtrl"<< (S,#FF7700) Singleton >>
+{
+}
+
+class "CConsoleInputProcessor"
+{
+}
+
+class "CConsoleView"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QLineEdit"
+{
+}
+
+class "QObject"
+{
+}
+
+class "QPlainTextEdit"
+{
+}
+
+class "QTabWidget"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CConsoleCtrl : extends
+QObject <|-- CConsoleInputProcessor : extends
+QPlainTextEdit <|-- CConsoleView : extends
+
+'====================Dependencies section====================
+CConsoleCtrl "1" o-- "1" QPlainTextEdit : console text edit
+CConsoleCtrl "1" o-- "1" QTabWidget : console view tab widget
+CConsoleCtrl "1" o-- "1" QWidget : console tab
+CConsoleInputProcessor "1" o-- "1" QLineEdit : console input
+CDLTMessageAnalyzer "1" *-- "1" CConsoleInputProcessor : contains
+Ui::Form "1" *-- "1" CConsoleView : contains
+
+@enduml

@@ -18,6 +18,8 @@
 #include "../common/OSHelper.hpp"
 #include "CSettingsManager.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 static const QString sSettingsManager_Directory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QDir::separator() + ".DLT-Message-Analyzer";
 static const QString sSettingsManager_Regex_SubDirectory = "regexes";
 static const QString sSettingsManager_User_SettingsFile = "user_settings.json";
@@ -2027,3 +2029,10 @@ const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getFilte
 {
     return mSetting_FiltersCompletion_CompletionPopUpWidth.getAllowedTange();
 }
+
+PUML_PACKAGE_BEGIN(DMA_Settings)
+    PUML_SINGLETONE_BEGIN_CHECKED(CSettingsManager)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_COMPOSITION_DEPENDENCY(TSettingItem<T>, 1, *, contains)
+    PUML_SINGLETONE_END()
+PUML_PACKAGE_END()

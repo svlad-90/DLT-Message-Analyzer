@@ -6,6 +6,8 @@
 #include "CImageViewer.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 CImageViewer::CImageViewer(QWidget *parent)
    : QWidget(parent)
 {}
@@ -46,3 +48,10 @@ void CImageViewer::paintEvent(QPaintEvent*)
     QPainter painter(this);
     painter.drawImage(0, 0, mImage);
 }
+
+PUML_PACKAGE_BEGIN(DMA_PlantUML)
+    PUML_CLASS_BEGIN_CHECKED(CImageViewer)
+        PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QImage, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

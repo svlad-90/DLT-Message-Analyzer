@@ -10,6 +10,7 @@
 // self-includes
 #include "CRegexDirectoryMonitor.hpp"
 
+#include "DMA_Plantuml.hpp"
 
 CRegexDirectoryMonitor::CRegexDirectoryMonitor():
 mFileSystemWatcher(),
@@ -103,3 +104,10 @@ void CRegexDirectoryMonitor::analyzeFolder()
         SEND_WRN(QString("[CRegexDirectoryMonitor]: Path \"%1\" does not exist").arg(mObservedPath));
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Common)
+    PUML_CLASS_BEGIN_CHECKED(CRegexDirectoryMonitor)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QFileSystemWatcher, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

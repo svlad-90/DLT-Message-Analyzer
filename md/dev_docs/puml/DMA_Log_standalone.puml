@@ -1,0 +1,27 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Log" #DDDDDD
+{
+
+class "CConsoleCtrl"<< (S,#FF7700) Singleton >>
+{
+}
+
+class "CConsoleInputProcessor"
+{
+}
+
+class "CConsoleView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CConsoleCtrl : extends
+QObject <|-- CConsoleInputProcessor : extends
+QPlainTextEdit <|-- CConsoleView : extends
+
+@enduml

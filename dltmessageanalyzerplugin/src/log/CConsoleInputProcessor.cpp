@@ -1,11 +1,40 @@
 #include "QStyleFactory"
 #include "QApplication"
+#include "QTextStream"
 
 #include "../common/Definitions.hpp"
 
 #include "../dltmessageanalyzerplugin.hpp"
 #include "CConsoleInputProcessor.hpp"
 #include "CLog.hpp"
+
+#include "DMA_Plantuml.hpp"
+
+static const int sMaxCommandsHistorySize = 100;
+static const QString sHelpCommandName = "help";
+
+namespace NShortcuts
+{
+    static bool isPrevHistoryItem( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->key() == Qt::Key_Up;
+    }
+
+    static bool isNextHistoryItem( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->key() == Qt::Key_Down;
+    }
+
+    static bool isInput( QKeyEvent * pEvent )
+    {
+        return pEvent && ( pEvent->key() == Qt::Key_Enter || pEvent->key() == Qt::Key_Return);
+    }
+
+    static bool isAutocomplete( QKeyEvent * pEvent )
+    {
+        return pEvent && ( pEvent->key() == Qt::Key_Tab);
+    }
+}
 
 static void webLink()
 {
@@ -29,9 +58,164 @@ static void supportedStyles()
     SEND_MSG("Supported styles:");
 
     const QStringList styles = QStyleFactory::keys();
-    for(QString style : styles)
+    for(const QString& style : styles)
     {
         SEND_MSG(QString("- ").append(style));
+    }
+}
+
+static void availableUMLPackages(const QString& packageName)
+{
+    SEND_MSG("Available UML packages:");
+
+    auto packageList = DMA::PlantUML::Creator::getInstance().findPackagesByName(packageName.toStdString());
+    for(const auto& pPackage : packageList)
+    {
+        SEND_MSG(QString("- ").append(QString::fromStdString(*pPackage)));
+    }
+}
+
+static void printClassDiagram(const QString& packageName, bool excludeExternalDependencies)
+{
+    auto printPackage = [&excludeExternalDependencies](const QString& packageName_)
+    {
+        SEND_MSG(QString("Class diagram for package \"%1\":").arg(packageName_));
+
+        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram(packageName_.toStdString(),
+                                                                                          excludeExternalDependencies);
+
+        if(true == diagramResult.bIsSuccessful)
+        {
+            SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+        }
+        else
+        {
+            SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
+        }
+    };
+
+    QString toLowerCandidate = packageName.toLower();
+
+    if(toLowerCandidate == "all")
+    {
+        auto packageList = DMA::PlantUML::Creator::getInstance().findPackagesByName("");
+
+        for(const auto& pPackageName : packageList)
+        {
+            if(nullptr != pPackageName)
+            {
+                printPackage(QString::fromStdString(*pPackageName));
+            }
+        }
+    }
+    else
+    {
+        printPackage(packageName);
+    }
+}
+
+static void exportClassDiagram(const QString& dir, const QString& packageName, bool excludeExternalDependencies)
+{
+    auto exportPackage = [&dir, &excludeExternalDependencies](const QString& packageName_)
+    {
+        auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram(packageName_.toStdString(),
+                                                                                          excludeExternalDependencies);
+        if(true == diagramResult.bIsSuccessful)
+        {
+            QString fileName = packageName_;
+
+            if(true == excludeExternalDependencies)
+            {
+                fileName.append("_standalone");
+            }
+
+            fileName.append(".puml");
+
+            QString filePath = dir;
+            filePath.append(QDir::separator()).append(fileName);
+
+            QFile file( filePath );
+            if ( true == file.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text) )
+            {
+                QTextStream textStream(&file);
+                textStream << QString::fromStdString( diagramResult.diagramContent );
+                file.close();
+
+                SEND_MSG(QString("[exportClassDiagram] Diagram \"%1\" was successfully exported").arg(fileName));
+            }
+            else
+            {
+                SEND_ERR(QString("Was not able to open or create file \"%1\"").arg(filePath));
+            }
+        }
+        else
+        {
+            SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
+        }
+    };
+
+    QString toLowerCandidate = packageName.toLower();
+
+    if(toLowerCandidate == "all")
+    {
+        auto packageList = DMA::PlantUML::Creator::getInstance().findPackagesByName("");
+
+        for(const auto& pPackageName : packageList)
+        {
+            if(nullptr != pPackageName)
+            {
+                exportPackage(QString::fromStdString(*pPackageName));
+            }
+        }
+    }
+    else
+    {
+        exportPackage(packageName);
+    }
+}
+
+static void printAppClassDiagram()
+{
+    SEND_MSG(QString("Class diagram of application:"));
+
+    auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
+
+    if(true == diagramResult.bIsSuccessful)
+    {
+        SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+    }
+    else
+    {
+        SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
+    }
+}
+
+static void exportAppClassDiagram(const QString& dir)
+{
+    auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
+
+    if(true == diagramResult.bIsSuccessful)
+    {
+        QString filePath = dir;
+        filePath.append(QDir::separator()).append("DMA_Full").append(".puml");
+
+        QFile file( filePath );
+        if ( true == file.open(QIODevice::WriteOnly|QIODevice::Truncate|QIODevice::Text) )
+        {
+            QTextStream textStream(&file);
+            textStream << QString::fromStdString( diagramResult.diagramContent );
+            file.close();
+
+            SEND_MSG(QString("[%1] Diagram \"DMA_Full.puml\" was successfully exported").arg(__FUNCTION__));
+        }
+        else
+        {
+            SEND_ERR(QString("Was not able to open or create file \"%1\"").arg(filePath));
+        }
+    }
+    else
+    {
+        SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
     }
 }
 
@@ -53,7 +237,7 @@ static void clear()
     CLEAR_CONSOLE_VIEW();
 }
 
-static void UML_identifiers()
+static void UML_sequence_identifiers()
 {
     SEND_MSG("UML regex group identifiers, which are supported by the plugin:");
 
@@ -73,73 +257,526 @@ static void UML_identifiers()
     }
 }
 
+static CConsoleInputProcessor::tScenariosMap createScenariosMap();
+
+static void printHelp(const QString& command)
+{
+    static const auto scenarioMap = createScenariosMap();
+
+    if(true == command.isEmpty())
+    {
+        SEND_MSG("Supported commands:");
+
+        for(const auto& scenarioItem : scenarioMap)
+        {
+            SEND_MSG(QString("- ")
+                     .append(scenarioItem.first)
+                     .append(" ")
+                     .append(scenarioItem.second.comment));
+        }
+
+        SEND_MSG("Note! Parameters should be mentioned in \"-param=value\" or \"--param=value\" format");
+    }
+    else
+    {
+        auto foundCommand = scenarioMap.find(command);
+
+        if(foundCommand != scenarioMap.end())
+        {
+            SEND_MSG(QString("- ")
+                     .append(foundCommand->first)
+                     .append(" ")
+                     .append(foundCommand->second.comment));
+        }
+        else
+        {
+            SEND_ERR(QString("Command with name \"%1\" was not found. Print \"help\" to see list of available commands").arg(command));
+        }
+    }
+}
+
+static bool strToBool( const QString& str, bool& val )
+{
+    bool bResult = false;
+
+    QString lowerCandidate = str.toLower();
+
+    if(lowerCandidate == "true")
+    {
+        bResult = true;
+        val = true;
+    }
+    else if(lowerCandidate == "false")
+    {
+        bResult = true;
+        val = false;
+    }
+    else
+    {
+        bResult = false;
+    }
+
+    return bResult;
+}
 
 static CConsoleInputProcessor::tScenariosMap createScenariosMap()
 {
     CConsoleInputProcessor::tScenariosMap result;
 
-    result.insert(std::make_pair( QString("clear"), [](){clear();} ));
-    result.insert(std::make_pair( QString("color-aliases"), [](){supportedColors();} ));
-    result.insert(std::make_pair( QString("support"), [](){support();} ));
-    result.insert(std::make_pair( QString("version"), [](){version();} ));
-    result.insert(std::make_pair( QString("web-link"), [](){webLink();} ));
-    result.insert(std::make_pair( QString("uml-id"), [](){UML_identifiers();} ));
-    result.insert(std::make_pair( QString("styles"), [](){supportedStyles();} ));
+    result[sHelpCommandName] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    {
+        auto foundCommandParam = params.find("c");
+
+        QString command;
+
+        if(foundCommandParam != params.end())
+        {
+            command = foundCommandParam->second;
+        }
+
+        printHelp(command);
+    }, "[-c=<command-name>] - show this help. If no \"c\" parameter is provided - "
+       "help regarding all available commands will be dumped. "
+       "Be aware, that [<command-name> <help>] syntax can also be used to get the help output regarding a single command. "
+       "Such syntax is easier to use, considering limited auto-complete functionality of this console. E.g. \"help -help\" (ha-ha).");
+
+    result["clear"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){clear();},
+                      "- clears debug view");
+    result["color-aliases"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedColors();}
+                              , "- prints all supported color aliases");
+    result["support"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){support();}
+                        , "- prints information regarding how to get support");
+    result["version"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){version();}
+                        , "- prints version of the plugin");
+    result["web-link"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){webLink();}
+                         , "- prints URL with location of the plugin on the Git hub");
+    result["uml-sequence-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){UML_sequence_identifiers();}
+                       , "- prints information about regex names scripting in area of the UML sequence diagrams");
+    result["styles"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedStyles();}
+                       , "- prints information about QT styles supported on target OS");
+    result["uml-packages"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    {
+        if(false == params.empty())
+        {
+            auto foundParam = params.find("p");
+
+            if(foundParam != params.end())
+            {
+                availableUMLPackages(foundParam->second);
+            }
+            else
+            {
+                SEND_ERR("Command [uml-packages]: required parameter \"p\" not found!");
+            }
+        }
+        else
+        {
+            availableUMLPackages("");
+        }
+    }, "[-p=<packageName> // part of case insensitive package name] - prints information about available UML packages. "
+       "In case if \"package\" parameter is empty - will print info about all available packages. "
+       "Obtained names can be used to build UML class diagrams using \"uml-print-class-diagram\" command");
+
+    result["uml-print-class-diagram"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    {
+        if(false == params.empty())
+        {
+            auto foundPackageParam = params.find("p");
+
+            if(foundPackageParam != params.end())
+            {
+                auto foundExcludeDepsParam = params.find("e");
+
+                bool bExcludeDeps = false;
+
+                if(foundExcludeDepsParam != params.end())
+                {
+                    if(strToBool(foundExcludeDepsParam->second, bExcludeDeps))
+                    {
+                        printClassDiagram(foundPackageParam->second, bExcludeDeps);
+                    }
+                    else
+                    {
+                        SEND_ERR("Command [uml-print-class-diagram]: non-boolean value provided in \"e\" parameter");
+                    }
+                }
+                else
+                {
+                    printClassDiagram(foundPackageParam->second, bExcludeDeps);
+                }
+            }
+            else
+            {
+                SEND_ERR("Command [uml-print-class-diagram]: required parameter \"p\" not found!");
+            }
+        }
+        else
+        {
+            printAppClassDiagram();
+        }
+    }, "[-p=<packageName> // case sensitive name of the package. Can be empty or contain special \"all\" value.]"
+       "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
+       "- prints class diagram of the whole application or of the dedicated package(s) to the console. "
+       "In case if no parameters provided - the whole application's diagram will be dumped.");
+
+    result["uml-export-class-diagram"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    {
+        if(params.size() > 1)
+        {
+            auto foundPackageParam = params.find("p");
+
+            if(foundPackageParam != params.end())
+            {
+                auto foundDirParam = params.find("d");
+
+                if(foundDirParam != params.end())
+                {
+                    QFile file( foundDirParam->second );
+                    if ( true == file.exists() )
+                    {
+                        auto foundExcludeDepsParam = params.find("e");
+
+                        bool bExcludeDeps = false;
+
+                        if(foundExcludeDepsParam != params.end())
+                        {
+                            if(strToBool(foundExcludeDepsParam->second, bExcludeDeps))
+                            {
+                                exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
+                            }
+                            else
+                            {
+                                SEND_ERR("Command [uml-export-class-diagram]: non-boolean value provided in \"e\" parameter");
+                            }
+                        }
+                        else
+                        {
+                            exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
+                        }
+                    }
+                    else
+                    {
+                        SEND_ERR(QString("Command [uml-export-class-diagram]: Provided path does not exist - \"%1\"").arg(foundDirParam->second));
+                    }
+                }
+                else
+                {
+                    SEND_ERR("Command [uml-export-class-diagram]: required parameter \"d\" not found!");
+                }
+            }
+            else
+            {
+                SEND_ERR("Command [uml-export-class-diagram]: required parameter \"p\" not found!");
+            }
+        }
+        else if(params.size() == 1)
+        {
+            auto foundDirParam = params.find("d");
+
+            if(foundDirParam != params.end())
+            {
+                QFile file( foundDirParam->second );
+                if ( true == file.exists() )
+                {
+                    exportAppClassDiagram(foundDirParam->second);
+                }
+                else
+                {
+                    SEND_ERR(QString("Command [uml-export-class-diagram]: Provided path does not exist - \"%1\"").arg(foundDirParam->second));
+                }
+            }
+            else
+            {
+                SEND_ERR("Command [uml-export-class-diagram]: required parameter \"d\" not found!");
+            }
+        }
+        else
+        {
+            SEND_ERR("Command [uml-export-class-diagram]: required parameter \"d\" not found!");
+        }
+    }, "[-d=<directory> // mandatory! Directory, to which store the the diagrams]"
+       "[-p=<packageName> // case sensitive name of the package. Can be empty or contain special \"all\" value.]"
+       "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
+       "- exports class diagram of the whole application or of the dedicated package(s) to the file-system. "
+       "In case if no optional parameters provided - the whole application's diagram will be exported.");
 
     return result;
 }
 
 CConsoleInputProcessor::CConsoleInputProcessor( QLineEdit* pTargetLineEdit ):
-    mScenariosMap(createScenariosMap())
+    mpTargetLineEdit(pTargetLineEdit),
+    mScenariosMap(createScenariosMap()),
+    mHistory(),
+    mCurrentHistoryItem(0),
+    mbBorderReached(eHistoryBorderStatus::Not_Near_Border)
 {
-    if(nullptr != pTargetLineEdit)
+    if(nullptr != mpTargetLineEdit)
     {
-        connect(pTargetLineEdit, &QLineEdit::returnPressed,
-                [this, pTargetLineEdit]()
-        {
-            if(nullptr != pTargetLineEdit)
-            {
-                SEND_MSG("========================================");
-
-                QString text = pTargetLineEdit->text();
-
-                pTargetLineEdit->clear();
-
-                SEND_MSG(text);
-
-                QString lowerCandidate = text.toLower();
-
-                if(lowerCandidate == "help")
-                {
-                    SEND_MSG("Supported commands:");
-
-                    for(const auto& scenarioItem : mScenariosMap)
-                    {
-                        SEND_MSG(QString("- ").append(scenarioItem.first));
-                    }
-                }
-                else
-                {
-                    auto foundScenario = mScenariosMap.find(lowerCandidate);
-
-                    if( foundScenario != mScenariosMap.end() )
-                    {
-                        foundScenario->second();
-                    }
-                    else
-                    {
-                        SEND_WRN(QString("Command \"%1\" not supported. Input \"help\" in order to get the list of supported commands.").arg(text));
-                    }
-                }
-
-                if(lowerCandidate != "clear")
-                {
-                    SEND_MSG("========================================");
-                }
-            }
-        });
+        pTargetLineEdit->installEventFilter(this);
     }
 }
 
 CConsoleInputProcessor::~CConsoleInputProcessor()
 {}
+
+bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
+{
+    bool bResult = false;
+
+    if (pEvent->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
+
+        if(NShortcuts::isPrevHistoryItem(pKeyEvent))
+        {
+            if(nullptr != mpTargetLineEdit)
+            {
+                if(false == mHistory.empty())
+                {
+                    if(mbBorderReached == eHistoryBorderStatus::Reached_Last ||
+                       mbBorderReached == eHistoryBorderStatus::Reached_Both)
+                    {
+                        mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
+                        mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
+                    }
+                    else
+                    {
+                        if(mCurrentHistoryItem < static_cast<int>(mHistory.size() - 1))
+                        {
+                            QString text = mpTargetLineEdit->text();
+
+                            if(false == text.isEmpty())
+                            {
+                                ++mCurrentHistoryItem;
+                            }
+
+                            mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
+                        }
+                        else
+                        {
+                            mpTargetLineEdit->setText("");
+                            mbBorderReached = eHistoryBorderStatus::Reached_First;
+                        }
+                    }
+
+                }
+            }
+
+            bResult = QObject::eventFilter(pObj, pEvent);
+        }
+        else if(NShortcuts::isNextHistoryItem(pKeyEvent))
+        {
+            if(nullptr != mpTargetLineEdit)
+            {
+                if(false == mHistory.empty())
+                {
+                    if(mbBorderReached == eHistoryBorderStatus::Reached_First)
+                    {
+                        mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
+                        mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
+                    }
+                    else
+                    {
+                        if(mCurrentHistoryItem > 0)
+                        {
+                            QString text = mpTargetLineEdit->text();
+
+                            if(false == text.isEmpty())
+                            {
+                                --mCurrentHistoryItem;
+                            }
+
+                            mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
+                        }
+                        else
+                        {
+                            mpTargetLineEdit->setText("");
+                            mbBorderReached = eHistoryBorderStatus::Reached_Last;
+                        }
+                    }
+                }
+            }
+
+            bResult = QObject::eventFilter(pObj, pEvent);
+        }
+        else if(NShortcuts::isAutocomplete(pKeyEvent))
+        {
+            if(nullptr != mpTargetLineEdit)
+            {
+                QString text = mpTargetLineEdit->text();
+
+                std::set<QString> autocompletionMap;
+
+                for(const auto& scenarioPair : mScenariosMap)
+                {
+                    bool bStartsWith = scenarioPair.first.startsWith(text);
+
+                    if(true == bStartsWith)
+                    {
+                        autocompletionMap.insert(scenarioPair.first);
+                    }
+                }
+
+                QString result = text;
+
+                if(autocompletionMap.size() == 1)
+                {
+                    result = *autocompletionMap.begin();
+                }
+                else if(false == autocompletionMap.empty() || true == text.isEmpty())
+                {
+                    QString msg;
+
+                    std::size_t counter = 0;
+
+                    for(const auto& autocompletionItem : autocompletionMap)
+                    {
+                        msg.append(autocompletionItem);
+
+                        if(counter < autocompletionMap.size() - 1)
+                        {
+                            msg.append(" | ");
+                        }
+
+                        ++counter;
+                    }
+
+                    SEND_MSG(msg);
+                }
+
+                if(false == result.isEmpty())
+                {
+                    mpTargetLineEdit->setText(result);
+                }
+            }
+
+            bResult = true;
+        }
+        else if(NShortcuts::isInput(pKeyEvent))
+        {
+            if(nullptr != mpTargetLineEdit)
+            {
+                QString text = mpTargetLineEdit->text();
+
+                mHistory.push_front(text);
+                mCurrentHistoryItem = 0;
+
+                if(mHistory.size() == 1)
+                {
+                    mbBorderReached = eHistoryBorderStatus::Reached_Both;
+                }
+                else if(mHistory.size() > 1)
+                {
+                    mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
+                }
+
+                if(mCurrentHistoryItem > sMaxCommandsHistorySize)
+                {
+                    mHistory.resize(sMaxCommandsHistorySize);
+                }
+
+                mpTargetLineEdit->clear();
+
+                SEND_MSG("");
+                SEND_MSG("========================================");
+                SEND_MSG(QString("| ").append(text));
+
+                // let's split input text into function name, and its parameters
+                auto stirngList = text.split(" -", Qt::SkipEmptyParts);
+
+                if(false == stirngList.empty())
+                {
+                    QString lowerCandidate = stirngList[0].toLower();
+                    stirngList.pop_front(); // erase name, as it is already copied
+
+                    auto foundScenario = mScenariosMap.find(lowerCandidate);
+
+                    if( foundScenario != mScenariosMap.end() )
+                    {
+                        // if command was found, let's parse aprameters
+
+                        tParamMap paramMap;
+
+                        for(const auto& paramCandidate : stirngList)
+                        {
+                            QStringList parsedParam = paramCandidate.split("=", Qt::SkipEmptyParts);
+
+                            if(parsedParam.size() == 2)
+                            {
+                                paramMap[parsedParam[0]] = parsedParam[1];
+                            }
+                            else if(parsedParam.size() == 1)
+                            {
+                                paramMap[parsedParam[0]] = "";
+                            }
+                        }
+
+                        SEND_MSG("----------------------------------------");
+
+                        auto foundHelpParameter = paramMap.find(sHelpCommandName);
+
+                        if(foundHelpParameter == paramMap.end())
+                        {
+                            if(foundScenario->second.scenarioHandler)
+                            {
+                                foundScenario->second.scenarioHandler(paramMap);
+                            }
+                        }
+                        else
+                        {
+                            auto foundHelpCommand = mScenariosMap.find(sHelpCommandName);
+
+                            if(foundHelpCommand != mScenariosMap.end())
+                            {
+                                tParamMap helpParamMap;
+                                helpParamMap["c"] = foundScenario->first;
+
+                                if(foundHelpCommand->second.scenarioHandler)
+                                {
+                                    foundHelpCommand->second.scenarioHandler(helpParamMap);
+                                }
+                            }
+                        }
+
+                        if(lowerCandidate != "clear")
+                        {
+                            SEND_MSG("========================================");
+                        }
+                    }
+                    else
+                    {
+                        SEND_MSG("----------------------------------------");
+                        SEND_WRN(QString("Command \"%1\" not supported. Input \"help\" in order to get the list of supported commands.").arg(text));
+                        SEND_MSG("========================================");
+                    }
+                }
+            }
+
+            bResult = QObject::eventFilter(pObj, pEvent);
+        }
+        else
+        {
+            bResult = QObject::eventFilter(pObj, pEvent);
+        }
+    }
+    else
+    {
+        bResult = QObject::eventFilter(pObj, pEvent);
+    }
+
+    return bResult;
+}
+
+CConsoleInputProcessor::tScenarioData::tScenarioData(
+        const CConsoleInputProcessor::tScenarioHandler& scenarioHandler_,
+        const QString& comment_ ):
+scenarioHandler(scenarioHandler_),
+ comment(comment_)
+{}
+
+PUML_PACKAGE_BEGIN(DMA_Log)
+    PUML_CLASS_BEGIN_CHECKED(CConsoleInputProcessor)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, console input)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()
