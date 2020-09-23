@@ -9,7 +9,7 @@
 /**
  *
  * Module:   DMA_Plantuml
- * Version:  1.0.0
+ * Version:  1.0.2
  * Author:   Vladyslav Goncharuk ( svlad1990@gmail.com )
  *
  * ////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,8 @@
  * Motivation:
  *
  * Firstly, as a developer I want documentation of my source code to be located
- * as near as possible to the code itself.
+ * as near as possible to the code itself. Additionally, I do not want to
+ * maintain multiple non-connected diagrams, but rather a one single model.
  *
  * Secondly, I do not want to use existing tools, which are generating the
  * diagrams during the build. Integration of such tools usually needs a lot of
@@ -145,33 +146,36 @@
  * order to store the whole metadata of the package there. No! Idea is to
  * declare metadata of the specific entities in their own cpp files. Even if
  * multiple classes are related to the same package.
- * - From the other side you can't split the definition of metadata for the
+ * - From the other side, you can't split the definition of metadata for the
  * classes and interfaces. There should be only one definition of entity with
  * its unique name within a package. In case of multiple definitions of an
  * element the "last win" strategy will be applied. So you can get partial
  * data ☺
- * - Class has: methods, inheritance, dependencies
- * - Interface has: methods, dependencies. No inheritance.
+ * - both class and interface do have: methods, inheritance and dependencies
  * - All parameters of the macro definitions should be placed without the
  * quotes. Stringification will be done inside the macro definitions
- * - Concept does NOT contain a type check mechanism. From one side that allows
- * you to register some garbage. But from the other - it allows to create
- * design for non-existing classes, which is useful.
+ * - Concept does contain a primitive type check mechanism. Refer to X_CHECKED
+ * macro definitions. It's usage is optional, so, if needed, you can add to
+ * your design even non-yet-existing classes.
  * - It is better to specify class names with namespaces in order to avoid
- * collisions between the entities. E.g. dependencies and inheritance are
- * searched by their names without considering name of the package. Thus, if
- * you will have the package_1::class_1 and package_2::class_1, then dependency
- * to class_1 might lead to ambiguation, when random data will be chosen.
+ * collisions between the entities. E.g. dependencies and inheritance lookup
+ * is using names without considering name of the packages. Thus, if you will
+ * have the package_1::class_1 and package_2::class_1, then dependency to
+ * class_1 might lead to ambiguation, when random data will be chosen.
  * - All internal search functionality is CASE SENSITIVE. Thus, metadata
- * declarations should also consider this. Only Creator::findPackagesByName does
- * a case-insensitive search.
+ * declarations should also consider this. Only Creator::findPackagesByName
+ * method does a case-insensitive search of packages.
  * - Be aware, that you will need a graphwiz installed in order to get plantuml
- * class diagrams. It is better to install version 2.38 of it.
+ * class diagrams. It is better to install version 2.38 of it, as plantuml
+ * documentation states, that currently it is the most compatible release.
  * - There is NO support of the nested packages, interfaces or classes. Only
  * package->class and package->interface folding.
  * - keywords virtual, override and "=0" should NOT be added together with
  * the method's definition. They will be added implicitly.
- * - Dependencies of class or interface to itself will be ignored.
+ * - Concept supports usage of template classes. But be aware, that X_CHECKED
+ * macro definitions will not fully work with it. TClass<int> might work, while
+ * TClass<T> ( where T is abstract template parameter ) definitely won't.
+ * - Concept supports declaration of singletone and abstract classes
  *
  * //////////////////////////////////////////////////////
  *
@@ -205,11 +209,11 @@
  * >
  * >  if(true == diagramResult.bIsSuccessful)
  * >  {
- * >      SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+ * >      // do something with diagramResult.diagramContent
  * >  }
  * >  else
  * >  {
- * >      SEND_ERR(QString::fromStdString(diagramResult.error));
+ * >      // dump diagramResult.error
  * >  }
  *
  * //////////////////////////////////////////////////////
@@ -307,6 +311,11 @@
  * >
  * >  @enduml
  *
+ * For more complex examples, please, visit the following project:
+ * https://github.com/svlad-90/DLT-Message-Analyzer
+ * Its class-diagrams documentation is fully based on usage of this library.
+ * Search for usage of this API within that repository, and you will get how to
+ * deal with it.
  */
 
 //////////// dependencies to the standard library ////////////
@@ -317,6 +326,7 @@
 #include <memory>
 #include <mutex>
 #include <functional>
+#include <type_traits>
 //////////// dependencies to the standard library ( end ) ////
 
 #define COMBINE1(X,Y) X##Y  // helper macro
@@ -336,17 +346,30 @@
 #define PUML_PACKAGE_BEGIN( PACKAGE_NAME )
 #define PUML_PACKAGE_END()
 #define PUML_INTERFACE_BEGIN( INTERFACE_NAME )
+#define PUML_INTERFACE_BEGIN_CHECKED( INTERFACE_NAME )
 #define PUML_INTERFACE_END()
 #define PUML_CLASS_BEGIN( CLASS_NAME )
+#define PUML_CLASS_BEGIN_CHECKED( CLASS_NAME )
 #define PUML_CLASS_END()
+#define PUML_ABSTRACT_CLASS_BEGIN( INTERFACE_NAME )
+#define PUML_ABSTRACT_CLASS_BEGIN_CHECKED( INTERFACE_NAME )
+#define PUML_ABSTRACT_CLASS_END()
+#define PUML_SINGLETONE_BEGIN( CLASS_NAME )
+#define PUML_SINGLETONE_BEGIN_CHECKED( CLASS_NAME )
+#define PUML_SINGLETONE_END()
 #define PUML_VIRTUAL_METHOD( ACCESS_MODIFIER, METHOD )
 #define PUML_PURE_VIRTUAL_METHOD( ACCESS_MODIFIER, METHOD )
 #define PUML_METHOD( ACCESS_MODIFIER, METHOD )
 #define PUML_OVERRIDE_METHOD( ACCESS_MODIFIER, METHOD )
 #define PUML_STATIC_METHOD( ACCESS_MODIFIER, METHOD )
 #define PUML_INHERITANCE( BASE_CLASS, COMMENT )
+#define PUML_INHERITANCE_CHECKED( BASE_CLASS, COMMENT )
 #define PUML_COMPOSITION_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
+#define PUML_COMPOSITION_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
 #define PUML_AGGREGATION_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
+#define PUML_AGGREGATION_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
+#define PUML_USE_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
+#define PUML_USE_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )
 
 #else
 
@@ -361,20 +384,74 @@ DMA::PlantUML::tStringPtrWrapper pPackageName = std::make_shared<std::string>(#P
 
 #define PUML_INTERFACE_BEGIN( INTERFACE_NAME )\
 {\
+    int interfaceCheck = 0;\
     DMA::PlantUML::tInterfaceDataPtr pItem = std::make_shared<DMA::PlantUML::tInterfaceData>();\
-    pItem->itemName = DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#INTERFACE_NAME) );
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#INTERFACE_NAME) ) );
+
+#define PUML_INTERFACE_BEGIN_CHECKED( INTERFACE_NAME )\
+{\
+    int interfaceCheck = 0;\
+    static_assert (std::is_class<INTERFACE_NAME>::value, "[PUML_INTERFACE_BEGIN_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tInterfaceDataPtr pItem = std::make_shared<DMA::PlantUML::tInterfaceData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#INTERFACE_NAME) ) );
 
 #define PUML_INTERFACE_END()\
     DMA::PlantUML::Creator::getInstance().addItem(pPackageName, pItem);\
+    static_cast<void>(interfaceCheck);\
 }
 
 #define PUML_CLASS_BEGIN( CLASS_NAME )\
 {\
+    int classCheck = 0;\
     DMA::PlantUML::tClassDataPtr pItem = std::make_shared<DMA::PlantUML::tClassData>();\
-    pItem->itemName = DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#CLASS_NAME) );
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#CLASS_NAME) ) );
+
+#define PUML_CLASS_BEGIN_CHECKED( CLASS_NAME )\
+{\
+    int classCheck = 0;\
+    static_assert (std::is_class<CLASS_NAME>::value, "[PUML_CLASS_BEGIN_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tClassDataPtr pItem = std::make_shared<DMA::PlantUML::tClassData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#CLASS_NAME) ) );
 
 #define PUML_CLASS_END()\
     DMA::PlantUML::Creator::getInstance().addItem(pPackageName, pItem);\
+    static_cast<void>(classCheck);\
+}
+
+#define PUML_SINGLETONE_BEGIN( CLASS_NAME )\
+{\
+    int singletoneCheck = 0;\
+    DMA::PlantUML::tSingletoneDataPtr pItem = std::make_shared<DMA::PlantUML::tSingletoneData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#CLASS_NAME) ) );
+
+#define PUML_SINGLETONE_BEGIN_CHECKED( CLASS_NAME )\
+{\
+    int singletoneCheck = 0;\
+    static_assert (std::is_class<CLASS_NAME>::value, "[PUML_SINGLETONE_BEGIN_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tSingletoneDataPtr pItem = std::make_shared<DMA::PlantUML::tSingletoneData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#CLASS_NAME) ) );
+
+#define PUML_SINGLETONE_END()\
+    DMA::PlantUML::Creator::getInstance().addItem(pPackageName, pItem);\
+    static_cast<void>(singletoneCheck);\
+}
+
+#define PUML_ABSTRACT_CLASS_BEGIN( INTERFACE_NAME )\
+{\
+    int abstractClassCheck = 0;\
+    DMA::PlantUML::tAbstractClassDataPtr pItem = std::make_shared<DMA::PlantUML::tAbstractClassData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#INTERFACE_NAME) ) );
+
+#define PUML_ABSTRACT_CLASS_BEGIN_CHECKED( INTERFACE_NAME )\
+{\
+    int abstractClassCheck = 0;\
+    static_assert (std::is_class<INTERFACE_NAME>::value, "[PUML_ABSTRACT_CLASS_BEGIN_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tAbstractClassDataPtr pItem = std::make_shared<DMA::PlantUML::tAbstractClassData>();\
+    pItem->name.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#INTERFACE_NAME) ) );
+
+#define PUML_ABSTRACT_CLASS_END()\
+    DMA::PlantUML::Creator::getInstance().addItem(pPackageName, pItem);\
+    static_cast<void>(abstractClassCheck);\
 }
 
 #define PUML_VIRTUAL_METHOD( ACCESS_MODIFIER, METHOD )\
@@ -411,8 +488,17 @@ DMA::PlantUML::tStringPtrWrapper pPackageName = std::make_shared<std::string>(#P
 {\
     DMA::PlantUML::tInheritanceDataPtr pInheritanceData = std::make_shared<DMA::PlantUML::tInheritanceData>();\
     pInheritanceData->comment = #COMMENT;\
-    pInheritanceData->baseClass = DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#BASE_CLASS) );\
-    pItem->inheritanceMap[pInheritanceData->baseClass] = pInheritanceData;\
+    pInheritanceData->baseClass.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#BASE_CLASS) ) );\
+    pItem->inheritanceMap[pInheritanceData->baseClass.getItemName()] = pInheritanceData;\
+}
+
+#define PUML_INHERITANCE_CHECKED( BASE_CLASS, COMMENT )\
+{\
+    static_assert (std::is_class<BASE_CLASS>::value, "[PUML_INHERITANCE_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tInheritanceDataPtr pInheritanceData = std::make_shared<DMA::PlantUML::tInheritanceData>();\
+    pInheritanceData->comment = #COMMENT;\
+    pInheritanceData->baseClass.setItemName( DMA::PlantUML::tStringPtrWrapper( std::make_shared<std::string>(#BASE_CLASS) ) );\
+    pItem->inheritanceMap[pInheritanceData->baseClass.getItemName()] = pInheritanceData;\
 }
 
 #define PUML_COMPOSITION_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
@@ -425,7 +511,21 @@ DMA::PlantUML::tStringPtrWrapper pPackageName = std::make_shared<std::string>(#P
     #USED_NUMBER,\
     #COMMENT);\
 \
-    pItem->dependencyMap[pDependencyData->itemName] = pDependencyData;\
+    pItem->dependencyMap[pDependencyData->name.getItemName()] = pDependencyData;\
+}
+
+#define PUML_COMPOSITION_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
+{\
+    static_assert (std::is_class<ITEM>::value, "[PUML_COMPOSITION_DEPENDENCY_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tDependencyDataPtr pDependencyData =\
+    std::make_shared<DMA::PlantUML::tDependencyData>(DMA::PlantUML::eDependencyType::eComposition,\
+    #ITEM,\
+    nullptr,\
+    #USING_NUMBER,\
+    #USED_NUMBER,\
+    #COMMENT);\
+\
+    pItem->dependencyMap[pDependencyData->name.getItemName()] = pDependencyData;\
 }
 
 #define PUML_AGGREGATION_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
@@ -438,7 +538,48 @@ DMA::PlantUML::tStringPtrWrapper pPackageName = std::make_shared<std::string>(#P
     #USED_NUMBER,\
     #COMMENT);\
 \
-    pItem->dependencyMap[pDependencyData->itemName] = pDependencyData;\
+    pItem->dependencyMap[pDependencyData->name.getItemName()] = pDependencyData;\
+}
+
+#define PUML_AGGREGATION_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
+{\
+    static_assert (std::is_class<ITEM>::value, "[PUML_AGGREGATION_DEPENDENCY_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tDependencyDataPtr pDependencyData =\
+    std::make_shared<DMA::PlantUML::tDependencyData>(DMA::PlantUML::eDependencyType::eAggregation,\
+    #ITEM,\
+    nullptr,\
+    #USING_NUMBER,\
+    #USED_NUMBER,\
+    #COMMENT);\
+\
+    pItem->dependencyMap[pDependencyData->name.getItemName()] = pDependencyData;\
+}
+
+#define PUML_USE_DEPENDENCY( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
+{\
+    DMA::PlantUML::tDependencyDataPtr pDependencyData =\
+    std::make_shared<DMA::PlantUML::tDependencyData>(DMA::PlantUML::eDependencyType::eUse,\
+    #ITEM,\
+    nullptr,\
+    #USING_NUMBER,\
+    #USED_NUMBER,\
+    #COMMENT);\
+\
+    pItem->dependencyMap[pDependencyData->getItemName()] = pDependencyData;\
+}
+
+#define PUML_USE_DEPENDENCY_CHECKED( ITEM, USING_NUMBER, USED_NUMBER, COMMENT )\
+{\
+    static_assert (std::is_class<ITEM>::value, "[PUML_USE_DEPENDENCY_CHECKED] Provided type should be an existing class or structure");\
+    DMA::PlantUML::tDependencyDataPtr pDependencyData =\
+    std::make_shared<DMA::PlantUML::tDependencyData>(DMA::PlantUML::eDependencyType::eUse,\
+    #ITEM,\
+    nullptr,\
+    #USING_NUMBER,\
+    #USED_NUMBER,\
+    #COMMENT);\
+\
+    pItem->dependencyMap[pDependencyData->name.getItemName()] = pDependencyData;\
 }
 
 #endif
@@ -461,6 +602,18 @@ namespace DMA
         };
 
         typedef tStringPtrWrapper tItemName;
+
+        struct tName
+        {
+            const tItemName& getItemName() const;
+            const tItemName& getTemplateAlias() const;
+            void setItemName(const tItemName& val);
+
+        private:
+            tItemName itemName;
+            tItemName templateAlias;
+        };
+
         typedef std::string tComment;
 
         // forward declarations
@@ -476,7 +629,8 @@ namespace DMA
         enum class eDependencyType
         {
             eComposition = 0,
-            eAggregation
+            eAggregation,
+            eUse
         };
 
         struct tDependencyData
@@ -489,7 +643,7 @@ namespace DMA
                             const std::string& toNumber_,
                             const std::string& comment_);
             eDependencyType dependencyType;
-            tItemName itemName;
+            tName name;
             tIItemWeakPtr pToItem;
             std::string fromNumber;
             std::string toNumber;
@@ -500,11 +654,10 @@ namespace DMA
         typedef std::weak_ptr<tDependencyData> tDependencyDataWeakPtr;
 
         typedef std::map<tItemName, tDependencyDataPtr> tDependencyMap;
-        typedef std::map<tItemName, tDependencyDataWeakPtr> tDependencyWeakMap;
 
         struct tInheritanceData
         {
-            tItemName baseClass;
+            tName baseClass;
             tIItemWeakPtr pFromItem;
             tComment comment;
         };
@@ -542,7 +695,9 @@ namespace DMA
         enum class eItemType
         {
             eInterface = 0,
-            eClass = 1
+            eClass,
+            eAbstractClass,
+            eSingletone
         };
 
         class IItem
@@ -550,40 +705,44 @@ namespace DMA
         public:
             virtual ~IItem();
             virtual const eItemType& getType() const = 0;
-            virtual tItemName& getItemName() = 0;
+            virtual const tItemName& getItemName() const = 0;
+            virtual void setItemName(const tItemName& val) = 0;
+            virtual const tItemName& getTemplateAlias() const = 0;
             virtual tDependencyMap& getDependencyMap() = 0;
-            virtual tDependencyWeakMap& getDependentMap() = 0;
+            virtual tDependencyMap& getDependentMap() = 0;
             virtual tInheritanceMap& getInheritanceMap() = 0;
+            virtual tInheritanceMap& getInheritanceFromMeMap() = 0;
             virtual tPackageDataWeakPtr& getParent() = 0;
-            virtual tMethodMap & getMethodMap() = 0;
+            virtual tMethodMap& getMethodMap() = 0;
         };
 
         struct tBaseData : public IItem
         {
-            virtual tItemName& getItemName() override;
+            virtual const tItemName& getItemName() const override;
+            virtual void setItemName(const tItemName& val) override;
+            virtual const tItemName& getTemplateAlias() const override;
             virtual tDependencyMap& getDependencyMap() override;
             virtual tInheritanceMap& getInheritanceMap() override;
-            virtual tDependencyWeakMap& getDependentMap() override;
+            virtual tInheritanceMap& getInheritanceFromMeMap() override;
+            virtual tDependencyMap& getDependentMap() override;
             virtual tPackageDataWeakPtr& getParent() override;
             virtual tMethodMap& getMethodMap() override;
 
-            tItemName itemName;
+            tName name;
             tMethodMap methodMap;
             tDependencyMap dependencyMap;
-            tDependencyWeakMap dependentMap;
+            tDependencyMap dependentMap;
             tPackageDataWeakPtr pParent;
+            tInheritanceMap inheritanceMap;
+            tInheritanceMap inheritanceFromMeMap;
         };
 
         struct tClassData : public tBaseData
         {
-            virtual const eItemType& getType() const override;
-            virtual tInheritanceMap& getInheritanceMap() override;
-
-            tInheritanceMap inheritanceMap;
+            virtual const eItemType& getType() const override;            
         };
 
         typedef std::shared_ptr<tClassData> tClassDataPtr;
-        typedef std::map<tItemName, tClassDataPtr> tClassMap;
 
         struct tInterfaceData : public tBaseData
         {
@@ -591,7 +750,20 @@ namespace DMA
         };
 
         typedef std::shared_ptr<tInterfaceData> tInterfaceDataPtr;
-        typedef std::map<tItemName, tInterfaceDataPtr> tInterfaceMap;
+
+        struct tAbstractClassData : public tBaseData
+        {
+            virtual const eItemType& getType() const override;
+        };
+
+        typedef std::shared_ptr<tAbstractClassData> tAbstractClassDataPtr;
+
+        struct tSingletoneData : public tBaseData
+        {
+            virtual const eItemType& getType() const override;
+        };
+
+        typedef std::shared_ptr<tSingletoneData> tSingletoneDataPtr;
 
         struct tPackageData
         {
@@ -660,7 +832,8 @@ namespace DMA
 
                 /**
                  * @brief findPackagesByName - tries to find package by name.
-                 * @param packageName - keyword to search for.
+                 * @param packageName - keyword to search for. If empty - names of the all
+                 * available packages will be provided
                  * @return - found elements, for which creation of diagram can be requested.
                  * Note! Search logic is using the "start with" policy.
                  * Search is case-insensitive.
@@ -669,8 +842,7 @@ namespace DMA
 
                 /**
                  * @brief addItem - adds item ( class or interface ) to the model
-                 * @param packageName - name of the package. Can be empty, then item will be added
-                 * to non-packaged elements.
+                 * @param packageName - name of the package.
                  * @param pItemData - pointer to item data
                  * Note! This method should be called before initialization of the model.
                  * After initialization it will do nothing.

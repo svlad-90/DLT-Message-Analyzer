@@ -2,6 +2,8 @@
 
 #include "QDebug"
 
+#include "DMA_Plantuml.hpp"
+
 bool ISettingItem::readDataFromArray( const QJsonArray& settingsArray )
 {
     bool bResult = false;
@@ -38,3 +40,13 @@ bool ISettingItem::readDataFromArray( const QJsonArray& settingsArray )
 
     return bResult;
 }
+
+PUML_PACKAGE_BEGIN(DMA_Settings)
+    PUML_ABSTRACT_CLASS_BEGIN_CHECKED(ISettingItem)
+        PUML_PURE_VIRTUAL_METHOD(+, QJsonObject writeData() const)
+        PUML_PURE_VIRTUAL_METHOD(+, bool readData( const QJsonValueRef& setting ))
+        PUML_PURE_VIRTUAL_METHOD(+, const QString& getKey())
+        PUML_PURE_VIRTUAL_METHOD(+, tGeneralUpdateDataFunc getGeneralUpdateDataFunc())
+        PUML_PURE_VIRTUAL_METHOD(+, const tUpdateSettingsFileFunc& getUpdateFileFunc())
+    PUML_ABSTRACT_CLASS_END()
+PUML_PACKAGE_END()

@@ -49,6 +49,8 @@
 #include "log/CConsoleInputProcessor.hpp"
 #include "plant_uml/CUMLView.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                                          CGroupedView* pGroupedView, QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
@@ -92,8 +94,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpMessageDecoder(nullptr),
 #else
     mDecoderPluginsList(),
-#endif
     mPluginManager(),
+#endif
     mpRegexDirectoryMonitor(nullptr)
   // timers
   #ifdef DEBUG_BUILD
@@ -1746,3 +1748,29 @@ void CDLTMessageAnalyzer::setMessageDecoder( QDltMessageDecoder* pMessageDecoder
     mpMessageDecoder = pMessageDecoder;
 }
 #endif
+
+PUML_PACKAGE_BEGIN(DMA_Root)
+    PUML_CLASS_BEGIN_CHECKED(CDLTMessageAnalyzer)
+        PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedViewModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+        PUML_USE_DEPENDENCY_CHECKED(CBGColorAnimation, 1, 1, uses)
+#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltMessageDecoder, 1, 1, uses)
+#else
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QDltPluginManager, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltPlugin, 1, many, uses)
+#endif
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexDirectoryMonitor, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CConsoleInputProcessor, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

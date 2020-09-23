@@ -1,0 +1,24 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+class "CDLTMsgWrapper"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CDLTFileWrapper : extends
+
+'====================Dependencies section====================
+CDLTFileWrapper "1" *-- "*" CDLTMsgWrapper : cache
+
+@enduml

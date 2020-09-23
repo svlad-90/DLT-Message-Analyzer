@@ -1,0 +1,75 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultHighlightingDelegate"
+{
+}
+
+class "CSearchResultModel"
+{
+}
+
+class "CSearchResultView"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractTableModel"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTableView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
+QAbstractTableModel <|-- CSearchResultModel : implements
+QTableView <|-- CSearchResultView : extends
+
+'====================Dependencies section====================
+CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
+Ui::Form "1" *-- "1" CSearchResultView : contains
+CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
+CSearchResultModel "1" o-- "1" CDLTFileWrapper : uses
+CSearchResultView "1" o-- "1" CDLTFileWrapper : uses
+CSearchResultView "1" o-- "1" CSearchResultModel : uses
+
+@enduml

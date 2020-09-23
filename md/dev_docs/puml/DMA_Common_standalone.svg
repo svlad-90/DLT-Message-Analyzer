@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="231px" preserveAspectRatio="none" style="width:809px;height:231px;" version="1.1" viewBox="0 0 809 231" width="809px" zoomAndPan="magnify"><defs><filter height="300%" id="f1siupy15nwucu" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[7ee2e9eb0913b0809c314d5eac520148]
+cluster DMA_Common--><polygon fill="#DDDDDD" filter="url(#f1siupy15nwucu)" points="16,119,123,119,130,142.6094,787,142.6094,787,219,16,219,16,119" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="16" x2="130" y1="142.6094" y2="142.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="101" x="20" y="135.5332">DMA_Common</text><!--MD5=[0c61cbfdddb6cc546d761014254647ab]
+class CBGColorAnimation--><rect codeLine="7" fill="#FEFECE" filter="url(#f1siupy15nwucu)" height="48" id="CBGColorAnimation" style="stroke: #A80036; stroke-width: 1.5;" width="143" x="428.5" y="155"/><ellipse cx="443.5" cy="171" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M446.2656,166.875 Q446.4219,166.6563 446.6094,166.5469 Q446.7969,166.4375 447.0156,166.4375 Q447.3906,166.4375 447.625,166.6953 Q447.8594,166.9531 447.8594,167.5625 L447.8594,169.0156 Q447.8594,169.625 447.625,169.8906 Q447.3906,170.1563 447.0156,170.1563 Q446.6719,170.1563 446.4688,169.9531 Q446.2656,169.7656 446.1563,169.25 Q446.1094,168.8906 445.9219,168.7031 Q445.5938,168.3281 444.9844,168.1094 Q444.375,167.8906 443.75,167.8906 Q442.9844,167.8906 442.3516,168.2188 Q441.7188,168.5469 441.2266,169.2969 Q440.7344,170.0469 440.7344,171.0781 L440.7344,172.1719 Q440.7344,173.4063 441.625,174.2266 Q442.5156,175.0469 444.1094,175.0469 Q445.0469,175.0469 445.7031,174.7969 Q446.0938,174.6406 446.5156,174.2031 Q446.7813,173.9375 446.9297,173.8594 Q447.0781,173.7813 447.2813,173.7813 Q447.6094,173.7813 447.8672,174.0391 Q448.125,174.2969 448.125,174.6406 Q448.125,174.9844 447.7813,175.3906 Q447.2813,175.9688 446.4844,176.2969 Q445.4063,176.75 444.1094,176.75 Q442.5938,176.75 441.3906,176.125 Q440.4063,175.625 439.7188,174.5547 Q439.0313,173.4844 439.0313,172.2031 L439.0313,171.0469 Q439.0313,169.7188 439.6484,168.5703 Q440.2656,167.4219 441.3594,166.8047 Q442.4531,166.1875 443.6875,166.1875 Q444.4219,166.1875 445.0703,166.3516 Q445.7188,166.5156 446.2656,166.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="111" x="457.5" y="175.9102">CBGColorAnimation</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="429.5" x2="570.5" y1="187" y2="187"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="429.5" x2="570.5" y1="195" y2="195"/><!--MD5=[05c9f3a16dd71ce6ca3b979b89b57304]
+class CRegexDirectoryMonitor--><rect codeLine="11" fill="#FEFECE" filter="url(#f1siupy15nwucu)" height="48" id="CRegexDirectoryMonitor" style="stroke: #A80036; stroke-width: 1.5;" width="164" x="607" y="155"/><ellipse cx="622" cy="171" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M624.7656,166.875 Q624.9219,166.6563 625.1094,166.5469 Q625.2969,166.4375 625.5156,166.4375 Q625.8906,166.4375 626.125,166.6953 Q626.3594,166.9531 626.3594,167.5625 L626.3594,169.0156 Q626.3594,169.625 626.125,169.8906 Q625.8906,170.1563 625.5156,170.1563 Q625.1719,170.1563 624.9688,169.9531 Q624.7656,169.7656 624.6563,169.25 Q624.6094,168.8906 624.4219,168.7031 Q624.0938,168.3281 623.4844,168.1094 Q622.875,167.8906 622.25,167.8906 Q621.4844,167.8906 620.8516,168.2188 Q620.2188,168.5469 619.7266,169.2969 Q619.2344,170.0469 619.2344,171.0781 L619.2344,172.1719 Q619.2344,173.4063 620.125,174.2266 Q621.0156,175.0469 622.6094,175.0469 Q623.5469,175.0469 624.2031,174.7969 Q624.5938,174.6406 625.0156,174.2031 Q625.2813,173.9375 625.4297,173.8594 Q625.5781,173.7813 625.7813,173.7813 Q626.1094,173.7813 626.3672,174.0391 Q626.625,174.2969 626.625,174.6406 Q626.625,174.9844 626.2813,175.3906 Q625.7813,175.9688 624.9844,176.2969 Q623.9063,176.75 622.6094,176.75 Q621.0938,176.75 619.8906,176.125 Q618.9063,175.625 618.2188,174.5547 Q617.5313,173.4844 617.5313,172.2031 L617.5313,171.0469 Q617.5313,169.7188 618.1484,168.5703 Q618.7656,167.4219 619.8594,166.8047 Q620.9531,166.1875 622.1875,166.1875 Q622.9219,166.1875 623.5703,166.3516 Q624.2188,166.5156 624.7656,166.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="132" x="636" y="175.9102">CRegexDirectoryMonitor</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="608" x2="770" y1="187" y2="187"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="608" x2="770" y1="195" y2="195"/><!--MD5=[542624a98036188dc3c47cfcea28487e]
+class CTableMemoryJumper--><rect codeLine="15" fill="#FEFECE" filter="url(#f1siupy15nwucu)" height="48" id="CTableMemoryJumper" style="stroke: #A80036; stroke-width: 1.5;" width="157" x="236.5" y="155"/><ellipse cx="251.5" cy="171" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M254.2656,166.875 Q254.4219,166.6563 254.6094,166.5469 Q254.7969,166.4375 255.0156,166.4375 Q255.3906,166.4375 255.625,166.6953 Q255.8594,166.9531 255.8594,167.5625 L255.8594,169.0156 Q255.8594,169.625 255.625,169.8906 Q255.3906,170.1563 255.0156,170.1563 Q254.6719,170.1563 254.4688,169.9531 Q254.2656,169.7656 254.1563,169.25 Q254.1094,168.8906 253.9219,168.7031 Q253.5938,168.3281 252.9844,168.1094 Q252.375,167.8906 251.75,167.8906 Q250.9844,167.8906 250.3516,168.2188 Q249.7188,168.5469 249.2266,169.2969 Q248.7344,170.0469 248.7344,171.0781 L248.7344,172.1719 Q248.7344,173.4063 249.625,174.2266 Q250.5156,175.0469 252.1094,175.0469 Q253.0469,175.0469 253.7031,174.7969 Q254.0938,174.6406 254.5156,174.2031 Q254.7813,173.9375 254.9297,173.8594 Q255.0781,173.7813 255.2813,173.7813 Q255.6094,173.7813 255.8672,174.0391 Q256.125,174.2969 256.125,174.6406 Q256.125,174.9844 255.7813,175.3906 Q255.2813,175.9688 254.4844,176.2969 Q253.4063,176.75 252.1094,176.75 Q250.5938,176.75 249.3906,176.125 Q248.4063,175.625 247.7188,174.5547 Q247.0313,173.4844 247.0313,172.2031 L247.0313,171.0469 Q247.0313,169.7188 247.6484,168.5703 Q248.2656,167.4219 249.3594,166.8047 Q250.4531,166.1875 251.6875,166.1875 Q252.4219,166.1875 253.0703,166.3516 Q253.7188,166.5156 254.2656,166.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="125" x="265.5" y="175.9102">CTableMemoryJumper</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="237.5" x2="392.5" y1="187" y2="187"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="237.5" x2="392.5" y1="195" y2="195"/><!--MD5=[923746b6cd9c294c0d4d5a9f43726767]
+class CTreeItem--><rect codeLine="19" fill="#FEFECE" filter="url(#f1siupy15nwucu)" height="48" id="CTreeItem" style="stroke: #A80036; stroke-width: 1.5;" width="90" x="32" y="155"/><ellipse cx="47" cy="171" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M49.7656,166.875 Q49.9219,166.6563 50.1094,166.5469 Q50.2969,166.4375 50.5156,166.4375 Q50.8906,166.4375 51.125,166.6953 Q51.3594,166.9531 51.3594,167.5625 L51.3594,169.0156 Q51.3594,169.625 51.125,169.8906 Q50.8906,170.1563 50.5156,170.1563 Q50.1719,170.1563 49.9688,169.9531 Q49.7656,169.7656 49.6563,169.25 Q49.6094,168.8906 49.4219,168.7031 Q49.0938,168.3281 48.4844,168.1094 Q47.875,167.8906 47.25,167.8906 Q46.4844,167.8906 45.8516,168.2188 Q45.2188,168.5469 44.7266,169.2969 Q44.2344,170.0469 44.2344,171.0781 L44.2344,172.1719 Q44.2344,173.4063 45.125,174.2266 Q46.0156,175.0469 47.6094,175.0469 Q48.5469,175.0469 49.2031,174.7969 Q49.5938,174.6406 50.0156,174.2031 Q50.2813,173.9375 50.4297,173.8594 Q50.5781,173.7813 50.7813,173.7813 Q51.1094,173.7813 51.3672,174.0391 Q51.625,174.2969 51.625,174.6406 Q51.625,174.9844 51.2813,175.3906 Q50.7813,175.9688 49.9844,176.2969 Q48.9063,176.75 47.6094,176.75 Q46.0938,176.75 44.8906,176.125 Q43.9063,175.625 43.2188,174.5547 Q42.5313,173.4844 42.5313,172.2031 L42.5313,171.0469 Q42.5313,169.7188 43.1484,168.5703 Q43.7656,167.4219 44.8594,166.8047 Q45.9531,166.1875 47.1875,166.1875 Q47.9219,166.1875 48.5703,166.3516 Q49.2188,166.5156 49.7656,166.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="58" x="61" y="175.9102">CTreeItem</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="33" x2="121" y1="187" y2="187"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="33" x2="121" y1="195" y2="195"/><!--MD5=[8dd17ccd1ae0e0e4eb0a7117370c35f4]
+class QObject--><rect fill="#FEFECE" filter="url(#f1siupy15nwucu)" height="48" id="QObject" style="stroke: #A80036; stroke-width: 1.5;" width="76" x="568" y="7"/><ellipse cx="583" cy="23" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M585.7656,18.875 Q585.9219,18.6563 586.1094,18.5469 Q586.2969,18.4375 586.5156,18.4375 Q586.8906,18.4375 587.125,18.6953 Q587.3594,18.9531 587.3594,19.5625 L587.3594,21.0156 Q587.3594,21.625 587.125,21.8906 Q586.8906,22.1563 586.5156,22.1563 Q586.1719,22.1563 585.9688,21.9531 Q585.7656,21.7656 585.6563,21.25 Q585.6094,20.8906 585.4219,20.7031 Q585.0938,20.3281 584.4844,20.1094 Q583.875,19.8906 583.25,19.8906 Q582.4844,19.8906 581.8516,20.2188 Q581.2188,20.5469 580.7266,21.2969 Q580.2344,22.0469 580.2344,23.0781 L580.2344,24.1719 Q580.2344,25.4063 581.125,26.2266 Q582.0156,27.0469 583.6094,27.0469 Q584.5469,27.0469 585.2031,26.7969 Q585.5938,26.6406 586.0156,26.2031 Q586.2813,25.9375 586.4297,25.8594 Q586.5781,25.7813 586.7813,25.7813 Q587.1094,25.7813 587.3672,26.0391 Q587.625,26.2969 587.625,26.6406 Q587.625,26.9844 587.2813,27.3906 Q586.7813,27.9688 585.9844,28.2969 Q584.9063,28.75 583.6094,28.75 Q582.0938,28.75 580.8906,28.125 Q579.9063,27.625 579.2188,26.5547 Q578.5313,25.4844 578.5313,24.2031 L578.5313,23.0469 Q578.5313,21.7188 579.1484,20.5703 Q579.7656,19.4219 580.8594,18.8047 Q581.9531,18.1875 583.1875,18.1875 Q583.9219,18.1875 584.5703,18.3516 Q585.2188,18.5156 585.7656,18.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="597" y="27.9102">QObject</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="569" x2="643" y1="39" y2="39"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="569" x2="643" y1="47" y2="47"/><!--MD5=[4304bcd14f0e29f611d58091b146bb4e]
+reverse link QObject to CBGColorAnimation--><path codeLine="26" d="M577.398,71.395 C557.98,98.141 532.971,132.587 516.717,154.9741 " fill="none" id="QObject-backto-CBGColorAnimation" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="571.789,67.206,589.204,55.134,583.118,75.431,571.789,67.206" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="567" y="99.4951">extends</text><!--MD5=[d94531e708a73141147ba02fe4a41dcc]
+reverse link QObject to CRegexDirectoryMonitor--><path codeLine="27" d="M629.05,72.546 C644.159,99.123 663.365,132.907 675.91,154.9741 " fill="none" id="QObject-backto-CRegexDirectoryMonitor" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="622.951,75.98,619.152,55.134,635.121,69.061,622.951,75.98" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="646" y="99.4951">extends</text><!--MD5=[634dfaa0a8086e8a24594f913cdf0a6f]
+reverse link CTreeItem to CTreeItem--><path codeLine="30" d="M135.603,163.7585 C148.028,165.3062 157,170.3867 157,179 C157,190.4844 141.049,195.6882 122.233,194.6116 " fill="none" id="CTreeItem-backto-CTreeItem" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="122.233,163.3884,128.1199,167.553,134.2284,163.7207,128.3415,159.5561,122.233,163.3884" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="163" y="184.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="129.9998" y="157.1484">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="5" x="130.1388" y="193.3965">*</text><!--MD5=[e525a0255500a7a234ff1e961c17a83c]
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CBGColorAnimation"
+{
+}
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+class "CTableMemoryJumper"
+{
+}
+
+class "CTreeItem"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|- - CBGColorAnimation : extends
+QObject <|- - CRegexDirectoryMonitor : extends
+
+'====================Dependencies section====================
+CTreeItem "1" *- - "*" CTreeItem : contains
+
+@enduml
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CBGColorAnimation"
+{
+}
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+class "CTableMemoryJumper"
+{
+}
+
+class "CTreeItem"
+{
+}
+
+}
+
+QObject <|- - CBGColorAnimation : extends
+QObject <|- - CRegexDirectoryMonitor : extends
+
+CTreeItem "1" *- - "*" CTreeItem : contains
+
+@enduml
+
+PlantUML version 1.2020.16(Sun Aug 23 23:20:43 EEST 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

@@ -15,6 +15,8 @@
 
 #include "CDLTMsgWrapper.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 //static std::atomic<int> sInstanceCounter(0);
 
 CDLTMsgWrapper::CDLTMsgWrapper():
@@ -227,3 +229,9 @@ void CDLTMsgWrapper::dumpPayload() const
 {
     qDebug() << "payload - " << QString::fromUtf8(mPayloadUTF8);
 }
+
+PUML_PACKAGE_BEGIN(DMA_DLTWrappers)
+    PUML_CLASS_BEGIN_CHECKED(CDLTMsgWrapper)
+        PUML_USE_DEPENDENCY_CHECKED(QDltMsg, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

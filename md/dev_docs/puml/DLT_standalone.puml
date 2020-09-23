@@ -1,0 +1,42 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+class "QDltFile"
+{
+}
+
+class "QDltMsg"
+{
+}
+
+class "QDltPlugin"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+class "QDltPluginManager"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+class "QFileSystemWatcher"
+{
+}
+
+}
+
+@enduml

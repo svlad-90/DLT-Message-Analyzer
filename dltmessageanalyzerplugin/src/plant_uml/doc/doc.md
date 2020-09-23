@@ -2,7 +2,15 @@
 
 ----
 
-![class diagram](./class.svg)
+# DMA_PlantUML
+
+## Standalone package diagram
+
+![Class diagram with dependencies](../../../../md/dev_docs/puml/DMA_PlantUML_standalone.svg)
+
+## Package diagram with the first-level dependencies
+
+![Class diagram with dependencies](../../../../md/dev_docs/puml/DMA_PlantUML.svg)
 
 ----
 

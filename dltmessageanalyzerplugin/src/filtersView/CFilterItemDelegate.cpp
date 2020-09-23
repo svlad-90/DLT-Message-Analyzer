@@ -10,6 +10,8 @@
 #include "CFiltersModel.hpp"
 #include "CFilterItemDelegate.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 const static QRegularExpression sFindLastPipeRegex("(.*)(?<!\\\\)(\\|)(?!.*(?<!\\\\)\\1)(.*)");
 
 class CRegexLineEdit : public QLineEdit
@@ -518,3 +520,12 @@ void CFilterItemDelegate::setSpecificModel( CFiltersModel* pModel )
         mpModel = pModel;
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_FiltersView)
+    PUML_CLASS_BEGIN_CHECKED(CFilterItemDelegate)
+        PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTreeView, 1, 1, parent view)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QCompleter, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

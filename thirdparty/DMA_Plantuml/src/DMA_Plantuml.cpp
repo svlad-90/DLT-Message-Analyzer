@@ -56,6 +56,43 @@ namespace DMA
         }
         //////////////////////////////////////////////////////////////////////////
 
+        /////////////////////////////tName//////////////////////////////
+        const tItemName& tName::getItemName() const
+        {
+            return itemName;
+        }
+
+        const tItemName& tName::getTemplateAlias() const
+        {
+            return templateAlias;
+        }
+
+        void tName::setItemName(const tItemName& val)
+        {
+            itemName = val;
+
+            if(nullptr == templateAlias.pString)
+            {
+                if(nullptr != itemName.pString)
+                {
+                    auto& itemNameStr = *itemName.pString;
+
+                    auto foundtemplateOpen = itemNameStr.find("<");
+                    auto foundtemplateClose = itemNameStr.find("<");
+
+                    if(foundtemplateOpen != std::string::npos
+                    && foundtemplateClose != std::string::npos)
+                    {
+                        std::string alias = itemNameStr;
+                        std::replace( alias.begin(), alias.end(), '<', '_' );
+                        std::replace( alias.begin(), alias.end(), '>', '_' );
+                        templateAlias = tStringPtrWrapper( std::make_shared<std::string>(alias) );
+                    }
+                }
+            }
+        }
+        /////////////////////////////tName ( end )//////////////////////
+
         /////////////////////////////CCreator///////////////////////////
         Creator::Creator():
         mPackageMap(),
@@ -97,7 +134,7 @@ namespace DMA
 
                                     if(nullptr != pDependency)
                                     {
-                                        auto foundItem = mItemRegistry.find(pDependency->itemName);
+                                        auto foundItem = mItemRegistry.find(pDependency->name.getItemName());
 
                                         if(foundItem != mItemRegistry.end() && nullptr != foundItem->second)
                                         {
@@ -109,7 +146,7 @@ namespace DMA
                                             tDependencyDataPtr pDependent = std::make_shared<tDependencyData>();
                                             pDependent->comment = pDependency->comment;
                                             pDependent->pToItem = pItem;
-                                            pDependent->itemName = pItem->getItemName();
+                                            pDependent->name.setItemName( pItem->getItemName() );
                                             pDependent->toNumber = pDependency->fromNumber;
                                             pDependent->fromNumber = pDependency->toNumber;
                                             pDependent->dependencyType = pDependency->dependencyType;
@@ -118,24 +155,28 @@ namespace DMA
                                     }
                                 }
 
-                                if(eItemType::eClass == pItem->getType())
+                                auto& inheritanceMap = pItem->getInheritanceMap();
+
+                                for(auto& inheritancePair : inheritanceMap)
                                 {
-                                    auto& inheritanceMap = pItem->getInheritanceMap();
+                                    auto pInheritance = inheritancePair.second;
 
-                                    for(auto& inheritancePair : inheritanceMap)
+                                    if(nullptr != pInheritance)
                                     {
-                                        auto pInheritance = inheritancePair.second;
+                                        auto foundItem = mItemRegistry.find(pInheritance->baseClass.getItemName());
 
-                                        if(nullptr != pInheritance)
+                                        if(foundItem != mItemRegistry.end() && nullptr != foundItem->second)
                                         {
-                                            auto foundItem = mItemRegistry.find(pInheritance->baseClass);
+                                            auto& pFoundItem = foundItem->second;
 
-                                            if(foundItem != mItemRegistry.end() && nullptr != foundItem->second)
-                                            {
-                                                auto& pFoundItem = foundItem->second;
+                                            pInheritance->pFromItem = pFoundItem;
 
-                                                pInheritance->pFromItem = pFoundItem;
-                                            }
+                                            auto& inheritanceFromMeMap = pFoundItem->getInheritanceFromMeMap();
+                                            tInheritanceDataPtr pInheritanceFromMe = std::make_shared<tInheritanceData>();
+                                            pInheritanceFromMe->comment = pInheritance->comment;
+                                            pInheritanceFromMe->pFromItem = pItem;
+                                            pInheritanceFromMe->baseClass.setItemName( pItem->getItemName() );
+                                            inheritanceFromMeMap[pItem->getItemName()] = pInheritanceFromMe;
                                         }
                                     }
                                 }
@@ -189,6 +230,7 @@ namespace DMA
 
                 diagram.append("@startuml").append(sNewLine);
                 diagram.append(sNewLine);
+                diagram.append("skinparam wrapWidth 600").append(sNewLine);
 
                 for(const auto& packagePair : packageMap)
                 {
@@ -257,9 +299,34 @@ namespace DMA
                                         diagram.append("interface \"");
                                     }
                                         break;
+                                    case eItemType::eAbstractClass:
+                                    {
+                                        diagram.append("abstract class \"");
+                                    }
+                                        break;
+                                    case eItemType::eSingletone:
+                                    {
+                                        diagram.append("class \"");
+                                    }
+                                        break;
                                 }
 
-                                diagram.append(*pItem->getItemName().pString).append("\"").append(sNewLine);
+                                diagram.append(*pItem->getItemName().pString).append("\"");
+
+                                const auto& templateAlias = pItem->getTemplateAlias();
+
+                                if(nullptr != templateAlias.pString)
+                                {
+                                    diagram.append(" as ").append(*templateAlias.pString);
+                                }
+
+                                if(eItemType::eSingletone == pItem->getType())
+                                {
+                                    diagram.append("<< (S,#FF7700) Singleton >>");
+                                }
+
+                                diagram.append(sNewLine);
+
                                 diagram.append("{").append(sNewLine);
 
                                 appendMethods(pItem->getMethodMap());
@@ -288,7 +355,7 @@ namespace DMA
                     {
                         const auto& pPackage = packagePair.second;
 
-                        auto appendInheritance = [&diagram](const tInheritanceMap& inheritanceMap, const std::string& className)
+                        auto appendInheritance = [&diagram](const tInheritanceMap& inheritanceMap, const std::string& itemName)
                         {
                             for(const auto& inheritancePair : inheritanceMap)
                             {
@@ -296,7 +363,11 @@ namespace DMA
 
                                 if(nullptr != pInheritance)
                                 {
-                                    diagram.append(*pInheritance->baseClass.pString).append(" <|-- ").append(className);
+                                    const tItemName& name = pInheritance->baseClass.getTemplateAlias().pString
+                                                      ? pInheritance->baseClass.getTemplateAlias()
+                                                      : pInheritance->baseClass.getItemName();
+
+                                    diagram.append(*name.pString).append(" <|-- ").append(itemName);
 
                                     if(false == pInheritance->comment.empty())
                                     {
@@ -313,18 +384,20 @@ namespace DMA
                             if(nullptr != itemPair.second)
                             {
                                 auto pItem = itemPair.second;
-                                if(eItemType::eClass == pItem->getType())
-                                {
-                                    if(false == pItem->getInheritanceMap().empty() && true == bShouldPlaceHeader)
-                                    {
-                                        diagram.append(sNewLine);
-                                        diagram.append("\'====================Inheritance section====================");
-                                        diagram.append(sNewLine);
-                                        bShouldPlaceHeader = false;
-                                    }
 
-                                    appendInheritance(pItem->getInheritanceMap(), *pItem->getItemName().pString);
+                                if(false == pItem->getInheritanceMap().empty() && true == bShouldPlaceHeader)
+                                {
+                                    diagram.append(sNewLine);
+                                    diagram.append("\'====================Inheritance section====================");
+                                    diagram.append(sNewLine);
+                                    bShouldPlaceHeader = false;
                                 }
+
+                                const tItemName& name = pItem->getTemplateAlias().pString
+                                                  ? pItem->getTemplateAlias()
+                                                  : pItem->getItemName();
+
+                                appendInheritance(pItem->getInheritanceMap(), *name.pString);
                             }
                         }
                     }
@@ -338,13 +411,13 @@ namespace DMA
                     {
                         const auto& pPackage = packagePair.second;
 
-                        auto appendDependencies = [&diagram](const tDependencyMap& dependencyMap, const std::string& className)
+                        auto appendDependencies = [&diagram](const tDependencyMap& dependencyMap, const std::string& itemName)
                         {
                             for(const auto& dependencyPair : dependencyMap)
                             {
                                 auto pDependency = dependencyPair.second;
 
-                                diagram.append(className);
+                                diagram.append(itemName);
 
                                 if(false == pDependency->fromNumber.empty())
                                 {
@@ -363,6 +436,11 @@ namespace DMA
                                         diagram.append(" o-- ");
                                     }
                                         break;
+                                    case eDependencyType::eUse:
+                                    {
+                                        diagram.append(" --> ");
+                                    }
+                                        break;
                                 }
 
                                 if(false == pDependency->toNumber.empty())
@@ -370,7 +448,11 @@ namespace DMA
                                     diagram.append("\"").append( pDependency->toNumber ).append("\" ");
                                 }
 
-                                diagram.append(*pDependency->itemName.pString);
+                                const tItemName& name = pDependency->name.getTemplateAlias().pString
+                                                  ? pDependency->name.getTemplateAlias()
+                                                  : pDependency->name.getItemName();
+
+                                diagram.append(*name.pString);
 
                                 if(false == pDependency->comment.empty())
                                 {
@@ -394,7 +476,12 @@ namespace DMA
                                     diagram.append(sNewLine);
                                     bShouldPlaceHeader = false;
                                 }
-                                appendDependencies(pItem->getDependencyMap(), *pItem->getItemName().pString);
+
+                                const tItemName& name = pItem->getTemplateAlias().pString
+                                                  ? pItem->getTemplateAlias()
+                                                  : pItem->getItemName();
+
+                                appendDependencies(pItem->getDependencyMap(), *name.pString);
                             }
                         }
                     }
@@ -456,18 +543,21 @@ namespace DMA
                             case eItemType::eInterface:
                                 pItemCopied = std::make_shared<tInterfaceData>();
                             break;
+                            case eItemType::eAbstractClass:
+                                pItemCopied = std::make_shared<tAbstractClassData>();
+                            break;
+                            case eItemType::eSingletone:
+                                pItemCopied = std::make_shared<tSingletoneData>();
+                            break;
                         }
 
                         pItemCopied->getParent() = pPackageFiltered;
-                        pItemCopied->getItemName() = pItem->getItemName();
+                        pItemCopied->setItemName( pItem->getItemName() );
                         pItemCopied->getMethodMap() = pItem->getMethodMap();
                         pItemCopied->getDependentMap() = pItem->getDependentMap();
                         pItemCopied->getDependencyMap() = pItem->getDependencyMap();
-
-                        if(eItemType::eClass == pItem->getType())
-                        {
-                            pItemCopied->getInheritanceMap() = pItem->getInheritanceMap();
-                        }
+                        pItemCopied->getInheritanceMap() = pItem->getInheritanceMap();
+                        pItemCopied->getInheritanceFromMeMap() = pItem->getInheritanceFromMeMap();
 
                         pPackageFiltered->itemMap[pItemCopied->getItemName()] = pItemCopied;
                     }
@@ -509,12 +599,12 @@ namespace DMA
                                     }
                                     else
                                     {
-                                        ++it;
+                                        it = dependencyMap.erase(it);
                                     }
                                 }
                                 else
                                 {
-                                    ++it;
+                                    it = dependencyMap.erase(it);
                                 }
                             }
 
@@ -524,12 +614,12 @@ namespace DMA
                             {
                                 auto& pDependent = it->second;
 
-                                if(false == pDependent.expired())
+                                if(nullptr != pDependent)
                                 {
-                                    if(false == pDependent.lock()->pToItem.expired()
-                                       && false == pDependent.lock()->pToItem.lock()->getParent().expired())
+                                    if(false == pDependent->pToItem.expired()
+                                       && false == pDependent->pToItem.lock()->getParent().expired())
                                     {
-                                        if(pDependent.lock()->pToItem.lock()->getParent().lock()->packageName !=
+                                        if(pDependent->pToItem.lock()->getParent().lock()->packageName !=
                                            pPackageFiltered->packageName)
                                         {
                                             it = dependentMap.erase(it);
@@ -541,12 +631,12 @@ namespace DMA
                                     }
                                     else
                                     {
-                                        ++it;
+                                        it = dependentMap.erase(it);
                                     }
                                 }
                                 else
                                 {
-                                    ++it;
+                                    it = dependentMap.erase(it);
                                 }
                             }
                         }
@@ -561,13 +651,86 @@ namespace DMA
                     {
                         if(false == excludeDependencies)
                         {
-                            auto fillInDependency = [&dumpMap](const tDependencyMap& dependencyMap)
+                            const auto& pPackageFilteredName = pPackageFiltered->packageName;
+
+                            auto addFilteredItem = [&pPackageFilteredName](const tPackageDataPtr& pPackage, const tIItemPtr& pToItem)
+                            {
+                                if(nullptr != pPackage)
+                                {
+                                    auto foundItem = pPackage->itemMap.find(pToItem->getItemName());
+
+                                    if(foundItem == pPackage->itemMap.end())
+                                    {
+                                        tIItemPtr pItemFiltered_ = nullptr;
+
+                                        switch(pToItem->getType())
+                                        {
+                                            case eItemType::eClass:
+                                                pItemFiltered_ = std::make_shared<tClassData>();
+                                            break;
+                                            case eItemType::eInterface:
+                                                pItemFiltered_ = std::make_shared<tInterfaceData>();
+                                            break;
+                                            case eItemType::eAbstractClass:
+                                                pItemFiltered_ = std::make_shared<tAbstractClassData>();
+                                            break;
+                                            case eItemType::eSingletone:
+                                                pItemFiltered_ = std::make_shared<tSingletoneData>();
+                                            break;
+                                        }
+
+                                        pItemFiltered_->getParent() = pPackage;
+                                        pItemFiltered_->setItemName( pToItem->getItemName() );
+                                        pItemFiltered_->getMethodMap() = pToItem->getMethodMap();
+
+                                        // we need to overtake dependencies which lead to filtered package
+                                        for(const auto& dependencyPair_ : pToItem->getDependencyMap())
+                                        {
+                                            if(nullptr != dependencyPair_.second)
+                                            {
+                                                const auto& pDependency_ = dependencyPair_.second;
+
+                                                if(false == pDependency_->pToItem.expired()
+                                                && false == pDependency_->pToItem.lock()->getParent().expired()
+                                                && pDependency_->pToItem.lock()->getParent().lock()->packageName ==
+                                                pPackageFilteredName)
+                                                {
+                                                    auto& dependencyMap_ = pItemFiltered_->getDependencyMap();
+                                                    dependencyMap_[pDependency_->name.getItemName()] = pDependency_;
+                                                }
+                                            }
+                                        }
+
+                                        // we need to overtake inheritance which leads to filtered package
+                                        for(const auto& inheritancePair_ : pToItem->getInheritanceMap())
+                                        {
+                                            if(nullptr != inheritancePair_.second)
+                                            {
+                                                const auto& pInheritance = inheritancePair_.second;
+
+                                                if(false == pInheritance->pFromItem.expired()
+                                                && false == pInheritance->pFromItem.lock()->getParent().expired()
+                                                && pInheritance->pFromItem.lock()->getParent().lock()->packageName ==
+                                                pPackageFilteredName)
+                                                {
+                                                    auto& inheritanceMap_ = pItemFiltered_->getInheritanceMap();
+                                                    inheritanceMap_[pInheritance->baseClass.getItemName()] = pInheritance;
+                                                }
+                                            }
+                                        }
+
+                                        pPackage->itemMap[pItemFiltered_->getItemName()] = pItemFiltered_;
+                                    }
+                                }
+                            };
+
+                            auto fillInDependency = [&dumpMap, &addFilteredItem](const tDependencyMap& dependencyMap)
                             {
                                 for(const auto& dependencyPair : dependencyMap)
                                 {
-                                    auto& pDependency = dependencyPair.second;
+                                    auto pDependency = dependencyPair.second;
 
-                                    if(nullptr != pDependency)
+                                    if(nullptr != pDependency) // NOLINT
                                     {
                                         if(false == pDependency->pToItem.expired())
                                         {
@@ -579,51 +742,21 @@ namespace DMA
 
                                                 if(nullptr != pParentPackage)
                                                 {
-                                                    auto addFilteredItem = [&pToItem](const tPackageDataPtr& pDependencyPackage)
-                                                    {
-                                                        if(nullptr != pDependencyPackage)
-                                                        {
-                                                            auto foundItem = pDependencyPackage->itemMap.find(pToItem->getItemName());
-
-                                                            if(foundItem == pDependencyPackage->itemMap.end())
-                                                            {
-                                                                tIItemPtr pDependencyItemFiltered_ = nullptr;
-
-                                                                switch(pToItem->getType())
-                                                                {
-                                                                    case eItemType::eClass:
-                                                                        pDependencyItemFiltered_ = std::make_shared<tClassData>();
-                                                                    break;
-                                                                    case eItemType::eInterface:
-                                                                        pDependencyItemFiltered_ = std::make_shared<tInterfaceData>();
-                                                                    break;
-                                                                }
-
-                                                                pDependencyItemFiltered_->getParent() = pDependencyPackage;
-                                                                pDependencyItemFiltered_->getItemName() = pToItem->getItemName();
-                                                                pDependencyItemFiltered_->getMethodMap() = pToItem->getMethodMap();
-
-                                                                pDependencyPackage->itemMap[pDependencyItemFiltered_->getItemName()] = pDependencyItemFiltered_;
-                                                            }
-                                                        }
-                                                    };
-
                                                     auto foundPackage_ = dumpMap.find(pParentPackage->packageName);
 
                                                     if(foundPackage_ != dumpMap.end())
                                                     {
-                                                        auto pFoundPackage_ = foundPackage_->second;
-                                                        auto& pDependencyPackage = foundPackage_->second;
-                                                        addFilteredItem(pDependencyPackage);
+                                                        auto pDependencyPackage = foundPackage_->second;
+                                                        addFilteredItem(pDependencyPackage, pToItem);
                                                     }
                                                     else
                                                     {
                                                         tPackageDataPtr pDependencyPackage = std::make_shared<tPackageData>();
                                                         pDependencyPackage->packageName = pParentPackage->packageName;
 
-                                                        addFilteredItem(pDependencyPackage);
+                                                        addFilteredItem(pDependencyPackage, pToItem);
 
-                                                        dumpMap[pDependencyPackage->packageName] = pDependencyPackage;
+                                                        dumpMap.insert(std::make_pair(pDependencyPackage->packageName, pDependencyPackage));
                                                     }
                                                 }
                                             }
@@ -633,95 +766,52 @@ namespace DMA
                             };
 
                             fillInDependency(pItem->getDependencyMap());
+                            fillInDependency(pItem->getDependentMap());
 
-                            tDependencyMap dependentLockedMap;
-
-                            for(const auto& dependentPair : pItem->getDependentMap())
+                            auto fillInheritance = [&dumpMap, &addFilteredItem](const tInheritanceMap& inheritanceMap)
                             {
-                                auto& pDependentWeak = dependentPair.second;
-
-                                if(false == pDependentWeak.expired())
+                                for(const auto& inheritancePair : inheritanceMap)
                                 {
-                                    auto pDependent = pDependentWeak.lock();
-                                    dependentLockedMap[pDependent->itemName] = pDependent;
-                                }
-                            }
+                                    auto pInheritance = inheritancePair.second;
 
-                            fillInDependency(dependentLockedMap);
-                        }
-
-                        auto fillInInheritance = [&dumpMap](const tInheritanceMap& inheritanceMap)
-                        {
-                            for(const auto& inharitancePair : inheritanceMap)
-                            {
-                                auto& pInheritance = inharitancePair.second;
-
-                                if(nullptr != pInheritance)
-                                {
-                                    if(false == pInheritance->pFromItem.expired())
+                                    if(nullptr != pInheritance) // NOLINT
                                     {
-                                        auto pFromItem = pInheritance->pFromItem.lock();
-
-                                        if(nullptr != pFromItem && false == pFromItem->getParent().expired())
+                                        if(false == pInheritance->pFromItem.expired())
                                         {
-                                            auto pParentPackage = pFromItem->getParent().lock();
+                                            auto pFromItem = pInheritance->pFromItem.lock();
 
-                                            if(nullptr != pParentPackage)
+                                            if(nullptr != pFromItem && false == pFromItem->getParent().expired())
                                             {
-                                                auto addFilteredItem = [&pFromItem](const tPackageDataPtr& pInheritancePackage)
+                                                auto pParentPackage = pFromItem->getParent().lock();
+
+                                                if(nullptr != pParentPackage)
                                                 {
-                                                    if(nullptr != pInheritancePackage)
+                                                    auto foundPackage_ = dumpMap.find(pParentPackage->packageName);
+
+                                                    if(foundPackage_ != dumpMap.end())
                                                     {
-                                                        auto foundItem = pInheritancePackage->itemMap.find(pFromItem->getItemName());
-
-                                                        if(foundItem == pInheritancePackage->itemMap.end())
-                                                        {
-                                                            tIItemPtr pInheritanceItemFiltered_ = nullptr;
-
-                                                            switch(pFromItem->getType())
-                                                            {
-                                                                case eItemType::eClass:
-                                                                    pInheritanceItemFiltered_ = std::make_shared<tClassData>();
-                                                                break;
-                                                                case eItemType::eInterface:
-                                                                    pInheritanceItemFiltered_ = std::make_shared<tInterfaceData>();
-                                                                break;
-                                                            }
-
-                                                            pInheritanceItemFiltered_->getParent() = pInheritancePackage;
-                                                            pInheritanceItemFiltered_->getItemName() = pFromItem->getItemName();
-                                                            pInheritanceItemFiltered_->getMethodMap() = pFromItem->getMethodMap();
-
-                                                            pInheritancePackage->itemMap[pInheritanceItemFiltered_->getItemName()] = pInheritanceItemFiltered_;
-                                                        }
+                                                        auto pDependencyPackage = foundPackage_->second;
+                                                        addFilteredItem(pDependencyPackage, pFromItem);
                                                     }
-                                                };
+                                                    else
+                                                    {
+                                                        tPackageDataPtr pDependencyPackage = std::make_shared<tPackageData>();
+                                                        pDependencyPackage->packageName = pParentPackage->packageName;
 
-                                                auto foundPackage_ = dumpMap.find(pParentPackage->packageName);
+                                                        addFilteredItem(pDependencyPackage, pFromItem);
 
-                                                if(foundPackage_ != dumpMap.end())
-                                                {
-                                                    auto pFoundPackage_ = foundPackage_->second;
-                                                    auto& pInheritancePackage = foundPackage_->second;
-                                                    addFilteredItem(pInheritancePackage);
-                                                }
-                                                else
-                                                {
-                                                    tPackageDataPtr pInheritancePackage = std::make_shared<tPackageData>();
-                                                    pInheritancePackage->packageName = pParentPackage->packageName;
-
-                                                    addFilteredItem(pInheritancePackage);
-
-                                                    dumpMap[pInheritancePackage->packageName] = pInheritancePackage;
+                                                        dumpMap.insert(std::make_pair(pDependencyPackage->packageName, pDependencyPackage));
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        };
+                            };
 
-                        fillInInheritance(pItem->getInheritanceMap());
+                            fillInheritance(pItem->getInheritanceMap());
+                            fillInheritance(pItem->getInheritanceFromMeMap());
+                        }
                     }
                 }
 
@@ -741,21 +831,36 @@ namespace DMA
             tStringPtrSet result;
 
             {
-                auto toLowerCandidate = packageName;
-                std::transform(toLowerCandidate.begin(), toLowerCandidate.end(), toLowerCandidate.begin(),
-                               [](unsigned char c){ return std::tolower(c); });
-
-                std::lock_guard<std::mutex> guard(*const_cast<std::mutex*>(&mDataProtector));
-
-                for(const auto& packagePair : mPackageMap)
+                if(false == packageName.empty())
                 {
-                    if(nullptr != packagePair.first.pString)
-                    {
-                        auto toLowerPackageName = *packagePair.second->packageName.pString;
-                        std::transform(toLowerPackageName.begin(), toLowerPackageName.end(), toLowerPackageName.begin(),
-                                       [](unsigned char c){ return std::tolower(c); });
+                    auto toLowerCandidate = packageName;
+                    std::transform(toLowerCandidate.begin(), toLowerCandidate.end(), toLowerCandidate.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
 
-                        if(toLowerPackageName.rfind(toLowerCandidate, 0) == 0)
+                    std::lock_guard<std::mutex> guard(*const_cast<std::mutex*>(&mDataProtector));
+
+                    for(const auto& packagePair : mPackageMap)
+                    {
+                        if(nullptr != packagePair.first.pString)
+                        {
+                            auto toLowerPackageName = *packagePair.second->packageName.pString;
+                            std::transform(toLowerPackageName.begin(), toLowerPackageName.end(), toLowerPackageName.begin(),
+                                           [](unsigned char c){ return std::tolower(c); });
+
+                            if(toLowerPackageName.find(toLowerCandidate, 0) != std::string::npos)
+                            {
+                                result.insert(packagePair.first.pString);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    std::lock_guard<std::mutex> guard(*const_cast<std::mutex*>(&mDataProtector));
+
+                    for(const auto& packagePair : mPackageMap)
+                    {
+                        if(nullptr != packagePair.first.pString)
                         {
                             result.insert(packagePair.first.pString);
                         }
@@ -798,9 +903,19 @@ namespace DMA
         /////////////////////////////Item ( end )///////////////////////
 
         /////////////////////////////tBaseData//////////////////////////
-        tItemName& tBaseData::getItemName()
+        const tItemName& tBaseData::getItemName()const
         {
-            return itemName;
+            return name.getItemName();
+        }
+
+        void tBaseData::setItemName(const tItemName& val)
+        {
+            name.setItemName(val);
+        }
+
+        const tItemName& tBaseData::getTemplateAlias() const
+        {
+            return name.getTemplateAlias();
         }
 
         tDependencyMap& tBaseData::getDependencyMap()
@@ -808,13 +923,7 @@ namespace DMA
             return dependencyMap;
         }
 
-        tInheritanceMap& tBaseData::getInheritanceMap()
-        {
-            static tInheritanceMap inheritanceMap;
-            return inheritanceMap;
-        }
-
-        tDependencyWeakMap& tBaseData::getDependentMap()
+        tDependencyMap& tBaseData::getDependentMap()
         {
             return dependentMap;
         }
@@ -828,6 +937,16 @@ namespace DMA
         {
             return methodMap;
         }
+
+        tInheritanceMap& tBaseData::getInheritanceMap()
+        {
+            return inheritanceMap;
+        }
+
+        tInheritanceMap& tBaseData::getInheritanceFromMeMap()
+        {
+            return inheritanceFromMeMap;
+        }
         /////////////////////////////tBaseData ( end )//////////////////
 
         /////////////////////////////tClassData/////////////////////////
@@ -835,11 +954,6 @@ namespace DMA
         {
             static const eItemType res = eItemType::eClass;
             return res;
-        }
-
-        tInheritanceMap& tClassData::getInheritanceMap()
-        {
-            return inheritanceMap;
         }
         /////////////////////////////tClassData ( end )/////////////////
 
@@ -850,6 +964,22 @@ namespace DMA
             return res;
         }
         /////////////////////////////tInterfaceData ( end )/////////////
+
+        /////////////////////////////tAbstractClassData/////////////////
+        const eItemType& tAbstractClassData::getType() const
+        {
+            static const eItemType res = eItemType::eAbstractClass;
+            return res;
+        }
+        /////////////////////////////tAbstractClassData ( end )/////////
+
+        /////////////////////////////tSingletoneData////////////////////
+        const eItemType& tSingletoneData::getType() const
+        {
+            static const eItemType res = eItemType::eSingletone;
+            return res;
+        }
+        /////////////////////////////tSingletoneData ( end )////////////
 
         /////////////////////////////Other//////////////////////////////
         tCallOnCreate::tCallOnCreate( const std::function<void(void)>& callable )
@@ -876,7 +1006,7 @@ namespace DMA
 
         tDependencyData::tDependencyData():
         dependencyType(eDependencyType::eComposition),
-        itemName(),
+        name(),
         pToItem(),
         fromNumber(),
         toNumber(),
@@ -890,12 +1020,14 @@ namespace DMA
                         const std::string& toNumber_,
                         const std::string& comment_):
         dependencyType(dependencyType_),
-        itemName(tStringPtrWrapper(std::make_shared<std::string>(itemName_))),
+        name(),
         pToItem(pToItem_),
         fromNumber(fromNumber_),
         toNumber(toNumber_),
         comment(comment_)
-        {}
+        {
+            name.setItemName( tStringPtrWrapper(std::make_shared<std::string>(itemName_)) );
+        }
         /////////////////////////////Other ( end )//////////////////////
     }
 }

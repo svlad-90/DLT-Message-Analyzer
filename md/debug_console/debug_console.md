@@ -4,7 +4,9 @@
 
 # Debug console
 
-Plugin contains the debug console, which prints different kinds of the debug messages.
+Plugin contains the debug console, which prints different kinds of the debug messages, which are sent by the plugin's implementation. 
+Also, it supports callbacks, which can be triggered via the user's textual input.
+Some of the supported callbacks do consider user's input parameters.
 
 ----
 
@@ -16,33 +18,46 @@ Plugin contains the debug console, which prints different kinds of the debug mes
 
 > **Note!**
 >
-> It is mainly used during the development phase, as allows to see debug messages from implementation right within the plugin.
+> Console is mainly used during the development phase. 
+> It is the output channel for the plugin's messages. Some sort of alternative to standard output stream.
+> Beside that, it allows the user to generate SW's class-diagrams and request specific debug output.
 
 ----
 
-Still, some messages are presented even in the production versions, as:
+Despite the fact, that majority of the messages are disables in production SW, some of them are intentionally made available, like:
 - messages regarding start-up phase of the settings manager
-- messages regarding the time, which was consumed to process the search query
+- messages regarding the time, which was consumed to process each search query
 - warning messages regarding the timestamp mismatch within the analyzed file. That impacts possibility to represent average values within the "Grouped view"
 
 ----
 
-Besides that, there is an input field, which allows you to get some useful information about the plugin:
+The input field of debug console allows you to send different requests to the plugin's implementation:
 
 ![Screenshot of the "Debug console" input field](./debug_console_input.png)
 
-Supported commands are:
+Current set of the supported commands contains:
 
-help -> get list of supported commands
-- clear -> clears console view
-- color-aliases -> shows list of the color aliases, which can be used within the regex name scripting
-- styles -> represents Qt styles available on target OS. Reference information, which can be used to run dlt-viewer with one of the supported styles.
-- support -> represents the support message
-- version -> represents the version of the plugin
-- web-link -> represents link to plugin's web-site
-- uml-id -> represents list of the supported UML types, which is used for cretion of the sequence diagrams
+- clear - clears debug view
+- color-aliases - prints all supported color aliases
+- help [-c=&lt;command-name&gt;] - show this help. If no "c" parameter is provided - help regarding all available commands will be dumped. Be aware, that [&lt;command-name&gt; &lt;help&gt;] syntax can also be used to get the help output regarding a single command. Such syntax is easier to use, considering limited auto-complete functionality of this console. E.g. "help -help" (ha-ha).
+- styles - prints information about QT styles supported on target OS
+- support - prints information regarding how to get support
+- uml-export-class-diagram [-d=&lt;directory&gt; // mandatory! Directory, to which store the the diagrams][-p=&lt;packageName&gt; // case sensitive name of the package. Can be empty or contain special "all" value.][-e=&lt;exclude-external-dependencies&gt; // whether to exclude external dependencies] - exports class diagram of the whole application or of the dedicated package(s) to the file-system. In case if no optional parameters provided - the whole application's diagram will be exported.
+- uml-packages [-p=&lt;packageName&gt; // part of case insensitive package name] - prints information about available UML packages. In case if "package" parameter is empty - will print info about all available packages. Obtained names can be used to build UML class diagrams using "uml-print-class-diagram" command
+- uml-print-class-diagram [-p=&lt;packageName&gt; // case sensitive name of the package. Can be empty or contain special "all" value.][-e=&lt;exclude-external-dependencies&gt; // whether to exclude external dependencies] - prints class diagram of the whole application or of the dedicated package(s) to the console. In case if no parameters provided - the whole application's diagram will be dumped.
+- uml-sequence-ids - prints information about regex names scripting in area of the UML sequence diagrams
+- version - prints version of the plugin
+- web-link - prints URL with location of the plugin on the Git hub
 
-List of the supported commands will be extended in future releases.
+----
+
+> **Note!**
+> 
+> Input parameters should be mentioned in "-param=value" or "--param=value" format
+
+----
+
+List of the supported commands will be extended in the future releases.
 
 ----
 

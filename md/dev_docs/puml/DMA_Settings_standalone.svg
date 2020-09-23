@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="509px" preserveAspectRatio="none" style="width:676px;height:509px;" version="1.1" viewBox="0 0 676 509" width="676px" zoomAndPan="magnify"><defs><filter height="300%" id="f1fy2aonq84wq8" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[fc32aa5bebb0188e14e40b5299cbf3a4]
+cluster DMA_Settings--><polygon fill="#DDDDDD" filter="url(#f1fy2aonq84wq8)" points="99,6,203,6,210,29.6094,654,29.6094,654,497,99,497,99,6" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="99" x2="210" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="98" x="103" y="22.5332">DMA_Settings</text><!--MD5=[ba96b2768c98df17205dd0ad9504f852]
+class CSettingItem--><rect codeLine="7" fill="#FEFECE" filter="url(#f1fy2aonq84wq8)" height="75.6719" id="CSettingItem" style="stroke: #A80036; stroke-width: 1.5;" width="354" x="284" y="237"/><ellipse cx="420.75" cy="253" fill="#A9DCDF" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M422.9375,254.7656 L418.7969,254.7656 L418.375,255.7969 L418.7969,255.7969 Q419.4063,255.7969 419.6719,256.0313 Q419.9375,256.2656 419.9375,256.6563 Q419.9375,257.0313 419.6719,257.2656 Q419.4063,257.5 418.7969,257.5 L416.5,257.5 Q415.8906,257.5 415.6328,257.2656 Q415.375,257.0313 415.375,256.6406 Q415.375,256.2656 415.6484,256.0234 Q415.9219,255.7813 416.5469,255.7969 L419.2188,249.1406 L418.1094,249.1406 Q417.5,249.1406 417.2344,248.9063 Q416.9688,248.6719 416.9688,248.2813 Q416.9688,247.9063 417.2344,247.6719 Q417.5,247.4375 418.1094,247.4375 L421.7813,247.4375 L425.1719,255.7969 Q425.7656,255.7969 425.9531,255.9375 Q426.3438,256.2031 426.3438,256.6563 Q426.3438,257.0313 426.0859,257.2656 Q425.8281,257.5 425.2188,257.5 L422.9219,257.5 Q422.3125,257.5 422.0469,257.2656 Q421.7813,257.0313 421.7813,256.6406 Q421.7813,256.2656 422.0469,256.0313 Q422.3125,255.7969 422.9219,255.7969 L423.3438,255.7969 L422.9375,254.7656 Z M422.2188,253.0625 L420.8594,249.6875 L419.4844,253.0625 L422.2188,253.0625 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="72" x="441.25" y="257.9102">CSettingItem</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="285" x2="637" y1="269" y2="269"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="285" x2="637" y1="277" y2="277"/><ellipse cx="295" cy="288" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="193" x="304" y="292.4189">virtual const QString&amp; getKey() override</text><ellipse cx="295" cy="301.8359" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="328" x="304" y="306.2549">virtual const tUpdateSettingsFileFunc&amp; getUpdateFileFunc() override</text><!--MD5=[8c5bafe3d5593576cf497eb55a6e6586]
+class CSettingsManager--><rect codeLine="13" fill="#FEFECE" filter="url(#f1fy2aonq84wq8)" height="56.1875" id="CSettingsManager" style="stroke: #A80036; stroke-width: 1.5;" width="134" x="115" y="247"/><ellipse cx="130" cy="267.0938" fill="#FF7700" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M128.1094,271.6563 Q127.8906,271.9219 127.75,272 Q127.6094,272.0781 127.4219,272.0781 Q127.0313,272.0781 126.7891,271.8125 Q126.5469,271.5469 126.5469,270.9531 L126.5469,269.7969 Q126.5469,269.1875 126.7891,268.9297 Q127.0313,268.6719 127.4219,268.6719 Q127.7188,268.6719 127.9219,268.8281 Q128.125,268.9844 128.2344,269.3516 Q128.3438,269.7188 128.4531,269.8594 Q128.7031,270.1094 129.3125,270.375 Q129.9219,270.6406 130.6563,270.6406 Q131.7969,270.6406 132.5156,270.1094 Q132.9844,269.7813 132.9844,269.3125 Q132.9844,269 132.7656,268.7188 Q132.5469,268.4375 132.0313,268.2656 Q131.7031,268.1406 130.5469,267.9219 Q129.1563,267.6563 128.4375,267.2969 Q127.7188,266.9375 127.3047,266.2734 Q126.8906,265.6094 126.8906,264.8281 Q126.8906,263.6094 127.9141,262.6953 Q128.9375,261.7813 130.5781,261.7813 Q131.2344,261.7813 131.7891,261.9219 Q132.3438,262.0625 132.8125,262.3594 Q133.1406,262.0469 133.4688,262.0469 Q133.8438,262.0469 134.0781,262.3047 Q134.3125,262.5625 134.3125,263.1719 L134.3125,264.4531 Q134.3125,265.0625 134.0781,265.3203 Q133.8438,265.5781 133.4688,265.5781 Q133.1563,265.5781 132.9219,265.3906 Q132.7344,265.25 132.6484,264.8281 Q132.5625,264.4063 132.4219,264.2188 Q132.1719,263.9063 131.6953,263.6953 Q131.2188,263.4844 130.5781,263.4844 Q129.6563,263.4844 129.125,263.9063 Q128.5938,264.3281 128.5938,264.7969 Q128.5938,265.1094 128.8125,265.4063 Q129.0313,265.7031 129.4531,265.875 Q129.7344,265.9844 131.0391,266.2422 Q132.3438,266.5 133.0469,266.8047 Q133.75,267.1094 134.2188,267.7656 Q134.6875,268.4219 134.6875,269.3281 Q134.6875,270.5938 133.7969,271.3438 Q132.6094,272.3438 130.7813,272.3438 Q130.0781,272.3438 129.4141,272.1719 Q128.75,272 128.1094,271.6563 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="66" x="162" y="264.457">«Singleton»</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="102" x="144" y="279.5508">CSettingsManager</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="116" x2="248" y1="287.1875" y2="287.1875"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="116" x2="248" y1="295.1875" y2="295.1875"/><!--MD5=[f7686f9ffdd154ba94b18df0710138cf]
+class ISettingItem--><rect codeLine="17" fill="#FEFECE" filter="url(#f1fy2aonq84wq8)" height="117.1797" id="ISettingItem" style="stroke: #A80036; stroke-width: 1.5;" width="350" x="286" y="42"/><ellipse cx="423.25" cy="58" fill="#A9DCDF" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M425.4375,59.7656 L421.2969,59.7656 L420.875,60.7969 L421.2969,60.7969 Q421.9063,60.7969 422.1719,61.0313 Q422.4375,61.2656 422.4375,61.6563 Q422.4375,62.0313 422.1719,62.2656 Q421.9063,62.5 421.2969,62.5 L419,62.5 Q418.3906,62.5 418.1328,62.2656 Q417.875,62.0313 417.875,61.6406 Q417.875,61.2656 418.1484,61.0234 Q418.4219,60.7813 419.0469,60.7969 L421.7188,54.1406 L420.6094,54.1406 Q420,54.1406 419.7344,53.9063 Q419.4688,53.6719 419.4688,53.2813 Q419.4688,52.9063 419.7344,52.6719 Q420,52.4375 420.6094,52.4375 L424.2813,52.4375 L427.6719,60.7969 Q428.2656,60.7969 428.4531,60.9375 Q428.8438,61.2031 428.8438,61.6563 Q428.8438,62.0313 428.5859,62.2656 Q428.3281,62.5 427.7188,62.5 L425.4219,62.5 Q424.8125,62.5 424.5469,62.2656 Q424.2813,62.0313 424.2813,61.6406 Q424.2813,61.2656 424.5469,61.0313 Q424.8125,60.7969 425.4219,60.7969 L425.8438,60.7969 L425.4375,59.7656 Z M424.7188,58.0625 L423.3594,54.6875 L421.9844,58.0625 L424.7188,58.0625 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="67" x="443.75" y="62.9102">ISettingItem</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="287" x2="635" y1="74" y2="74"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="287" x2="635" y1="82" y2="82"/><ellipse cx="297" cy="93" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="205" x="306" y="97.4189">virtual QJsonObject writeData() const = 0</text><ellipse cx="297" cy="106.8359" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="286" x="306" y="111.2549">virtual bool readData( const QJsonValueRef&amp; setting ) = 0</text><ellipse cx="297" cy="120.6719" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="170" x="306" y="125.0908">virtual const QString&amp; getKey() = 0</text><ellipse cx="297" cy="134.5078" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="313" x="306" y="138.9268">virtual const tUpdateSettingsFileFunc&amp; getUpdateFileFunc() = 0</text><ellipse cx="297" cy="148.3438" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="324" x="306" y="152.7627">virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() = 0</text><!--MD5=[b3085e70496369092ee13243d279f6e8]
+class TSettingItem_T_--><rect codeLine="26" fill="#FEFECE" filter="url(#f1fy2aonq84wq8)" height="89.5078" id="TSettingItem_T_" style="stroke: #A80036; stroke-width: 1.5;" width="366" x="156" y="391"/><ellipse cx="294.75" cy="407" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M297.5156,402.875 Q297.6719,402.6563 297.8594,402.5469 Q298.0469,402.4375 298.2656,402.4375 Q298.6406,402.4375 298.875,402.6953 Q299.1094,402.9531 299.1094,403.5625 L299.1094,405.0156 Q299.1094,405.625 298.875,405.8906 Q298.6406,406.1563 298.2656,406.1563 Q297.9219,406.1563 297.7188,405.9531 Q297.5156,405.7656 297.4063,405.25 Q297.3594,404.8906 297.1719,404.7031 Q296.8438,404.3281 296.2344,404.1094 Q295.625,403.8906 295,403.8906 Q294.2344,403.8906 293.6016,404.2188 Q292.9688,404.5469 292.4766,405.2969 Q291.9844,406.0469 291.9844,407.0781 L291.9844,408.1719 Q291.9844,409.4063 292.875,410.2266 Q293.7656,411.0469 295.3594,411.0469 Q296.2969,411.0469 296.9531,410.7969 Q297.3438,410.6406 297.7656,410.2031 Q298.0313,409.9375 298.1797,409.8594 Q298.3281,409.7813 298.5313,409.7813 Q298.8594,409.7813 299.1172,410.0391 Q299.375,410.2969 299.375,410.6406 Q299.375,410.9844 299.0313,411.3906 Q298.5313,411.9688 297.7344,412.2969 Q296.6563,412.75 295.3594,412.75 Q293.8438,412.75 292.6406,412.125 Q291.6563,411.625 290.9688,410.5547 Q290.2813,409.4844 290.2813,408.2031 L290.2813,407.0469 Q290.2813,405.7188 290.8984,404.5703 Q291.5156,403.4219 292.6094,402.8047 Q293.7031,402.1875 294.9375,402.1875 Q295.6719,402.1875 296.3203,402.3516 Q296.9688,402.5156 297.5156,402.875 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="69" x="315.25" y="411.9102">TSettingItem</text><rect fill="#FFFFFF" height="17.0938" style="stroke: #000000; stroke-width: 1.0; stroke-dasharray: 2.0,2.0;" width="9" x="516" y="388"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="7" x="517" y="401.457">T</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="157" x2="521" y1="423" y2="423"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="157" x2="521" y1="431" y2="431"/><ellipse cx="167" cy="442" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="225" x="176" y="446.4189">virtual QJsonObject writeData() const override</text><ellipse cx="167" cy="455.8359" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="304" x="176" y="460.2549">virtual bool readData( const QJsonValueRef&amp; setting ) override</text><ellipse cx="167" cy="469.6719" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="340" x="176" y="474.0908">virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() override</text><!--MD5=[8dd17ccd1ae0e0e4eb0a7117370c35f4]
+class QObject--><rect fill="#FEFECE" filter="url(#f1fy2aonq84wq8)" height="48" id="QObject" style="stroke: #A80036; stroke-width: 1.5;" width="76" x="7" y="76.5"/><ellipse cx="22" cy="92.5" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M24.7656,88.375 Q24.9219,88.1563 25.1094,88.0469 Q25.2969,87.9375 25.5156,87.9375 Q25.8906,87.9375 26.125,88.1953 Q26.3594,88.4531 26.3594,89.0625 L26.3594,90.5156 Q26.3594,91.125 26.125,91.3906 Q25.8906,91.6563 25.5156,91.6563 Q25.1719,91.6563 24.9688,91.4531 Q24.7656,91.2656 24.6563,90.75 Q24.6094,90.3906 24.4219,90.2031 Q24.0938,89.8281 23.4844,89.6094 Q22.875,89.3906 22.25,89.3906 Q21.4844,89.3906 20.8516,89.7188 Q20.2188,90.0469 19.7266,90.7969 Q19.2344,91.5469 19.2344,92.5781 L19.2344,93.6719 Q19.2344,94.9063 20.125,95.7266 Q21.0156,96.5469 22.6094,96.5469 Q23.5469,96.5469 24.2031,96.2969 Q24.5938,96.1406 25.0156,95.7031 Q25.2813,95.4375 25.4297,95.3594 Q25.5781,95.2813 25.7813,95.2813 Q26.1094,95.2813 26.3672,95.5391 Q26.625,95.7969 26.625,96.1406 Q26.625,96.4844 26.2813,96.8906 Q25.7813,97.4688 24.9844,97.7969 Q23.9063,98.25 22.6094,98.25 Q21.0938,98.25 19.8906,97.625 Q18.9063,97.125 18.2188,96.0547 Q17.5313,94.9844 17.5313,93.7031 L17.5313,92.5469 Q17.5313,91.2188 18.1484,90.0703 Q18.7656,88.9219 19.8594,88.3047 Q20.9531,87.6875 22.1875,87.6875 Q22.9219,87.6875 23.5703,87.8516 Q24.2188,88.0156 24.7656,88.375 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="36" y="97.4102">QObject</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="8" x2="82" y1="108.5" y2="108.5"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="8" x2="82" y1="116.5" y2="116.5"/><!--MD5=[662a638815e3cd7aa53ba72a771fba57]
+reverse link ISettingItem to CSettingItem--><path codeLine="36" d="M461,179.429 C461,199.4 461,219.971 461,236.806 " fill="none" id="ISettingItem-backto-CSettingItem" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="454,179.42,461,159.42,468,179.42,454,179.42" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="116" x="462" y="203.4951">partially implements</text><!--MD5=[c9708a29889a057b5d0f23ca50b4c66c]
+reverse link QObject to CSettingsManager--><path codeLine="37" d="M76.2401,140.835 C101.9762,173.24 137.798,218.345 160.44,246.853 " fill="none" id="QObject-backto-CSettingsManager" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="70.4334,144.779,63.4764,124.764,81.3965,136.072,70.4334,144.779" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="127" y="203.4951">extends</text><!--MD5=[ae4eb370003d61dcc480c45326138593]
+reverse link CSettingItem to TSettingItem_T_--><path codeLine="38" d="M420.057,329.361 C404.715,349.355 387.468,371.832 372.84,390.897 " fill="none" id="CSettingItem-backto-TSettingItem_T_" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="414.668,324.885,432.396,313.278,425.775,333.407,414.668,324.885" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="408" y="357.4951">extends</text><!--MD5=[bf456ae3f29084b1a32e1450de84f07a]
+reverse link CSettingsManager to TSettingItem_T_--><path codeLine="41" d="M218.391,312.855 C241.392,336.149 271.244,366.381 295.494,390.94 " fill="none" id="CSettingsManager-backto-TSettingItem_T_" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="208.989,303.333,210.3581,310.4129,217.42,311.8722,216.0509,304.7922,208.989,303.333" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="266" y="357.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="207.1272" y="324.7939">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="5" x="283.1618" y="380.0459">*</text><!--MD5=[7844070360676f490118009aa4300cc8]
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Settings" #DDDDDD
+{
+
+abstract class "CSettingItem"
+{
+    + virtual const QString& getKey() override
+    + virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() override
+}
+
+class "CSettingsManager"<< (S,#FF7700) Singleton >>
+{
+}
+
+abstract class "ISettingItem"
+{
+    + {abstract} virtual QJsonObject writeData() const = 0
+    + {abstract} virtual bool readData( const QJsonValueRef& setting ) = 0
+    + {abstract} virtual const QString& getKey() = 0
+    + {abstract} virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() = 0
+    + {abstract} virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() = 0
+}
+
+class "TSettingItem<T>" as TSettingItem_T_
+{
+    + virtual QJsonObject writeData() const override
+    + virtual bool readData( const QJsonValueRef& setting ) override
+    + virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() override
+}
+
+}
+
+'====================Inheritance section====================
+ISettingItem <|- - CSettingItem : partially implements
+QObject <|- - CSettingsManager : extends
+CSettingItem <|- - TSettingItem_T_ : extends
+
+'====================Dependencies section====================
+CSettingsManager "1" *- - "*" TSettingItem_T_ : contains
+
+@enduml
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Settings" #DDDDDD
+{
+
+abstract class "CSettingItem"
+{
+    + virtual const QString& getKey() override
+    + virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() override
+}
+
+class "CSettingsManager"<< (S,#FF7700) Singleton >>
+{
+}
+
+abstract class "ISettingItem"
+{
+    + {abstract} virtual QJsonObject writeData() const = 0
+    + {abstract} virtual bool readData( const QJsonValueRef& setting ) = 0
+    + {abstract} virtual const QString& getKey() = 0
+    + {abstract} virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() = 0
+    + {abstract} virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() = 0
+}
+
+class "TSettingItem<T>" as TSettingItem_T_
+{
+    + virtual QJsonObject writeData() const override
+    + virtual bool readData( const QJsonValueRef& setting ) override
+    + virtual tGeneralUpdateDataFunc getGeneralUpdateDataFunc() override
+}
+
+}
+
+ISettingItem <|- - CSettingItem : partially implements
+QObject <|- - CSettingsManager : extends
+CSettingItem <|- - TSettingItem_T_ : extends
+
+CSettingsManager "1" *- - "*" TSettingItem_T_ : contains
+
+@enduml
+
+PlantUML version 1.2020.16(Sun Aug 23 23:20:43 EEST 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

@@ -29,6 +29,8 @@
 #include "common/OSHelper.hpp"
 #include "common/CQtHelper.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
     QWidget(parent),
     mpUI(new Ui::Form),
@@ -783,3 +785,22 @@ void Form::on_createSequenceDiagram_clicked()
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Root)
+    PUML_CLASS_BEGIN_CHECKED(Form)
+        PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(Ui::Form, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(DLTMessageAnalyzerPlugin, 1, 1, uses)
+    PUML_CLASS_END()
+
+    PUML_CLASS_BEGIN_CHECKED(Ui::Form)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CConsoleView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLView, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogo, 1, 1, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

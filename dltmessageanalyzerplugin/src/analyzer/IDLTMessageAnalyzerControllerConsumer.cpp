@@ -11,6 +11,8 @@
 #include "../settings/CSettingsManager.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 //IDLTMessageAnalyzerControllerConsumer
 IDLTMessageAnalyzerControllerConsumer::~IDLTMessageAnalyzerControllerConsumer()
 {
@@ -73,3 +75,24 @@ void IDLTMessageAnalyzerControllerConsumer::cancelRequest( const tRequestId& req
         mpController.lock()->cancelRequest( shared_from_this(), requestId );
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Analyzer)
+    PUML_CLASS_BEGIN_CHECKED(std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>)
+    PUML_CLASS_END()
+
+    PUML_ABSTRACT_CLASS_BEGIN_CHECKED(IDLTMessageAnalyzerControllerConsumer)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_INHERITANCE_CHECKED(std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>, extends)
+        PUML_PURE_VIRTUAL_METHOD( +, void progressNotification( const tRequestId& requestId,
+                                                                const eRequestState& requestState,
+                                                                const int8_t& progress,
+                                                                const tFoundMatchesPack& processedMatches) )
+        PUML_METHOD( +, tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile,
+                                                   const int& fromMessage,
+                                                   const int& numberOfMessages,
+                                                   const QRegularExpression& regex,
+                                                   const int& numberOfThreads,
+                                                   bool isContinuous ) )
+        PUML_AGGREGATION_DEPENDENCY(IDLTMessageAnalyzerController, 1, 1, uses)
+    PUML_ABSTRACT_CLASS_END()
+PUML_PACKAGE_END()

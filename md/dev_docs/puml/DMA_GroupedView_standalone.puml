@@ -1,0 +1,22 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_GroupedView" #DDDDDD
+{
+
+class "CGroupedView"
+{
+}
+
+class "CGroupedViewModel"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QTreeView <|-- CGroupedView : extends
+QAbstractItemModel <|-- CGroupedViewModel : implements
+
+@enduml

@@ -20,6 +20,8 @@
 #include "../log/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 class CDoubleDelegate: public QStyledItemDelegate
 {
     public:
@@ -705,3 +707,9 @@ void CGroupedView::updateColumnsVisibility()
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_GroupedView)
+    PUML_CLASS_BEGIN_CHECKED(CGroupedView)
+        PUML_INHERITANCE_CHECKED(QTreeView, extends)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

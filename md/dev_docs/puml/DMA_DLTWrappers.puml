@@ -1,0 +1,78 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+class "QDltFile"
+{
+}
+
+class "QDltMsg"
+{
+}
+
+}
+
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+class "CDLTMsgWrapper"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultModel"
+{
+}
+
+class "CSearchResultView"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CDLTFileWrapper : extends
+
+'====================Dependencies section====================
+CDLTFileWrapper "1" *-- "*" CDLTMsgWrapper : cache
+CDLTFileWrapper "1" o-- "1" QDltFile : uses
+CDLTMsgWrapper "1" --> "1" QDltMsg : uses
+CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
+CSearchResultModel "1" o-- "1" CDLTFileWrapper : uses
+CSearchResultView "1" o-- "1" CDLTFileWrapper : uses
+
+@enduml

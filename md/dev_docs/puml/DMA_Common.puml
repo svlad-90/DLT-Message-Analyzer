@@ -1,0 +1,104 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+class "QFileSystemWatcher"
+{
+}
+
+}
+
+package "DMA_Common" #DDDDDD
+{
+
+class "CBGColorAnimation"
+{
+}
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+class "CTableMemoryJumper"
+{
+}
+
+class "CTreeItem"
+{
+}
+
+}
+
+package "DMA_FiltersView" #DDDDDD
+{
+
+class "CFiltersModel"
+{
+}
+
+}
+
+package "DMA_GroupedView" #DDDDDD
+{
+
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_PatternsView" #DDDDDD
+{
+
+class "CPatternsModel"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QTableView"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|-- CBGColorAnimation : extends
+QObject <|-- CRegexDirectoryMonitor : extends
+
+'====================Dependencies section====================
+CBGColorAnimation "1" o-- "1" QWidget : animation widget
+CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
+CTableMemoryJumper "1" o-- "1" QTableView : contains
+CTreeItem "1" *-- "*" CTreeItem : contains
+CFiltersModel "1" *-- "*" CTreeItem : contains
+CGroupedViewModel "1" *-- "*" CTreeItem : contains
+CPatternsModel "1" *-- "*" CTreeItem : contains
+CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
+CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
+CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
+
+@enduml

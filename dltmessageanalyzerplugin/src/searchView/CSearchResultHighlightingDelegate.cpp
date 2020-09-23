@@ -13,6 +13,8 @@
 #include "CSearchResultModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate():
 mbMarkTimestampWithBold(CSettingsManager::getInstance()->getMarkTimeStampWithBold())
 {
@@ -399,3 +401,10 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
 {
     return QStyledItemDelegate::sizeHint(option, index);
 }
+
+PUML_PACKAGE_BEGIN(DMA_SearchView)
+    PUML_CLASS_BEGIN_CHECKED(CSearchResultHighlightingDelegate)
+        PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

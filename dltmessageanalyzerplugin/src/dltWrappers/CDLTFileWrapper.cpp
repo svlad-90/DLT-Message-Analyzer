@@ -16,6 +16,8 @@
 
 #include "qdlt.h"
 
+#include "DMA_Plantuml.hpp"
+
 CDLTFileWrapper::CDLTFileWrapper(QDltFile* pFile):
     mpFile(pFile),
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
@@ -988,3 +990,11 @@ int CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::size()
 {
     return mIndexAll.size();
 }
+
+PUML_PACKAGE_BEGIN(DMA_DLTWrappers)
+    PUML_CLASS_BEGIN_CHECKED(CDLTFileWrapper)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltFile, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMsgWrapper, 1, *, cache)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

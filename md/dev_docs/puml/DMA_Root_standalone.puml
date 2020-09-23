@@ -1,0 +1,40 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Form"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+'====================Inheritance section====================
+IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
+QObject <|-- DLTMessageAnalyzerPlugin : extends
+QWidget <|-- Form : extends
+
+'====================Dependencies section====================
+DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
+Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
+Form "1" *-- "1" Ui::Form : contains
+
+@enduml

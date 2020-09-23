@@ -13,6 +13,8 @@
 #include "../log/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 static const tQStringPtr sRootItemName = std::make_shared<QString>("Root");
 
 CGroupedViewModel::CGroupedViewModel(QObject *parent)
@@ -51,9 +53,14 @@ CGroupedViewModel::CGroupedViewModel(QObject *parent)
                 {
                     if(nullptr != pChild)
                     {
-                        const QString& subString = pChild->data(sortingColumn).get<QString>();
+                        const tQStringPtrWrapper& subString = pChild->data(sortingColumn).get<tQStringPtrWrapper>();
                         tComparator comparator;
-                        comparator.val = subString;
+
+                        if(nullptr != subString.pString)
+                        {
+                            comparator.val = *subString.pString;
+                        }
+
                         sortedChildrenMap.insert(comparator, pChild);
                     }
                 }
@@ -820,3 +827,10 @@ void CGroupedViewModel::sort(int column, Qt::SortOrder order)
 
     updateView();
 }
+
+PUML_PACKAGE_BEGIN(DMA_GroupedView)
+    PUML_CLASS_BEGIN_CHECKED(CGroupedViewModel)
+        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

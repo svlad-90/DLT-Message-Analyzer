@@ -1,0 +1,70 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CTreeItem"
+{
+}
+
+}
+
+package "DMA_PatternsView" #DDDDDD
+{
+
+class "CPatternsModel"
+{
+}
+
+class "CPatternsView"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QLineEdit"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QAbstractItemModel <|-- CPatternsModel : implements
+QTreeView <|-- CPatternsView : extends
+
+'====================Dependencies section====================
+CPatternsModel "1" *-- "*" CTreeItem : contains
+CPatternsView "1" o-- "1" CPatternsModel : uses
+CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
+CPatternsView "1" o-- "1" QLineEdit : patterns search input
+CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
+Ui::Form "1" *-- "1" CPatternsView : contains
+
+@enduml

@@ -2,7 +2,15 @@
 
 ----
 
-![test plant-uml diagram](../../../../md/dev_docs/TO_DO.svg)
+# DMA_Common
+
+## Standalone package diagram
+
+![Class diagram with dependencies](../../../../md/dev_docs/puml/DMA_Common_standalone.svg)
+
+## Package diagram with the first-level dependencies
+
+![Class diagram with dependencies](../../../../md/dev_docs/puml/DMA_Common.svg)
 
 ----
 

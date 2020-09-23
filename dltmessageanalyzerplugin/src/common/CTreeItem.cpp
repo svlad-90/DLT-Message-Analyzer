@@ -9,6 +9,8 @@
 #include "CTreeItem.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 //CTreeItem
 void CTreeItem::visit( const tVisitFunction& preVisitFunction,
                        const tVisitFunction& postVisitFunction,
@@ -585,3 +587,9 @@ const tDataItem& CTreeItem::getValue(const int& column) const
         return sDummyVal;
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Common)
+    PUML_CLASS_BEGIN_CHECKED(CTreeItem)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

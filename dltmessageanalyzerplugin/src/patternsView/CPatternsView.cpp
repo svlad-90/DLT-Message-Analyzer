@@ -32,6 +32,8 @@
 #include "CPatternsModel.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 namespace NShortcuts
 {
     static bool isApplyCombinationShortcut( QKeyEvent * pEvent )
@@ -1156,3 +1158,12 @@ void CPatternsView::pasteSelectedRow()
         pastePatternTriggered(mCopyPastePatternData);
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_PatternsView)
+    PUML_CLASS_BEGIN_CHECKED(CPatternsView)
+        PUML_INHERITANCE_CHECKED(QTreeView, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeRepresentationDelegate, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, patterns search input)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

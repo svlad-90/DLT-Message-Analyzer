@@ -18,6 +18,8 @@
 #include "../settings/CSettingsManager.hpp"
 #include "../log/CLog.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 static QString get_UML_Storage_Path()
 {
     static const QString result( CSettingsManager::getInstance()->getSettingsFilepath() + QString("/uml/") );
@@ -449,3 +451,11 @@ bool CUMLView::isDiagramShown() const
 {
     return mbDiagramShown;
 }
+
+PUML_PACKAGE_BEGIN(DMA_PlantUML)
+    PUML_CLASS_BEGIN_CHECKED(CUMLView)
+        PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CImageViewer, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QProcess, 1, 2, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

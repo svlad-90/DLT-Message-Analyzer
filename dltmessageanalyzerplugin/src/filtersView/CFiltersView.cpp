@@ -19,6 +19,8 @@
 #include "CFilterItemDelegate.hpp"
 #include "CFiltersView.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 namespace NShortcuts
 {
     static bool isEnter( QKeyEvent * pEvent )
@@ -540,3 +542,12 @@ void CFiltersView::keyPressEvent ( QKeyEvent * event )
         tParent::keyPressEvent(event);
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_FiltersView)
+    PUML_CLASS_BEGIN_CHECKED(CFiltersView)
+        PUML_INHERITANCE_CHECKED(QTreeView, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CFilterItemDelegate, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, regex input field)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

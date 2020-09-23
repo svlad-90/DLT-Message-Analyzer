@@ -19,6 +19,8 @@
 #include "../log/CLog.hpp"
 #include "../common/cpp_extensions.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 //#define DEBUG_MESSAGES
 
 Q_DECLARE_METATYPE(tWorkerId)
@@ -461,3 +463,11 @@ CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzer
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Analyzer)
+    PUML_CLASS_BEGIN_CHECKED(CMTAnalyzer)
+        PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerController, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QThread, 1, *, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTRegexAnalyzerWorker, 1, *, contains)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

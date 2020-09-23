@@ -1,0 +1,230 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+class "QDltPlugin"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+class "QDltPluginManager"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+}
+
+package "DMA_Analyzer" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerController"
+{
+    + {abstract} virtual int getMaximumNumberOfThreads() const = 0
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
+}
+
+abstract class "IDLTMessageAnalyzerControllerConsumer"
+{
+    + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+}
+
+}
+
+package "DMA_Common" #DDDDDD
+{
+
+class "CBGColorAnimation"
+{
+}
+
+class "CRegexDirectoryMonitor"
+{
+}
+
+class "CTableMemoryJumper"
+{
+}
+
+}
+
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+}
+
+package "DMA_FiltersView" #DDDDDD
+{
+
+class "CFiltersModel"
+{
+}
+
+class "CFiltersView"
+{
+}
+
+}
+
+package "DMA_GroupedView" #DDDDDD
+{
+
+class "CGroupedView"
+{
+}
+
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_Log" #DDDDDD
+{
+
+class "CConsoleInputProcessor"
+{
+}
+
+class "CConsoleView"
+{
+}
+
+}
+
+package "DMA_Logo" #DDDDDD
+{
+
+class "CLogo"
+{
+}
+
+}
+
+package "DMA_PatternsView" #DDDDDD
+{
+
+class "CPatternsModel"
+{
+}
+
+class "CPatternsView"
+{
+}
+
+}
+
+package "DMA_PlantUML" #DDDDDD
+{
+
+class "CUMLView"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Form"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultModel"
+{
+}
+
+class "CSearchResultView"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
+QObject <|-- DLTMessageAnalyzerPlugin : extends
+QWidget <|-- Form : extends
+
+'====================Dependencies section====================
+CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
+CDLTMessageAnalyzer "1" *-- "1" CConsoleInputProcessor : contains
+CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
+CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
+CDLTMessageAnalyzer "1" o-- "1" CGroupedView : uses
+CDLTMessageAnalyzer "1" *-- "1" CGroupedViewModel : contains
+CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
+CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
+CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
+CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
+CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
+CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
+CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" IDLTMessageAnalyzerController : contains
+Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
+Form "1" *-- "1" Ui::Form : contains
+Ui::Form "1" *-- "1" CConsoleView : contains
+Ui::Form "1" *-- "1" CFiltersView : contains
+Ui::Form "1" *-- "1" CGroupedView : contains
+Ui::Form "1" *-- "1" CLogo : contains
+Ui::Form "1" *-- "1" CPatternsView : contains
+Ui::Form "1" *-- "1" CSearchResultView : contains
+Ui::Form "1" *-- "1" CUMLView : contains
+
+@enduml

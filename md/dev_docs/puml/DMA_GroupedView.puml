@@ -1,0 +1,63 @@
+
+@startuml
+
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CTreeItem"
+{
+}
+
+}
+
+package "DMA_GroupedView" #DDDDDD
+{
+
+class "CGroupedView"
+{
+}
+
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QTreeView <|-- CGroupedView : extends
+QAbstractItemModel <|-- CGroupedViewModel : implements
+
+'====================Dependencies section====================
+CGroupedViewModel "1" *-- "*" CTreeItem : contains
+CDLTMessageAnalyzer "1" o-- "1" CGroupedView : uses
+CDLTMessageAnalyzer "1" *-- "1" CGroupedViewModel : contains
+Ui::Form "1" *-- "1" CGroupedView : contains
+
+@enduml

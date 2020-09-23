@@ -18,6 +18,8 @@
 #include "../log/CLog.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 Q_DECLARE_METATYPE(CDLTRegexAnalyzerWorker::ePortionAnalysisState)
 
 static std::atomic<tWorkerId> sWorkerIdCounter(0);
@@ -135,3 +137,9 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
 
     emit portionAnalysisFinished( requestId, static_cast<int>(processingStrings.size()), portionAnalysisState, foundMatchesPack, mWorkerId, workerThreadCookie );
 }
+
+PUML_PACKAGE_BEGIN(DMA_Analyzer)
+    PUML_CLASS_BEGIN_CHECKED(CDLTRegexAnalyzerWorker)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

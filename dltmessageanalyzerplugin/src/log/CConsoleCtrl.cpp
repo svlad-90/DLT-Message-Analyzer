@@ -9,6 +9,8 @@
 #include "../common/Definitions.hpp"
 #include "CConsoleCtrl.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 Q_DECLARE_METATYPE(NDLTMessageAnalyzer::NConsole::tMessageSettings)
 
 using namespace NDLTMessageAnalyzer::NConsole;
@@ -205,10 +207,12 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
         else
         {
 
-            QString messageEscaped = message. toHtmlEscaped();
+            QString messageEscaped = message.toHtmlEscaped();
             messageEscaped.replace("\n", "<br/>");
-            messageEscaped.replace(" ", "&nbsp;");
+
             QString HTMLMessage;
+
+            HTMLMessage.append("<pre>");
 
             if(true == messageSettings.bCustomColor)
             {
@@ -241,6 +245,8 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
 
             HTMLMessage.append(messageNormalized);
             HTMLMessage.append(endHtml);
+
+            HTMLMessage.append("</pre>");
 
             mConsoleConfig.pConsoleTextEdit->appendHtml(HTMLMessage);
         }
@@ -286,3 +292,12 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
         }
     }
 }
+
+PUML_PACKAGE_BEGIN(DMA_Log)
+    PUML_SINGLETONE_BEGIN_CHECKED(CConsoleCtrl)
+        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTabWidget, 1, 1, console view tab widget)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QWidget, 1, 1, console tab)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QPlainTextEdit, 1, 1, console text edit)
+    PUML_SINGLETONE_END()
+PUML_PACKAGE_END()

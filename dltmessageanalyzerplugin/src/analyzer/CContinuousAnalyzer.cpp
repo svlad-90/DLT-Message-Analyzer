@@ -7,13 +7,14 @@
 #include "qdlt.h"
 
 #include "CContinuousAnalyzer.hpp"
-#include "CMTAnalyzer.hpp"
 #include "IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "functional"
 #include "QTimer"
 #include "QDebug"
 
 #include "../dltWrappers/CDLTFileWrapper.hpp"
+
+#include "DMA_Plantuml.hpp"
 
 static const int WAITING_TIME = 50;
 
@@ -318,3 +319,15 @@ CContinuousAnalyzer::tRequestData::tRequestData(const tRequestId& requestId_,
             numberOfThreads(numberOfThreads_),
             bContinuousModeActive(false)
 {}
+
+PUML_PACKAGE_BEGIN(DMA_Analyzer)
+    PUML_CLASS_BEGIN_CHECKED(CSubConsumer)
+        PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
+    PUML_CLASS_END()
+
+    PUML_CLASS_BEGIN_CHECKED(CContinuousAnalyzer)
+        PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerController, implements)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(IDLTMessageAnalyzerControllerConsumer, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()
