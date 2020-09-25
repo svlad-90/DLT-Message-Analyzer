@@ -693,7 +693,7 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                     if( foundScenario != mScenariosMap.end() )
                     {
-                        // if command was found, let's parse aprameters
+                        // if command was found, let's parse paprameters
 
                         tParamMap paramMap;
 
@@ -703,7 +703,7 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                             if(parsedParam.size() == 2)
                             {
-                                paramMap[parsedParam[0]] = parsedParam[1];
+                                paramMap[parsedParam[0]] = parsedParam[1].trimmed();
                             }
                             else if(parsedParam.size() == 1)
                             {

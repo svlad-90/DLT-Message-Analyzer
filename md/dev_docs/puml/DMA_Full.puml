@@ -178,6 +178,10 @@ class "CPatternsView"
 {
 }
 
+class "CTreeRepresentationDelegate"
+{
+}
+
 }
 
 package "DMA_PlantUML" #DDDDDD
@@ -273,6 +277,10 @@ abstract class "QAbstractTableModel"
 {
 }
 
+class "QCompleter"
+{
+}
+
 class "QElapsedTimer"
 {
 }
@@ -353,6 +361,7 @@ QPlainTextEdit <|-- CConsoleView : extends
 QPushButton <|-- CLogo : extends
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 QWidget <|-- CImageViewer : extends
 QWidget <|-- CUMLView : extends
 IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements

@@ -1,0 +1,62 @@
+name: Build update repo size
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch'     
+        required: true
+        default: 'master'
+
+jobs:
+  build_update_repo_size:
+    
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Install cloc
+    - name: Install cloc
+      run: |
+           sudo apt update
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install cloc
+      shell: bash
+      
+    # Checkout DLT-Message-Analyzer's revision, which was pushed
+    - name: Checkout of the DLT-Message-Analyzer
+      uses: actions/checkout@v2
+      with:
+        repository: svlad-90/DLT-Message-Analyzer
+        path: ./
+        ref: ${{ github.ref }}
+        
+    # Build repository size_md report
+    - name: Build repository size report
+      run: |
+        cloc  --md --out=./md/repo_size/repo_size.md
+      shell: bash
+      
+    # Modify repository size report
+    - name: Modify repository size report
+      run: |
+        sed -i -e '1,3d' ./md/repo_size/repo_size.md
+        sed -i '1s/^/----\n\n/' ./md/repo_size/repo_size.md
+        sed -i '1s/^/[**Go to the previous page**](..\/..\/README.md)\n\n/' ./md/repo_size/repo_size.md
+        sed -i -e '$a\\n----\n\n' ./md/repo_size/repo_size.md
+        sed -i -e '$a[**Go to the previous page**](..\/..\/README.md)' ./md/repo_size/repo_size.md      
+      shell: bash
+
+    # Commit update file
+    - name: Commit repository size report
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+          commit_message: Update of the repository size report
+          branch: ${{ github.event.inputs.branch }}
+          commit_options: '--no-verify --signoff'
+          file_pattern: ./md/repo_size/*.md
+          repository: .
+          commit_user_name: DMA Actions Bot
+          commit_user_email: svlad1990@gmail.com
+          commit_author: DMA Actions Bot <svlad1990@gmail.com>

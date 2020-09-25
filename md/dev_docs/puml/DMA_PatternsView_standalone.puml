@@ -13,13 +13,19 @@ class "CPatternsView"
 {
 }
 
+class "CTreeRepresentationDelegate"
+{
+}
+
 }
 
 '====================Inheritance section====================
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 
 '====================Dependencies section====================
 CPatternsView "1" o-- "1" CPatternsModel : uses
+CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
 
 @enduml
