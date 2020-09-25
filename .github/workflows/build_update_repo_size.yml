@@ -35,7 +35,7 @@ jobs:
     # Build repository size_md report
     - name: Build repository size report
       run: |
-        cloc  --md --out=./md/repo_size/repo_size.md
+        cloc ./ --md --out=./md/repo_size/repo_size.md
       shell: bash
       
     # Modify repository size report
