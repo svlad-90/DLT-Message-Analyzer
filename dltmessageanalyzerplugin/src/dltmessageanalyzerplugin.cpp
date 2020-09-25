@@ -183,8 +183,6 @@ void DLTMessageAnalyzerPlugin::initFileStart(QDltFile *file)
 {
     mpFile = std::make_shared<CDLTFileWrapper>(file);
 
-    mpDLTMessageAnalyzer->setFile(mpFile);
-
     if( mpDLTMessageAnalyzer )
     {
        mpDLTMessageAnalyzer->setFile(mpFile);

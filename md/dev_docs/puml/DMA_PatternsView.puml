@@ -22,6 +22,10 @@ class "CPatternsView"
 {
 }
 
+class "CTreeRepresentationDelegate"
+{
+}
+
 }
 
 package "DMA_Root" #DDDDDD
@@ -48,6 +52,10 @@ class "QLineEdit"
 {
 }
 
+class "QStyledItemDelegate"
+{
+}
+
 class "QTreeView"
 {
 }
@@ -57,6 +65,7 @@ class "QTreeView"
 '====================Inheritance section====================
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 
 '====================Dependencies section====================
 CPatternsModel "1" *-- "*" CTreeItem : contains

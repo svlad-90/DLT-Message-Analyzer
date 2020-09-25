@@ -130,6 +130,18 @@ make -j4
 
 > **Note!** 
 > 
+> For Linux build you will need to install the uuid-dev package. To do that try out the following commands:
+>
+> ```
+> sudo apt update
+> sudo apt-get install uuid-dev
+> ```
+>
+
+----
+
+> **Note!** 
+> 
 > If you want to have a compatible build with PLUGIN_INTERFACE_VERSION "1.0.0", enable the following define in the 
 > **./dlt-viewer/plugin/ DLT-Message-Analyzer/ dltmessageanalyzerplugin/ src/ CMakeLists.txt**:
 > 

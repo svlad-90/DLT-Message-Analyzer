@@ -121,6 +121,10 @@ class "CPatternsView"
 {
 }
 
+class "CTreeRepresentationDelegate"
+{
+}
+
 }
 
 package "DMA_PlantUML" #DDDDDD
@@ -183,6 +187,10 @@ abstract class "QAbstractItemModel"
 }
 
 abstract class "QAbstractTableModel"
+{
+}
+
+class "QCompleter"
 {
 }
 
@@ -262,6 +270,7 @@ QPlainTextEdit <|-- CConsoleView : extends
 QPushButton <|-- CLogo : extends
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 QWidget <|-- CImageViewer : extends
 QWidget <|-- CUMLView : extends
 QObject <|-- DLTMessageAnalyzerPlugin : extends
@@ -275,6 +284,7 @@ QObject <|-- CSettingsManager : extends
 CMTAnalyzer "1" *-- "*" QThread : contains
 CBGColorAnimation "1" o-- "1" QWidget : animation widget
 CTableMemoryJumper "1" o-- "1" QTableView : contains
+CFilterItemDelegate "1" o-- "1" QCompleter : uses
 CFilterItemDelegate "1" o-- "1" QTreeView : parent view
 CFiltersView "1" o-- "1" QLineEdit : regex input field
 CConsoleCtrl "1" o-- "1" QPlainTextEdit : console text edit

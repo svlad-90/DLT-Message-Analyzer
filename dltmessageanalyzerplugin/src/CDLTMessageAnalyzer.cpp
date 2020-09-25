@@ -134,6 +134,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         mpGroupedResultView->setModel(mpGroupedViewModel);
     }
 
+    if(nullptr != mpLabel)
+    {
+        mpLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    }
+
     if(nullptr != mpFiltersView &&
             nullptr != mpFiltersModel)
     {
@@ -790,7 +795,7 @@ bool CDLTMessageAnalyzer::analyze()
 {
     if(!mpFile)
     {
-        updateStatusLabel( "Initial enabling error! Caused by limitations of dlt-viewer's plugin API. Please, use \"File->Clear\" or \"Ctrl+K\" to recover", true );
+        updateStatusLabel( "Initial enabling error! Please, visit the \"https://github.com/svlad-90/DLT-Message-Analyzer/blob/master/md/troubleshooting/troubleshooting.md\", which addresses this issue", true );
         return false;
     }
 

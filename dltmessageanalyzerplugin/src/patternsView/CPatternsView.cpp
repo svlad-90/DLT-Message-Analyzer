@@ -1166,4 +1166,8 @@ PUML_PACKAGE_BEGIN(DMA_PatternsView)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, patterns search input)
     PUML_CLASS_END()
+
+    PUML_CLASS_BEGIN_CHECKED(CTreeRepresentationDelegate)
+        PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
+    PUML_CLASS_END()
 PUML_PACKAGE_END()

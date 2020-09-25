@@ -85,23 +85,9 @@ and many other features
 
 ----
 
-## Repo size:
+## Repo size: 
 
-Baseline: https://github.com/svlad-90/DLT-Message-Analyzer/commit/7005e44fad183699be6df82831917e9ce71945dc
-
-| Language     | files | blank | comment | code |
-| ---- | ---- | ---- | ---- | ---- |
-| C++          | 39 | 3572 | 637 | 17495 |
-| C/C++ Header   | 44 | 1385 | 1562 | 4872 |
-| Markdown       | 26 | 682 | 0 | 1344 |
-| Qt             | 1 | 8 | 0 | 1183 |
-| CMake          | 16 | 78 | 71 | 410 |
-| ANTLR Grammar  | 1 | 46 | 291 | 400 |
-| YAML           | 4 | 46 | 33 | 210 |
-| Java           | 3 | 46 | 9 | 125 |
-| Maven          | 1 | 15 | 0 | 112 |
-| HTML           | 1 | 0 | 0 | 1 |
-| SUM:           | 136 | 5878 | 2603 | 26152 |
+### [Read it here](./md/repo_size/repo_size.md)
 
 ----
 
