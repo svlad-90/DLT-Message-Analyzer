@@ -11,6 +11,15 @@ class "CLogo"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QPushButton"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QPushButton <|-- CLogo : extends
 

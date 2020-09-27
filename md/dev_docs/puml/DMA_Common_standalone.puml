@@ -23,6 +23,15 @@ class "CTreeItem"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QObject <|-- CBGColorAnimation : extends
 QObject <|-- CRegexDirectoryMonitor : extends

@@ -52,11 +52,11 @@ jobs:
     - name: Commit repository size report
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-          commit_message: Update of the repository size report
+          commit_message: "Automation: update of the repository size report"
           branch: ${{ github.event.inputs.branch }}
           commit_options: '--no-verify --signoff'
           file_pattern: ./md/repo_size/*.md
           repository: .
           commit_user_name: DMA Actions Bot
-          commit_user_email: svlad1990@gmail.com
-          commit_author: DMA Actions Bot <svlad1990@gmail.com>
+          commit_user_email: DMA_Actions_Bot@gmail.com
+          commit_author: DMA Actions Bot <DMA_Actions_Bot@gmail.com>

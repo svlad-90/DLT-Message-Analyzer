@@ -10,10 +10,10 @@ Those groups are then represented in a form of the tree view.
 The view provides the following information regarding each tree level:
 - number of messages, entries
 - number of messages, percent
-- number of messages, average per second
+- number of messages, the average per second
 - payload size, bytes
 - payload size, percent
-- payload size, average per second
+- payload size, the average per second
 
 # How does it look like?
 
@@ -21,7 +21,7 @@ The view provides the following information regarding each tree level:
 
 # How does it work?
 
-The above screenshot contains an example of "grouped view" for a system journal's messages.
+The above screenshot contains an example of a "grouped view" for a system journal's messages.
 
 ### Used regex is:
 
@@ -55,7 +55,7 @@ The above screenshot contains an example of "grouped view" for a system journal'
         |-~DLT~61956~NOTICE   ~Send log-level to context: SYS:SYSL [-1 -> 4] [-1 -> 1] | Msg-s : 1 | Msg-s, % : 0.909 | Msg-s/sec, av. : 0 | Payload : 259 | Payload, % : 0.939 | Payload, b/sec, av. : 1
 </pre>
  
- As you can see, result formed tree levels for:
+ As you can see, the result formed tree levels for:
  - SYS app id
  - JOUR context
  - dlt-daemon service
@@ -63,11 +63,11 @@ The above screenshot contains an example of "grouped view" for a system journal'
  - Messages
  
 The tested file was a quite small one, which contained system journal messages only from the dlt-daemon.
-Still even in that data-set we can see, that there were 19 same messages from dlt-daemon regarding sending log-level contexts.
+Still, even in that data-set, we can see, that there were 19 same messages from dlt-daemon regarding sending log-level contexts.
 And 10 deactivations of connection type 2.
 
-Together with that you can see which kind of message has taken which amount of payload.
-That is quite important in case if you work within a system, which has a trace-spam cases, which should be addressed.
+Together with that, you can see which kind of message has taken which amount of payload.
+That is quite important in case if you work within a system, which has trace-spam cases, which should be addressed.
 
 ----
 

@@ -19,6 +19,23 @@ class "CFiltersView"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
 QAbstractItemModel <|-- CFiltersModel : implements

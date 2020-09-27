@@ -40,6 +40,15 @@ class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as s
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
 '====================Inheritance section====================
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends

@@ -6,7 +6,7 @@
 
 ## Instance of dlt-viewer has an old-fashion styling
 
-Majority of the users are using dlt-viewer with the default styling, which is "windowsvista".
+The majority of the users are using dlt-viewer with the default styling, which is "windowsvista".
 
 If you build dlt-viewer with Qt version which is equal or greater than 5.10, you should be aware that "windowsvista" styling has become a separate dynamic library there.
 
@@ -15,7 +15,7 @@ That will show you used, and available style sets:
 
 ![Screenshot of the "styles" command output](./troubleshooting_styles_command.png)
 
-You can select one of the available styles using the "-style" command line option, e.g.:
+You can select one of the available styles using the "-style" command-line option, e.g.:
 
 > ./dlt-viewer -style Fusion
 
@@ -24,13 +24,13 @@ In case if "windowsvista" style is missing in the above list, you can add it to 
 >
 > Place it to: ".\dlt-viewer\styles\qwindowsvistastyle.dll" // or *.so, depending on the used OS.
 
-Then reboot the dlt-viewer. Addition style should become available.
+Then reboot the dlt-viewer. The additional style should become available.
 
 ----
 
-## When I try to perform a search within athe DLT-Message-Analyzer plugin, I do get the "Initial enabling error!"
+## When I try to perform a search within the DLT-Message-Analyzer plugin, I get the "Initial enabling error!" message
 
-In older version the error looks like this:
+In the older version the error looks like this:
 
 ![Screenshot of the "initial enabling error"](./troubleshooting_initial_enabling_error.png)
 
@@ -41,11 +41,11 @@ In newer versions - like this:
 In general, you get this error, when dlt-viewer core is not providing to the plugin a pointer to the dlt file through the plugin's API. 
 
 It doesn't really matter whether you have opened any dlt file or not. 
-Dlt-viewer always has connection to some file:
+Dlt-viewer always has a connection to some file:
 - if you've opened the file - dlt-viewer will use it
 - if you haven't opened any file - dlt-viewer will itself implicitly create and use a temporary file
 
-But in case when you get the above-mentioned error, something went wrong, and file is not provided.
+But in the case when you get the above-mentioned error, something went wrong, and the file is not provided.
 Another proof of that would be an empty "Files view" of the plugin:
 
 ![Screenshot of the empty "files view"](./troubleshooting_empty_files_view.png)
@@ -66,9 +66,9 @@ The possible measures of avoidance in this case are:
 
 ----
 
-#### 2. You have compiled newer version of the dlt-viewer, which has settings incompatible with an older version.
+#### 2. You have compiled a newer version of the dlt-viewer, which has a settings format incompatible with the previously used version.
 
-The are possible measures of avoidance for this issue.
+There are possible measures of avoidance for this issue.
 
 On Windows:
 - Close dlt-viewer.
@@ -86,7 +86,7 @@ If that does not help, you can also try to press "Ctrl+K" in dlt-viewer in order
 
 ----
 
-If above instructions didn't help you - create a new issue [here](https://github.com/svlad-90/DLT-Message-Analyzer/issues) 
+If the above instructions didn't help you - create a new issue [here](https://github.com/svlad-90/DLT-Message-Analyzer/issues) 
 
 ----
 

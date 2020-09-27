@@ -4,7 +4,7 @@
 
 # Search
 
-This chapter describes general aspects of the plugin's search functionality.
+This chapter describes the general aspects of the plugin's search functionality.
 
 ----
 
@@ -14,7 +14,7 @@ Currently plugin's implementation forms the search string in the following way:
 
 > **Apid + " " + Ctid + " " + Payload**
 
-As of now there is no way exist to change this rule. Still, implementation might be extended in the future releases to allow the runtime change of the search string.
+As of now, there is no way exist to change this rule. Still, the implementation might be extended in future releases to allow the runtime change of the search string.
 
 ----
 
@@ -24,17 +24,17 @@ As of now there is no way exist to change this rule. Still, implementation might
 > - filter out messages of the specific application - e.g. ^DLTD
 > - filter out messages, which originate from the specific context id of all applications - e.g. ^[\w]{1,4} CTX
 > - filter out messages, which originate from the specific context id of the specific application - e.g. ^SYS JOUR
-> - use your already existing regex expression, which do not consider the above filtering capabilities
+> - use your already existing regex expression, which does not consider the above filtering capabilities
 >
-> Together with the increased speed of the search this way of filtering becomes much more comfortable, than usage of the usual dlt-viewer's filters.
+> Together with the increased speed of the search this way of filtering becomes much more comfortable, than the usage of the usual dlt-viewer's filters.
 >
-> However, the search is fully compatible with usage of the dlt-viewer's filters.
+> However, the search is fully compatible with the usage of the dlt-viewer's filters.
 
 ----
 
 ## Continuous search
 
-Another thing, which differs between the "dlt-viewer's search" and the "plugin's search" is that DLT Message Analyzer allows to get the continuous updates of the search results.
+Another thing, which differs between the "dlt-viewer's search" and the "plugin's search" is that DLT Message Analyzer allows getting the continuous updates of the search results.
 
 Simply start the search:
 
@@ -52,14 +52,14 @@ You will see, that in case if your HU is connected, the search will continue to 
 >
 > The continuous search will stop in the following cases:
 > - loss of connection to the target
-> - if user presses the "Stop search" button
+> - if the user presses the "Stop search" button
 
 ----
 
 ## Case sensitive search
 
 Be default the search is case insensitive. 
-But, it is easy to change that via the search input field's context-menu:
+But, it is easy to change that via the search input field's context menu:
 
 ![Screenshot of the "Case sensitive search" context-menu item](./case_sensitive_search.png)
 
@@ -69,11 +69,11 @@ The changed setting would be persisted and applied to all the next search operat
 
 ## Regex errors handling
 
-In case if user makes a mistake in the provided regex, the plugin will give a status bar notification with description of the error, which was provided by the used regex engine:
+In case if the user makes a mistake in the provided regex, the plugin will give a status bar notification with a description of the error, which was provided by the used regex engine:
 
 ![Screenshot of the attempt to apply regex which contains the error](./regex_with_error.png)
 
-Notification message contains the col number, at which an error has occured. In addition to that, the regex line edit will jump to the error location and will select the col number character, which contains error. 
+Notification message contains the col number, at which an error has occurred. In addition to that, the regex line edit will jump to the error location and will select the col number character, which contains an error. 
 
 The same kind of error handling is also supported in the other menus, where user can enter the regexes, e.g. during the edit operation of the previously saved pattern: 
 
@@ -89,9 +89,9 @@ It works much faster than the QRegExp, which is still used in the dlt-viewer's v
 Qt documentation itself tells:
 >https://doc.qt.io/qt-5/qregularexpression.html#notes-for-qregexp-users
 >
->The QRegularExpression class introduced in Qt 5 is a big improvement upon QRegExp, in terms of APIs offered, supported pattern syntax and speed of execution. 
+>The QRegularExpression class introduced in Qt 5 is a big improvement upon QRegExp, in terms of APIs offered, supported pattern syntax, and speed of execution. 
 
-And we've checked that. It really works faster and provides a deeper support of the regex syntax.
+And we've checked that. It works faster and provides deeper support of the regex syntax.
 
 ----
 

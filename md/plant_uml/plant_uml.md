@@ -6,14 +6,14 @@
 
 DLT-Message-Analyzer's implementation is integrated with the PlantUML tool ( https://plantuml.com/ )
 PlantUML is used to generate different types of UML diagrams out of their textual descriptions.
-This plugin is using the PlantUML syntax in order to generate sequence diagrams out of the logs.
+This plugin is using the PlantUML syntax to generate sequence diagrams out of the logs.
 
 ----
 > **Note!**
 >
-> For majority of its features PlantUML is using Graphwiz as its dependency.
-> Still, for creation of sequence dieagrams Graphwiz is not used. Thus there is no need to install any additional SW on your PC.
-> And plantuml.jar itself is distributed together with the plugin's source-code.
+> For the majority of its features PlantUML is using Graphviz as its dependency.
+> Still, for the creation of sequence diagrams, Graphviz is not used. Thus there is no need to install any additional SW on your PC.
+> And plantuml.jar itself is distributed together with the plugin's source code.
 > It will be automatically copied to the build directory as part of the CMake or QTCreator build. 
 > 
 > In other words - this feature should work out of the box.
@@ -27,7 +27,7 @@ As a SW developer or SW architect, I want to be able to automatically build sequ
 I want to be able to normalize data from different applications and put them all into a single unified sequence diagram.
 
 Why is that important?
-- Instant synchronization between logs and sequence diagrams is required in order to achieve productive discussions with different stakeholders, which often do not have an idea regarding the format of logs of different applications.
+- Instant synchronization between logs and sequence diagrams is required to achieve productive discussions with different stakeholders, which often do not have an idea regarding the format of logs of different applications.
 - Often the task is to represent, which PART OF THE SEQUENCE is wrong and should be changed. Building a "correct" sequence based on the currently existing one is much faster than building a new sequence from scratch.
 - Support of the project's documentation becomes much easier when you can get sequences out of the latest logs. 
 
@@ -88,7 +88,7 @@ The above way of tracing is unified and contains all required parts to create a 
 We can use the following regex expression for creation of the sequence diagram:
 <pre>^(SYS).*?: Informational: (?&lt;UCL&gt;[\w]+):.*?((?&lt;URT&gt;RQ)|(?&lt;URS&gt;RP)|(?&lt;UEV&gt;EV)).*?(to|from) (?&lt;US&gt;[\w]+) - (?&lt;UM&gt;.*?)\((?&lt;UA&gt;.*?)\)</pre>
 
-Result of search would look like:
+The result of the search would look like:
 
 ![Screenshot of the result, which contains UML items](./plant_uml_search_result.png)
 
@@ -126,20 +126,20 @@ Use the following context menu item to trigger save operation:
 
 ## Advanced example
 
-First example was quite simple, as log has contained all required parts.
-But what if you need a sequence for a set of the messages, which does not contain all required parts? 
-E.g. there is no service name, client name or method name.
+The first example was quite simple, as the log has contained all the required parts.
+But what if you need a sequence for a set of the messages, which does not contain all required elements? 
+E.g. there is no service name, client name, or method name.
 
-Still, as a develoepr you might understand the context, and want to fulfil the missing parts and have a sequence without modification of logs.
+Still, as a developer, you might understand the context, and want to fulfill the missing parts and have a sequence without modification of logs.
 Fortunately, the DLT-Message-Analyzer allows you to do this.
 
 Imagine that we have the following 3 messages, which represent the communication between components "Alice" and "Bob":
 
 ![Screenshot of another set of messages between Alice and Bob components](./plant_uml_alice_bob_messages_advanced.png)
 
-Let's also imagine that result diagram should have actor Alex instead of actor Alice.
+Let's also imagine that the resulting diagram should have actor Alex instead of actor Alice.
 The above way of tracing is not quite unified and does not contain all required parts to create a sequence out of it. 
-Also it contains a typo - Alice instead of Alex.
+Also, it contains a typo - Alice instead of Alex.
 Still, we can use the following regex expression for sequence creation:
 
 <pre>^(SYS).*?: Informational: ((?&lt;UCL_Alex&gt;CAlice):.*?(?&lt;US_Bob&gt;(?&lt;UM_sayMyName&gt;(?&lt;URT&gt;sentName)|(?&lt;URS&gt;response))).*?\((?&lt;UA&gt;.*)\)|(?&lt;UCL_AND_US&gt;Bob): (?&lt;URT&gt;processRequest)\("(?&lt;UM&gt;[\w]+)"\))</pre>
@@ -149,10 +149,10 @@ Specific parts of behavior:
 - UCL_Alex will replace CAlice to Alex in the diagram's content
 - US_Bob will add Bob service, despite, that it is not presented in the message
 - UM_sayMyName will add sayMyName method, despite that it is not presented in the message
-- URT & URP are stick to the parts of the message, which only indirectly show whether it is request or response
+- URT & URP are stick to the parts of the message, which only indirectly show whether it is a request or response
 - UCL_AND_US will add Bob client and service, despite that it is not part of the message
 
-Result of search would look like:
+The result of the search would look like:
 
 ![Screenshot of the result, which contains UML items](./plant_uml_search_result_advanced.png)
 
@@ -176,8 +176,8 @@ The resulting diagram looks like this:
 > There is a possibility to combine multiple UML items in the name of one group. 
 > E.g. US_AND_UCL, or US_Alex_AND_UCL_Alex.
 >
-> Still, there is no possibility to mention the same UML item type in same group name more than once. 
-> E.g. in case of US_Alex_AND_US_Alice "last win" strategy is applied, meaning that US_Alice will win.
+> Still, there is no possibility to mention the same UML item type in the same group name more than once. 
+> E.g. in the case of US_Alex_AND_US_Alice "last win" strategy is applied, meaning that US_Alice will win.
 ----
 
 ----
@@ -185,8 +185,8 @@ The resulting diagram looks like this:
 >
 > Imagine the case, when one UML type is specified in one regex more than once:
 > <pre>(?&lt;UM_one&gt;[\w]+):(?&lt;UM__two&gt;[\w]+)</pre>
-> In such case, if one UML type will be found in a result log more than once, all found results of the same type will be concatenated. 
-> With above example result qould be: "one_two".
+> In such a case, if one UML type will be found in a result log more than once, all found results of the same type will be concatenated. 
+> With the above example result could be: "one_two".
 ----
 
 ## Settings
