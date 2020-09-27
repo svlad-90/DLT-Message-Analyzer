@@ -19,6 +19,23 @@ class "CTreeRepresentationDelegate"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends

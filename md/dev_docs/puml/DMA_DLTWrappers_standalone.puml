@@ -15,6 +15,15 @@ class "CDLTMsgWrapper"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QObject <|-- CDLTFileWrapper : extends
 

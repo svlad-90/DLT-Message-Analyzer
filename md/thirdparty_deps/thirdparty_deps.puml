@@ -1,0 +1,77 @@
+@startuml
+
+left to right direction
+
+package "DMA" {
+    package "DMA_Source" {
+        [dlt-message-analyzer]
+    }
+    
+    package "DMA_Github" {
+        [dlt-message-analyzer-repo]
+    }
+}
+
+package "DMA Dependencies" {
+    package "DLT" {
+        [qdlt]
+    }
+
+    package "Qt" {
+        [qt5]
+    }
+
+    package "DMA_Plantuml" {
+        [dma_plantuml]
+    }
+
+    package "Plantuml" {
+        [plantuml]
+    }
+
+    package "Antlr" {
+        [antlr4]
+    }
+    
+    package "uuid" {
+        [uuid-dev]
+    }
+
+    package "Pcre-parser" {
+        [pcre-parser]
+    }
+
+    package "Variant-lite" {
+        [variant-lite]
+    }
+
+    package "Github-actions"{
+        [actions/cache]
+        [actions/checkout]
+        [jurplel/install-qt-action]
+        [stefanzweifel/git-auto-commit-action]
+    }
+    
+    package "Build system"{
+        [cmake]
+    }
+}
+
+[dlt-message-analyzer] --> [qt5] : https://doc.qt.io/qt-5/reference-overview.html
+[dlt-message-analyzer] --> [qdlt] : https://github.com/GENIVI/dlt-viewer/tree/master/qdlt
+[dlt-message-analyzer] --> [plantuml] : https://plantuml.com/en/
+[dlt-message-analyzer] --> [antlr4] : https://github.com/antlr/antlr4
+[dlt-message-analyzer] --> [pcre-parser] : https://github.com/bkiers/pcre-parser
+[dlt-message-analyzer] --> [variant-lite] : https://github.com/martinmoene/variant-lite
+
+[antlr4] --> [uuid-dev]
+
+[dlt-message-analyzer-repo] --> [actions/cache] : https://github.com/actions/cache
+[dlt-message-analyzer-repo] --> [actions/checkout] : https://github.com/actions/checkout
+[dlt-message-analyzer-repo] --> [jurplel/install-qt-action] : https://github.com/jurplel/install-qt-action
+[dlt-message-analyzer-repo] --> [stefanzweifel/git-auto-commit-action] : https://github.com/stefanzweifel/git-auto-commit-action
+[dlt-message-analyzer-repo] --> [cmake] : https://gitlab.kitware.com/cmake/cmake
+
+[dlt-message-analyzer] --> [dma_plantuml] : https://github.com/svlad-90/DMA_Plantuml
+
+@enduml

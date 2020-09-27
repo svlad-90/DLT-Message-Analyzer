@@ -33,6 +33,15 @@ class "TSettingItem<T>" as TSettingItem_T_
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
 '====================Inheritance section====================
 ISettingItem <|-- CSettingItem : partially implements
 QObject <|-- CSettingsManager : extends

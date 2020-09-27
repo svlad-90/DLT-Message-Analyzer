@@ -4,8 +4,8 @@
 
 # Search view
 
-Plugin's "search view" is the analog of the dlt-viewer's "Search Results" section, meaning that its main purpose is to represent you the find result entries.
-Still there are additional things which it does on top of what the standard functionality of the dlt-viewer provides to you.
+The plugin's "search view" is the analog of the dlt-viewer's "Search Results" section, meaning that its main purpose is to represent you the find result entries.
+Still, there are additional things that it does on top of what the standard functionality of the dlt-viewer provides to you.
 
 ----
 
@@ -25,7 +25,7 @@ Search view allows you to select the visible columns, which might increase the r
 
 ## Copy-paste extensions 
 
-As in the dlt-viewer, the search view allows you to copy the whole message, or only the payload:
+As in the dlt-viewer, the search view allows you to copy the whole message or only the payload:
 
 ![Screenshot of the context-menu part, which is related to the "Copy" operation](./search_view_copy_context_menu.png)
 
@@ -48,7 +48,7 @@ Then copy-paste any found rows into your email:
 
 > **Note!**
 >
-> You can paste highlighted text to any application, which supports representation of colored content, e.g. Word, Excel, Outlook, etc.
+> You can paste highlighted text to any application, which supports the representation of colored content, e.g. Word, Excel, Outlook, etc.
 > For other text editors, plain text will be pasted.
 
 ----
@@ -56,20 +56,20 @@ Then copy-paste any found rows into your email:
 ## Lock the search range
 
 Another feature of the "Search view" is called a "Lock search range".
-It allows you to specify, which range of the message id-s should be considered during the search. Other messages will be skipped by the search algorithm, making it to run much faster.
+It allows you to specify, which range of the message id-s should be considered during the search. Other messages will be skipped by the search algorithm, making it run much faster.
 
 ----
 
 > **Note!**
 >
-> It really helps while you work with huge DLT files.
-> E.g. you have 10 Gb DLT file with the 3 hours of tracing, while you are interested in specific use-case, which took around several minutes.
+> It helps while you work with huge DLT files.
+> E.g. you have a 10 Gb DLT file with the 3 hours of tracing, while you are interested in a specific use-case, which took around several minutes.
 
 ----
 
 There are 3 ways to specify the search range within the plugin's implementation:
 
-- Select already found row and specify whether it should be considered as "start search" or "end search" point:
+- Select the already found row and specify whether it should be considered as "start search" or "end search" point:
 
 ![Screenshot of the "Lock search range by single row" part of the context menu](./search_view_lock_search_range_by_single_row.png)
 
@@ -77,7 +77,7 @@ There are 3 ways to specify the search range within the plugin's implementation:
 
 ![Screenshot of the "Lock search range by two rows" part of the context menu](./search_view_lock_search_range_by_two_rows.png)
 
-- Enter start and end message id-s manually:
+- Enter the start and end message id-s manually:
 
 ![Screenshot of the "Set search range" context menu item](./search_view_set_search_range_context_menu.png)
 
@@ -120,9 +120,9 @@ Nothing special, still it is quite useful when you want to emphasize that time i
 
 ## Copy file name
 
-Sometimes developer can analyze bunch of the files, related to the same life-cycle.
-E.g. he can work with 30 files from archive "Friday testing.zip".
-In his analysis he might want to mention which sub-set of files is related to the finding.
+Sometimes a developer can analyze a bunch of the files, related to the same life-cycle.
+E.g. he can work with 30 files from the archive "Friday testing.zip".
+In his analysis, he might want to mention which sub-set of files is related to the finding.
 
 For this purpose plugin's implementation provides the possibility to copy file name(s) by selected message(s):
 
@@ -132,17 +132,17 @@ For this purpose plugin's implementation provides the possibility to copy file n
 
 > **Note!**
 >
-> In case if more than one row is selected, plugin will copy names of all files within the range of the selected messages. File names are separated with '\n' symbol.
+> In case if more than one row is selected, the plugin will copy the names of all files within the range of the selected messages. File names are separated with '\n' symbol.
 
 ----
 
-Due to limitation of dlt-viewer's SW API, this feature requires some overhead to index each sub-file separately inside the plugin.
+Due to the limitation of dlt-viewer's SW API, this feature requires some overhead to index each sub-file separately inside the plugin.
 Usually, that will not cause visible side-effects, e.g. additional processing for 500 000 messages might additionally take ~1-2 seconds on i5 CPU.
-Still, if needed, feature can be turned off or on via the following context-menu:
+Still, if needed, the feature can be turned off or on via the following context-menu:
 
 ![Screenshot of the "Mark timestamp with bold" feature, before being applied](./search_view_monitor_sub_files.png)
 
-By default feature is turned on.
+By default, feature is turned on.
 
 ----
 

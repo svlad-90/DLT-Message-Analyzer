@@ -14,7 +14,7 @@
 >
 > The build under the v2.20.1 is also supported.
 >
-> The build under the v2.19.0 is also supported. But you will need to use the compatibility mode. Such option is described below. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
+> The build under the v2.19.0 is also supported. But you will need to use the compatibility mode. Such an option is described below. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
 >
 > Be sure, that you've checked out the compatible base-line and used needed options. 
 
@@ -130,7 +130,9 @@ make -j4
 
 > **Note!** 
 > 
-> For Linux build you will need to install the uuid-dev package. To do that try out the following commands:
+> For Linux build you will need to install the uuid-dev package. 
+> It is required to build the antlr4 runtime library.
+> To do that you can use the following commands:
 >
 > ```
 > sudo apt update
@@ -149,7 +151,7 @@ make -j4
 
 ----
 
-- Proceed to the build artifact's folder and run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
+- Proceed to the build's artifacts folder and run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
 - Enable and show the DLT-Message-Analyzer plugin:
 
 ![Screenshot of enabling the plugin](./installation_guide_enable_plugin.png)

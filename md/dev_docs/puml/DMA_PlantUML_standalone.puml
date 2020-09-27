@@ -15,6 +15,15 @@ class "CUMLView"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+class "QWidget"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QWidget <|-- CImageViewer : extends
 QWidget <|-- CUMLView : extends

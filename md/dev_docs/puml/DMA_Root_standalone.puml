@@ -2,6 +2,34 @@
 @startuml
 
 skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+}
+
+package "DMA_Analyzer" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerControllerConsumer"
+{
+    + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+}
+
+}
+
 package "DMA_Root" #DDDDDD
 {
 
@@ -18,6 +46,19 @@ class "Form"
 }
 
 class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QWidget"
 {
 }
 

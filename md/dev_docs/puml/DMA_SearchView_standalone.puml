@@ -19,6 +19,23 @@ class "CSearchResultView"
 
 }
 
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractTableModel"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTableView"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 QAbstractTableModel <|-- CSearchResultModel : implements

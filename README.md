@@ -6,11 +6,11 @@
 
 ----
 
-## What is the DLT Message Analyzer?
+## What is DLT Message Analyzer?
 
-The DLT Message Analyzer is a plugin for dlt-viewer SW. It works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.
+DLT Message Analyzer is a plugin for dlt-viewer SW. It works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.
 
-It is developed in order to increase the analytical capabilities of the dlt-viewer.
+It is developed to increase the analytical capabilities of the dlt-viewer.
 
 ----
 
@@ -43,13 +43,13 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 ### [Advanced highlighting](./md/advanced_highlighting/advanced_highlighting.md)
 
 - Advanced highlighting of regex groups
-- Possibility to copy-paste highlighted content into your emails in order to increase their readability
+- Possibility to copy-paste highlighted content into your emails to increase their readability
 
 ### [Patterns view](./md/patterns_view/patterns_view.md)
 
 - Possibility to save regex patterns with the human-readable aliases
-- Possibility to use combinations of the saved regex patterns, which allows to instantly form the complex requests. This incredibly increases the speed and quality of the trace analysis!
-- Possibility to work with multiple regex configuration files and switch between them. This allows you to use other's domains knowledge in your own analysis
+- Possibility to use combinations of the saved regex patterns, which allows you to instantly form the complex requests. This incredibly increases the speed and quality of the trace analysis!
+- Possibility to work with multiple regex configuration files and switch between them. This allows you to use other's domains knowledge in your analysis
 - Possibility to search patterns by their aliases
 
 ### [Search view](./md/search_view/search_view.md)
@@ -67,21 +67,27 @@ It is developed in order to increase the analytical capabilities of the dlt-view
 
 ### [Debug console](./md/debug_console/debug_console.md)
 
-- Debug "console view", which prints different kinds of useful information.
+- Debug "console view", which shows debug messages of the plugin and allows you to perform a set of predefined scenarios.
 
 and many other features
-
-----
-
-## Development documentation
-
-### [Read it here](./md/dev_docs/dev_docs.md)
 
 ----
 
 ## Troubleshooting
 
 ### [Read it here](./md/troubleshooting/troubleshooting.md)
+
+----
+
+## Thirdparty dependencies: 
+
+### [Read it here](./md/thirdparty_deps/thirdparty_deps.md)
+
+----
+
+## Development documentation
+
+### [Read it here](./md/dev_docs/dev_docs.md)
 
 ----
 
