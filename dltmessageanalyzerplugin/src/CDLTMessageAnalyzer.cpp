@@ -1674,10 +1674,28 @@ void CDLTMessageAnalyzer::searchView_clicked_jumpTo_inMainTable(const QModelInde
 
         if(fileIdx >= 0)
         {
-            auto jumpIndex = mpMainTableView->model()->index( fileIdx, 0 );
-            mpMainTableView->setFocus();
-            mpMainTableView->scrollTo( jumpIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
-            mpMainTableView->setCurrentIndex(jumpIndex);
+            auto firstVisibleColumn = -1;
+
+            const int columnsSize = mpMainTableView->model()->columnCount();
+
+
+            for(int columnCouner = 0; columnCouner < columnsSize; ++columnCouner)
+            {
+                if(false == mpMainTableView->isColumnHidden(columnCouner))
+                {
+                    firstVisibleColumn = columnCouner;
+                    break;
+                }
+            }
+
+            if(firstVisibleColumn != -1)
+            {
+                auto jumpIndex = mpMainTableView->model()->index( fileIdx, firstVisibleColumn );
+
+                mpMainTableView->setFocus();
+                mpMainTableView->scrollTo( jumpIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
+                mpMainTableView->setCurrentIndex(jumpIndex);
+            }
         }
     }
 }
