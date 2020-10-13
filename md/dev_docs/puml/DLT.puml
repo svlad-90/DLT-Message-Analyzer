@@ -1,6 +1,7 @@
 
 @startuml
 
+skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
 package "DLT" #DDDDDD
 {
@@ -30,19 +31,6 @@ class "QDltPluginManager"
 }
 
 interface "QDltPluginViewerInterface"
-{
-}
-
-class "QFileSystemWatcher"
-{
-}
-
-}
-
-package "DMA_Common" #DDDDDD
-{
-
-class "CRegexDirectoryMonitor"
 {
 }
 
@@ -80,7 +68,6 @@ QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
 
 '====================Dependencies section====================
-CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
 CDLTFileWrapper "1" o-- "1" QDltFile : uses
 CDLTMsgWrapper "1" --> "1" QDltMsg : uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses

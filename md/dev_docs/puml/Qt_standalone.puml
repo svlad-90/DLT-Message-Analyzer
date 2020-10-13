@@ -1,6 +1,7 @@
 
 @startuml
 
+skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
 package "Qt" #DDDDDD
 {
@@ -18,6 +19,10 @@ class "QCompleter"
 }
 
 class "QElapsedTimer"
+{
+}
+
+class "QFileSystemWatcher"
 {
 }
 

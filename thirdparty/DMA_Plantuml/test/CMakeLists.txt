@@ -1,5 +1,0 @@
-add_definitions(-DPUML_ENABLED)
-
-add_executable(DMA_Plantuml_example DMA_Plantuml_example.cpp)
-
-target_link_libraries(DMA_Plantuml_example DMA_Plantuml)

@@ -50,17 +50,17 @@ jobs:
         repository: GENIVI/dlt-viewer
         ref: v2.20.1
 
-    # Checkout DLT-Message-Analyzer's revision, which is pushed
-    - name: Checkout of the DLT-Message-Analyzer
+    # Checkout project's revision, which is pushed
+    - name: Checkout of the project
       uses: actions/checkout@v2
       with:
-        repository: svlad-90/DLT-Message-Analyzer
-        path: ./plugin/DLT-Message-Analyzer
+        repository: svlad-90/${{ github.event.repository.name }}
+        path: ./plugin/${{ github.event.repository.name }}
         ref: ${{ github.ref }}
         
-    # Adjust dlt-viewer's CMake file to sub-include DLT-Message-Analyzer
+    # Adjust dlt-viewer's CMake file to sub-include the plugin
     - name: Patch dlt-viewer's CMakeLists.txt
-      run: echo 'add_subdirectory(DLT-Message-Analyzer/dltmessageanalyzerplugin/src)' >> CMakeLists.txt
+      run: echo 'add_subdirectory(${{ github.event.repository.name }}/dltmessageanalyzerplugin/src)' >> CMakeLists.txt
       shell: bash
       working-directory: ./plugin
 
@@ -70,9 +70,9 @@ jobs:
       shell: bash
       working-directory: ./
 
-    # CMake for DLT-Message_analyzer plugin, including clang-tidy directive
+    # CMake execution
     - name: CMake with clang-tidy
-      run: cmake ../DLT-Message-Analyzer -DDMA_CLANG_TIDY_BUILD=true
+      run: cmake ../${{ github.event.repository.name }} -DDMA_CLANG_TIDY_BUILD=true
       shell: bash
       working-directory: ../build
     
