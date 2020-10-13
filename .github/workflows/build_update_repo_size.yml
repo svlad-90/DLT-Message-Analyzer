@@ -24,11 +24,11 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install cloc
       shell: bash
       
-    # Checkout DLT-Message-Analyzer's revision, which was pushed
-    - name: Checkout of the DLT-Message-Analyzer
+    # Checkout project's revision, which was pushed
+    - name: Checkout of the project
       uses: actions/checkout@v2
       with:
-        repository: svlad-90/DLT-Message-Analyzer
+        repository: svlad-90/${{ github.event.repository.name }}
         path: ./
         ref: ${{ github.ref }}
         

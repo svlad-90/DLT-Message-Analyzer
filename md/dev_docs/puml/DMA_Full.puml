@@ -1,6 +1,7 @@
 
 @startuml
 
+skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
 package "DLT" #DDDDDD
 {
@@ -30,10 +31,6 @@ class "QDltPluginManager"
 }
 
 interface "QDltPluginViewerInterface"
-{
-}
-
-class "QFileSystemWatcher"
 {
 }
 
@@ -282,6 +279,10 @@ class "QCompleter"
 }
 
 class "QElapsedTimer"
+{
+}
+
+class "QFileSystemWatcher"
 {
 }
 

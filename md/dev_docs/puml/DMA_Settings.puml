@@ -1,6 +1,7 @@
 
 @startuml
 
+skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
 package "DMA_Settings" #DDDDDD
 {

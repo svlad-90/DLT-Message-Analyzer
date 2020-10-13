@@ -1,6 +1,7 @@
 
 @startuml
 
+skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
 package "DMA_Analyzer" #DDDDDD
 {
@@ -198,6 +199,10 @@ class "QElapsedTimer"
 {
 }
 
+class "QFileSystemWatcher"
+{
+}
+
 class "QImage"
 {
 }
@@ -283,6 +288,7 @@ QObject <|-- CSettingsManager : extends
 '====================Dependencies section====================
 CMTAnalyzer "1" *-- "*" QThread : contains
 CBGColorAnimation "1" o-- "1" QWidget : animation widget
+CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
 CTableMemoryJumper "1" o-- "1" QTableView : contains
 CFilterItemDelegate "1" o-- "1" QCompleter : uses
 CFilterItemDelegate "1" o-- "1" QTreeView : parent view

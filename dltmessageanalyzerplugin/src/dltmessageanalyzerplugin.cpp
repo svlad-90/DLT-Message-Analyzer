@@ -43,6 +43,7 @@ mbAnalysisRunning(false)
     qRegisterMetaType<tDltMsgWrapperPtr>("tDLTMsgWrapperPtr");
 
     DMA::PlantUML::Creator::getInstance().initialize();
+    DMA::PlantUML::Creator::getInstance().setBackgroundColor("#FEFEFE");
 }
 
 DLTMessageAnalyzerPlugin::~DLTMessageAnalyzerPlugin()

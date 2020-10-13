@@ -3,6 +3,23 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ################### CPP ( END ) ###########################
 
+################### COMMON_DEPS ###########################
+include(FetchContent)
+FetchContent_Declare(
+  dma_common_deps
+  GIT_REPOSITORY https://github.com/svlad-90/DMA_CommonDeps.git
+  GIT_TAG        master
+)
+FetchContent_MakeAvailable(dma_common_deps)
+include(${FETCHCONTENT_BASE_DIR}/dma_common_deps-src/CMakeLists_Helper.txt)
+################### COMMON_DEPS ( END ) ###################
+
+################### DEPENDENCIES ##########################
+DMA_sync_g_test_framework()
+DMA_sync_plantuml()
+DMA_sync_framework()
+################### DEPENDENCIES ( END )###################
+
 ################### COMPATIBILITY #########################
 # Turn this on if you want build, compatible with the PLUGIN_INTERFACE_VERSION "1.0.0"
 # add_definitions(-DPLUGIN_API_COMPATIBILITY_MODE_1_0_0)
@@ -19,8 +36,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
 
-# using /MD flag for antlr4_runtime (for Visual C++ compilers only)
-set(ANTLR4_WITH_STATIC_CRT OFF)
+# using /MT flag for antlr4_runtime (for Visual C++ compilers only)
+set(ANTLR4_WITH_STATIC_CRT ON)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -53,18 +70,13 @@ set_property(TARGET antlr4_PCRE_static PROPERTY POSITION_INDEPENDENT_CODE ON)
 TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
 ################### ANTLR ( END ) #########################
 
-################### CLANG_TIDY ############################
-if( DMA_CLANG_TIDY_BUILD )
-    message("-- [DLT-Message-Analyzer]: clang-tidy build.")
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
-    list(APPEND CMAKE_CXX_CLANG_TIDY
-    "-format-style='file'"
-    "-warnings-as-errors=*" )
-endif()
-################### CLANG_TIDY ( END ) ####################
-
 ################### DLT_MESSAGE_ANALYZER ##################
 QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
+
+################### PROJECT ###############################
+enable_testing()
+DMA_Prepare()
+################### PROJECT ( END ) #######################
 
 set(TURN_OFF_RCC OFF)
 
@@ -75,19 +87,17 @@ endif()
 
 include_directories(../../thirdparty/DMA_Plantuml/src)
 
-add_subdirectory(analyzer)
-add_subdirectory(common)
-add_subdirectory(searchView)
-add_subdirectory(plant_uml)
-add_subdirectory(log)
-add_subdirectory(settings)
-add_subdirectory(logo)
-add_subdirectory(dltWrappers)
-add_subdirectory(filtersView)
-add_subdirectory(groupedView)
-add_subdirectory(patternsView)
-
-add_subdirectory(../../thirdparty/DMA_Plantuml DMA_Plantuml)
+DMA_add_subdirectory_with_clang_tidy(analyzer)
+DMA_add_subdirectory_with_clang_tidy(common)
+DMA_add_subdirectory_with_clang_tidy(searchView)
+DMA_add_subdirectory_with_clang_tidy(plant_uml)
+DMA_add_subdirectory_with_clang_tidy(log)
+DMA_add_subdirectory_with_clang_tidy(settings)
+DMA_add_subdirectory_with_clang_tidy(logo)
+DMA_add_subdirectory_with_clang_tidy(dltWrappers)
+DMA_add_subdirectory_with_clang_tidy(filtersView)
+DMA_add_subdirectory_with_clang_tidy(groupedView)
+DMA_add_subdirectory_with_clang_tidy(patternsView)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp
