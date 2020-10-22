@@ -340,9 +340,9 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
         auto field = static_cast<eSearchResultColumn>(index.column());
 
-        bool UML_Applicability = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<bool>();
+        Qt::CheckState UML_Applicability = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data(Qt::CheckStateRole).value<Qt::CheckState>();
 
-        if(true == UML_Applicability)
+        if(Qt::Checked == UML_Applicability)
         {
             painter->fillRect(opt.rect, QBrush(QColor(200,200,200)));
         }
