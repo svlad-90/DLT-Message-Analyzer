@@ -696,8 +696,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
                                 {
                                     auto variantVal = pItem->data(i);
                                     finalText.append(variantVal
-                                                     .get<QString>()
-                                                     .toHtmlEscaped());
+                                                     .get<tQStringPtrWrapper>().pString->toHtmlEscaped());
                                 }
                                     break;
                                 case eGroupedViewColumn::Messages:
