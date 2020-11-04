@@ -24,7 +24,7 @@
 Your target path to the plugin should look like **"./dlt-viewer/plugin/DLT-Message-Analyzer"**:
 
 >```
-> cd ./dlt-viewer/plugin/DLT-Message-Analyzer
+> cd ./dlt-viewer/plugin
 > git clone git@github.com:svlad-90/DLT-Message-Analyzer.git
 > ```
 
