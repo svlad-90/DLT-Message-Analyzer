@@ -682,7 +682,14 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
                 SEND_MSG(QString("| ").append(text));
 
                 // let's split input text into function name, and its parameters
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+                auto stirngList = text.split(" -", QString::SplitBehavior::SkipEmptyParts);
+#else
                 auto stirngList = text.split(" -", Qt::SkipEmptyParts);
+#endif
+
+
 
                 if(false == stirngList.empty())
                 {
@@ -699,7 +706,11 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                         for(const auto& paramCandidate : stirngList)
                         {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+                            QStringList parsedParam = paramCandidate.split("=", QString::SplitBehavior::SkipEmptyParts);
+#else
                             QStringList parsedParam = paramCandidate.split("=", Qt::SkipEmptyParts);
+#endif
 
                             if(parsedParam.size() == 2)
                             {
