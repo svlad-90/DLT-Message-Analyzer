@@ -15,6 +15,13 @@
 
 #include "DMA_Plantuml.hpp"
 
+//#define DEBUG_CSearchResultHighlightingDelegate
+
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+#include "../log/CLog.hpp"
+#include <QElapsedTimer>
+#endif
+
 CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate():
 mbMarkTimestampWithBold(CSettingsManager::getInstance()->getMarkTimeStampWithBold())
 {
@@ -190,10 +197,10 @@ static void drawHighlightedText(eSearchResultColumn field,
             {
                 int shift = 0;
 
+                auto font = painter->font();
+
                 for(auto& drawDataItem : drawDataPack.drawDataList)
                 {
-                    auto font = painter->font();
-
                     if(drawDataItem.isBold)
                     {
                         font.setBold(true);
@@ -263,6 +270,11 @@ static void drawHighlightedText(eSearchResultColumn field,
                 }
             };
 
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+            QElapsedTimer timer;
+            timer.start();
+#endif
+
             int i = 0;
             for(auto it = highlightingData.begin(); it != highlightingData.end(); ++it)
             {
@@ -302,8 +314,21 @@ static void drawHighlightedText(eSearchResultColumn field,
                 ++i;
             }
 
+
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+            SEND_MSG(QString("collectDrawData - %1").arg(timer.elapsed()));
+            timer.restart();
+#endif
             calculateShifts();
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+            SEND_MSG(QString("calculateShifts - %1").arg(timer.elapsed()));
+            timer.restart();
+#endif
             drawText();
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+            SEND_MSG(QString("drawText - %1").arg(timer.elapsed()));
+            timer.invalidate();
+#endif
         }
         else
         {
@@ -326,6 +351,17 @@ static void drawHighlightedText(eSearchResultColumn field,
 void CSearchResultHighlightingDelegate::paint(QPainter *painter,
            const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+    QElapsedTimer elapsedTimer;
+    elapsedTimer.start();
+
+    SEND_MSG(QString("CSearchResultHighlightingDelegate::paint(start:<index:row-%1:col-%2>)")
+             .arg(index.row())
+             .arg(index.column()));
+#endif
+
+    //SEND_MSG(QString("CSearchResultHighlightingDelegate::paint: row %1").arg(index.row()));
+
     const auto* pModel = qobject_cast<const CSearchResultModel*>(index.model());
 
     if(nullptr != pModel)
@@ -353,8 +389,19 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             case eSearchResultColumn::Ctid:
             case eSearchResultColumn::Payload:
             {
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+                SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(start:<index:row-%1:col-%2>)")
+                         .arg(index.row())
+                         .arg(index.column()));
+#endif
                 const auto& matchData = pModel->getFoundMatchesItemPack(index);
                 drawHighlightedText(field, matchData, stringData, painter, opt);
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+                SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(end:<index:row-%2:col-%3>): took %1 ms")
+                         .arg(elapsedTimer.elapsed())
+                         .arg(index.row())
+                         .arg(index.column()));
+#endif
             }
                 break;
             case eSearchResultColumn::Args:
@@ -394,6 +441,14 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
         painter->restore();
     }
+
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+    SEND_MSG(QString("CSearchResultHighlightingDelegate::paint(end:<index:row-%2:col-%3>): took %1 ms")
+             .arg(elapsedTimer.elapsed())
+             .arg(index.row())
+             .arg(index.column()));
+    elapsedTimer.invalidate();
+#endif
 }
 
 QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &option,

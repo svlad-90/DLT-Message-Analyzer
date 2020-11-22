@@ -48,6 +48,13 @@ mInitialMsgSize(0u)
     //qDebug() << "CDLTMsgWrapper::CDLTMsgWrapper: number of instances - " << sInstanceCounter;
 }
 
+static const QRegularExpression sReplaceRegex("\n|\\x{0000}|\\x{0001}|\\x{0002}|\\x{0003}|\\x{0004}|\\x{0005}"
+                                 "|\\x{0006}|\\x{0007}|\\x{0008}|\\x{0009}|\\x{000A}|\\x{000B}"
+                                 "|\\x{000C}|\\x{000D}|\\x{000E}|\\x{000F}|\\x{0010}|\\x{0011}"
+                                 "|\\x{0012}|\\x{0013}|\\x{0014}|\\x{0015}|\\x{0016}|\\x{0017}"
+                                 "|\\x{0018}|\\x{0019}|\\x{001A}|\\x{001B}|\\x{001C}|\\x{001D}"
+                                 "|\\x{001E}|\\x{001F}");
+
 CDLTMsgWrapper::CDLTMsgWrapper(const QDltMsg& msg):
 mMicroseconds(msg.getMicroseconds()),
 mTimestamp(msg.getTimestamp()),
@@ -60,7 +67,7 @@ mTime(msg.getTime()),
 mEcuidUTF8(msg.getEcuid().toUtf8()),
 mApidUTF8(msg.getApid().toUtf8()),
 mCtidUTF8(msg.getCtid().toUtf8()),
-mPayloadUTF8(msg.toStringPayload().replace("\n", "").toUtf8()),
+mPayloadUTF8(msg.toStringPayload().replace(sReplaceRegex, "").toUtf8()),
 mType(msg.getType()),
 mMode(msg.getMode()),
 mCtrlReturnType(msg.getCtrlReturnType()),

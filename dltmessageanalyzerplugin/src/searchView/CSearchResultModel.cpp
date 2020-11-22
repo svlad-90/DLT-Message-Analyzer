@@ -25,9 +25,9 @@ void CSearchResultModel::setFile(const tDLTFileWrapperPtr& pFile)
     mpFile = pFile;
 }
 
-void CSearchResultModel::updateView()
+void CSearchResultModel::updateView(const int& fromRow)
 {
-    emit dataChanged( index(0,0), index(static_cast<int>(mFoundMatchesPack.matchedItemVec.size()), 1) );
+    emit dataChanged( index(fromRow,0), index(static_cast<int>(mFoundMatchesPack.matchedItemVec.size()), columnCount(QModelIndex())) );
     emit layoutChanged();
 }
 
@@ -275,14 +275,13 @@ std::pair<bool, tIntRange> CSearchResultModel::addNextMessageIdxVec(const tFound
     if(false == foundMatchesPack.matchedItemVec.empty())
     {
         beginInsertRows(QModelIndex(), static_cast<int>(mFoundMatchesPack.matchedItemVec.size()),
-                        static_cast<int>(mFoundMatchesPack.matchedItemVec.size()));
+                        static_cast<int>(mFoundMatchesPack.matchedItemVec.size() + foundMatchesPack.matchedItemVec.size() - 1));
         result.second.from = static_cast<int>(mFoundMatchesPack.matchedItemVec.size());
         mFoundMatchesPack.matchedItemVec.insert(mFoundMatchesPack.matchedItemVec.end(),
                                                 foundMatchesPack.matchedItemVec.begin(),
                                                 foundMatchesPack.matchedItemVec.end());
         result.second.to = static_cast<int>(mFoundMatchesPack.matchedItemVec.size() - 1);
         endInsertRows();
-        updateView();
 
         result.first = true;
     }

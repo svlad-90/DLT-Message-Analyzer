@@ -22,7 +22,7 @@ public:
     CSearchResultModel(QObject *parent=nullptr);
 
     void setFile(const tDLTFileWrapperPtr& pFile);
-    void updateView();
+    void updateView(const int& fromRow = 0);
     void resetData();
     int getFileIdx( const QModelIndex& idx ) const;
 
