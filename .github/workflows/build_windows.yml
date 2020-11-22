@@ -52,7 +52,9 @@ jobs:
       
     # Add jom to path
     - name: Add jom to path
-      run: echo "::add-path::D:/a/${{ github.event.repository.name }}/tools/jom/"
+      run: |
+           echo "D:/a/${{ github.event.repository.name }}/tools/jom/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: powershell
 
     # Checkout dlt-viewer's revision 2.20.1
     - name: Checkout of the dlt-viewer
