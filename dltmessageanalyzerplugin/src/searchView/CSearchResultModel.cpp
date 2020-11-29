@@ -15,7 +15,8 @@
 #include "DMA_Plantuml.hpp"
 
 CSearchResultModel::CSearchResultModel(QObject *):
-    mFoundMatchesPack(), mpFile(nullptr)
+    mFoundMatchesPack(),
+    mpFile(nullptr)
 {
 
 }
@@ -27,7 +28,7 @@ void CSearchResultModel::setFile(const tDLTFileWrapperPtr& pFile)
 
 void CSearchResultModel::updateView(const int& fromRow)
 {
-    emit dataChanged( index(fromRow,0), index(static_cast<int>(mFoundMatchesPack.matchedItemVec.size()), columnCount(QModelIndex())) );
+    emit dataChanged( index(fromRow,0), index(static_cast<int>(mFoundMatchesPack.matchedItemVec.size() - 1), columnCount(QModelIndex()) - 1) );
     emit layoutChanged();
 }
 
@@ -69,6 +70,8 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
 
     QVariant result;
 
+    auto column = static_cast<eSearchResultColumn>(index.column());
+
     if (role == Qt::TextAlignmentRole)
     {
         Qt::AlignmentFlag alignment = Qt::AlignCenter;
@@ -94,12 +97,15 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
 
         result = alignment;
     }
-    else if ( role == Qt::DisplayRole && static_cast<eSearchResultColumn>(index.column()) != eSearchResultColumn::UML_Applicability )
+    else if ( role == Qt::DisplayRole && column != eSearchResultColumn::UML_Applicability )
     {
-        if(nullptr != mpFile && 0 < mpFile->size())
+        auto msgId = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().msgId;
+        const auto& pMsg = mpFile->getMsg(msgId);
+        auto pStrValue = getDataStrFromMsg(msgId, pMsg, column);
+
+        if(nullptr != pStrValue)
         {
-            const auto& pMsg = mpFile->getMsg(mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().msgId);
-            result = getDataStrFromMsg(index, pMsg, static_cast<eSearchResultColumn>(index.column()));
+            result = std::move(*pStrValue);
         }
     }
     else if( role == Qt::CheckStateRole && ( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
@@ -129,99 +135,97 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QString CSearchResultModel::getDataStrFromMsg(const QModelIndex& modelIndex, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const
+tQStringPtr CSearchResultModel::getDataStrFromMsg(const tMsgId& msgId, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const
 {
     if(nullptr == pMsg)
     {
-        return QString();
+        return tQStringPtr();
     }
 
-    QString strRes;
+    tQStringPtr pStrRes = std::make_shared<QString>();
 
     switch(field)
     {
         case eSearchResultColumn::Index:
         {
-            int idx = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(modelIndex.row())].getItemMetadata().msgId;
-
-            strRes = QString("%1").arg(idx);
+            *pStrRes = QString("%1").arg(msgId);
         }
             break;
         case eSearchResultColumn::Time:
         {
-            strRes = QString("%1.%2").arg(pMsg->getTimeString()).arg(pMsg->getMicroseconds(),6,10,QLatin1Char('0'));
+            *pStrRes = QString("%1.%2").arg(pMsg->getTimeString()).arg(pMsg->getMicroseconds(),6,10,QLatin1Char('0'));
         }
             break;
         case eSearchResultColumn::Timestamp:
         {
-            strRes = QString("%1.%2").arg(pMsg->getTimestamp()/10000).arg(pMsg->getTimestamp()%10000,4,10,QLatin1Char('0'));
+            *pStrRes = QString("%1.%2").arg(pMsg->getTimestamp()/10000).arg(pMsg->getTimestamp()%10000,4,10,QLatin1Char('0'));
         }
             break;
         case eSearchResultColumn::Count:
         {
-            strRes = QString("%1").arg(pMsg->getMessageCounter());
+            *pStrRes = QString("%1").arg(pMsg->getMessageCounter());
         }
             break;
         case eSearchResultColumn::Ecuid:
         {
-            strRes = pMsg->getEcuid();
+            *pStrRes = pMsg->getEcuid();
         }
             break;
         case eSearchResultColumn::Apid:
         {
-            strRes = pMsg->getApid();
+            *pStrRes = pMsg->getApid();
         }
             break;
         case eSearchResultColumn::Ctid:
         {
-            strRes = pMsg->getCtid();
+            *pStrRes = pMsg->getCtid();
         }
             break;
         case eSearchResultColumn::SessionId:
         {
-            strRes = QString("%1").arg(pMsg->getSessionid());
+            *pStrRes = QString("%1").arg(pMsg->getSessionid());
         }
             break;
         case eSearchResultColumn::Type:
         {
-            strRes = pMsg->getTypeString();
+            *pStrRes = pMsg->getTypeString();
         }
             break;
         case eSearchResultColumn::Subtype:
         {
-            strRes = pMsg->getSubtypeString();
+            *pStrRes = pMsg->getSubtypeString();
         }
             break;
         case eSearchResultColumn::Mode:
         {
-            strRes = pMsg->getModeString();
+            *pStrRes = pMsg->getModeString();
         }
             break;
         case eSearchResultColumn::Args:
         {
-            strRes = QString("%1").arg(pMsg->getNumberOfArguments());
+            *pStrRes = QString("%1").arg(pMsg->getNumberOfArguments());
         }
             break;
         case eSearchResultColumn::Payload:
         {
-            strRes = pMsg->getPayload();
+            *pStrRes = pMsg->getPayload();
         }
             break;
         case eSearchResultColumn::UML_Applicability:
         {
-            strRes = ""; // no string value provided for this column
+            *pStrRes = ""; // no string value provided for this column
         }
             break;
         case eSearchResultColumn::Last:
         {
-            strRes = "Unhandled field type!";
+            *pStrRes = "Unhandled field type!";
         }
             break;
         default:
             break;
     }
 
-    return strRes;
+    return pStrRes;
 }
 
 QVariant CSearchResultModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -281,7 +285,10 @@ std::pair<bool, tIntRange> CSearchResultModel::addNextMessageIdxVec(const tFound
                                                 foundMatchesPack.matchedItemVec.begin(),
                                                 foundMatchesPack.matchedItemVec.end());
         result.second.to = static_cast<int>(mFoundMatchesPack.matchedItemVec.size() - 1);
+
         endInsertRows();
+
+        updateView(result.second.from);
 
         result.first = true;
     }
@@ -301,6 +308,23 @@ int CSearchResultModel::getFileIdx( const QModelIndex& idx ) const
    }
 
    return result;
+}
+
+QString CSearchResultModel::getStrValue(const int& row, const eSearchResultColumn& column) const
+{
+    QString result;
+
+    if(column != eSearchResultColumn::UML_Applicability)
+    {
+        auto index = createIndex(row, static_cast<int>(column));
+
+        if(true == index.isValid())
+        {
+            result = index.data().value<QString>();
+        }
+    }
+
+    return result;
 }
 
 std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::getUMLDiagramContent() const
@@ -328,6 +352,8 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 #endif
 
     //let's represent wheether UML data is properly filled in
+    int row = 0;
+
     for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
     {
         QString subStr;
@@ -337,14 +363,12 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
         if(true == itemMetadata.UMLInfo.bUMLConstraintsFulfilled
            && true == itemMetadata.UMLInfo.bApplyForUMLCreation)
         {
-            const auto& pMsg = mpFile->getMsg(itemMetadata.msgId);
-
             // Result string - <UCL> <URT|URS|UE> <US> : [timestamp] <USID><UM>(<UA>)
 
             tIntRange insertMethodFormattingRange;
             tIntRange insertMethodFormattingOffset;
 
-            auto getUMLItemRepresentation = [this, &itemMetadata, &pMsg](const eUML_ID& UML_ID)->std::pair<bool, QString>
+            auto getUMLItemRepresentation = [this, &itemMetadata, &row](const eUML_ID& UML_ID)->std::pair<bool, QString>
             {
                 std::pair<bool, QString> UMLRepresentationResult;
                 UMLRepresentationResult.first = false;
@@ -360,8 +384,9 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                             // let's use value from the corresponding group
                             for(const auto& stringCoverageMapItem : item.stringCoverageMap)
                             {
-                                QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(stringCoverageMapItem.first));
-                                QString message = getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column()));
+                                auto column = stringCoverageMapItem.first;
+
+                                QString message = getStrValue(row, column);
 
                                 auto messageSize = message.size();
                                 const auto& range = stringCoverageMapItem.second.range;
@@ -459,8 +484,8 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
             subStr.append(" : ");
             int wrappingStartingPoint = subStr.size();
             subStr.append("[");
-            QModelIndex modelIndex = createIndex(itemMetadata.msgId, static_cast<int>(eSearchResultColumn::Timestamp));
-            subStr.append( getDataStrFromMsg(modelIndex, pMsg, static_cast<eSearchResultColumn>(modelIndex.column())) );
+            const auto column = eSearchResultColumn::Timestamp;
+            subStr.append( getStrValue(row, column) );
             subStr.append("] ");
             appendUMLData(eUML_ID::UML_SEQUENCE_ID);
             subStr.append(" ");
@@ -534,9 +559,13 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                 break;
             }
         }
+
+        ++row;
     }
 
     outputString.append("@enduml");
+
+    SEND_MSG(result.second);
 
     return result;
 }

@@ -89,32 +89,248 @@ void drawText(const QString& inputStr,
                              option.displayAlignment, inputStr);
 }
 
+struct tDrawData
+{
+    QString subStr;
+    bool isHighlighted = false;
+    bool isBold = false;
+    QColor color;
+    QPalette::ColorGroup colorGroup;
+    int shift = 0;
+};
+
+typedef QVector<tDrawData> tDrawDataList;
+
+struct tDrawDataPack
+{
+    Qt::Alignment alignment;
+    tDrawDataList drawDataList;
+    int baseShift = 0;
+    bool isSelected = false;
+};
+
+static void collectDrawData(const QString& inputStr,
+                            tDrawDataPack& drawDataPack,
+                            const QStyleOptionViewItem &option,
+                            const tHighlightingRange& range,
+                            bool isHighlighted)
+{
+    tDrawData drawData;
+
+    QString subStr = inputStr.mid( range.from, range.to - range.from + 1 );
+    drawData.subStr = subStr;
+
+    if (true == drawDataPack.isSelected)
+    {
+        drawData.colorGroup = QPalette::Normal;
+        drawData.color = option.palette.color(QPalette::Normal, QPalette::HighlightedText);
+
+        if(true == isHighlighted)
+        {
+            drawData.isBold = true;
+            drawData.isHighlighted = true;
+        }
+        else
+        {
+            drawData.isBold = false;
+            drawData.isHighlighted = false;
+        }
+    }
+    else
+    {
+        drawData.colorGroup = QPalette::Normal;
+
+        if(true == isHighlighted)
+        {
+            bool isMonoColorHighlighting = CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting();
+            bool isExplicitColor = range.explicitColor;
+
+            if(true == isExplicitColor)
+            {
+                drawData.color = range.color;
+            }
+            else
+            {
+                if(true == isMonoColorHighlighting)
+                {
+                    drawData.color = CSettingsManager::getInstance()->getRegexMonoHighlightingColor();
+                }
+                else
+                {
+                    drawData.color = range.color;
+                }
+            }
+
+            drawData.isBold = true;
+        }
+        else
+        {
+            drawData.color = QColor(0,0,0);
+            drawData.isBold = false;
+        }
+    }
+
+    drawDataPack.drawDataList.push_back(drawData);
+}
+
+static int calculateShifts( tDrawDataPack& drawDataPack,
+                             const QStyleOptionViewItem& option )
+{
+    int shift = 0;
+
+    auto font = option.font;
+
+    for(auto& drawDataItem : drawDataPack.drawDataList)
+    {
+        if(drawDataItem.isBold)
+        {
+            font.setBold(true);
+        }
+        else
+        {
+            font.setBold(false);
+        }
+
+        drawDataItem.shift = shift;
+        QFontMetrics fm(font);
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+shift += fm.width(drawDataItem.subStr);
+#else
+shift += fm.horizontalAdvance(drawDataItem.subStr);
+#endif
+
+         //qDebug() << "drawDataItem.shift - " << drawDataItem.shift;
+    }
+
+    if(Qt::AlignmentFlag::AlignCenter == drawDataPack.alignment)
+    {
+        QRect rect = option.rect;
+        drawDataPack.baseShift = (( rect.width() -  shift ) / 2 );
+    }
+    else
+    {
+        drawDataPack.baseShift = 2;
+    }
+
+    //qDebug() << "drawDataPack.baseShift - " << drawDataPack.baseShift;
+
+    return shift;
+}
+
+static void drawText( const tDrawDataPack& drawDataPack,
+                      QPainter *painter,
+                      const QStyleOptionViewItem& option )
+{
+    if(true == drawDataPack.isSelected)
+    {
+        painter->fillRect(option.rect, option.palette.highlight());
+    }
+
+    for(const auto& drawDataItem : drawDataPack.drawDataList)
+    {
+        const QRect& rect = option.rect;
+
+        painter->setPen(drawDataItem.color);
+
+        auto font = painter->font();
+
+        if(drawDataItem.isBold)
+        {
+            font.setBold(true);
+        }
+        else
+        {
+            font.setBold(false);
+        }
+
+        painter->setFont(font);
+
+        //qDebug() << "rect.left() - " << rect.left() << "; drawDataPack.baseShift - " << drawDataPack.baseShift << "; drawDataItem.shift - " << drawDataItem.shift;
+
+        painter->drawText(QRect(rect.left()+drawDataPack.baseShift+drawDataItem.shift, rect.top(), rect.width(), rect.height()),
+                          drawDataPack.alignment == Qt::AlignCenter ?
+                                                    static_cast<Qt::AlignmentFlag>((Qt::AlignLeft | Qt::AlignVCenter).operator QFlags<Qt::AlignmentFlag>::Int()) :
+                                                    drawDataPack.alignment, drawDataItem.subStr);
+    }
+}
+
+static void collectDrawDataPack(const QString& inputStr,
+                                const tHighlightingRangeSet& highlightingData,
+                                tDrawDataPack& drawDataPack,
+                                const QStyleOptionViewItem& option)
+{
+    if (option.state & QStyle::State_Selected)
+    {
+        drawDataPack.isSelected = true;
+    }
+
+    int i = 0;
+    for(auto it = highlightingData.begin(); it != highlightingData.end(); ++it)
+    {
+        const auto& range = *it;
+
+        if(0 == i)
+        {
+            if(0 != range.from)
+            {
+                collectDrawData( inputStr,
+                                 drawDataPack,
+                                 option,
+                                 tHighlightingRange(0, range.from - 1, range.color, range.explicitColor),
+                                 false );
+            }
+
+            collectDrawData( inputStr,
+                             drawDataPack,
+                             option,
+                             tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
+                             true );
+        }
+        else if(0 < i)
+        {
+            auto itPrev = it;
+            --itPrev;
+            const auto& prevRange = *(itPrev);
+
+            if(prevRange.to < range.from)
+            {
+                collectDrawData( inputStr,
+                                 drawDataPack,
+                                 option,
+                                 tHighlightingRange(prevRange.to + 1, range.from - 1, range.color, range.explicitColor),
+                                 false );
+            }
+
+            collectDrawData( inputStr,
+                             drawDataPack,
+                             option,
+                             tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
+                             true );
+        }
+
+        if(i == static_cast<int>(highlightingData.size() - 1)) // last element
+        {
+            if( range.to < inputStr.size() - 1 )
+            {
+                collectDrawData( inputStr,
+                                 drawDataPack,
+                                 option,
+                                 tHighlightingRange(range.to + 1, inputStr.size() - 1, range.color, range.explicitColor),
+                                 false );
+            }
+        }
+
+        ++i;
+    }
+}
+
 static void drawHighlightedText(eSearchResultColumn field,
                     const tFoundMatchesPackItem& foundMatchPackItem,
                     const QString& inputStr,
                     QPainter *painter,
-                    const QStyleOptionViewItem &option)
+                    const QStyleOptionViewItem& option)
 {
-    struct tDrawData
-    {
-        QString subStr;
-        bool isHighlighted = false;
-        bool isBold = false;
-        QColor color;
-        QPalette::ColorGroup colorGroup;
-        int shift = 0;
-    };
-
-    typedef QVector<tDrawData> tDrawDataList;
-
-    struct tDrawDataPack
-    {
-        Qt::Alignment alignment;
-        tDrawDataList drawDataList;
-        int baseShift = 0;
-        bool isSelected = false;
-    };
-
     tDrawDataPack drawDataPack;
 
     drawDataPack.alignment = option.displayAlignment;
@@ -128,203 +344,26 @@ static void drawHighlightedText(eSearchResultColumn field,
 
         if(false == highlightingData.empty())
         {
-            if (option.state & QStyle::State_Selected)
-            {
-                drawDataPack.isSelected = true;
-            }
-
-            auto collectDrawData = [&inputStr, &drawDataPack, &option](const tHighlightingRange& range, bool isHighlighted)
-            {
-                tDrawData drawData;
-
-                QString subStr = inputStr.mid( range.from, range.to - range.from + 1 );
-                drawData.subStr = subStr;
-
-                if (true == drawDataPack.isSelected)
-                {
-                    drawData.colorGroup = QPalette::Normal;
-                    drawData.color = option.palette.color(QPalette::Normal, QPalette::HighlightedText);
-
-                    if(true == isHighlighted)
-                    {
-                        drawData.isBold = true;
-                        drawData.isHighlighted = true;
-                    }
-                    else
-                    {
-                        drawData.isBold = false;
-                        drawData.isHighlighted = false;
-                    }
-                }
-                else
-                {
-                    drawData.colorGroup = QPalette::Normal;
-
-                    if(true == isHighlighted)
-                    {
-                        bool isMonoColorHighlighting = CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting();
-                        bool isExplicitColor = range.explicitColor;
-
-                        if(true == isExplicitColor)
-                        {
-                            drawData.color = range.color;
-                        }
-                        else
-                        {
-                            if(true == isMonoColorHighlighting)
-                            {
-                                drawData.color = CSettingsManager::getInstance()->getRegexMonoHighlightingColor();
-                            }
-                            else
-                            {
-                                drawData.color = range.color;
-                            }
-                        }
-
-                        drawData.isBold = true;
-                    }
-                    else
-                    {
-                        drawData.color = QColor(0,0,0);
-                        drawData.isBold = false;
-                    }
-                }
-
-                drawDataPack.drawDataList.push_back(drawData);
-            };
-
-            auto calculateShifts = [&drawDataPack, &painter, &option]()
-            {
-                int shift = 0;
-
-                auto font = painter->font();
-
-                for(auto& drawDataItem : drawDataPack.drawDataList)
-                {
-                    if(drawDataItem.isBold)
-                    {
-                        font.setBold(true);
-                    }
-                    else
-                    {
-                        font.setBold(false);
-                    }
-
-                    drawDataItem.shift = shift;
-                    QFontMetrics fm(font);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-    shift += fm.width(drawDataItem.subStr);
-#else
-    shift += fm.horizontalAdvance(drawDataItem.subStr);
-#endif
-
-                     //qDebug() << "drawDataItem.shift - " << drawDataItem.shift;
-                }
-
-                if(Qt::AlignmentFlag::AlignCenter == drawDataPack.alignment)
-                {
-                    QRect rect = option.rect;
-                    drawDataPack.baseShift = (( rect.width() -  shift ) / 2 );
-                }
-                else
-                {
-                    drawDataPack.baseShift = 2;
-                }
-
-                //qDebug() << "drawDataPack.baseShift - " << drawDataPack.baseShift;
-            };
-
-            auto drawText = [&drawDataPack, &option, &painter]()
-            {
-                if(true == drawDataPack.isSelected)
-                {
-                    painter->fillRect(option.rect, option.palette.highlight());
-                }
-
-                for(const auto& drawDataItem : drawDataPack.drawDataList)
-                {
-                    const QRect& rect = option.rect;
-
-                    painter->setPen(drawDataItem.color);
-
-                    auto font = painter->font();
-
-                    if(drawDataItem.isBold)
-                    {
-                        font.setBold(true);
-                    }
-                    else
-                    {
-                        font.setBold(false);
-                    }
-
-                    painter->setFont(font);
-
-                    //qDebug() << "rect.left() - " << rect.left() << "; drawDataPack.baseShift - " << drawDataPack.baseShift << "; drawDataItem.shift - " << drawDataItem.shift;
-
-                    painter->drawText(QRect(rect.left()+drawDataPack.baseShift+drawDataItem.shift, rect.top(), rect.width(), rect.height()),
-                                      drawDataPack.alignment == Qt::AlignCenter ?
-                                                                static_cast<Qt::AlignmentFlag>((Qt::AlignLeft | Qt::AlignVCenter).operator QFlags<Qt::AlignmentFlag>::Int()) :
-                                                                drawDataPack.alignment, drawDataItem.subStr);
-                }
-            };
-
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             QElapsedTimer timer;
             timer.start();
 #endif
 
-            int i = 0;
-            for(auto it = highlightingData.begin(); it != highlightingData.end(); ++it)
-            {
-                const auto& range = *it;
-
-                if(0 == i)
-                {
-                    if(0 != range.from)
-                    {
-                        collectDrawData( tHighlightingRange(0, range.from - 1, range.color, range.explicitColor), false );
-                    }
-
-                    collectDrawData( tHighlightingRange( range.from, range.to, range.color, range.explicitColor ), true );
-                }
-                else if(0 < i)
-                {
-                    auto itPrev = it;
-                    --itPrev;
-                    const auto& prevRange = *(itPrev);
-
-                    if(prevRange.to < range.from)
-                    {
-                        collectDrawData( tHighlightingRange(prevRange.to + 1, range.from - 1, range.color, range.explicitColor), false );
-                    }
-
-                    collectDrawData( tHighlightingRange( range.from, range.to, range.color, range.explicitColor ), true );
-                }
-
-                if(i == static_cast<int>(highlightingData.size() - 1)) // last element
-                {
-                    if( range.to < inputStr.size() - 1 )
-                    {
-                        collectDrawData( tHighlightingRange(range.to + 1, inputStr.size() - 1, range.color, range.explicitColor), false );
-                    }
-                }
-
-                ++i;
-            }
-
+            collectDrawDataPack(inputStr,
+                                highlightingData,
+                                drawDataPack,
+                                option);
 
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             SEND_MSG(QString("collectDrawData - %1").arg(timer.elapsed()));
             timer.restart();
 #endif
-            calculateShifts();
+            static_cast<void>(calculateShifts(drawDataPack, option));
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             SEND_MSG(QString("calculateShifts - %1").arg(timer.elapsed()));
             timer.restart();
 #endif
-            drawText();
+            drawText(drawDataPack, painter, option);
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             SEND_MSG(QString("drawText - %1").arg(timer.elapsed()));
             timer.invalidate();
@@ -454,7 +493,78 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &option,
                const QModelIndex &index) const
 {
-    return QStyledItemDelegate::sizeHint(option, index);
+    QSize result;
+
+    auto column = static_cast<eSearchResultColumn>(index.column());
+
+    switch(column)
+    {
+        case eSearchResultColumn::Apid:
+        case eSearchResultColumn::Ctid:
+        case eSearchResultColumn::Payload:
+        {
+            const auto* pModel = qobject_cast<const CSearchResultModel*>(index.model());
+
+            if(nullptr != pModel)
+            {
+                const auto& matchData = pModel->getFoundMatchesItemPack(index);
+
+                tDrawDataPack drawDataPack;
+
+                drawDataPack.alignment = option.displayAlignment;
+
+                const auto& highlightingInfo = matchData.getItemMetadata().highlightingInfoMultiColor;
+                auto foundHighlightingInfoItem = highlightingInfo.find(column);
+
+                if(highlightingInfo.end() != foundHighlightingInfoItem)
+                {
+                    const auto& highlightingData = foundHighlightingInfoItem.value();
+
+                    if(false == highlightingData.empty())
+                    {
+                        auto inputStr = pModel->data(index, Qt::DisplayRole).value<QString>();
+
+                        collectDrawDataPack(inputStr,
+                                            highlightingData,
+                                            drawDataPack,
+                                            option);
+
+                        int shift = calculateShifts(drawDataPack, option);
+
+                        result = QStyledItemDelegate::sizeHint(option, index);
+                        result.setWidth(shift);
+                    }
+                    else
+                    {
+                        result = QStyledItemDelegate::sizeHint(option, index);
+                    }
+                }
+                else
+                {
+                    result = QStyledItemDelegate::sizeHint(option, index);
+                }
+            }
+        }
+            break;
+        case eSearchResultColumn::Args:
+        case eSearchResultColumn::Last:
+        case eSearchResultColumn::Mode:
+        case eSearchResultColumn::Time:
+        case eSearchResultColumn::Type:
+        case eSearchResultColumn::Count:
+        case eSearchResultColumn::Ecuid:
+        case eSearchResultColumn::Index:
+        case eSearchResultColumn::Subtype:
+        case eSearchResultColumn::SessionId:
+        case eSearchResultColumn::Timestamp:
+        case eSearchResultColumn::UML_Applicability:
+        {
+            result = QStyledItemDelegate::sizeHint(option, index);
+        }
+        break;
+    }
+
+    return result;
 }
 
 PUML_PACKAGE_BEGIN(DMA_SearchView)

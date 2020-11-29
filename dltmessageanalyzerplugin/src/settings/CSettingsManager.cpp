@@ -73,6 +73,8 @@ static const QString sFiltersCompletion_MaxCharactersInSuggestionKey = "FiltersC
 static const QString sFiltersCompletion_CompletionPopUpWidthKey = "FiltersCompletion_CompletionPopUpWidth";
 static const QString sFiltersCompletion_SearchPolicyKey = "FiltersCompletion_SearchPolicy";
 
+static const QString sSearchViewLastColumnWidthStrategyKey = "SearchViewLastColumnWidthStrategy";
+
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
 
@@ -375,6 +377,12 @@ CSettingsManager::CSettingsManager():
        [this](const bool& data){filtersCompletion_SearchPolicyChanged(data);},
        [this](){tryStoreSettingsConfig();},
        false)),
+    mSetting_SearchViewLastColumnWidthStrategy(createRangedArithmeticSettingsItem<int>(sSearchViewLastColumnWidthStrategyKey,
+        [this](const int& data){searchViewLastColumnWidthStrategyChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(eSearchViewLastColumnWidthStrategy::eFitToContent),
+                                                                                              static_cast<int>(eSearchViewLastColumnWidthStrategy::eFitToContent))),
+        static_cast<int>(eSearchViewLastColumnWidthStrategy::eReset))),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -420,6 +428,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxCharactersInSuggestion);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CompletionPopUpWidth);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_SearchPolicy);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchViewLastColumnWidthStrategy);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1551,6 +1560,11 @@ void CSettingsManager::setFiltersCompletion_SearchPolicy(const bool& val)
     mSetting_FiltersCompletion_SearchPolicy.setData(val);
 }
 
+void CSettingsManager::setSearchViewLastColumnWidthStrategy(const int& val)
+{
+    mSetting_SearchViewLastColumnWidthStrategy.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1746,6 +1760,11 @@ const int& CSettingsManager::getFiltersCompletion_CompletionPopUpWidth() const
 const bool& CSettingsManager::getFiltersCompletion_SearchPolicy() const
 {
     return mSetting_FiltersCompletion_SearchPolicy.getData();
+}
+
+const int& CSettingsManager::getSearchViewLastColumnWidthStrategy() const
+{
+    return mSetting_SearchViewLastColumnWidthStrategy.getData();
 }
 
 QString CSettingsManager::getRegexDirectory() const

@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QFontDialog>
+#include <QTableWidget>
 
 #include "../common/Definitions.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"
@@ -34,11 +35,13 @@
 
 CSearchResultView::CSearchResultView(QWidget *parent):
     tParent(parent),
-    mWidthUpdateRequired(eUpdateRequired::eUpdateRequired_NO),
     mbIsVerticalScrollBarVisible(false),
+    mbIsViewFull(false),
+    mbUserManuallyAdjustedLastVisibleColumnWidth(false),
     mpFile(nullptr),
     mSearchRange(),
-    mpSpecificModel(nullptr)
+    mpSpecificModel(nullptr),
+    mContentSizeMap()
 {
     setItemDelegate(new CSearchResultHighlightingDelegate());
 
@@ -398,6 +401,35 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             pSubMenu->addSeparator();
 
             {
+                QMenu* pSubSubMenu = new QMenu("Last column width policy", this);
+
+                QActionGroup* pActionGroup = new QActionGroup(this);
+                pActionGroup->setExclusive(true);
+
+                for(int i = static_cast<int>(eSearchViewLastColumnWidthStrategy::eReset);
+                    i < static_cast<int>(eSearchViewLastColumnWidthStrategy::eLast);
+                    i++)
+                {
+                    QAction* pAction = new QAction(getPayloadWidthAsString(static_cast<eSearchViewLastColumnWidthStrategy>(i)), this);
+                    connect(pAction, &QAction::triggered, [i]()
+                    {
+                        CSettingsManager::getInstance()->setSearchViewLastColumnWidthStrategy(i);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(CSettingsManager::getInstance()->getSearchViewLastColumnWidthStrategy() == i);
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+
+            pSubMenu->addSeparator();
+
+            {
                 QAction* pAction = new QAction("Mark timestamp with bold", this);
                 connect(pAction, &QAction::triggered, [](bool checked)
                 {
@@ -633,7 +665,7 @@ CSearchResultView::CSearchResultView(QWidget *parent):
 
         QFontMetrics fontMetrics( font );
         verticalHeader()->setDefaultSectionSize(fontMetrics.height());
-        updateWidth();
+        forceUpdateWidthAndResetContentMap();
     });
 
     connect(this, &QTableView::clicked, [this](const QModelIndex &index)
@@ -666,6 +698,20 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     {
         updateColumnsVisibility();
     });
+
+    connect( CSettingsManager::getInstance().get(),
+             &CSettingsManager::searchViewLastColumnWidthStrategyChanged,
+             [this](const int&)
+    {
+        forceUpdateWidthAndResetContentMap();
+    });
+}
+
+void CSearchResultView::newSearchStarted()
+{
+    mContentSizeMap.clear();
+    mbIsViewFull = false;
+    mbUserManuallyAdjustedLastVisibleColumnWidth = false;
 }
 
 void CSearchResultView::getUserSearchRange()
@@ -809,63 +855,193 @@ void CSearchResultView::setFile( const tDLTFileWrapperPtr& pFile )
     mpFile = pFile;
 }
 
-void CSearchResultView::updateWidth()
+void CSearchResultView::forceUpdateWidthAndResetContentMap()
 {
-    int widthWithoutPayload = 0;
+    mContentSizeMap.clear();
+    mbUserManuallyAdjustedLastVisibleColumnWidth = false;
+    updateWidth(true);
+}
+
+eSearchResultColumn CSearchResultView::getLastVisibleColumn() const
+{
+    eSearchResultColumn result = eSearchResultColumn::Last;
 
     for(int i = 0; i < static_cast<int>(eSearchResultColumn::Last); ++i)
     {
-        if(eSearchResultColumn::Payload != static_cast<eSearchResultColumn>(i))
+        if(false == isColumnHidden(i))
         {
-            if(false == isColumnHidden(i))
-            {
-                resizeColumnToContents(i);
-                widthWithoutPayload += columnWidth(i);
-            }
+            result = static_cast<eSearchResultColumn>(i);
         }
     }
 
-    auto payloadWidth = viewport()->size().width() - widthWithoutPayload;
+    return result;
+}
 
-    setColumnWidth( static_cast<int>(eSearchResultColumn::Payload), payloadWidth );
+void CSearchResultView::updateWidth(bool force, tUpdateWidthSet updateWidthSet)
+{
+    if(true == force)
+    {
+        for(int i = 0; i < static_cast<int>(eSearchResultColumn::Last); ++i)
+        {
+            updateWidthSet.insert(static_cast<eSearchResultColumn>(i));
+        }
+    }
+
+    auto lastVisibleColumn = getLastVisibleColumn();
+
+    auto updateAllColumnsExceptLastVisibleOne = [this, &updateWidthSet, &lastVisibleColumn]()->int
+    {
+        int widthWithoutLastVisible = 0;
+
+        for(int i = 0; i < static_cast<int>(lastVisibleColumn); ++i)
+        {
+            if(false == isColumnHidden(i))
+            {
+                auto itemFound = updateWidthSet.find(static_cast<eSearchResultColumn>(i));
+
+                if(itemFound != updateWidthSet.end())
+                {
+                    resizeColumnToContents(i);
+                }
+
+                widthWithoutLastVisible += columnWidth(i);
+            }
+        }
+
+        return widthWithoutLastVisible;
+    };
+
+    auto setLastVisibleColumnWidth = [this, &lastVisibleColumn](const int& widthWithoutLastVisible)
+    {
+        auto payloadWidth = viewport()->size().width() - widthWithoutLastVisible;
+        setColumnWidth( static_cast<int>(lastVisibleColumn), payloadWidth );
+    };
+
+    auto widthWithoutLastVisible = updateAllColumnsExceptLastVisibleOne();
+
+    const auto searchViewLastColumnWidthStrategy = static_cast<eSearchViewLastColumnWidthStrategy>(CSettingsManager::getInstance()->getSearchViewLastColumnWidthStrategy());
+
+    switch(searchViewLastColumnWidthStrategy)
+    {
+        case eSearchViewLastColumnWidthStrategy::eReset:
+        {
+            if(false == mbUserManuallyAdjustedLastVisibleColumnWidth)
+            {
+                setLastVisibleColumnWidth(widthWithoutLastVisible);
+            }
+        }
+            break;
+        case eSearchViewLastColumnWidthStrategy::eFitToContent:
+        {
+            auto foundColumn = updateWidthSet.find(lastVisibleColumn);
+
+            if(foundColumn != updateWidthSet.end())
+            {
+                resizeColumnToContents(static_cast<int>(lastVisibleColumn));
+            }
+        }
+        break;
+        case eSearchViewLastColumnWidthStrategy::ePreserveUserWidth:
+        case eSearchViewLastColumnWidthStrategy::eLast:
+            //do nothing
+            break;
+    }
 }
 
 void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
-    tParent::dataChanged(topLeft,bottomRight,roles);
+    tParent::dataChanged(topLeft, bottomRight, roles);
 
     auto pVerticalScrollBar = verticalScrollBar();
 
-    auto isVerticalScrollBarVisible_ = pVerticalScrollBar->isVisible();
+    bool continueCheck = true;
 
+    if(false == mbIsViewFull)
     {
-        if(0 == model()->rowCount())
+        if(false == indexAt(rect().bottomLeft()).isValid())
         {
-            mWidthUpdateRequired = eUpdateRequired::eUpdateRequired_BE_READY;
+            updateWidthLogic(topLeft.row(), bottomRight.row());
+            continueCheck = false;
         }
-
-        if(0 < model()->rowCount())
+        else
         {
-            if(eUpdateRequired::eUpdateRequired_BE_READY == mWidthUpdateRequired)
+            mbIsViewFull = true;
+        }
+    }
+
+    if(true == continueCheck && nullptr != pVerticalScrollBar)
+    {
+        auto isVerticalScrollBarVisible_ = pVerticalScrollBar->isVisible();
+
+        if(mbIsVerticalScrollBarVisible != isVerticalScrollBarVisible_)
+        {
+            updateWidth(true);
+            mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
+        }
+    }
+}
+
+void CSearchResultView::currentChanged(const QModelIndex &current,
+                      const QModelIndex &previous)
+{
+    tParent::currentChanged(current, previous);
+
+    if(true == current.isValid())
+    {
+        updateWidthLogic(current.row(), current.row());
+    }
+}
+
+void CSearchResultView::verticalScrollbarAction(int action)
+{
+    tParent::verticalScrollbarAction(action);
+
+    // we will check up to 100 elements above the current and up to 100 elements after the current
+
+    auto indexFrom = indexAt(rect().topLeft());
+    auto rangeFrom = indexFrom.row();
+    auto indexTo = indexAt(rect().bottomLeft());
+    auto rangeTo = indexTo.row();
+
+    if(true == indexFrom.isValid() && true == indexTo.isValid())
+    {
+        updateWidthLogic(rangeFrom, rangeTo);
+    }
+}
+
+void CSearchResultView::updateWidthLogic(const int& rowFrom, const int& rowTo)
+{
+    bool bShouldUpdateWidth = false;
+
+    tUpdateWidthSet updateWidthSet;
+
+    for(int iColumn = 0; iColumn < static_cast<int>(eSearchResultColumn::Last); ++iColumn)
+    {
+        if(false == isColumnHidden(iColumn))
+        {
+            for(int iRow = rowFrom; iRow <= rowTo; ++iRow)
             {
-                mWidthUpdateRequired = eUpdateRequired::eUpdateRequired_REQUIRED;
+                if(nullptr != mpSpecificModel)
+                {
+                    auto searchColumn = static_cast<eSearchResultColumn>(iColumn);
+                    auto strValue = mpSpecificModel->getStrValue(iRow, searchColumn);
+
+                    auto dataSize = strValue.size();
+
+                    if(mContentSizeMap[searchColumn] < dataSize)
+                    {
+                        updateWidthSet.insert(searchColumn);
+                        mContentSizeMap[searchColumn] = dataSize;
+                        bShouldUpdateWidth = true;
+                    }
+                }
             }
         }
     }
 
-    bool bUpdated = false;
-
-    if(false == bUpdated && eUpdateRequired::eUpdateRequired_REQUIRED == mWidthUpdateRequired)
+    if(true == bShouldUpdateWidth)
     {
-        updateWidth();
-        mWidthUpdateRequired = eUpdateRequired::eUpdateRequired_NO;
-        bUpdated = true;
-    }
-
-    if(false == bUpdated && mbIsVerticalScrollBarVisible != isVerticalScrollBarVisible_)
-    {
-        updateWidth();
-        mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
+        updateWidth(false, updateWidthSet);
     }
 }
 
@@ -912,6 +1088,8 @@ void CSearchResultView::updateColumnsVisibility()
              hideColumn(static_cast<int>(i));
         }
     }
+
+    forceUpdateWidthAndResetContentMap();
 }
 
 void CSearchResultView::setModel(QAbstractItemModel *model)
@@ -940,6 +1118,11 @@ void CSearchResultView::setModel(QAbstractItemModel *model)
 
     connect( horizontalHeader, &QHeaderView::sectionDoubleClicked, [this](int logicalIndex)
     {
+        if(static_cast<eSearchResultColumn>(logicalIndex) == getLastVisibleColumn())
+        {
+            mbUserManuallyAdjustedLastVisibleColumnWidth = true;
+        }
+
         resizeColumnToContents(logicalIndex);
     });
 }
@@ -1431,6 +1614,24 @@ void CSearchResultView::selectAllUMLItems(bool select)
                 }
             }
         }
+    }
+}
+
+void CSearchResultView::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+    auto pHorizontalScrollBar = horizontalScrollBar();
+    auto scrollPosition = 0;
+
+    if(nullptr != pHorizontalScrollBar)
+    {
+        scrollPosition = horizontalScrollBar()->value();
+    }
+
+    tParent::scrollTo(index, hint);
+
+    if(nullptr != pHorizontalScrollBar)
+    {
+        horizontalScrollBar()->setValue(scrollPosition);
     }
 }
 
