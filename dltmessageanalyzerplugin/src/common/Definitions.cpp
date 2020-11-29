@@ -2278,6 +2278,29 @@ int getRegexErrorColumn(const QRegularExpression& regex)
     return regex.patternErrorOffset() - getRegexOptionsCharSize();
 }
 
+QString getPayloadWidthAsString(const eSearchViewLastColumnWidthStrategy& val)
+{
+    QString result;
+
+    switch(val)
+    {
+        case eSearchViewLastColumnWidthStrategy::eReset:
+            result = "Reset user width";
+        break;
+        case eSearchViewLastColumnWidthStrategy::eFitToContent:
+            result = "Fit to content";
+        break;
+        case eSearchViewLastColumnWidthStrategy::ePreserveUserWidth:
+            result = "Preserve user width";
+        break;
+        case eSearchViewLastColumnWidthStrategy::eLast:
+            result = "Last value";
+        break;
+    }
+
+    return result;
+}
+
 PUML_PACKAGE_BEGIN(Qt)
     PUML_CLASS_BEGIN(QThread)
     PUML_CLASS_END()

@@ -121,6 +121,7 @@ public:
     void setFiltersCompletion_MaxCharactersInSuggestion(const int& val);
     void setFiltersCompletion_CompletionPopUpWidth(const int& val);
     void setFiltersCompletion_SearchPolicy(const bool& val);
+    void setSearchViewLastColumnWidthStrategy(const int& val);
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -176,6 +177,7 @@ public:
     const int& getFiltersCompletion_MaxCharactersInSuggestion() const;
     const int& getFiltersCompletion_CompletionPopUpWidth() const;
     const bool& getFiltersCompletion_SearchPolicy() const;
+    const int& getSearchViewLastColumnWidthStrategy() const;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const;
@@ -231,6 +233,7 @@ signals:
     void filtersCompletion_MaxCharactersInSuggestionChanged(const int& filtersCompletion_MaxCharactersInSuggestion);
     void filtersCompletion_CompletionPopUpWidthChanged(const int& filtersCompletion_CompletionPopUpWidth);
     void filtersCompletion_SearchPolicyChanged(const bool& filtersCompletion_SearchPolicy);
+    void searchViewLastColumnWidthStrategyChanged(const int& payloadWidthChanged);
 
 private: // methods
 
@@ -511,6 +514,8 @@ private: // fields
     TRangedSettingItem<int> mSetting_FiltersCompletion_MaxCharactersInSuggestion;
     TRangedSettingItem<int> mSetting_FiltersCompletion_CompletionPopUpWidth;
     TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
+
+    TRangedSettingItem<int> mSetting_SearchViewLastColumnWidthStrategy;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

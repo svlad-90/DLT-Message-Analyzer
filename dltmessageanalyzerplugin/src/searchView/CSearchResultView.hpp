@@ -22,8 +22,9 @@ public:
 
     void setFile( const tDLTFileWrapperPtr& pFile );
     virtual void setModel(QAbstractItemModel *model) override;
-
     void copySelectionToClipboard( bool copyAsHTML, bool copyOnlyPayload ) const;
+    void newSearchStarted();
+    void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) override;
 
 signals:
     void searchRangeChanged( const tIntRangeProperty& searchRange, bool bReset );
@@ -31,6 +32,9 @@ signals:
     void restartSearch();
 
 protected:
+    void verticalScrollbarAction(int action) override;
+    void currentChanged(const QModelIndex &current,
+                          const QModelIndex &previous) override;
     virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
     virtual void keyPressEvent ( QKeyEvent * event ) override;
 
@@ -41,21 +45,26 @@ private:
     void copyMessageFiles();
     void switchToNextUMLItem(bool bNext);
     void selectAllUMLItems(bool select);
-    void updateWidth();
+    void updateWidthLogic(const int& rowFrom, const int& rowTo);
+
+    typedef std::set<eSearchResultColumn> tUpdateWidthSet;
+
+    void updateWidth(bool force, tUpdateWidthSet updateWidthSet = tUpdateWidthSet());
+    void forceUpdateWidthAndResetContentMap();
+
+    eSearchResultColumn getLastVisibleColumn() const;
 
 private:
-    enum class eUpdateRequired
-    {
-        eUpdateRequired_NO,
-        eUpdateRequired_BE_READY,
-        eUpdateRequired_REQUIRED
-    };
 
-    eUpdateRequired mWidthUpdateRequired;
     bool mbIsVerticalScrollBarVisible;
+    bool mbIsViewFull;
+    bool mbUserManuallyAdjustedLastVisibleColumnWidth;
     tDLTFileWrapperPtr mpFile;
     tIntRangeProperty mSearchRange;
     CSearchResultModel* mpSpecificModel;
+
+    typedef std::map<eSearchResultColumn, int /*max size of content*/> tContentSizeMap;
+    tContentSizeMap mContentSizeMap;
 };
 
 #endif // CSEARCHRESULTVIEW_HPP

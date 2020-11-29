@@ -146,4 +146,24 @@ By default, feature is turned on.
 
 ----
 
+## Last visible column width strategies
+
+"Search view" supports different strategies regarding how to handle the width of the last visible column. The supported strategies are:
+
+| Strategy name | Strategy meaning | Impact on the other columns |
+|---|---|---|
+| Reset user width | During each search the width of the last visible column is reset to the default value. Double click on the column's header will cause resize to "Fit content" width. Resize algorithm will consider 1000 lines starting from the first currently visible row. Thus, for lists with 1000+ rows, additional double clicks might be necessary. | Width of the other columns is dynamically adjusted during the scrolling. |
+| Preserve user width | User width of the last visible column is preserved. It stays unchanged. | Width of the other columns is dynamically adjusted during the scrolling. |
+| Fit to content | The width of the last visible column is fit to the content of the string. Initially, width considers only 1000 elements starting from the first visible element. But it is additionally dynamically adjusted during the scrolling. | Width of the other columns is dynamically adjusted during the scrolling. |
+
+Here how the setting looks like within the plugin's context menu tree:
+
+![Screenshot of the "Last visible column width strategy" items in the plugin's context menu tree](./search_view_last_visible_column_strategy.png)
+
+> **Note!**
+>
+> Default value of this setting is "Fit to content".
+
+----
+
 [**Go to the previous page**](../../README.md)

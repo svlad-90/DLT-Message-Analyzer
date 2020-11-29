@@ -628,6 +628,16 @@ struct tIntRangeProperty : public tIntRange
     int toFiltered = 0;
 };
 
+enum class eSearchViewLastColumnWidthStrategy
+{
+    eReset = 0,             // reset width on each search ( default strategy )
+    ePreserveUserWidth,     // save user-selected width
+    eFitToContent,          // fit width to the content of the visible rows
+    eLast                   // last enum value
+};
+
+QString getPayloadWidthAsString(const eSearchViewLastColumnWidthStrategy& val);
+
 /**
  * @brief V_2_CS - tries to get check state out of variant
  * @param val - input variant

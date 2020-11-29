@@ -1,5 +1,7 @@
 #include "assert.h"
 
+#include "QScrollBar"
+
 #include "CTableMemoryJumper.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -35,8 +37,24 @@ void CTableMemoryJumper::checkRows( const tCheckSet& checkSet )
                 if(analysisItem.first == mSelectedRowKey)
                 {
                     auto index = mpTargetTable->model()->index(analysisItem.second, 0);
+
+                    auto pHorizontalScrollBar = mpTargetTable->horizontalScrollBar();
+                    auto scrollPosition = 0;
+
+                    if(nullptr != pHorizontalScrollBar)
+                    {
+                        scrollPosition = mpTargetTable->horizontalScrollBar()->value();
+                    }
+
                     mpTargetTable->scrollTo( index );
+
                     mpTargetTable->setCurrentIndex( index );
+
+                    if(nullptr != pHorizontalScrollBar)
+                    {
+                        mpTargetTable->horizontalScrollBar()->setValue(scrollPosition);
+                    }
+
                     break;
                 }
             }

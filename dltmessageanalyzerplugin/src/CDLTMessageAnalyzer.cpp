@@ -799,6 +799,11 @@ bool CDLTMessageAnalyzer::analyze()
         return false;
     }
 
+    if(nullptr != mpSearchResultTableView)
+    {
+        mpSearchResultTableView->newSearchStarted();
+    }
+
     if(nullptr != mpUMLView)
     {
         if(true == mpUMLView->isDiagramGenerationInProgress())
