@@ -3,31 +3,6 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_Analyzer" #DDDDDD
-{
-
-class "CAnalyzerComponent"
-{
-}
-
-class "CContinuousAnalyzer"
-{
-}
-
-class "CDLTRegexAnalyzerWorker"
-{
-}
-
-class "CMTAnalyzer"
-{
-}
-
-class "CSubConsumer"
-{
-}
-
-}
-
 package "DMA_Analyzer_API" #DDDDDD
 {
 
@@ -44,12 +19,7 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
     + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
 }
 
-}
-
-package "DMA_Framework_Component" #DDDDDD
-{
-
-class "DMA::IComponent"
+class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_
 {
 }
 
@@ -65,15 +35,11 @@ class "QObject"
 }
 
 '====================Inheritance section====================
-DMA::IComponent <|-- CAnalyzerComponent : implements
-IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
-QObject <|-- CDLTRegexAnalyzerWorker : extends
-IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
-IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
+QObject <|-- IDLTMessageAnalyzerController : extends
+QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends
+std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ <|-- IDLTMessageAnalyzerControllerConsumer : extends
 
 '====================Dependencies section====================
-CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
-CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
-CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
+IDLTMessageAnalyzerControllerConsumer "1" o-- "1" IDLTMessageAnalyzerController : uses
 
 @enduml

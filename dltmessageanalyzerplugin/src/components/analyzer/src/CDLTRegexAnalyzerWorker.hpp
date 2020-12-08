@@ -3,8 +3,7 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CDLTRegexAnalyzerWorker class
  */
-#ifndef CDLTREGEXANALYZERWORKER_HPP
-#define CDLTREGEXANALYZERWORKER_HPP
+#pragma once
 
 #include "memory"
 #include "set"
@@ -12,8 +11,8 @@
 
 #include <QRegularExpression>
 
-#include "../common/Definitions.hpp"
-#include "IDLTMessageAnalyzerController.hpp"
+#include "common/Definitions.hpp"
+#include "../api/IDLTMessageAnalyzerController.hpp"
 
 typedef int tWorkerThreadCookie;
 
@@ -49,5 +48,3 @@ private: // members
     tWorkerId mWorkerId;
     QVector<QColor> mColors;
 };
-
-#endif // CDLTREGEXANALYZERWORKER_HPP

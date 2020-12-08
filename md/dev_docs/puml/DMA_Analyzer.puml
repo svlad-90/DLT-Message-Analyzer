@@ -6,6 +6,10 @@ skinparam wrapWidth 600
 package "DMA_Analyzer" #DDDDDD
 {
 
+class "CAnalyzerComponent"
+{
+}
+
 class "CContinuousAnalyzer"
 {
 }
@@ -22,6 +26,11 @@ class "CSubConsumer"
 {
 }
 
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
+
 abstract class "IDLTMessageAnalyzerController"
 {
     + {abstract} virtual int getMaximumNumberOfThreads() const = 0
@@ -35,7 +44,12 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
     + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
 }
 
-class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
 {
 }
 
@@ -43,10 +57,6 @@ class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as s
 
 package "DMA_Root" #DDDDDD
 {
-
-class "CDLTMessageAnalyzer"
-{
-}
 
 class "DLTMessageAnalyzerPlugin"
 {
@@ -68,21 +78,19 @@ class "QThread"
 }
 
 '====================Inheritance section====================
+DMA::IComponent <|-- CAnalyzerComponent : implements
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
-QObject <|-- IDLTMessageAnalyzerController : extends
-QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends
-std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ <|-- IDLTMessageAnalyzerControllerConsumer : extends
-IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
 
 '====================Dependencies section====================
+CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
+CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 CContinuousAnalyzer "1" o-- "1" IDLTMessageAnalyzerController : uses
 CContinuousAnalyzer "1" *-- "1" IDLTMessageAnalyzerControllerConsumer : contains
 CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
 CMTAnalyzer "1" *-- "*" QThread : contains
-IDLTMessageAnalyzerControllerConsumer "1" o-- "1" IDLTMessageAnalyzerController : uses
-DLTMessageAnalyzerPlugin "1" *-- "1" IDLTMessageAnalyzerController : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 
 @enduml

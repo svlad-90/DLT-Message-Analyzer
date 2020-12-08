@@ -252,9 +252,13 @@ QModelIndex CPatternsModel::index(int row, int column,
     else
         pParentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
-    tTreeItem *childItem = pParentItem->child(row);
-    if (childItem)
-        return createIndexInternal(row, column, childItem);
+    if(nullptr != pParentItem)
+    {
+        tTreeItem *childItem = pParentItem->child(row);
+        if (childItem)
+            return createIndexInternal(row, column, childItem);
+    }
+
     return QModelIndex();
 }
 
@@ -301,9 +305,11 @@ int CPatternsModel::rowCount(const QModelIndex &parent) const
     else
         parentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
-    parentItem->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
-
-    result =  parentItem->childCount();
+    if(nullptr != parentItem)
+    {
+        parentItem->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
+        result =  parentItem->childCount();
+    }
 
     return result;
 }

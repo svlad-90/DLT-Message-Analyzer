@@ -3,11 +3,10 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CContinuousAnalyzer class
  */
-#ifndef CCONTINUOUSANALYZER_HPP
-#define CCONTINUOUSANALYZER_HPP
+#pragma once
 
-#include "IDLTMessageAnalyzerController.hpp"
-#include "IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "../api/IDLTMessageAnalyzerController.hpp"
+#include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "functional"
 #include "QRegularExpression"
 
@@ -114,5 +113,3 @@ private:// fields
     tSubRequestDataMap mSubRequestDataMap;
     tRequestId mRequestIdCounter;
 };
-
-#endif // CCONTINUOUSANALYZER_HPP

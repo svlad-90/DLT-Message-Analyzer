@@ -11,8 +11,6 @@
 
 #include "dltmessageanalyzerplugin.hpp"
 #include "CDLTMessageAnalyzer.hpp"
-#include "analyzer/CContinuousAnalyzer.hpp"
-#include "analyzer/CMTAnalyzer.hpp"
 #include "dltWrappers/CDLTFileWrapper.hpp"
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTMsgWrapper.hpp"
@@ -29,12 +27,12 @@ Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
 DLTMessageAnalyzerPlugin::DLTMessageAnalyzerPlugin():
 mpForm(nullptr),
 mpDLTMessageAnalyzer(nullptr),
-mpMessageAnalyzerController(nullptr),
 mpFile(nullptr),
 mLastAvailableNumberOfMsg(0),
 mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
-mbAnalysisRunning(false)
+mbAnalysisRunning(false),
+mAnalyzerComponent()
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -44,10 +42,23 @@ mbAnalysisRunning(false)
 
     DMA::PlantUML::Creator::getInstance().initialize();
     DMA::PlantUML::Creator::getInstance().setBackgroundColor("#FEFEFE");
+
+    auto initResult = mAnalyzerComponent.startInit();
+
+    if(false == initResult.bIsOperationSuccessful)
+    {
+        SEND_ERR(QString("Failed to initialize %1").arg(mAnalyzerComponent.getName()));
+    }
 }
 
 DLTMessageAnalyzerPlugin::~DLTMessageAnalyzerPlugin()
 {
+    auto shutdownResult = mAnalyzerComponent.startShutdown();
+
+    if(false == shutdownResult.bIsOperationSuccessful)
+    {
+        SEND_ERR(QString("Failed to shutdown %1").arg(mAnalyzerComponent.getName()));
+    }
 }
 
 QString DLTMessageAnalyzerPlugin::name()
@@ -101,15 +112,12 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 {    
     mpForm = new Form(this);
 
-    auto pMTController = IDLTMessageAnalyzerController::createInstance<CMTAnalyzer>();
-    mpMessageAnalyzerController = IDLTMessageAnalyzerController::createInstance<CContinuousAnalyzer>(pMTController);
-
     if(nullptr != mpForm->getFiltersView())
     {
         mpForm->getFiltersView()->setRegexInputField(mpForm->getRegexLineEdit());
     }
 
-    mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(mpMessageAnalyzerController,
+    mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(mAnalyzerComponent.getAnalyzerController(),
                                                                                                       mpForm->getGroupedResultView(),
                                                                                                       mpForm->getProgresBarLabel(),
                                                                                                       mpForm->getProgresBar(),
@@ -516,7 +524,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_INHERITANCE_CHECKED(QDltPluginControlInterface, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(Form, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMessageAnalyzer, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CAnalyzerComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -4,12 +4,12 @@
  * @brief   Implementation of the IDLTMessageAnalyzerControllerConsumer class
  */
 
-#include "IDLTMessageAnalyzerControllerConsumer.hpp"
-#include "IDLTMessageAnalyzerController.hpp"
+#include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "../api/IDLTMessageAnalyzerController.hpp"
 #include "qdlt.h"
 
-#include "../settings/CSettingsManager.hpp"
-#include "../log/CLog.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "log/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -76,7 +76,7 @@ void IDLTMessageAnalyzerControllerConsumer::cancelRequest( const tRequestId& req
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_Analyzer)
+PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
     PUML_CLASS_BEGIN_CHECKED(std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>)
     PUML_CLASS_END()
 

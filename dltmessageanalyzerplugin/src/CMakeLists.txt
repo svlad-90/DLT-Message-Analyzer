@@ -14,6 +14,19 @@ FetchContent_MakeAvailable(dma_common_deps)
 include(${FETCHCONTENT_BASE_DIR}/dma_common_deps-src/CMakeLists_Helper.txt)
 ################### COMMON_DEPS ( END ) ###################
 
+################### POSITION INDEPENDENT CODE #############
+# as we are building the shared library, all the involved code
+# should be compiled with the -fPIC flags
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+################### POSITION INDEPENDENT CODE ( END ) #####
+
+################### DEFINES ###############################
+# enables generation of diagrams within DMA_Framework
+add_definitions(-DPUML_ENABLED)
+# enables force link which is used by DMA_Framework in diagrams generation
+add_definitions(-DDMA_FORCE_LINK_ON)
+################### DEFINES ( END ) #######################
+
 ################### DEPENDENCIES ##########################
 DMA_sync_g_test_framework()
 DMA_sync_plantuml()
@@ -63,8 +76,6 @@ add_library(antlr4_PCRE_static STATIC
     ${ANTLR_PCRE_CXX_OUTPUTS}
 )
 
-add_definitions(-DPUML_ENABLED)
-
 set_property(TARGET antlr4_PCRE_static PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
@@ -72,6 +83,7 @@ TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
 
 ################### DLT_MESSAGE_ANALYZER ##################
 QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 ################### PROJECT ###############################
 enable_testing()
@@ -87,8 +99,8 @@ endif()
 
 include_directories(../../thirdparty/DMA_Plantuml/src)
 
-DMA_add_subdirectory_with_clang_tidy(analyzer)
 DMA_add_subdirectory_with_clang_tidy(common)
+DMA_add_subdirectory_with_clang_tidy(components)
 DMA_add_subdirectory_with_clang_tidy(searchView)
 DMA_add_subdirectory_with_clang_tidy(plant_uml)
 DMA_add_subdirectory_with_clang_tidy(log)
@@ -120,7 +132,8 @@ target_link_libraries(DLT-Message-Analyzer
     DMA_groupedView
     DMA_patternsView
     DMA_PCRE
-    DMA_Plantuml)
+    DMA_Plantuml
+    )
 
 if(TURN_OFF_RCC)
     set(CMAKE_AUTORCC OFF)

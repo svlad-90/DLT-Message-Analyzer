@@ -8,14 +8,14 @@
 
 #include "QDebug"
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 #ifdef DEBUG_BUILD
 #include "QElapsedTimer"
 #endif
 
-#include "../settings/CSettingsManager.hpp"
-#include "../log/CLog.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "log/CLog.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
 #include "DMA_Plantuml.hpp"
