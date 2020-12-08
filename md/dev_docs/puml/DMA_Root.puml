@@ -31,6 +31,15 @@ interface "QDltPluginViewerInterface"
 package "DMA_Analyzer" #DDDDDD
 {
 
+class "CAnalyzerComponent"
+{
+}
+
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
+
 abstract class "IDLTMessageAnalyzerController"
 {
     + {abstract} virtual int getMaximumNumberOfThreads() const = 0
@@ -212,12 +221,13 @@ CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
+CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
-DLTMessageAnalyzerPlugin "1" *-- "1" IDLTMessageAnalyzerController : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains
 Ui::Form "1" *-- "1" CConsoleView : contains

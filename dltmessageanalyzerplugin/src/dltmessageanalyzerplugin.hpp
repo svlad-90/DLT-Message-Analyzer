@@ -15,6 +15,7 @@
 #include "form.h"
 
 #include "common/Definitions.hpp"
+#include "components/analyzer/api/CAnalyzerComponent.hpp"
 
 #define DLT_MESSAGE_ANALYZER_NAME "DLT-Message-Analyzer"
 #define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.24"
@@ -118,12 +119,12 @@ private: // members
     /* internal variables */
     Form *mpForm;
     tDLTMessageAnalyzerPtr mpDLTMessageAnalyzer;
-    std::shared_ptr<IDLTMessageAnalyzerController> mpMessageAnalyzerController;
     tDLTFileWrapperPtr mpFile;
     int mLastAvailableNumberOfMsg;
     QMap<QString, QDltConnection::QDltConnectionState> mConnecitonsMap;
     QDltConnection::QDltConnectionState mConnectionState;
     bool mbAnalysisRunning;
+    CAnalyzerComponent mAnalyzerComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

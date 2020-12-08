@@ -23,7 +23,7 @@
 
 
 #include "common/Definitions.hpp"
-#include "analyzer/IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "components/analyzer/api/IDLTMessageAnalyzerControllerConsumer.hpp"
 
 #include "QElapsedTimer"
 

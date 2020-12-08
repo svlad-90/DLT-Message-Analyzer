@@ -13,11 +13,11 @@
 #include "qdlt.h"
 
 #include "CMTAnalyzer.hpp"
-#include "../dltWrappers/CDLTFileWrapper.hpp"
-#include "IDLTMessageAnalyzerControllerConsumer.hpp"
-#include "../dltWrappers/CDLTMsgWrapper.hpp"
-#include "../log/CLog.hpp"
-#include "../common/cpp_extensions.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "dltWrappers/CDLTMsgWrapper.hpp"
+#include "log/CLog.hpp"
+#include "common/cpp_extensions.hpp"
 
 #include "DMA_Plantuml.hpp"
 

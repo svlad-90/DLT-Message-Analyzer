@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="505px" preserveAspectRatio="none" style="width:823px;height:505px;background:#FEFEFE;" version="1.1" viewBox="0 0 823 505" width="823px" zoomAndPan="magnify"><defs><filter height="300%" id="f92j6v8ylpqrv" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[a43f0570bf913c7517b07599f2176edf]
+cluster DMA_Analyzer_API--><polygon fill="#DDDDDD" filter="url(#f92j6v8ylpqrv)" points="16,6,151,6,158,29.6094,674,29.6094,674,498,16,498,16,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="158" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="129" x="20" y="22.5332">DMA_Analyzer_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#f92j6v8ylpqrv)" points="698,6,720,6,727,29.6094,806,29.6094,806,106,698,106,698,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="698" x2="727" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="702" y="22.5332">Qt</text><!--MD5=[1dfd103297d4f11507e95ecca23075dd]
+class IDLTMessageAnalyzerController--><rect codeLine="8" fill="#FEFECE" filter="url(#f92j6v8ylpqrv)" height="131.0156" id="IDLTMessageAnalyzerController" style="stroke:#A80036;stroke-width:1.5;" width="626" x="32" y="351"/><ellipse cx="251.25" cy="367" fill="#A9DCDF" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M253.4375,368.7656 L249.2969,368.7656 L248.875,369.7969 L249.2969,369.7969 Q249.9063,369.7969 250.1719,370.0313 Q250.4375,370.2656 250.4375,370.6563 Q250.4375,371.0313 250.1719,371.2656 Q249.9063,371.5 249.2969,371.5 L247,371.5 Q246.3906,371.5 246.1328,371.2656 Q245.875,371.0313 245.875,370.6406 Q245.875,370.2656 246.1484,370.0234 Q246.4219,369.7813 247.0469,369.7969 L249.7188,363.1406 L248.6094,363.1406 Q248,363.1406 247.7344,362.9063 Q247.4688,362.6719 247.4688,362.2813 Q247.4688,361.9063 247.7344,361.6719 Q248,361.4375 248.6094,361.4375 L252.2813,361.4375 L255.6719,369.7969 Q256.2656,369.7969 256.4531,369.9375 Q256.8438,370.2031 256.8438,370.6563 Q256.8438,371.0313 256.5859,371.2656 Q256.3281,371.5 255.7188,371.5 L253.4219,371.5 Q252.8125,371.5 252.5469,371.2656 Q252.2813,371.0313 252.2813,370.6406 Q252.2813,370.2656 252.5469,370.0313 Q252.8125,369.7969 253.4219,369.7969 L253.8438,369.7969 L253.4375,368.7656 Z M252.7188,367.0625 L251.3594,363.6875 L249.9844,367.0625 L252.7188,367.0625 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="179" x="271.75" y="371.9102">IDLTMessageAnalyzerController</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="657" y1="383" y2="383"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="657" y1="391" y2="391"/><ellipse cx="43" cy="402" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="260" x="52" y="406.4189">virtual int getMaximumNumberOfThreads() const = 0</text><ellipse cx="43" cy="415.8359" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="569" x="52" y="420.2549">virtual tRequestId requestAnalyze( const std::weak_ptr&lt;IDLTMessageAnalyzerControllerConsumer&gt;&amp; pClient, const</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="600" x="52" y="434.0908">tDLTFileWrapperPtr&amp; pFile, const int&amp; fromMessage, const int&amp; numberOfMessages, const QRegularExpression&amp; regex,</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="548" x="52" y="447.9268">const int&amp; numberOfThreads, const tRegexScriptingMetadata&amp; regexScriptingMetadata, bool isContinuous) = 0</text><ellipse cx="43" cy="457.3438" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="597" x="52" y="461.7627">virtual void cancelRequest( const std::weak_ptr&lt;IDLTMessageAnalyzerControllerConsumer&gt;&amp; pClient, const tRequestId&amp;</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="71" x="52" y="475.5986">requestId ) = 0</text><!--MD5=[64238a8b2e357f8fff98225717e7ba5d]
+class IDLTMessageAnalyzerControllerConsumer--><rect codeLine="15" fill="#FEFECE" filter="url(#f92j6v8ylpqrv)" height="103.3438" id="IDLTMessageAnalyzerControllerConsumer" style="stroke:#A80036;stroke-width:1.5;" width="603" x="51.5" y="170"/><ellipse cx="230.25" cy="186" fill="#A9DCDF" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M232.4375,187.7656 L228.2969,187.7656 L227.875,188.7969 L228.2969,188.7969 Q228.9063,188.7969 229.1719,189.0313 Q229.4375,189.2656 229.4375,189.6563 Q229.4375,190.0313 229.1719,190.2656 Q228.9063,190.5 228.2969,190.5 L226,190.5 Q225.3906,190.5 225.1328,190.2656 Q224.875,190.0313 224.875,189.6406 Q224.875,189.2656 225.1484,189.0234 Q225.4219,188.7813 226.0469,188.7969 L228.7188,182.1406 L227.6094,182.1406 Q227,182.1406 226.7344,181.9063 Q226.4688,181.6719 226.4688,181.2813 Q226.4688,180.9063 226.7344,180.6719 Q227,180.4375 227.6094,180.4375 L231.2813,180.4375 L234.6719,188.7969 Q235.2656,188.7969 235.4531,188.9375 Q235.8438,189.2031 235.8438,189.6563 Q235.8438,190.0313 235.5859,190.2656 Q235.3281,190.5 234.7188,190.5 L232.4219,190.5 Q231.8125,190.5 231.5469,190.2656 Q231.2813,190.0313 231.2813,189.6406 Q231.2813,189.2656 231.5469,189.0313 Q231.8125,188.7969 232.4219,188.7969 L232.8438,188.7969 L232.4375,187.7656 Z M231.7188,186.0625 L230.3594,182.6875 L228.9844,186.0625 L231.7188,186.0625 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="237" x="250.75" y="190.9102">IDLTMessageAnalyzerControllerConsumer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="52.5" x2="653.5" y1="202" y2="202"/><line style="stroke:#A80036;stroke-width:1.5;" x1="52.5" x2="653.5" y1="210" y2="210"/><ellipse cx="62.5" cy="221" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="574" x="71.5" y="225.4189">tRequestId requestAnalyze( const tDLTFileWrapperPtr&amp; pFile, const int&amp; fromMessage, const int&amp; numberOfMessages,</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="410" x="71.5" y="239.2549">const QRegularExpression&amp; regex, const int&amp; numberOfThreads, bool isContinuous )</text><ellipse cx="62.5" cy="248.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="552" x="71.5" y="253.0908">virtual void progressNotification( const tRequestId&amp; requestId, const eRequestState&amp; requestState, const int8_t&amp;</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="307" x="71.5" y="266.9268">progress, const tFoundMatchesPack&amp; processedMatches) = 0</text><!--MD5=[1cf1042647a412f477576ae9c93b280c]
+class std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_--><rect codeLine="21" fill="#FEFECE" filter="url(#f92j6v8ylpqrv)" height="48" id="std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_" style="stroke:#A80036;stroke-width:1.5;" width="439" x="133.5" y="42"/><ellipse cx="148.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M151.2656,53.875 Q151.4219,53.6563 151.6094,53.5469 Q151.7969,53.4375 152.0156,53.4375 Q152.3906,53.4375 152.625,53.6953 Q152.8594,53.9531 152.8594,54.5625 L152.8594,56.0156 Q152.8594,56.625 152.625,56.8906 Q152.3906,57.1563 152.0156,57.1563 Q151.6719,57.1563 151.4688,56.9531 Q151.2656,56.7656 151.1563,56.25 Q151.1094,55.8906 150.9219,55.7031 Q150.5938,55.3281 149.9844,55.1094 Q149.375,54.8906 148.75,54.8906 Q147.9844,54.8906 147.3516,55.2188 Q146.7188,55.5469 146.2266,56.2969 Q145.7344,57.0469 145.7344,58.0781 L145.7344,59.1719 Q145.7344,60.4063 146.625,61.2266 Q147.5156,62.0469 149.1094,62.0469 Q150.0469,62.0469 150.7031,61.7969 Q151.0938,61.6406 151.5156,61.2031 Q151.7813,60.9375 151.9297,60.8594 Q152.0781,60.7813 152.2813,60.7813 Q152.6094,60.7813 152.8672,61.0391 Q153.125,61.2969 153.125,61.6406 Q153.125,61.9844 152.7813,62.3906 Q152.2813,62.9688 151.4844,63.2969 Q150.4063,63.75 149.1094,63.75 Q147.5938,63.75 146.3906,63.125 Q145.4063,62.625 144.7188,61.5547 Q144.0313,60.4844 144.0313,59.2031 L144.0313,58.0469 Q144.0313,56.7188 144.6484,55.5703 Q145.2656,54.4219 146.3594,53.8047 Q147.4531,53.1875 148.6875,53.1875 Q149.4219,53.1875 150.0703,53.3516 Q150.7188,53.5156 151.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="166" x="162.5" y="62.9102">std::enable_shared_from_this</text><rect fill="#FEFEFE" height="17.0938" style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" width="239" x="336.5" y="39"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="237" x="337.5" y="52.457">IDLTMessageAnalyzerControllerConsumer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="134.5" x2="571.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="134.5" x2="571.5" y1="82" y2="82"/><!--MD5=[8dd17ccd1ae0e0e4eb0a7117370c35f4]
+class QObject--><rect codeLine="30" fill="#FEFECE" filter="url(#f92j6v8ylpqrv)" height="48" id="QObject" style="stroke:#A80036;stroke-width:1.5;" width="76" x="714" y="42"/><ellipse cx="729" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M731.7656,53.875 Q731.9219,53.6563 732.1094,53.5469 Q732.2969,53.4375 732.5156,53.4375 Q732.8906,53.4375 733.125,53.6953 Q733.3594,53.9531 733.3594,54.5625 L733.3594,56.0156 Q733.3594,56.625 733.125,56.8906 Q732.8906,57.1563 732.5156,57.1563 Q732.1719,57.1563 731.9688,56.9531 Q731.7656,56.7656 731.6563,56.25 Q731.6094,55.8906 731.4219,55.7031 Q731.0938,55.3281 730.4844,55.1094 Q729.875,54.8906 729.25,54.8906 Q728.4844,54.8906 727.8516,55.2188 Q727.2188,55.5469 726.7266,56.2969 Q726.2344,57.0469 726.2344,58.0781 L726.2344,59.1719 Q726.2344,60.4063 727.125,61.2266 Q728.0156,62.0469 729.6094,62.0469 Q730.5469,62.0469 731.2031,61.7969 Q731.5938,61.6406 732.0156,61.2031 Q732.2813,60.9375 732.4297,60.8594 Q732.5781,60.7813 732.7813,60.7813 Q733.1094,60.7813 733.3672,61.0391 Q733.625,61.2969 733.625,61.6406 Q733.625,61.9844 733.2813,62.3906 Q732.7813,62.9688 731.9844,63.2969 Q730.9063,63.75 729.6094,63.75 Q728.0938,63.75 726.8906,63.125 Q725.9063,62.625 725.2188,61.5547 Q724.5313,60.4844 724.5313,59.2031 L724.5313,58.0469 Q724.5313,56.7188 725.1484,55.5703 Q725.7656,54.4219 726.8594,53.8047 Q727.9531,53.1875 729.1875,53.1875 Q729.9219,53.1875 730.5703,53.3516 Q731.2188,53.5156 731.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="743" y="62.9102">QObject</text><line style="stroke:#A80036;stroke-width:1.5;" x1="715" x2="789" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="715" x2="789" y1="82" y2="82"/><!--MD5=[0ca337ed74ead4f92fc821c5414bf1b9]
+reverse link QObject to IDLTMessageAnalyzerController--><path codeLine="37" d="M745.329,110.039 C736.176,155.765 715.603,227.593 672,273 C640.796,305.496 600.919,331.03 559.818,350.936 " fill="none" id="QObject-backto-IDLTMessageAnalyzerController" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="738.468,108.641,748.91,90.203,752.246,111.128,738.468,108.641" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="729" y="226.9951">extends</text><!--MD5=[6d039f1a97f04703243e72438616e14a]
+reverse link QObject to IDLTMessageAnalyzerControllerConsumer--><path codeLine="38" d="M700.149,100.405 C691.584,105.29 682.668,110.011 674,114 C628.129,135.111 576.851,154.057 528.976,169.91 " fill="none" id="QObject-backto-IDLTMessageAnalyzerControllerConsumer" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="696.811,94.246,717.571,90.002,703.989,106.266,696.811,94.246" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="649" y="136.4951">extends</text><!--MD5=[77f32df591099b82d4bd17cbbc583fdb]
+reverse link std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ to IDLTMessageAnalyzerControllerConsumer--><path codeLine="39" d="M353,110.56 C353,129.048 353,150.719 353,169.911 " fill="none" id="std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_-backto-IDLTMessageAnalyzerControllerConsumer" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="346,110.313,353,90.313,360,110.313,346,110.313" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="354" y="136.4951">extends</text><!--MD5=[60cd2d4c84628eec8535b39d736f86e9]
+reverse link IDLTMessageAnalyzerControllerConsumer to IDLTMessageAnalyzerController--><path codeLine="42" d="M350.349,286.453 C349.49,307.177 348.537,330.168 347.676,350.936 " fill="none" id="IDLTMessageAnalyzerControllerConsumer-backto-IDLTMessageAnalyzerController" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="350.898,273.208,346.6529,279.0371,350.4008,285.1977,354.646,279.3686,350.898,273.208" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="350" y="317.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="343.1452" y="294.7269">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="340.5807" y="339.9447">1</text><!--MD5=[b4b8e8d584f1928de809dd75988d98c2]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerController"
+{
+    + {abstract} virtual int getMaximumNumberOfThreads() const = 0
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
+}
+
+abstract class "IDLTMessageAnalyzerControllerConsumer"
+{
+    + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+}
+
+class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QObject <|- - IDLTMessageAnalyzerController : extends
+QObject <|- - IDLTMessageAnalyzerControllerConsumer : extends
+std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ <|- - IDLTMessageAnalyzerControllerConsumer : extends
+
+'====================Dependencies section====================
+IDLTMessageAnalyzerControllerConsumer "1" o- - "1" IDLTMessageAnalyzerController : uses
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerController"
+{
+    + {abstract} virtual int getMaximumNumberOfThreads() const = 0
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
+}
+
+abstract class "IDLTMessageAnalyzerControllerConsumer"
+{
+    + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+}
+
+class "std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>" as std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+QObject <|- - IDLTMessageAnalyzerController : extends
+QObject <|- - IDLTMessageAnalyzerControllerConsumer : extends
+std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ <|- - IDLTMessageAnalyzerControllerConsumer : extends
+
+IDLTMessageAnalyzerControllerConsumer "1" o- - "1" IDLTMessageAnalyzerController : uses
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

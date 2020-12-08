@@ -3,16 +3,15 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CMTAnalyzer class
  */
-#ifndef CDLTMESSAGEANALYZERCONTROLLER_HPP
-#define CDLTMESSAGEANALYZERCONTROLLER_HPP
+#pragma once
 
 #include <list>
 
 #include <QRegularExpression>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
-#include "IDLTMessageAnalyzerController.hpp"
+#include "../api/IDLTMessageAnalyzerController.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
 //Forward declarations
@@ -107,5 +106,3 @@ private: //fields
     tRequestMap mRequestMap;
     tRequestId mRequestIdCounter;
 };
-
-#endif // CDLTMESSAGEANALYZERCONTROLLER_HPP

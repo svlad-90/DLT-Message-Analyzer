@@ -3,12 +3,11 @@
  * @author  vgoncharuk
  * @brief   Declaration of the IDLTMessageAnalyzerController class
  */
-#ifndef IDLTMESSAGEANALYZERCONTROLLER_HPP
-#define IDLTMESSAGEANALYZERCONTROLLER_HPP
+#pragma once
 
 #include <QObject>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 //Forward declarations
 class IDLTMessageAnalyzerControllerConsumer;
@@ -88,5 +87,3 @@ signals:
 };
 
 typedef std::shared_ptr<IDLTMessageAnalyzerController> tDLTMessageAnalyzerControllerPtr;
-
-#endif // IDLTMESSAGEANALYZERCONTROLLER_HPP

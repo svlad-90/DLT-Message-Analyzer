@@ -39,7 +39,7 @@
 
 #include "groupedView/CGroupedViewModel.hpp"
 #include "searchView/CSearchResultModel.hpp"
-#include "analyzer/IDLTMessageAnalyzerController.hpp"
+#include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
@@ -1800,5 +1800,6 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexDirectoryMonitor, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CConsoleInputProcessor, 1, 1, contains)
+        PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

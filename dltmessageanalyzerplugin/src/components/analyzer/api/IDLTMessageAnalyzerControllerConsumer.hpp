@@ -3,12 +3,11 @@
  * @author  vgoncharuk
  * @brief   Declaration of the IDLTMessageAnalyzerControllerConsumer class
  */
-#ifndef IDLTMESSAGEANALYZERCONTROLLERCONSUMER_HPP
-#define IDLTMESSAGEANALYZERCONTROLLERCONSUMER_HPP
+#pragma once
 
 #include <QObject>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 //Forward declarations
 
@@ -52,4 +51,3 @@ protected: // fields
 
 typedef std::shared_ptr<IDLTMessageAnalyzerControllerConsumer> tDLTMessageAnalyzerControllerConsumerPtr;
 typedef std::weak_ptr<IDLTMessageAnalyzerControllerConsumer> tDLTMessageAnalyzerControllerConsumerWeakPtr;
-#endif // IDLTMESSAGEANALYZERCONTROLLERCONSUMER_HPP

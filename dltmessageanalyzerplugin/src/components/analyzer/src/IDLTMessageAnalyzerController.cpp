@@ -4,7 +4,7 @@
  * @brief   Implementation of the IDLTMessageAnalyzerController class
  */
 
-#include "IDLTMessageAnalyzerController.hpp"
+#include "../api/IDLTMessageAnalyzerController.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -12,7 +12,7 @@
 IDLTMessageAnalyzerController::~IDLTMessageAnalyzerController(){}
 IDLTMessageAnalyzerController::IDLTMessageAnalyzerController(){}
 
-PUML_PACKAGE_BEGIN(DMA_Analyzer)
+PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
     PUML_ABSTRACT_CLASS_BEGIN_CHECKED(IDLTMessageAnalyzerController)
         PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_PURE_VIRTUAL_METHOD( +, void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) )

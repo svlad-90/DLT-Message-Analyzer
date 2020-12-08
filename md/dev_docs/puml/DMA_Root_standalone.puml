@@ -20,7 +20,7 @@ interface "QDltPluginViewerInterface"
 
 }
 
-package "DMA_Analyzer" #DDDDDD
+package "DMA_Analyzer_API" #DDDDDD
 {
 
 abstract class "IDLTMessageAnalyzerControllerConsumer"

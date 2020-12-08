@@ -7,12 +7,12 @@
 #include "qdlt.h"
 
 #include "CContinuousAnalyzer.hpp"
-#include "IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "functional"
 #include "QTimer"
 #include "QDebug"
 
-#include "../dltWrappers/CDLTFileWrapper.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
 
 #include "DMA_Plantuml.hpp"
 

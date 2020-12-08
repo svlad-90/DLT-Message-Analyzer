@@ -401,9 +401,13 @@ QModelIndex CGroupedViewModel::index(int row, int column, const QModelIndex &par
     else
         pParentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
-    tTreeItem *childItem = pParentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
+    if(nullptr != pParentItem)
+    {
+        tTreeItem *childItem = pParentItem->child(row);
+        if (childItem)
+            return createIndex(row, column, childItem);
+    }
+
     return QModelIndex();
 }
 
@@ -423,16 +427,22 @@ QModelIndex CGroupedViewModel::parent(const QModelIndex &index) const
 
 int CGroupedViewModel::rowCount(const QModelIndex &parent) const
 {
-     tTreeItem *parentItem;
+    int result = 0;
+
+    tTreeItem *parentItem;
 
     if (parent == rootIndex())
         parentItem = mpRootItem;
     else
         parentItem = static_cast<tTreeItemPtr>(parent.internalPointer());
 
-    parentItem->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
+    if(nullptr != parentItem)
+    {
+        parentItem->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
+        result = parentItem->childCount();
+    }
 
-    return parentItem->childCount();
+    return result;
 }
 
 int CGroupedViewModel::columnCount(const QModelIndex &) const

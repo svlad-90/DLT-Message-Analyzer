@@ -18,7 +18,7 @@ It's main purposes is to:
 
 #### [DMA_Root](../../dltmessageanalyzerplugin/src/doc/doc.md)
 ----
-#### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/analyzer/doc/doc.md)
+#### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/components/analyzer/doc/doc.md)
 #### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
 #### [DMA_DLTWrappers](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
 #### [DMA_FiltersView](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)

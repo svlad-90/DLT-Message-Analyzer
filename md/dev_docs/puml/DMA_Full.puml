@@ -39,6 +39,10 @@ interface "QDltPluginViewerInterface"
 package "DMA_Analyzer" #DDDDDD
 {
 
+class "CAnalyzerComponent"
+{
+}
+
 class "CContinuousAnalyzer"
 {
 }
@@ -54,6 +58,11 @@ class "CMTAnalyzer"
 class "CSubConsumer"
 {
 }
+
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
 
 abstract class "IDLTMessageAnalyzerController"
 {
@@ -120,6 +129,41 @@ class "CFiltersModel"
 }
 
 class "CFiltersView"
+{
+}
+
+}
+
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+class "DMA::ISynchronousInitializable"
+{
+    + {abstract} virtual virtual tSyncInitOperationResult startInit() = 0
+    + {abstract} virtual virtual tSyncInitOperationResult startShutdown() = 0
+    + {abstract} virtual virtual virtual bool isInitialized () const = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
 {
 }
 
@@ -341,6 +385,7 @@ class "QWidget"
 }
 
 '====================Inheritance section====================
+DMA::IComponent <|-- CAnalyzerComponent : implements
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
@@ -354,6 +399,9 @@ QObject <|-- CDLTFileWrapper : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
 QAbstractItemModel <|-- CFiltersModel : implements
 QTreeView <|-- CFiltersView : implements
+DMA::ISynchronousInitializable <|-- DMA::CBaseSynchronousInitializable : implements
+DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
+DMA::INamedObject <|-- DMA::IComponent : implements
 QTreeView <|-- CGroupedView : extends
 QAbstractItemModel <|-- CGroupedViewModel : implements
 QObject <|-- CConsoleCtrl : extends
@@ -379,6 +427,8 @@ QObject <|-- CSettingsManager : extends
 CSettingItem <|-- TSettingItem_T_ : extends
 
 '====================Dependencies section====================
+CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
+CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 CContinuousAnalyzer "1" o-- "1" IDLTMessageAnalyzerController : uses
 CContinuousAnalyzer "1" *-- "1" IDLTMessageAnalyzerControllerConsumer : contains
 CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
@@ -424,12 +474,13 @@ CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
+CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
-DLTMessageAnalyzerPlugin "1" *-- "1" IDLTMessageAnalyzerController : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains
 Ui::Form "1" *-- "1" CConsoleView : contains
