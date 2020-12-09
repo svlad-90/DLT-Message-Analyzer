@@ -14,7 +14,7 @@
 
 #include "../settings/CSettingsManager.hpp"
 #include "CFiltersModel.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../common/PCRE/PCREHelper.hpp"
 
 #include "DMA_Plantuml.hpp"

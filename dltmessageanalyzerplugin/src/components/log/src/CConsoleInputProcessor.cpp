@@ -2,11 +2,11 @@
 #include "QApplication"
 #include "QTextStream"
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
-#include "../dltmessageanalyzerplugin.hpp"
+#include "dltmessageanalyzerplugin.hpp"
 #include "CConsoleInputProcessor.hpp"
-#include "CLog.hpp"
+#include "../api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 

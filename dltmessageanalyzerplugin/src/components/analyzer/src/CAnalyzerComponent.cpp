@@ -39,6 +39,11 @@ DMA::tSyncInitOperationResult CAnalyzerComponent::init()
 
 DMA::tSyncInitOperationResult CAnalyzerComponent::shutdown()
 {
+    if(nullptr != mpMessageAnalyzerController)
+    {
+        mpMessageAnalyzerController.reset();
+    }
+
     DMA::tSyncInitOperationResult result;
     result.bIsOperationSuccessful = true;
     result.returnCode = 0;

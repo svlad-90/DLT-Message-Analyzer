@@ -44,9 +44,8 @@
 #include "patternsView/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 #include "filtersView/CFiltersModel.hpp"
-#include "log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "common/CTableMemoryJumper.hpp"
-#include "log/CConsoleInputProcessor.hpp"
 #include "plant_uml/CUMLView.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -59,8 +58,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput, QComboBox* pRegexSelectionComboBox,
-                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
-                                         QLineEdit* pConsoleViewInput, CUMLView* pUMLView
+                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput, CUMLView* pUMLView
                                          ):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
@@ -102,8 +100,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   , mMeasurementNotificationTimer()
   #endif
   , mMeasurementRequestTimer(),
-    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView)),
-    mpConsoleInputProcessor(std::make_shared<CConsoleInputProcessor>(pConsoleViewInput))
+    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView))
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
@@ -1799,7 +1796,6 @@ PUML_PACKAGE_BEGIN(DMA_Root)
 #endif
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexDirectoryMonitor, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CConsoleInputProcessor, 1, 1, contains)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

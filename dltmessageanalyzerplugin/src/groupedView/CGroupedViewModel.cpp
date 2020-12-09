@@ -10,7 +10,7 @@
 #include "QDateTime"
 
 #include "CGroupedViewModel.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"

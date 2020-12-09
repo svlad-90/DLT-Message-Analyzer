@@ -1,0 +1,68 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Log" #DDDDDD
+{
+
+class "CConsoleInputProcessor"
+{
+}
+
+}
+
+package "DMA_Log_API" #DDDDDD
+{
+
+class "CConsoleView"
+{
+}
+
+class "CLogComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QPlainTextEdit"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QPlainTextEdit <|-- CConsoleView : extends
+DMA::IComponent <|-- CLogComponent : implements
+
+'====================Dependencies section====================
+CLogComponent "1" *-- "1" CConsoleInputProcessor : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+Ui::Form "1" *-- "1" CConsoleView : contains
+
+@enduml

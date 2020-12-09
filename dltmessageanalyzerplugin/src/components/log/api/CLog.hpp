@@ -1,5 +1,4 @@
-#ifndef CLOG_HPP
-#define CLOG_HPP
+#pragma once
 
 #include <QString>
 #include <QColor>
@@ -54,5 +53,3 @@ do\
 {\
    DMA_Log::clearConsole();\
 }while(false)
-
-#endif // CLOG_HPP

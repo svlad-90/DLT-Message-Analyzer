@@ -17,7 +17,7 @@
 
 #include "CGroupedView.hpp"
 #include "../common/CTreeItem.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"

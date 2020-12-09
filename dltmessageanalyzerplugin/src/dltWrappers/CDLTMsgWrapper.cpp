@@ -11,7 +11,7 @@
 #include "dlt_protocol.h"
 #include "dlt_common.h"
 
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 
 #include "CDLTMsgWrapper.hpp"
 

@@ -13,7 +13,7 @@
 
 #include "CFiltersModel.hpp"
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../common/CQtHelper.hpp"
 
 #include "CFilterItemDelegate.hpp"

@@ -42,7 +42,6 @@ class CRegexDirectoryMonitor;
 class CFiltersView;
 class CFiltersModel;
 class CTableMemoryJumper;
-class CConsoleInputProcessor;
 class CUMLView;
 
 /**
@@ -82,7 +81,7 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             QLineEdit* pPatternsSearchInput,
                             QComboBox* pRegexSelectionComboBox,
                             CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
-                            QLineEdit* pConsoleViewInput, CUMLView* pUMLView);
+                            CUMLView* pUMLView);
 
         /**
          * Destructor
@@ -325,7 +324,6 @@ signals:
 
         QElapsedTimer mMeasurementRequestTimer;
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
-        std::shared_ptr<CConsoleInputProcessor> mpConsoleInputProcessor;
 };
 
 #endif // CDLTMESSAGEANALYZER_HPP

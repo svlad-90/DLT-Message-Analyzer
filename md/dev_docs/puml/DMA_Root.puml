@@ -107,14 +107,14 @@ class "CGroupedViewModel"
 
 }
 
-package "DMA_Log" #DDDDDD
+package "DMA_Log_API" #DDDDDD
 {
 
-class "CConsoleInputProcessor"
+class "CConsoleView"
 {
 }
 
-class "CConsoleView"
+class "CLogComponent"
 {
 }
 
@@ -208,7 +208,6 @@ QWidget <|-- Form : extends
 
 '====================Dependencies section====================
 CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
-CDLTMessageAnalyzer "1" *-- "1" CConsoleInputProcessor : contains
 CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
 CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
@@ -227,6 +226,7 @@ CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains

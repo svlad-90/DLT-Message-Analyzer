@@ -29,7 +29,7 @@
 #include "CSearchResultModel.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 

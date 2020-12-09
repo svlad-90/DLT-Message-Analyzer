@@ -101,6 +101,11 @@ class "CConsoleInputProcessor"
 {
 }
 
+}
+
+package "DMA_Log_API" #DDDDDD
+{
+
 class "CConsoleView"
 {
 }

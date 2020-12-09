@@ -13,7 +13,7 @@
 #include "PCREBaseVisitor.h"
 
 #include "../CTreeItem.hpp"
-#include "../../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "PCREHelper.hpp"
 
 using namespace std;
