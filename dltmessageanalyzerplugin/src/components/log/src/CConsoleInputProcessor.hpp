@@ -1,5 +1,4 @@
-#ifndef CCONSOLEINPUTPROCESSOR_HPP
-#define CCONSOLEINPUTPROCESSOR_HPP
+#pragma once
 
 #include "map"
 #include "string"
@@ -56,5 +55,3 @@ private:
 
     eHistoryBorderStatus mbBorderReached;
 };
-
-#endif // CCONSOLEINPUTPROCESSOR_HPP

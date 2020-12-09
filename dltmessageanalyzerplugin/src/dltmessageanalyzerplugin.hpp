@@ -15,7 +15,6 @@
 #include "form.h"
 
 #include "common/Definitions.hpp"
-#include "components/analyzer/api/CAnalyzerComponent.hpp"
 
 #define DLT_MESSAGE_ANALYZER_NAME "DLT-Message-Analyzer"
 #define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.24"
@@ -26,6 +25,11 @@ typedef std::shared_ptr<CDLTMessageAnalyzer> tDLTMessageAnalyzerPtr;
 typedef std::shared_ptr<QString> tQStringPtr;
 typedef QMap<int, tQStringPtr > tMsgMap;
 class IDLTMessageAnalyzerController;
+
+namespace DMA
+{
+    class IComponent;
+}
 
 class DLTMessageAnalyzerPlugin : public QObject, QDLTPluginInterface, QDltPluginViewerInterface, QDltPluginControlInterface
 {
@@ -39,7 +43,6 @@ class DLTMessageAnalyzerPlugin : public QObject, QDLTPluginInterface, QDltPlugin
 
 public:
     DLTMessageAnalyzerPlugin();
-    ~DLTMessageAnalyzerPlugin() override;
 
     //general trigger
     void analysisTrigger();
@@ -124,7 +127,11 @@ private: // members
     QMap<QString, QDltConnection::QDltConnectionState> mConnecitonsMap;
     QDltConnection::QDltConnectionState mConnectionState;
     bool mbAnalysisRunning;
-    CAnalyzerComponent mAnalyzerComponent;
+
+    typedef std::shared_ptr<DMA::IComponent> tComponentPtr;
+    typedef std::vector<tComponentPtr> tComponentPtrVec;
+
+    tComponentPtrVec mComponents;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

@@ -1,7 +1,7 @@
 #include <QAction>
 #include <QMenu>
 
-#include "CConsoleView.hpp"
+#include "../api/CConsoleView.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -50,7 +50,7 @@ void CConsoleView::keyPressEvent ( QKeyEvent* pEvent )
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_Log)
+PUML_PACKAGE_BEGIN(DMA_Log_API)
     PUML_CLASS_BEGIN_CHECKED(CConsoleView)
         PUML_INHERITANCE_CHECKED(QPlainTextEdit, extends)
     PUML_CLASS_END()

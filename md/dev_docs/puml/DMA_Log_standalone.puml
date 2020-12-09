@@ -14,10 +14,6 @@ class "CConsoleInputProcessor"
 {
 }
 
-class "CConsoleView"
-{
-}
-
 }
 
 package "Qt" #DDDDDD
@@ -27,15 +23,10 @@ class "QObject"
 {
 }
 
-class "QPlainTextEdit"
-{
-}
-
 }
 
 '====================Inheritance section====================
 QObject <|-- CConsoleCtrl : extends
 QObject <|-- CConsoleInputProcessor : extends
-QPlainTextEdit <|-- CConsoleView : extends
 
 @enduml

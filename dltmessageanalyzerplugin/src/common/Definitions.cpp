@@ -17,7 +17,7 @@
 #include "QRegularExpression"
 #include "QTextStream"
 
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "CTreeItem.hpp"
 
 #include "DMA_Plantuml.hpp"

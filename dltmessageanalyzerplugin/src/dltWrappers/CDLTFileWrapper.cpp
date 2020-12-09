@@ -12,7 +12,7 @@
 #include "CDLTFileWrapper.hpp"
 #include "CDLTMsgWrapper.hpp"
 
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 
 #include "qdlt.h"
 

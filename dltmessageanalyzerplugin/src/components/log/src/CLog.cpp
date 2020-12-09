@@ -1,4 +1,4 @@
-#include "CLog.hpp"
+#include "../api/CLog.hpp"
 
 #include "CConsoleCtrl.hpp"
 

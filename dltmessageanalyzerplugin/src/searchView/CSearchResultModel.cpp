@@ -7,7 +7,7 @@
 #include "qdlt.h"
 
 #include "CSearchResultModel.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../dltWrappers/CDLTMsgWrapper.hpp"
 #include "../dltWrappers/CDLTFileWrapper.hpp"

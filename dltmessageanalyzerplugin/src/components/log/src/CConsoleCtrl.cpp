@@ -6,7 +6,7 @@
 #include <QTabBar>
 #include <QThread>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 #include "CConsoleCtrl.hpp"
 
 #include "DMA_Plantuml.hpp"

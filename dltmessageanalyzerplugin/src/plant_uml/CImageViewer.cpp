@@ -4,7 +4,7 @@
 #include <QPainter>
 
 #include "CImageViewer.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 

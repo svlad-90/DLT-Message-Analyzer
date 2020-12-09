@@ -1178,7 +1178,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CConsoleView</class>
    <extends>QPlainTextEdit</extends>
-   <header>log/CConsoleView.hpp</header>
+   <header>components/log/api/CConsoleView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CUMLView</class>

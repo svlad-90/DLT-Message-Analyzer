@@ -1,5 +1,4 @@
-#ifndef CCONSOLEVIEW_HPP
-#define CCONSOLEVIEW_HPP
+#pragma once
 
 #include "QPlainTextEdit"
 
@@ -15,5 +14,3 @@ public:
 protected:
     virtual void keyPressEvent ( QKeyEvent* pEvent ) override;
 };
-
-#endif // CCONSOLEVIEW_HPP

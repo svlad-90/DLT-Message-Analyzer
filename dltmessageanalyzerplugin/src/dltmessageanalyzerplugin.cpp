@@ -8,6 +8,7 @@
 #include <QMetaObject>
 #include "QMenu"
 #include "QLineEdit"
+#include "QApplication"
 
 #include "dltmessageanalyzerplugin.hpp"
 #include "CDLTMessageAnalyzer.hpp"
@@ -18,7 +19,10 @@
 #include "filtersView/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
-#include "log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
+
+#include "components/analyzer/api/CAnalyzerComponent.hpp"
+#include "components/log/api/CLogComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -32,7 +36,7 @@ mLastAvailableNumberOfMsg(0),
 mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false),
-mAnalyzerComponent()
+mComponents()
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -42,23 +46,6 @@ mAnalyzerComponent()
 
     DMA::PlantUML::Creator::getInstance().initialize();
     DMA::PlantUML::Creator::getInstance().setBackgroundColor("#FEFEFE");
-
-    auto initResult = mAnalyzerComponent.startInit();
-
-    if(false == initResult.bIsOperationSuccessful)
-    {
-        SEND_ERR(QString("Failed to initialize %1").arg(mAnalyzerComponent.getName()));
-    }
-}
-
-DLTMessageAnalyzerPlugin::~DLTMessageAnalyzerPlugin()
-{
-    auto shutdownResult = mAnalyzerComponent.startShutdown();
-
-    if(false == shutdownResult.bIsOperationSuccessful)
-    {
-        SEND_ERR(QString("Failed to shutdown %1").arg(mAnalyzerComponent.getName()));
-    }
 }
 
 QString DLTMessageAnalyzerPlugin::name()
@@ -112,12 +99,65 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 {    
     mpForm = new Form(this);
 
+    std::shared_ptr<IDLTMessageAnalyzerController> pAnalyzerController = nullptr;
+
+    {
+        auto pAnalyzerComponent = std::make_shared<CAnalyzerComponent>();
+
+        auto initResult = pAnalyzerComponent->startInit();
+
+        if(true == initResult.bIsOperationSuccessful)
+        {
+            pAnalyzerController = pAnalyzerComponent->getAnalyzerController();
+        }
+        else
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pAnalyzerComponent->getName()));
+        }
+
+        mComponents.push_back(pAnalyzerComponent);
+    }
+
+    {
+        auto pLogComponent = std::make_shared<CLogComponent>(mpForm->getConsoleViewInput(),
+                                                             mpForm->getMainTabWidget(),
+                                                             mpForm->getConsoleViewTab(),
+                                                             mpForm->getConsoleView());
+
+        auto initResult = pLogComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pLogComponent->getName()));
+        }
+
+        mComponents.push_back(pLogComponent);
+    }
+
+    connect( qApp, &QApplication::aboutToQuit, [this]()
+    {
+        for(auto& pComponent : mComponents)
+        {
+            if(nullptr != pComponent)
+            {
+                auto shutdownResult = pComponent->startShutdown();
+
+                if(false == shutdownResult.bIsOperationSuccessful)
+                {
+                    SEND_ERR(QString("Failed to shutdown %1").arg(pComponent->getName()));
+                }
+            }
+        }
+
+        mComponents.clear();
+    });
+
     if(nullptr != mpForm->getFiltersView())
     {
         mpForm->getFiltersView()->setRegexInputField(mpForm->getRegexLineEdit());
     }
 
-    mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(mAnalyzerComponent.getAnalyzerController(),
+    mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(pAnalyzerController,
                                                                                                       mpForm->getGroupedResultView(),
                                                                                                       mpForm->getProgresBarLabel(),
                                                                                                       mpForm->getProgresBar(),
@@ -133,7 +173,6 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getConfigComboBox(),
                                                                                                       mpForm->getFiltersView(),
                                                                                                       mpForm->getFiltersSearchInput(),
-                                                                                                      mpForm->getConsoleViewInput(),
                                                                                                       mpForm->getUMLView());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
@@ -525,6 +564,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(Form, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMessageAnalyzer, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CAnalyzerComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

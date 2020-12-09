@@ -16,7 +16,7 @@
 #include "CImageViewer.hpp"
 #include "CUMLView.hpp"
 #include "../settings/CSettingsManager.hpp"
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 

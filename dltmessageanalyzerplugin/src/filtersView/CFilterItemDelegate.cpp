@@ -4,7 +4,7 @@
 #include <QApplication>
 #include <QStringListModel>
 
-#include "../log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "../settings/CSettingsManager.hpp"
 #include "../common/Definitions.hpp"
 #include "CFiltersModel.hpp"

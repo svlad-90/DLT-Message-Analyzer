@@ -16,7 +16,7 @@
 #include "dltWrappers/CDLTFileWrapper.hpp"
 #include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "dltWrappers/CDLTMsgWrapper.hpp"
-#include "log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "common/cpp_extensions.hpp"
 
 #include "DMA_Plantuml.hpp"

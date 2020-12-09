@@ -23,8 +23,7 @@
 #include "settings/CSettingsManager.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
-#include "log/CConsoleCtrl.hpp"
-#include "log/CLog.hpp"
+#include "components/log/api/CLog.hpp"
 #include "plant_uml/CUMLView.hpp"
 #include "common/OSHelper.hpp"
 #include "common/CQtHelper.hpp"
@@ -39,14 +38,6 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
     mPatternsHidden(false)
 {
     mpUI->setupUi(this);
-
-    NDLTMessageAnalyzer::NConsole::tConsoleConfig consoleConfig;
-    consoleConfig.maxMsgSize = 10240;
-    consoleConfig.logSize = 1000;
-    consoleConfig.pTabWidget = getMainTabWidget();
-    consoleConfig.pConsoleTab = getConsoleViewTab();
-    consoleConfig.pConsoleTextEdit = getConsoleView();
-    NDLTMessageAnalyzer::NConsole::CConsoleCtrl::createInstance(consoleConfig);
 
     mpUI->tabWidget->setFocusPolicy(Qt::ClickFocus);
 
@@ -328,7 +319,6 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
 Form::~Form()
 {
-    NDLTMessageAnalyzer::NConsole::CConsoleCtrl::destroyInstance();
     delete mpUI;
 }
 

@@ -1,5 +1,4 @@
-#ifndef CCONSOLECTRL_HPP
-#define CCONSOLECTRL_HPP
+#pragma once
 
 #include <QMap>
 
@@ -109,5 +108,3 @@ private slots:
         };
     }
 }
-
-#endif // CCONSOLECTRL_HPP
