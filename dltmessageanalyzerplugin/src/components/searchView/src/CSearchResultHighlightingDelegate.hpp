@@ -3,8 +3,7 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CSearchResultHighlightingDelegate class
  */
-#ifndef CSEARCHRESULTHIGHLIGHTINGDELEGATE_HPP
-#define CSEARCHRESULTHIGHLIGHTINGDELEGATE_HPP
+#pragma once
 
 #include "QMap"
 
@@ -28,5 +27,3 @@ private:
 
     bool mbMarkTimestampWithBold;
 };
-
-#endif // CSEARCHRESULTHIGHLIGHTINGDELEGATE_HPP

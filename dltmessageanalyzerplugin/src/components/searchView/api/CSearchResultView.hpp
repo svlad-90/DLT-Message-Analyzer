@@ -3,11 +3,10 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CSearchResultView.hpp class
  */
-#ifndef CSEARCHRESULTVIEW_HPP
-#define CSEARCHRESULTVIEW_HPP
+#pragma once
 
 #include <QTableView>
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 class CSearchResultModel;
 
@@ -66,5 +65,3 @@ private:
     typedef std::map<eSearchResultColumn, int /*max size of content*/> tContentSizeMap;
     tContentSizeMap mContentSizeMap;
 };
-
-#endif // CSEARCHRESULTVIEW_HPP

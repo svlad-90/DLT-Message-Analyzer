@@ -1153,7 +1153,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CSearchResultView</class>
    <extends>QTableView</extends>
-   <header>searchView/CSearchResultView.hpp</header>
+   <header>components/searchView/api/CSearchResultView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CLogo</class>

@@ -175,7 +175,16 @@ class "CSearchResultModel"
 {
 }
 
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
 class "CSearchResultView"
+{
+}
+
+class "CSearchViewComponent"
 {
 }
 
@@ -293,6 +302,7 @@ QWidget <|-- Form : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
+QObject <|-- CSearchViewComponent : extends
 QObject <|-- CSettingsManager : extends
 
 '====================Dependencies section====================

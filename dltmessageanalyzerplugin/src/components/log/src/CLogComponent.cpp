@@ -36,26 +36,47 @@ DMA::tSyncInitOperationResult CLogComponent::init()
 
     try
     {
-        mpConsoleInputProcessor = std::make_shared<CConsoleInputProcessor>(mpConsoleViewInput);
-        result.bIsOperationSuccessful = true;
-        result.returnCode = 0;
+        if(nullptr != mpConsoleViewInput)
+        {
+            mpConsoleInputProcessor = std::make_shared<CConsoleInputProcessor>(mpConsoleViewInput);
+            result.bIsOperationSuccessful = true;
+            result.returnCode = 0;
+        }
+        else
+        {
+            result.bIsOperationSuccessful = false;
+            result.returnCode = -1;
+        }
     }
     catch (...)
-    {}
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
     return result;
 }
 
 DMA::tSyncInitOperationResult CLogComponent::shutdown()
 {
-    if(nullptr != mpConsoleInputProcessor)
+    DMA::tSyncInitOperationResult result;
+
+    try
     {
-        mpConsoleInputProcessor.reset();
+        if(nullptr != mpConsoleInputProcessor)
+        {
+            mpConsoleInputProcessor.reset();
+        }
+
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
     }
 
-    DMA::tSyncInitOperationResult result;
-    result.bIsOperationSuccessful = true;
-    result.returnCode = 0;
     return result;
 }
 

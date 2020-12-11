@@ -1,0 +1,46 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+class "DMA::ISynchronousInitializable"
+{
+    + {abstract} virtual virtual tSyncInitOperationResult startInit() = 0
+    + {abstract} virtual virtual tSyncInitOperationResult startShutdown() = 0
+    + {abstract} virtual virtual virtual bool isInitialized () const = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+'====================Inheritance section====================
+DMA::ISynchronousInitializable <|-- DMA::CBaseSynchronousInitializable : implements
+DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
+DMA::INamedObject <|-- DMA::IComponent : implements
+
+@enduml

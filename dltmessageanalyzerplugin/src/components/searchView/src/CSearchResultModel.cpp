@@ -8,9 +8,9 @@
 
 #include "CSearchResultModel.hpp"
 #include "components/log/api/CLog.hpp"
-#include "../settings/CSettingsManager.hpp"
-#include "../dltWrappers/CDLTMsgWrapper.hpp"
-#include "../dltWrappers/CDLTFileWrapper.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "dltWrappers/CDLTMsgWrapper.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -587,6 +587,7 @@ void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool ch
 PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultModel)
         PUML_INHERITANCE_CHECKED(QAbstractTableModel, implements)
+        PUML_INHERITANCE_CHECKED(ISearchResultModel, implements)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

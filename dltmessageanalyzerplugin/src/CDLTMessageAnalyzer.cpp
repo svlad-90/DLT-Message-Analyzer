@@ -31,14 +31,14 @@
 #include "QApplication"
 #include "QColorDialog"
 
-#include "searchView/CSearchResultView.hpp"
 #include "groupedView/CGroupedView.hpp"
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTFileWrapper.hpp"
 #include "common/CRegexDirectoryMonitor.hpp"
 
 #include "groupedView/CGroupedViewModel.hpp"
-#include "searchView/CSearchResultModel.hpp"
+#include "components/searchView/api/CSearchResultView.hpp"
+#include "components/searchView/api/ISearchResultModel.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "patternsView/CPatternsView.hpp"
@@ -54,12 +54,14 @@
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                                          CGroupedView* pGroupedView, QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
                                          QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
-                                         CSearchResultView* pSearchResultTableView,
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
-                                         QLineEdit* pPatternsSearchInput, QComboBox* pRegexSelectionComboBox,
-                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput, CUMLView* pUMLView
-                                         ):
+                                         QLineEdit* pPatternsSearchInput,
+                                         QComboBox* pRegexSelectionComboBox,
+                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
+                                         CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
+                                         CSearchResultView* pSearchResultView,
+                                         const std::shared_ptr<ISearchResultModel>& pSearchResultModel):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
@@ -76,8 +78,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpGroupedResultView(pGroupedView),
     mpGroupedViewModel( new CGroupedViewModel() ),
     mpRegexSelectionComboBox(pRegexSelectionComboBox),
-    mpSearchResultTableView(pSearchResultTableView),
-    mpSearchResultModel( new CSearchResultModel() ),
+    mpSearchResultView(pSearchResultView),
+    mpSearchResultModel(pSearchResultModel),
     mpPatternsTreeView(pPatternsTableView),
     mpAvailablePatternsModel( new CPatternsModel() ),
     mpFiltersView(pFiltersView),
@@ -99,8 +101,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   #ifdef DEBUG_BUILD
   , mMeasurementNotificationTimer()
   #endif
-  , mMeasurementRequestTimer(),
-    mpSearchViewTableJumper(std::make_shared<CTableMemoryJumper>(mpSearchResultTableView))
+  , mMeasurementRequestTimer()
+  , mpSearchViewTableJumper(pSearchViewTableJumper)
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
@@ -285,12 +287,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         mpNumberOfThreadsCombobBox->repaint();
     }
 
-    if(nullptr != mpSearchResultTableView &&
-            nullptr != mpSearchResultModel)
-    {
-        mpSearchResultTableView->setModel(mpSearchResultModel);
-    }
-
 #ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     {
         QMainWindow* pMainWindow = nullptr;
@@ -373,14 +369,14 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    if(nullptr != mpSearchResultTableView)
+    if(nullptr != mpSearchResultView)
     {
-        connect( mpSearchResultTableView, &CSearchResultView::restartSearch, [this]()
+        connect( mpSearchResultView, &CSearchResultView::restartSearch, [this]()
         {
             static_cast<void>(analyze());
         });
 
-        connect( mpSearchResultTableView, &CSearchResultView::searchRangeChanged, [this](const tIntRangeProperty& searchRange, bool bReset)
+        connect( mpSearchResultView, &CSearchResultView::searchRangeChanged, [this](const tIntRangeProperty& searchRange, bool bReset)
         {
             if(false == bReset)
             {
@@ -419,9 +415,9 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    if(nullptr != mpSearchResultTableView)
+    if(nullptr != mpSearchResultView)
     {
-        connect(mpSearchResultTableView, &CSearchResultView::clearSearchResultsRequested, [this](){cancel();});
+        connect(mpSearchResultView, &CSearchResultView::clearSearchResultsRequested, [this](){cancel();});
     }
 
     mpRegexDirectoryMonitor = std::make_shared<CRegexDirectoryMonitor>();
@@ -481,19 +477,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     {
         handleLoadedRegexConfig();
     });
-
-    if(nullptr != mpSearchResultTableView)
-    {
-        connect(mpSearchResultTableView->selectionModel(), &QItemSelectionModel::currentChanged,
-        [this](const QModelIndex &current, const QModelIndex &)
-        {
-            if(nullptr != mpSearchResultTableView)
-            {
-                auto index = current.sibling(current.row(), static_cast<int>(eSearchResultColumn::Index));
-                mpSearchViewTableJumper->setSelectedRow(index.data().value<int>());
-            }
-        });
-    }
 
     connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
     {
@@ -621,12 +604,6 @@ CDLTMessageAnalyzer::~CDLTMessageAnalyzer()
         mpAvailablePatternsModel = nullptr;
     }
 
-    if(mpSearchResultModel)
-    {
-        delete mpSearchResultModel;
-        mpSearchResultModel = nullptr;
-    }
-
     if(mpFiltersModel)
     {
         delete mpFiltersModel;
@@ -714,19 +691,9 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
         });
     }
 
-    if(nullptr != mpSearchResultTableView)
-    {
-        mpSearchResultTableView->setFile(pFile);
-    }
-
     resetSearchRange();
 
     mpFile = pFile;
-
-    if(nullptr != mpSearchViewTableJumper)
-    {
-        mpSearchViewTableJumper->resetSelectedRow();
-    }
 
     if(nullptr != mpFile)
     {
@@ -796,9 +763,9 @@ bool CDLTMessageAnalyzer::analyze()
         return false;
     }
 
-    if(nullptr != mpSearchResultTableView)
+    if(nullptr != mpSearchResultView)
     {
-        mpSearchResultTableView->newSearchStarted();
+        mpSearchResultView->newSearchStarted();
     }
 
     if(nullptr != mpUMLView)
@@ -1779,8 +1746,6 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedViewModel, 1, 1, contains)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
@@ -1795,7 +1760,9 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltPlugin, 1, many, uses)
 #endif
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexDirectoryMonitor, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, gets and uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, gets and uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

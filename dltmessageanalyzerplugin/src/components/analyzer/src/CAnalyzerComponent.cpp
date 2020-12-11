@@ -32,21 +32,34 @@ DMA::tSyncInitOperationResult CAnalyzerComponent::init()
         result.returnCode = 0;
     }
     catch (...)
-    {}
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
     return result;
 }
 
 DMA::tSyncInitOperationResult CAnalyzerComponent::shutdown()
 {
-    if(nullptr != mpMessageAnalyzerController)
+    DMA::tSyncInitOperationResult result;
+
+    try
     {
-        mpMessageAnalyzerController.reset();
+        if(nullptr != mpMessageAnalyzerController)
+        {
+            mpMessageAnalyzerController.reset();
+        }
+
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
     }
 
-    DMA::tSyncInitOperationResult result;
-    result.bIsOperationSuccessful = true;
-    result.returnCode = 0;
     return result;
 }
 
@@ -56,7 +69,7 @@ CAnalyzerComponent::getAnalyzerController() const
     return mpMessageAnalyzerController;
 }
 
-PUML_PACKAGE_BEGIN(DMA_Analyzer)
+PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
     PUML_CLASS_BEGIN(CAnalyzerComponent)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CContinuousAnalyzer, 1, 1, contains)

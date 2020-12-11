@@ -6,10 +6,6 @@ skinparam wrapWidth 600
 package "DMA_Analyzer" #DDDDDD
 {
 
-class "CAnalyzerComponent"
-{
-}
-
 class "CContinuousAnalyzer"
 {
 }
@@ -31,6 +27,10 @@ class "CSubConsumer"
 package "DMA_Analyzer_API" #DDDDDD
 {
 
+class "CAnalyzerComponent"
+{
+}
+
 abstract class "IDLTMessageAnalyzerController"
 {
     + {abstract} virtual int getMaximumNumberOfThreads() const = 0
@@ -42,24 +42,6 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
 {
     + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
     + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
-}
-
-}
-
-package "DMA_Framework_Component" #DDDDDD
-{
-
-class "DMA::IComponent"
-{
-}
-
-}
-
-package "DMA_Root" #DDDDDD
-{
-
-class "DLTMessageAnalyzerPlugin"
-{
 }
 
 }
@@ -78,19 +60,17 @@ class "QThread"
 }
 
 '====================Inheritance section====================
-DMA::IComponent <|-- CAnalyzerComponent : implements
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
 
 '====================Dependencies section====================
-CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
-CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 CContinuousAnalyzer "1" o-- "1" IDLTMessageAnalyzerController : uses
 CContinuousAnalyzer "1" *-- "1" IDLTMessageAnalyzerControllerConsumer : contains
 CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
 CMTAnalyzer "1" *-- "*" QThread : contains
-DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
+CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
+CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 
 @enduml
