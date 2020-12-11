@@ -49,6 +49,11 @@ class "CSearchResultModel"
 {
 }
 
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
 class "CSearchResultView"
 {
 }

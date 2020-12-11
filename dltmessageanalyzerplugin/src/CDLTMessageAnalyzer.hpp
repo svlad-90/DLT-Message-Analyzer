@@ -33,16 +33,16 @@ class QPushButton;
 
 class CGroupedViewModel;
 typedef CGroupedViewModel* tGroupedViewModelPtr;
-class CSearchResultModel;
-typedef CSearchResultModel* tSearchResultModelPtr;
 class CSearchResultView;
 class CGroupedView;
 class CPatternsView;
 class CRegexDirectoryMonitor;
 class CFiltersView;
 class CFiltersModel;
-class CTableMemoryJumper;
 class CUMLView;
+class CSearchResultView;
+class ISearchResultModel;
+class CTableMemoryJumper;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -53,35 +53,18 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
     Q_OBJECT
 
     public:
-    /**
-         * @brief CDLTMessageAnalyzer - Constructor. Creates instance of dlt message analyzer
-         * @param pController - the weak pointer to controller
-         * @param pGroupedView - instance of grouped view
-         * @param pProgressBarLabel - instance of progress bar label
-         * @param pProgressBar - instance of progress bar
-         * @param regexLineEdit - instance of regex line edit
-         * @param pLabel - instance of status label
-         * @param pPatternsTableView - instance of patterns table view
-         * @param pNumberOfThreadsCombobBox - "number of threads" combo-box
-         * @param pSearchResultTableView - search result table view
-         * @param pContinuousSearchCheckBox - instance of
-         * @param pCacheStatusLabel - instance of cache status label
-         * @param pMainTabWidget - instance of main tab widget
-         * @param pPatternsSearchInput - instance of regex patterns search input widget
-         * @param pRegexSelectionComboBox - instance of regex selection combo-box
-         * @param pFiltersView - instance of filters view
-         * @param pFiltersSearchInput - instance of filters search input
-         */
+
         CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                             CGroupedView* pGroupedView, QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
                             QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
-                            CSearchResultView* pSearchResultTableView,
                             QCheckBox* pContinuousSearchCheckBox,
                             QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                             QLineEdit* pPatternsSearchInput,
                             QComboBox* pRegexSelectionComboBox,
                             CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
-                            CUMLView* pUMLView);
+                            CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
+                            CSearchResultView* pSearchResultView,
+                            const std::shared_ptr<ISearchResultModel>& pSearchResultModel);
 
         /**
          * Destructor
@@ -291,8 +274,8 @@ signals:
         tGroupedViewModelPtr mpGroupedViewModel;
         QComboBox* mpRegexSelectionComboBox;
 
-        CSearchResultView* mpSearchResultTableView;
-        tSearchResultModelPtr mpSearchResultModel;
+        CSearchResultView* mpSearchResultView;
+        std::shared_ptr<ISearchResultModel> mpSearchResultModel;
 
         CPatternsView* mpPatternsTreeView;
         tPatternsModelPtr mpAvailablePatternsModel;

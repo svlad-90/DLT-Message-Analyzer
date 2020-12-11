@@ -3,14 +3,10 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_SearchView" #DDDDDD
+package "DMA_Framework_Component" #DDDDDD
 {
 
-class "CSearchResultHighlightingDelegate"
-{
-}
-
-class "CSearchResultModel"
+class "DMA::IComponent"
 {
 }
 
@@ -18,6 +14,14 @@ class "CSearchResultModel"
 
 package "DMA_SearchView_API" #DDDDDD
 {
+
+class "CSearchResultView"
+{
+}
+
+class "CSearchViewComponent"
+{
+}
 
 class "ISearchResultModel"
 {
@@ -34,22 +38,22 @@ class "ISearchResultModel"
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractTableModel"
+class "QObject"
 {
 }
 
-class "QStyledItemDelegate"
+class "QTableView"
 {
 }
 
 }
 
 '====================Inheritance section====================
-QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
-ISearchResultModel <|-- CSearchResultModel : implements
-QAbstractTableModel <|-- CSearchResultModel : implements
+QTableView <|-- CSearchResultView : extends
+DMA::IComponent <|-- CSearchViewComponent : implements
+QObject <|-- CSearchViewComponent : extends
 
 '====================Dependencies section====================
-CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
+CSearchViewComponent "1" o-- "1" CSearchResultView : uses
 
 @enduml

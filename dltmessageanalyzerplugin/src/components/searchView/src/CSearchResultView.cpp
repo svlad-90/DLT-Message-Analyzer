@@ -4,7 +4,7 @@
  * @brief   Implementation of the CSearchResultView class
  */
 
-#include "CSearchResultView.hpp"
+#include "../api/CSearchResultView.hpp"
 
 #include "QHeaderView"
 #include "QScrollBar"
@@ -24,11 +24,11 @@
 #include <QFontDialog>
 #include <QTableWidget>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "CSearchResultModel.hpp"
-#include "../settings/CSettingsManager.hpp"
-#include "../dltWrappers/CDLTFileWrapper.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "dltWrappers/CDLTFileWrapper.hpp"
 #include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -1291,7 +1291,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                 finalStringSize += columnStr.size();
             };
 
-            const auto* pSpecificModel = qobject_cast<CSearchResultModel*>(model());
+            const auto* pSpecificModel = dynamic_cast<CSearchResultModel*>(model());
 
             if(nullptr != pSpecificModel)
             {
@@ -1635,7 +1635,7 @@ void CSearchResultView::scrollTo(const QModelIndex &index, ScrollHint hint)
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_SearchView)
+PUML_PACKAGE_BEGIN(DMA_SearchView_API)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultView)
         PUML_INHERITANCE_CHECKED(QTableView, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)

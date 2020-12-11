@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="644px" preserveAspectRatio="none" style="width:1438px;height:644px;background:#FEFEFE;" version="1.1" viewBox="0 0 1438 644" width="1438px" zoomAndPan="magnify"><defs><filter height="300%" id="fjl2uqgvrgahx" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[7ee2e9eb0913b0809c314d5eac520148]
+cluster DMA_Common--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="1231,387,1338,387,1345,410.6094,1421,410.6094,1421,487,1231,487,1231,387" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="1231" x2="1345" y1="410.6094" y2="410.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="101" x="1235" y="403.5332">DMA_Common</text><!--MD5=[52ee596670a41bc52440020e3c812fb2]
+cluster DMA_DLTWrappers--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="397,537,537,537,544,560.6094,561,560.6094,561,637,397,637,397,537" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="397" x2="544" y1="560.6094" y2="560.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="134" x="401" y="553.5332">DMA_DLTWrappers</text><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="994,6,1207,6,1214,29.6094,1217,29.6094,1217,106,994,106,994,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="994" x2="1214" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="998" y="22.5332">DMA_Framework_Component</text><!--MD5=[8783dc687c912be3a190a2183cc7b433]
+cluster DMA_Root--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="16,6,95,6,102,29.6094,323,29.6094,323,106,16,106,16,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="102" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="73" x="20" y="22.5332">DMA_Root</text><!--MD5=[e161d740f7247c3d6e8c2afc21f18eb1]
+cluster DMA_SearchView--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="605,537,733,537,740,560.6094,787,560.6094,787,637,605,637,605,537" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="605" x2="740" y1="560.6094" y2="560.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="122" x="609" y="553.5332">DMA_SearchView</text><!--MD5=[d4892f74e8b231ffe841a66f7609dced]
+cluster DMA_SearchView_API--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="392,156,550,156,557,179.6094,1207,179.6094,1207,487,392,487,392,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="392" x2="557" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="152" x="396" y="172.5332">DMA_SearchView_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fjl2uqgvrgahx)" points="524,6,546,6,553,29.6094,765,29.6094,765,106,524,106,524,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="524" x2="553" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="528" y="22.5332">Qt</text><!--MD5=[542624a98036188dc3c47cfcea28487e]
+class CTableMemoryJumper--><rect codeLine="8" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CTableMemoryJumper" style="stroke:#A80036;stroke-width:1.5;" width="157" x="1247.5" y="423"/><ellipse cx="1262.5" cy="439" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1265.2656,434.875 Q1265.4219,434.6563 1265.6094,434.5469 Q1265.7969,434.4375 1266.0156,434.4375 Q1266.3906,434.4375 1266.625,434.6953 Q1266.8594,434.9531 1266.8594,435.5625 L1266.8594,437.0156 Q1266.8594,437.625 1266.625,437.8906 Q1266.3906,438.1563 1266.0156,438.1563 Q1265.6719,438.1563 1265.4688,437.9531 Q1265.2656,437.7656 1265.1563,437.25 Q1265.1094,436.8906 1264.9219,436.7031 Q1264.5938,436.3281 1263.9844,436.1094 Q1263.375,435.8906 1262.75,435.8906 Q1261.9844,435.8906 1261.3516,436.2188 Q1260.7188,436.5469 1260.2266,437.2969 Q1259.7344,438.0469 1259.7344,439.0781 L1259.7344,440.1719 Q1259.7344,441.4063 1260.625,442.2266 Q1261.5156,443.0469 1263.1094,443.0469 Q1264.0469,443.0469 1264.7031,442.7969 Q1265.0938,442.6406 1265.5156,442.2031 Q1265.7813,441.9375 1265.9297,441.8594 Q1266.0781,441.7813 1266.2813,441.7813 Q1266.6094,441.7813 1266.8672,442.0391 Q1267.125,442.2969 1267.125,442.6406 Q1267.125,442.9844 1266.7813,443.3906 Q1266.2813,443.9688 1265.4844,444.2969 Q1264.4063,444.75 1263.1094,444.75 Q1261.5938,444.75 1260.3906,444.125 Q1259.4063,443.625 1258.7188,442.5547 Q1258.0313,441.4844 1258.0313,440.2031 L1258.0313,439.0469 Q1258.0313,437.7188 1258.6484,436.5703 Q1259.2656,435.4219 1260.3594,434.8047 Q1261.4531,434.1875 1262.6875,434.1875 Q1263.4219,434.1875 1264.0703,434.3516 Q1264.7188,434.5156 1265.2656,434.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="125" x="1276.5" y="443.9102">CTableMemoryJumper</text><line style="stroke:#A80036;stroke-width:1.5;" x1="1248.5" x2="1403.5" y1="455" y2="455"/><line style="stroke:#A80036;stroke-width:1.5;" x1="1248.5" x2="1403.5" y1="463" y2="463"/><!--MD5=[d5903df59b18896e6e27345f5b1788b9]
+class CDLTFileWrapper--><rect codeLine="17" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CDLTFileWrapper" style="stroke:#A80036;stroke-width:1.5;" width="131" x="413.5" y="573"/><ellipse cx="428.5" cy="589" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M431.2656,584.875 Q431.4219,584.6563 431.6094,584.5469 Q431.7969,584.4375 432.0156,584.4375 Q432.3906,584.4375 432.625,584.6953 Q432.8594,584.9531 432.8594,585.5625 L432.8594,587.0156 Q432.8594,587.625 432.625,587.8906 Q432.3906,588.1563 432.0156,588.1563 Q431.6719,588.1563 431.4688,587.9531 Q431.2656,587.7656 431.1563,587.25 Q431.1094,586.8906 430.9219,586.7031 Q430.5938,586.3281 429.9844,586.1094 Q429.375,585.8906 428.75,585.8906 Q427.9844,585.8906 427.3516,586.2188 Q426.7188,586.5469 426.2266,587.2969 Q425.7344,588.0469 425.7344,589.0781 L425.7344,590.1719 Q425.7344,591.4063 426.625,592.2266 Q427.5156,593.0469 429.1094,593.0469 Q430.0469,593.0469 430.7031,592.7969 Q431.0938,592.6406 431.5156,592.2031 Q431.7813,591.9375 431.9297,591.8594 Q432.0781,591.7813 432.2813,591.7813 Q432.6094,591.7813 432.8672,592.0391 Q433.125,592.2969 433.125,592.6406 Q433.125,592.9844 432.7813,593.3906 Q432.2813,593.9688 431.4844,594.2969 Q430.4063,594.75 429.1094,594.75 Q427.5938,594.75 426.3906,594.125 Q425.4063,593.625 424.7188,592.5547 Q424.0313,591.4844 424.0313,590.2031 L424.0313,589.0469 Q424.0313,587.7188 424.6484,586.5703 Q425.2656,585.4219 426.3594,584.8047 Q427.4531,584.1875 428.6875,584.1875 Q429.4219,584.1875 430.0703,584.3516 Q430.7188,584.5156 431.2656,584.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="442.5" y="593.9102">CDLTFileWrapper</text><line style="stroke:#A80036;stroke-width:1.5;" x1="414.5" x2="543.5" y1="605" y2="605"/><line style="stroke:#A80036;stroke-width:1.5;" x1="414.5" x2="543.5" y1="613" y2="613"/><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="26" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="1039.5" y="42"/><ellipse cx="1054.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1057.2656,53.875 Q1057.4219,53.6563 1057.6094,53.5469 Q1057.7969,53.4375 1058.0156,53.4375 Q1058.3906,53.4375 1058.625,53.6953 Q1058.8594,53.9531 1058.8594,54.5625 L1058.8594,56.0156 Q1058.8594,56.625 1058.625,56.8906 Q1058.3906,57.1563 1058.0156,57.1563 Q1057.6719,57.1563 1057.4688,56.9531 Q1057.2656,56.7656 1057.1563,56.25 Q1057.1094,55.8906 1056.9219,55.7031 Q1056.5938,55.3281 1055.9844,55.1094 Q1055.375,54.8906 1054.75,54.8906 Q1053.9844,54.8906 1053.3516,55.2188 Q1052.7188,55.5469 1052.2266,56.2969 Q1051.7344,57.0469 1051.7344,58.0781 L1051.7344,59.1719 Q1051.7344,60.4063 1052.625,61.2266 Q1053.5156,62.0469 1055.1094,62.0469 Q1056.0469,62.0469 1056.7031,61.7969 Q1057.0938,61.6406 1057.5156,61.2031 Q1057.7813,60.9375 1057.9297,60.8594 Q1058.0781,60.7813 1058.2813,60.7813 Q1058.6094,60.7813 1058.8672,61.0391 Q1059.125,61.2969 1059.125,61.6406 Q1059.125,61.9844 1058.7813,62.3906 Q1058.2813,62.9688 1057.4844,63.2969 Q1056.4063,63.75 1055.1094,63.75 Q1053.5938,63.75 1052.3906,63.125 Q1051.4063,62.625 1050.7188,61.5547 Q1050.0313,60.4844 1050.0313,59.2031 L1050.0313,58.0469 Q1050.0313,56.7188 1050.6484,55.5703 Q1051.2656,54.4219 1052.3594,53.8047 Q1053.4531,53.1875 1054.6875,53.1875 Q1055.4219,53.1875 1056.0703,53.3516 Q1056.7188,53.5156 1057.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="1068.5" y="62.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="1040.5" x2="1169.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="1040.5" x2="1169.5" y1="82" y2="82"/><!--MD5=[65cf5b7ad40f1b0ece06d7cb106e6435]
+class CDLTMessageAnalyzer--><rect codeLine="35" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CDLTMessageAnalyzer" style="stroke:#A80036;stroke-width:1.5;" width="160" x="147" y="42"/><ellipse cx="162" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M164.7656,53.875 Q164.9219,53.6563 165.1094,53.5469 Q165.2969,53.4375 165.5156,53.4375 Q165.8906,53.4375 166.125,53.6953 Q166.3594,53.9531 166.3594,54.5625 L166.3594,56.0156 Q166.3594,56.625 166.125,56.8906 Q165.8906,57.1563 165.5156,57.1563 Q165.1719,57.1563 164.9688,56.9531 Q164.7656,56.7656 164.6563,56.25 Q164.6094,55.8906 164.4219,55.7031 Q164.0938,55.3281 163.4844,55.1094 Q162.875,54.8906 162.25,54.8906 Q161.4844,54.8906 160.8516,55.2188 Q160.2188,55.5469 159.7266,56.2969 Q159.2344,57.0469 159.2344,58.0781 L159.2344,59.1719 Q159.2344,60.4063 160.125,61.2266 Q161.0156,62.0469 162.6094,62.0469 Q163.5469,62.0469 164.2031,61.7969 Q164.5938,61.6406 165.0156,61.2031 Q165.2813,60.9375 165.4297,60.8594 Q165.5781,60.7813 165.7813,60.7813 Q166.1094,60.7813 166.3672,61.0391 Q166.625,61.2969 166.625,61.6406 Q166.625,61.9844 166.2813,62.3906 Q165.7813,62.9688 164.9844,63.2969 Q163.9063,63.75 162.6094,63.75 Q161.0938,63.75 159.8906,63.125 Q158.9063,62.625 158.2188,61.5547 Q157.5313,60.4844 157.5313,59.2031 L157.5313,58.0469 Q157.5313,56.7188 158.1484,55.5703 Q158.7656,54.4219 159.8594,53.8047 Q160.9531,53.1875 162.1875,53.1875 Q162.9219,53.1875 163.5703,53.3516 Q164.2188,53.5156 164.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="128" x="176" y="62.9102">CDLTMessageAnalyzer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="148" x2="306" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="148" x2="306" y1="82" y2="82"/><!--MD5=[b1d639026a64f7feb39d803aafe5f2b4]
+class Ui::Form--><rect codeLine="39" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="Ui::Form" style="stroke:#A80036;stroke-width:1.5;" width="79" x="32.5" y="42"/><ellipse cx="47.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M50.2656,53.875 Q50.4219,53.6563 50.6094,53.5469 Q50.7969,53.4375 51.0156,53.4375 Q51.3906,53.4375 51.625,53.6953 Q51.8594,53.9531 51.8594,54.5625 L51.8594,56.0156 Q51.8594,56.625 51.625,56.8906 Q51.3906,57.1563 51.0156,57.1563 Q50.6719,57.1563 50.4688,56.9531 Q50.2656,56.7656 50.1563,56.25 Q50.1094,55.8906 49.9219,55.7031 Q49.5938,55.3281 48.9844,55.1094 Q48.375,54.8906 47.75,54.8906 Q46.9844,54.8906 46.3516,55.2188 Q45.7188,55.5469 45.2266,56.2969 Q44.7344,57.0469 44.7344,58.0781 L44.7344,59.1719 Q44.7344,60.4063 45.625,61.2266 Q46.5156,62.0469 48.1094,62.0469 Q49.0469,62.0469 49.7031,61.7969 Q50.0938,61.6406 50.5156,61.2031 Q50.7813,60.9375 50.9297,60.8594 Q51.0781,60.7813 51.2813,60.7813 Q51.6094,60.7813 51.8672,61.0391 Q52.125,61.2969 52.125,61.6406 Q52.125,61.9844 51.7813,62.3906 Q51.2813,62.9688 50.4844,63.2969 Q49.4063,63.75 48.1094,63.75 Q46.5938,63.75 45.3906,63.125 Q44.4063,62.625 43.7188,61.5547 Q43.0313,60.4844 43.0313,59.2031 L43.0313,58.0469 Q43.0313,56.7188 43.6484,55.5703 Q44.2656,54.4219 45.3594,53.8047 Q46.4531,53.1875 47.6875,53.1875 Q48.4219,53.1875 49.0703,53.3516 Q49.7188,53.5156 50.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="47" x="61.5" y="62.9102">Ui::Form</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="110.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="110.5" y1="82" y2="82"/><!--MD5=[f3163cffd64cd90a121d8451d55be389]
+class CSearchResultModel--><rect codeLine="48" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CSearchResultModel" style="stroke:#A80036;stroke-width:1.5;" width="149" x="621.5" y="573"/><ellipse cx="636.5" cy="589" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M639.2656,584.875 Q639.4219,584.6563 639.6094,584.5469 Q639.7969,584.4375 640.0156,584.4375 Q640.3906,584.4375 640.625,584.6953 Q640.8594,584.9531 640.8594,585.5625 L640.8594,587.0156 Q640.8594,587.625 640.625,587.8906 Q640.3906,588.1563 640.0156,588.1563 Q639.6719,588.1563 639.4688,587.9531 Q639.2656,587.7656 639.1563,587.25 Q639.1094,586.8906 638.9219,586.7031 Q638.5938,586.3281 637.9844,586.1094 Q637.375,585.8906 636.75,585.8906 Q635.9844,585.8906 635.3516,586.2188 Q634.7188,586.5469 634.2266,587.2969 Q633.7344,588.0469 633.7344,589.0781 L633.7344,590.1719 Q633.7344,591.4063 634.625,592.2266 Q635.5156,593.0469 637.1094,593.0469 Q638.0469,593.0469 638.7031,592.7969 Q639.0938,592.6406 639.5156,592.2031 Q639.7813,591.9375 639.9297,591.8594 Q640.0781,591.7813 640.2813,591.7813 Q640.6094,591.7813 640.8672,592.0391 Q641.125,592.2969 641.125,592.6406 Q641.125,592.9844 640.7813,593.3906 Q640.2813,593.9688 639.4844,594.2969 Q638.4063,594.75 637.1094,594.75 Q635.5938,594.75 634.3906,594.125 Q633.4063,593.625 632.7188,592.5547 Q632.0313,591.4844 632.0313,590.2031 L632.0313,589.0469 Q632.0313,587.7188 632.6484,586.5703 Q633.2656,585.4219 634.3594,584.8047 Q635.4531,584.1875 636.6875,584.1875 Q637.4219,584.1875 638.0703,584.3516 Q638.7188,584.5156 639.2656,584.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="117" x="650.5" y="593.9102">CSearchResultModel</text><line style="stroke:#A80036;stroke-width:1.5;" x1="622.5" x2="769.5" y1="605" y2="605"/><line style="stroke:#A80036;stroke-width:1.5;" x1="622.5" x2="769.5" y1="613" y2="613"/><!--MD5=[7407fe43e74073cc7abb3b7b92331dbd]
+class CSearchResultView--><rect codeLine="57" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CSearchResultView" style="stroke:#A80036;stroke-width:1.5;" width="142" x="408" y="423"/><ellipse cx="423" cy="439" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M425.7656,434.875 Q425.9219,434.6563 426.1094,434.5469 Q426.2969,434.4375 426.5156,434.4375 Q426.8906,434.4375 427.125,434.6953 Q427.3594,434.9531 427.3594,435.5625 L427.3594,437.0156 Q427.3594,437.625 427.125,437.8906 Q426.8906,438.1563 426.5156,438.1563 Q426.1719,438.1563 425.9688,437.9531 Q425.7656,437.7656 425.6563,437.25 Q425.6094,436.8906 425.4219,436.7031 Q425.0938,436.3281 424.4844,436.1094 Q423.875,435.8906 423.25,435.8906 Q422.4844,435.8906 421.8516,436.2188 Q421.2188,436.5469 420.7266,437.2969 Q420.2344,438.0469 420.2344,439.0781 L420.2344,440.1719 Q420.2344,441.4063 421.125,442.2266 Q422.0156,443.0469 423.6094,443.0469 Q424.5469,443.0469 425.2031,442.7969 Q425.5938,442.6406 426.0156,442.2031 Q426.2813,441.9375 426.4297,441.8594 Q426.5781,441.7813 426.7813,441.7813 Q427.1094,441.7813 427.3672,442.0391 Q427.625,442.2969 427.625,442.6406 Q427.625,442.9844 427.2813,443.3906 Q426.7813,443.9688 425.9844,444.2969 Q424.9063,444.75 423.6094,444.75 Q422.0938,444.75 420.8906,444.125 Q419.9063,443.625 419.2188,442.5547 Q418.5313,441.4844 418.5313,440.2031 L418.5313,439.0469 Q418.5313,437.7188 419.1484,436.5703 Q419.7656,435.4219 420.8594,434.8047 Q421.9531,434.1875 423.1875,434.1875 Q423.9219,434.1875 424.5703,434.3516 Q425.2188,434.5156 425.7656,434.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="110" x="437" y="443.9102">CSearchResultView</text><line style="stroke:#A80036;stroke-width:1.5;" x1="409" x2="549" y1="455" y2="455"/><line style="stroke:#A80036;stroke-width:1.5;" x1="409" x2="549" y1="463" y2="463"/><!--MD5=[63a39deb90f5ccdbd9386bf2f62956d9]
+class CSearchViewComponent--><rect codeLine="61" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="CSearchViewComponent" style="stroke:#A80036;stroke-width:1.5;" width="171" x="1019.5" y="233.5"/><ellipse cx="1034.5" cy="249.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1037.2656,245.375 Q1037.4219,245.1563 1037.6094,245.0469 Q1037.7969,244.9375 1038.0156,244.9375 Q1038.3906,244.9375 1038.625,245.1953 Q1038.8594,245.4531 1038.8594,246.0625 L1038.8594,247.5156 Q1038.8594,248.125 1038.625,248.3906 Q1038.3906,248.6563 1038.0156,248.6563 Q1037.6719,248.6563 1037.4688,248.4531 Q1037.2656,248.2656 1037.1563,247.75 Q1037.1094,247.3906 1036.9219,247.2031 Q1036.5938,246.8281 1035.9844,246.6094 Q1035.375,246.3906 1034.75,246.3906 Q1033.9844,246.3906 1033.3516,246.7188 Q1032.7188,247.0469 1032.2266,247.7969 Q1031.7344,248.5469 1031.7344,249.5781 L1031.7344,250.6719 Q1031.7344,251.9063 1032.625,252.7266 Q1033.5156,253.5469 1035.1094,253.5469 Q1036.0469,253.5469 1036.7031,253.2969 Q1037.0938,253.1406 1037.5156,252.7031 Q1037.7813,252.4375 1037.9297,252.3594 Q1038.0781,252.2813 1038.2813,252.2813 Q1038.6094,252.2813 1038.8672,252.5391 Q1039.125,252.7969 1039.125,253.1406 Q1039.125,253.4844 1038.7813,253.8906 Q1038.2813,254.4688 1037.4844,254.7969 Q1036.4063,255.25 1035.1094,255.25 Q1033.5938,255.25 1032.3906,254.625 Q1031.4063,254.125 1030.7188,253.0547 Q1030.0313,251.9844 1030.0313,250.7031 L1030.0313,249.5469 Q1030.0313,248.2188 1030.6484,247.0703 Q1031.2656,245.9219 1032.3594,245.3047 Q1033.4531,244.6875 1034.6875,244.6875 Q1035.4219,244.6875 1036.0703,244.8516 Q1036.7188,245.0156 1037.2656,245.375 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="139" x="1048.5" y="254.4102">CSearchViewComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="1020.5" x2="1189.5" y1="265.5" y2="265.5"/><line style="stroke:#A80036;stroke-width:1.5;" x1="1020.5" x2="1189.5" y1="273.5" y2="273.5"/><!--MD5=[5aafdeb37bd495b7ad56fd7459101ed3]
+class ISearchResultModel--><rect codeLine="65" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="131.0156" id="ISearchResultModel" style="stroke:#A80036;stroke-width:1.5;" width="576" x="408" y="192"/><ellipse cx="636.25" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M639.0156,203.875 Q639.1719,203.6563 639.3594,203.5469 Q639.5469,203.4375 639.7656,203.4375 Q640.1406,203.4375 640.375,203.6953 Q640.6094,203.9531 640.6094,204.5625 L640.6094,206.0156 Q640.6094,206.625 640.375,206.8906 Q640.1406,207.1563 639.7656,207.1563 Q639.4219,207.1563 639.2188,206.9531 Q639.0156,206.7656 638.9063,206.25 Q638.8594,205.8906 638.6719,205.7031 Q638.3438,205.3281 637.7344,205.1094 Q637.125,204.8906 636.5,204.8906 Q635.7344,204.8906 635.1016,205.2188 Q634.4688,205.5469 633.9766,206.2969 Q633.4844,207.0469 633.4844,208.0781 L633.4844,209.1719 Q633.4844,210.4063 634.375,211.2266 Q635.2656,212.0469 636.8594,212.0469 Q637.7969,212.0469 638.4531,211.7969 Q638.8438,211.6406 639.2656,211.2031 Q639.5313,210.9375 639.6797,210.8594 Q639.8281,210.7813 640.0313,210.7813 Q640.3594,210.7813 640.6172,211.0391 Q640.875,211.2969 640.875,211.6406 Q640.875,211.9844 640.5313,212.3906 Q640.0313,212.9688 639.2344,213.2969 Q638.1563,213.75 636.8594,213.75 Q635.3438,213.75 634.1406,213.125 Q633.1563,212.625 632.4688,211.5547 Q631.7813,210.4844 631.7813,209.2031 L631.7813,208.0469 Q631.7813,206.7188 632.3984,205.5703 Q633.0156,204.4219 634.1094,203.8047 Q635.2031,203.1875 636.4375,203.1875 Q637.1719,203.1875 637.8203,203.3516 Q638.4688,203.5156 639.0156,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="111" x="656.75" y="212.9102">ISearchResultModel</text><line style="stroke:#A80036;stroke-width:1.5;" x1="409" x2="983" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="409" x2="983" y1="232" y2="232"/><ellipse cx="419" cy="243" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="280" x="428" y="247.4189">virtual int getFileIdx( const QModelIndex&amp; idx ) const = 0</text><ellipse cx="419" cy="256.8359" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="550" x="428" y="261.2549">virtual std::pair&lt;bool__tIntRange&gt; addNextMessageIdxVec(const tFoundMatchesPack&amp; foundMatchesPack) = 0</text><ellipse cx="419" cy="270.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="326" x="428" y="275.0908">virtual std::pair&lt;int__QString &gt; getUMLDiagramContent() const = 0</text><ellipse cx="419" cy="284.5078" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="130" x="428" y="288.9268">virtual void resetData() = 0</text><ellipse cx="419" cy="298.3438" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="281" x="428" y="302.7627">virtual void setFile(const tDLTFileWrapperPtr&amp; pFile) = 0</text><ellipse cx="419" cy="312.1797" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="251" x="428" y="316.5986">virtual void updateView(const int&amp; fromRow = 0) = 0</text><!--MD5=[8dd17ccd1ae0e0e4eb0a7117370c35f4]
+class QObject--><rect codeLine="80" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="QObject" style="stroke:#A80036;stroke-width:1.5;" width="76" x="673" y="42"/><ellipse cx="688" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M690.7656,53.875 Q690.9219,53.6563 691.1094,53.5469 Q691.2969,53.4375 691.5156,53.4375 Q691.8906,53.4375 692.125,53.6953 Q692.3594,53.9531 692.3594,54.5625 L692.3594,56.0156 Q692.3594,56.625 692.125,56.8906 Q691.8906,57.1563 691.5156,57.1563 Q691.1719,57.1563 690.9688,56.9531 Q690.7656,56.7656 690.6563,56.25 Q690.6094,55.8906 690.4219,55.7031 Q690.0938,55.3281 689.4844,55.1094 Q688.875,54.8906 688.25,54.8906 Q687.4844,54.8906 686.8516,55.2188 Q686.2188,55.5469 685.7266,56.2969 Q685.2344,57.0469 685.2344,58.0781 L685.2344,59.1719 Q685.2344,60.4063 686.125,61.2266 Q687.0156,62.0469 688.6094,62.0469 Q689.5469,62.0469 690.2031,61.7969 Q690.5938,61.6406 691.0156,61.2031 Q691.2813,60.9375 691.4297,60.8594 Q691.5781,60.7813 691.7813,60.7813 Q692.1094,60.7813 692.3672,61.0391 Q692.625,61.2969 692.625,61.6406 Q692.625,61.9844 692.2813,62.3906 Q691.7813,62.9688 690.9844,63.2969 Q689.9063,63.75 688.6094,63.75 Q687.0938,63.75 685.8906,63.125 Q684.9063,62.625 684.2188,61.5547 Q683.5313,60.4844 683.5313,59.2031 L683.5313,58.0469 Q683.5313,56.7188 684.1484,55.5703 Q684.7656,54.4219 685.8594,53.8047 Q686.9531,53.1875 688.1875,53.1875 Q688.9219,53.1875 689.5703,53.3516 Q690.2188,53.5156 690.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="702" y="62.9102">QObject</text><line style="stroke:#A80036;stroke-width:1.5;" x1="674" x2="748" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="674" x2="748" y1="82" y2="82"/><!--MD5=[a7b1893a9314c7bdb8dbb90769625d69]
+class QTableView--><rect codeLine="84" fill="#FEFECE" filter="url(#fjl2uqgvrgahx)" height="48" id="QTableView" style="stroke:#A80036;stroke-width:1.5;" width="98" x="540" y="42"/><ellipse cx="555" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M557.7656,53.875 Q557.9219,53.6563 558.1094,53.5469 Q558.2969,53.4375 558.5156,53.4375 Q558.8906,53.4375 559.125,53.6953 Q559.3594,53.9531 559.3594,54.5625 L559.3594,56.0156 Q559.3594,56.625 559.125,56.8906 Q558.8906,57.1563 558.5156,57.1563 Q558.1719,57.1563 557.9688,56.9531 Q557.7656,56.7656 557.6563,56.25 Q557.6094,55.8906 557.4219,55.7031 Q557.0938,55.3281 556.4844,55.1094 Q555.875,54.8906 555.25,54.8906 Q554.4844,54.8906 553.8516,55.2188 Q553.2188,55.5469 552.7266,56.2969 Q552.2344,57.0469 552.2344,58.0781 L552.2344,59.1719 Q552.2344,60.4063 553.125,61.2266 Q554.0156,62.0469 555.6094,62.0469 Q556.5469,62.0469 557.2031,61.7969 Q557.5938,61.6406 558.0156,61.2031 Q558.2813,60.9375 558.4297,60.8594 Q558.5781,60.7813 558.7813,60.7813 Q559.1094,60.7813 559.3672,61.0391 Q559.625,61.2969 559.625,61.6406 Q559.625,61.9844 559.2813,62.3906 Q558.7813,62.9688 557.9844,63.2969 Q556.9063,63.75 555.6094,63.75 Q554.0938,63.75 552.8906,63.125 Q551.9063,62.625 551.2188,61.5547 Q550.5313,60.4844 550.5313,59.2031 L550.5313,58.0469 Q550.5313,56.7188 551.1484,55.5703 Q551.7656,54.4219 552.8594,53.8047 Q553.9531,53.1875 555.1875,53.1875 Q555.9219,53.1875 556.5703,53.3516 Q557.2188,53.5156 557.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="66" x="569" y="62.9102">QTableView</text><line style="stroke:#A80036;stroke-width:1.5;" x1="541" x2="637" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="541" x2="637" y1="82" y2="82"/><!--MD5=[cd4f5f5782c9d99a9c4c71c44e3ef82a]
+reverse link ISearchResultModel to CSearchResultModel--><path codeLine="91" d="M696,343.28 C696,419.44 696,526.224 696,572.7763 " fill="none" id="ISearchResultModel-backto-CSearchResultModel" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="689,343.174,696,323.174,703,343.174,689,343.174" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="697" y="452.4951">implements</text><!--MD5=[f2b55ae3836b40422af534ef7e1e0a63]
+reverse link QTableView to CSearchResultView--><path codeLine="92" d="M519.583,68.755 C461.62,74.345 382.205,92.504 342,148 C296.369,210.986 310.314,251.969 342,323 C361.598,366.933 405.502,401.721 438.361,422.933 " fill="none" id="QTableView-backto-CSearchResultView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="519.383,61.751,539.855,67.219,520.441,75.711,519.383,61.751" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="343" y="262.9951">extends</text><!--MD5=[86ddd3009da82c1fdf9c471f925df1e3]
+reverse link DMA::IComponent to CSearchViewComponent--><path codeLine="93" d="M1105,110.348 C1105,148.596 1105,202.868 1105,233.37 " fill="none" id="DMA::IComponent-backto-CSearchViewComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="1098,110.236,1105,90.236,1112,110.236,1098,110.236" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="1106" y="136.4951">implements</text><!--MD5=[54ac869df4bd3a0c6fc45a6edb366368]
+reverse link QObject to CSearchViewComponent--><path codeLine="94" d="M769.528,73.894 C831.037,83.204 928.834,103.999 1002,148 C1038.73,170.086 1070.9,208.775 1089.13,233.49 " fill="none" id="QObject-backto-CSearchViewComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="768.215,80.779,749.385,71.061,770.165,66.915,768.215,80.779" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="988" y="136.4951">extends</text><!--MD5=[c467cc5d73fa869f659261b384d8d4af]
+reverse link CDLTMessageAnalyzer to CSearchResultView--><path codeLine="97" d="M224.995,103.22 C223.871,156.192 228.793,255.784 275,323 C308.034,371.053 366.564,403.486 412.484,422.928 " fill="none" id="CDLTMessageAnalyzer-backto-CSearchResultView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="225.416,90.192,221.2242,96.0596,225.0283,102.1857,229.2201,96.3181,225.416,90.192" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="276" y="262.9951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="217.1768" y="111.5768">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="393.0124" y="414.7416">1</text><!--MD5=[ef9710ee013b0696f9c37ae51aa148c7]
+reverse link CDLTMessageAnalyzer to ISearchResultModel--><path codeLine="98" d="M296.181,94.953 C359.113,120.38 454.371,158.87 536.123,191.901 " fill="none" id="CDLTMessageAnalyzer-backto-ISearchResultModel" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="284.04,90.047,288.1039,96.0039,295.1656,94.5437,291.1017,88.5868,284.04,90.047" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="82" x="407" y="136.4951">gets and uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="290.0904" y="111.3964">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="511.2536" y="181.3646">1</text><!--MD5=[78d9b0b95785a68a5f5974edd2dec10d]
+reverse link Ui::Form to CSearchResultView--><path codeLine="99" d="M76.0677,103.229 C84.0354,157.821 106.562,261.33 167,323 C232.205,389.534 337.779,420.948 407.79,435.151 " fill="none" id="Ui::Form-backto-CSearchResultView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="74.3025,90.144,71.1408,96.625,75.9073,102.0362,79.069,95.5552,74.3025,90.144" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="168" y="262.9951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="67.0106" y="111.5171">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="393.0855" y="448.2673">1</text><!--MD5=[4eef0a18d05685ab45114b0544b34ad0]
+reverse link CSearchResultView to CDLTFileWrapper--><path codeLine="100" d="M479,484.15 C479,511.682 479,548.78 479,572.549 " fill="none" id="CSearchResultView-backto-CDLTFileWrapper" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="479,471.125,475,477.125,479,483.125,483,477.125,479,471.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="480" y="517.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="471.1469" y="492.4934">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="471.1469" y="562.177">1</text><!--MD5=[ee7c2bd3a359369fe039795cddd2b846]
+reverse link CSearchResultView to CSearchResultModel--><path codeLine="101" d="M523.688,478.479 C564.738,506.476 624.692,547.366 661.974,572.7936 " fill="none" id="CSearchResultView-backto-CSearchResultModel" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="512.906,471.125,515.6087,477.8104,522.8194,477.8869,520.1167,471.2015,512.906,471.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="581" y="517.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="513.3175" y="492.4934">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="645.358" y="562.0809">1</text><!--MD5=[40d9b0d8fe9ef946feeb8b78c45b5e7b]
+reverse link CSearchViewComponent to CSearchResultModel--><path codeLine="102" d="M1066.55,290.226 C984.844,357.65 795.55,513.853 724.038,572.8635 " fill="none" id="CSearchViewComponent-backto-CSearchResultModel" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="1076.89,281.698,1069.7168,282.4365,1067.6396,289.3419,1074.8127,288.6034,1076.89,281.698" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="955" y="452.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="1070.8913" y="303.0842">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="723.3259" y="562.1687">1</text><!--MD5=[677232d2eab8035a472744b5aabefee5]
+reverse link CSearchViewComponent to CSearchResultView--><path codeLine="103" d="M1064.39,289.222 C1046.19,301.553 1023.92,314.768 1002,323 C854.936,378.236 804.68,338.108 653,379 C610.806,390.375 564.726,408.385 530.592,422.869 " fill="none" id="CSearchViewComponent-backto-CSearchResultView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="1075.15,281.711,1067.9404,281.8592,1065.3043,288.5712,1072.5139,288.423,1075.15,281.711" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="878" y="367.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="1060.0209" y="303.1004">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="535.9156" y="412.1756">1</text><!--MD5=[b057fc0eb66fa0d207eb8e6812ce1e77]
+reverse link CSearchViewComponent to CTableMemoryJumper--><path codeLine="104" d="M1142.63,290.428 C1186.98,328.052 1259.58,389.648 1298.8,422.927 " fill="none" id="CSearchViewComponent-backto-CTableMemoryJumper" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="1132.54,281.868,1134.5258,288.8003,1141.6886,289.6335,1139.7028,282.7012,1132.54,281.868" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="1236" y="367.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="1131.0993" y="302.8889">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="1283.9331" y="412.2485">1</text><!--MD5=[b0d23be925875cf7b5c5fd6e1640a2ca]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CTableMemoryJumper"
+{
+}
+
+}
+
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultModel"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchResultView"
+{
+}
+
+class "CSearchViewComponent"
+{
+}
+
+class "ISearchResultModel"
+{
+    + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
+    + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
+    + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void updateView(const int& fromRow = 0) = 0
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QTableView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+ISearchResultModel <|- - CSearchResultModel : implements
+QTableView <|- - CSearchResultView : extends
+DMA::IComponent <|- - CSearchViewComponent : implements
+QObject <|- - CSearchViewComponent : extends
+
+'====================Dependencies section====================
+CDLTMessageAnalyzer "1" o- - "1" CSearchResultView : uses
+CDLTMessageAnalyzer "1" o- - "1" ISearchResultModel : gets and uses
+Ui::Form "1" *- - "1" CSearchResultView : contains
+CSearchResultView "1" o- - "1" CDLTFileWrapper : uses
+CSearchResultView "1" o- - "1" CSearchResultModel : uses
+CSearchViewComponent "1" *- - "1" CSearchResultModel : contains
+CSearchViewComponent "1" o- - "1" CSearchResultView : uses
+CSearchViewComponent "1" *- - "1" CTableMemoryJumper : contains
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Common" #DDDDDD
+{
+
+class "CTableMemoryJumper"
+{
+}
+
+}
+
+package "DMA_DLTWrappers" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultModel"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchResultView"
+{
+}
+
+class "CSearchViewComponent"
+{
+}
+
+class "ISearchResultModel"
+{
+    + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
+    + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
+    + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void updateView(const int& fromRow = 0) = 0
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QTableView"
+{
+}
+
+}
+
+ISearchResultModel <|- - CSearchResultModel : implements
+QTableView <|- - CSearchResultView : extends
+DMA::IComponent <|- - CSearchViewComponent : implements
+QObject <|- - CSearchViewComponent : extends
+
+CDLTMessageAnalyzer "1" o- - "1" CSearchResultView : uses
+CDLTMessageAnalyzer "1" o- - "1" ISearchResultModel : gets and uses
+Ui::Form "1" *- - "1" CSearchResultView : contains
+CSearchResultView "1" o- - "1" CDLTFileWrapper : uses
+CSearchResultView "1" o- - "1" CSearchResultModel : uses
+CSearchViewComponent "1" *- - "1" CSearchResultModel : contains
+CSearchViewComponent "1" o- - "1" CSearchResultView : uses
+CSearchViewComponent "1" *- - "1" CTableMemoryJumper : contains
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

@@ -25,6 +25,7 @@ typedef std::shared_ptr<CDLTMessageAnalyzer> tDLTMessageAnalyzerPtr;
 typedef std::shared_ptr<QString> tQStringPtr;
 typedef QMap<int, tQStringPtr > tMsgMap;
 class IDLTMessageAnalyzerController;
+class CSearchViewComponent;
 
 namespace DMA
 {
@@ -132,6 +133,8 @@ private: // members
     typedef std::vector<tComponentPtr> tComponentPtrVec;
 
     tComponentPtrVec mComponents;
+
+    std::shared_ptr<CSearchViewComponent> mpSearchViewComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

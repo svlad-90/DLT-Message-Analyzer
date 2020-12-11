@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="500px" preserveAspectRatio="none" style="width:556px;height:500px;background:#FEFEFE;" version="1.1" viewBox="0 0 556 500" width="556px" zoomAndPan="magnify"><defs><filter height="300%" id="f1n3neyqk5jfg1" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[9f15be47acc2a41528901c4fc27ec7cc]
+cluster DMA_Framework_Base--><polygon fill="#DDDDDD" filter="url(#f1n3neyqk5jfg1)" points="16,6,183,6,190,29.6094,539,29.6094,539,343,16,343,16,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="190" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="161" x="20" y="22.5332">DMA_Framework_Base</text><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#f1n3neyqk5jfg1)" points="265,393,478,393,485,416.6094,488,416.6094,488,493,265,493,265,393" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="265" x2="485" y1="416.6094" y2="416.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="269" y="409.5332">DMA_Framework_Component</text><!--MD5=[174df07b8ed5cfbef6aeb90929406f8b]
+class DMA::CBaseSynchronousInitializable--><rect codeLine="8" fill="#FEFECE" filter="url(#f1n3neyqk5jfg1)" height="117.1797" id="DMA::CBaseSynchronousInitializable" style="stroke:#A80036;stroke-width:1.5;" width="291" x="78.5" y="210"/><ellipse cx="119.15" cy="226" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M121.9156,221.875 Q122.0719,221.6563 122.2594,221.5469 Q122.4469,221.4375 122.6656,221.4375 Q123.0406,221.4375 123.275,221.6953 Q123.5094,221.9531 123.5094,222.5625 L123.5094,224.0156 Q123.5094,224.625 123.275,224.8906 Q123.0406,225.1563 122.6656,225.1563 Q122.3219,225.1563 122.1188,224.9531 Q121.9156,224.7656 121.8063,224.25 Q121.7594,223.8906 121.5719,223.7031 Q121.2438,223.3281 120.6344,223.1094 Q120.025,222.8906 119.4,222.8906 Q118.6344,222.8906 118.0016,223.2188 Q117.3688,223.5469 116.8766,224.2969 Q116.3844,225.0469 116.3844,226.0781 L116.3844,227.1719 Q116.3844,228.4063 117.275,229.2266 Q118.1656,230.0469 119.7594,230.0469 Q120.6969,230.0469 121.3531,229.7969 Q121.7438,229.6406 122.1656,229.2031 Q122.4313,228.9375 122.5797,228.8594 Q122.7281,228.7813 122.9313,228.7813 Q123.2594,228.7813 123.5172,229.0391 Q123.775,229.2969 123.775,229.6406 Q123.775,229.9844 123.4313,230.3906 Q122.9313,230.9688 122.1344,231.2969 Q121.0563,231.75 119.7594,231.75 Q118.2438,231.75 117.0406,231.125 Q116.0563,230.625 115.3688,229.5547 Q114.6813,228.4844 114.6813,227.2031 L114.6813,226.0469 Q114.6813,224.7188 115.2984,223.5703 Q115.9156,222.4219 117.0094,221.8047 Q118.1031,221.1875 119.3375,221.1875 Q120.0719,221.1875 120.7203,221.3516 Q121.3688,221.5156 121.9156,221.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="202" x="138.85" y="230.9102">DMA::CBaseSynchronousInitializable</text><line style="stroke:#A80036;stroke-width:1.5;" x1="79.5" x2="368.5" y1="242" y2="242"/><line style="stroke:#A80036;stroke-width:1.5;" x1="79.5" x2="368.5" y1="250" y2="250"/><polygon fill="#FFFF44" points="89.5,256,93.5,260,89.5,264,85.5,260" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="233" x="98.5" y="265.4189">virtual virtual tSyncInitOperationResult init() = 0</text><polygon fill="#FFFF44" points="89.5,269.8359,93.5,273.8359,89.5,277.8359,85.5,273.8359" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="264" x="98.5" y="279.2549">virtual virtual tSyncInitOperationResult shutdown() = 0</text><ellipse cx="89.5" cy="288.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="228" x="98.5" y="293.0908">virtual virtual tSyncInitOperationResult startInit()</text><ellipse cx="89.5" cy="302.5078" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="265" x="98.5" y="306.9268">virtual virtual tSyncInitOperationResult startShutdown()</text><ellipse cx="89.5" cy="316.3438" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="211" x="98.5" y="320.7627">virtual virtual virtual bool isInitialized () const</text><!--MD5=[1f7de4c50f1be6d876c8d2e2c56db179]
+class DMA::INamedObject--><rect codeLine="17" fill="#FEFECE" filter="url(#f1n3neyqk5jfg1)" height="61.8359" id="DMA::INamedObject" style="stroke:#A80036;stroke-width:1.5;" width="142" x="381" y="56"/><ellipse cx="396" cy="72" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M398.7656,67.875 Q398.9219,67.6563 399.1094,67.5469 Q399.2969,67.4375 399.5156,67.4375 Q399.8906,67.4375 400.125,67.6953 Q400.3594,67.9531 400.3594,68.5625 L400.3594,70.0156 Q400.3594,70.625 400.125,70.8906 Q399.8906,71.1563 399.5156,71.1563 Q399.1719,71.1563 398.9688,70.9531 Q398.7656,70.7656 398.6563,70.25 Q398.6094,69.8906 398.4219,69.7031 Q398.0938,69.3281 397.4844,69.1094 Q396.875,68.8906 396.25,68.8906 Q395.4844,68.8906 394.8516,69.2188 Q394.2188,69.5469 393.7266,70.2969 Q393.2344,71.0469 393.2344,72.0781 L393.2344,73.1719 Q393.2344,74.4063 394.125,75.2266 Q395.0156,76.0469 396.6094,76.0469 Q397.5469,76.0469 398.2031,75.7969 Q398.5938,75.6406 399.0156,75.2031 Q399.2813,74.9375 399.4297,74.8594 Q399.5781,74.7813 399.7813,74.7813 Q400.1094,74.7813 400.3672,75.0391 Q400.625,75.2969 400.625,75.6406 Q400.625,75.9844 400.2813,76.3906 Q399.7813,76.9688 398.9844,77.2969 Q397.9063,77.75 396.6094,77.75 Q395.0938,77.75 393.8906,77.125 Q392.9063,76.625 392.2188,75.5547 Q391.5313,74.4844 391.5313,73.2031 L391.5313,72.0469 Q391.5313,70.7188 392.1484,69.5703 Q392.7656,68.4219 393.8594,67.8047 Q394.9531,67.1875 396.1875,67.1875 Q396.9219,67.1875 397.5703,67.3516 Q398.2188,67.5156 398.7656,67.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="110" x="410" y="76.9102">DMA::INamedObject</text><line style="stroke:#A80036;stroke-width:1.5;" x1="382" x2="522" y1="88" y2="88"/><line style="stroke:#A80036;stroke-width:1.5;" x1="382" x2="522" y1="96" y2="96"/><ellipse cx="392" cy="107" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="401" y="111.4189">char* getName() const</text><!--MD5=[5fa8e3947aa0ba31d408613d9abc790a]
+class DMA::ISynchronousInitializable--><rect codeLine="22" fill="#FEFECE" filter="url(#f1n3neyqk5jfg1)" height="89.5078" id="DMA::ISynchronousInitializable" style="stroke:#A80036;stroke-width:1.5;" width="313" x="32.5" y="42"/><ellipse cx="101.25" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M104.0156,53.875 Q104.1719,53.6563 104.3594,53.5469 Q104.5469,53.4375 104.7656,53.4375 Q105.1406,53.4375 105.375,53.6953 Q105.6094,53.9531 105.6094,54.5625 L105.6094,56.0156 Q105.6094,56.625 105.375,56.8906 Q105.1406,57.1563 104.7656,57.1563 Q104.4219,57.1563 104.2188,56.9531 Q104.0156,56.7656 103.9063,56.25 Q103.8594,55.8906 103.6719,55.7031 Q103.3438,55.3281 102.7344,55.1094 Q102.125,54.8906 101.5,54.8906 Q100.7344,54.8906 100.1016,55.2188 Q99.4688,55.5469 98.9766,56.2969 Q98.4844,57.0469 98.4844,58.0781 L98.4844,59.1719 Q98.4844,60.4063 99.375,61.2266 Q100.2656,62.0469 101.8594,62.0469 Q102.7969,62.0469 103.4531,61.7969 Q103.8438,61.6406 104.2656,61.2031 Q104.5313,60.9375 104.6797,60.8594 Q104.8281,60.7813 105.0313,60.7813 Q105.3594,60.7813 105.6172,61.0391 Q105.875,61.2969 105.875,61.6406 Q105.875,61.9844 105.5313,62.3906 Q105.0313,62.9688 104.2344,63.2969 Q103.1563,63.75 101.8594,63.75 Q100.3438,63.75 99.1406,63.125 Q98.1563,62.625 97.4688,61.5547 Q96.7813,60.4844 96.7813,59.2031 L96.7813,58.0469 Q96.7813,56.7188 97.3984,55.5703 Q98.0156,54.4219 99.1094,53.8047 Q100.2031,53.1875 101.4375,53.1875 Q102.1719,53.1875 102.8203,53.3516 Q103.4688,53.5156 104.0156,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="167" x="121.75" y="62.9102">DMA::ISynchronousInitializable</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="344.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="344.5" y1="82" y2="82"/><ellipse cx="43.5" cy="93" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="255" x="52.5" y="97.4189">virtual virtual tSyncInitOperationResult startInit() = 0</text><ellipse cx="43.5" cy="106.8359" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="287" x="52.5" y="111.2549">virtual virtual tSyncInitOperationResult startShutdown() = 0</text><ellipse cx="43.5" cy="120.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="240" x="52.5" y="125.0908">virtual virtual virtual bool isInitialized () const = 0</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="34" fill="#FEFECE" filter="url(#f1n3neyqk5jfg1)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="310.5" y="429"/><ellipse cx="325.5" cy="445" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M328.2656,440.875 Q328.4219,440.6563 328.6094,440.5469 Q328.7969,440.4375 329.0156,440.4375 Q329.3906,440.4375 329.625,440.6953 Q329.8594,440.9531 329.8594,441.5625 L329.8594,443.0156 Q329.8594,443.625 329.625,443.8906 Q329.3906,444.1563 329.0156,444.1563 Q328.6719,444.1563 328.4688,443.9531 Q328.2656,443.7656 328.1563,443.25 Q328.1094,442.8906 327.9219,442.7031 Q327.5938,442.3281 326.9844,442.1094 Q326.375,441.8906 325.75,441.8906 Q324.9844,441.8906 324.3516,442.2188 Q323.7188,442.5469 323.2266,443.2969 Q322.7344,444.0469 322.7344,445.0781 L322.7344,446.1719 Q322.7344,447.4063 323.625,448.2266 Q324.5156,449.0469 326.1094,449.0469 Q327.0469,449.0469 327.7031,448.7969 Q328.0938,448.6406 328.5156,448.2031 Q328.7813,447.9375 328.9297,447.8594 Q329.0781,447.7813 329.2813,447.7813 Q329.6094,447.7813 329.8672,448.0391 Q330.125,448.2969 330.125,448.6406 Q330.125,448.9844 329.7813,449.3906 Q329.2813,449.9688 328.4844,450.2969 Q327.4063,450.75 326.1094,450.75 Q324.5938,450.75 323.3906,450.125 Q322.4063,449.625 321.7188,448.5547 Q321.0313,447.4844 321.0313,446.2031 L321.0313,445.0469 Q321.0313,443.7188 321.6484,442.5703 Q322.2656,441.4219 323.3594,440.8047 Q324.4531,440.1875 325.6875,440.1875 Q326.4219,440.1875 327.0703,440.3516 Q327.7188,440.5156 328.2656,440.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="339.5" y="449.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="311.5" x2="440.5" y1="461" y2="461"/><line style="stroke:#A80036;stroke-width:1.5;" x1="311.5" x2="440.5" y1="469" y2="469"/><!--MD5=[3d707c7335a7a8cbcfeacb77478ad871]
+reverse link DMA::ISynchronousInitializable to DMA::CBaseSynchronousInitializable--><path codeLine="41" d="M201.535,152.288 C205.192,171.043 209.165,191.417 212.738,209.742 " fill="none" id="DMA::ISynchronousInitializable-backto-DMA::CBaseSynchronousInitializable" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="194.609,153.341,197.652,132.371,208.35,150.661,194.609,153.341" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="207" y="176.4951">implements</text><!--MD5=[aaa816c28561942d8aa7773bd2dd957a]
+reverse link DMA::CBaseSynchronousInitializable to DMA::IComponent--><path codeLine="42" d="M285.218,343.001 C310.845,373.771 338.805,407.342 356.826,428.9787 " fill="none" id="DMA::CBaseSynchronousInitializable-backto-DMA::IComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="279.515,347.092,272.094,327.244,290.272,338.132,279.515,347.092" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="310" y="373.4951">extends</text><!--MD5=[bea947969257b93aacfc180fc36608da]
+reverse link DMA::INamedObject to DMA::IComponent--><path codeLine="43" d="M441.603,137.794 C424.978,217.422 393.043,370.373 380.873,428.659 " fill="none" id="DMA::INamedObject-backto-DMA::IComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="434.776,136.244,445.716,118.097,448.48,139.106,434.776,136.244" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="427" y="273.9951">implements</text><!--MD5=[964436ad4e53a35a5cf4c458c081a861]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+class "DMA::ISynchronousInitializable"
+{
+    + {abstract} virtual virtual tSyncInitOperationResult startInit() = 0
+    + {abstract} virtual virtual tSyncInitOperationResult startShutdown() = 0
+    + {abstract} virtual virtual virtual bool isInitialized () const = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+'====================Inheritance section====================
+DMA::ISynchronousInitializable <|- - DMA::CBaseSynchronousInitializable : implements
+DMA::CBaseSynchronousInitializable <|- - DMA::IComponent : extends
+DMA::INamedObject <|- - DMA::IComponent : implements
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+class "DMA::ISynchronousInitializable"
+{
+    + {abstract} virtual virtual tSyncInitOperationResult startInit() = 0
+    + {abstract} virtual virtual tSyncInitOperationResult startShutdown() = 0
+    + {abstract} virtual virtual virtual bool isInitialized () const = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+DMA::ISynchronousInitializable <|- - DMA::CBaseSynchronousInitializable : implements
+DMA::CBaseSynchronousInitializable <|- - DMA::IComponent : extends
+DMA::INamedObject <|- - DMA::IComponent : implements
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

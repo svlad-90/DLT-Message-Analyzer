@@ -27,7 +27,7 @@ It's main purposes is to:
 #### [DMA_Logo](../../dltmessageanalyzerplugin/src/logo/doc/doc.md)
 #### [DMA_PatternsView](../../dltmessageanalyzerplugin/src/patternsView/doc/doc.md)
 #### [DMA_PlantUML](../../dltmessageanalyzerplugin/src/plant_uml/doc/doc.md)
-#### [DMA_SearchView](../../dltmessageanalyzerplugin/src/searchView/doc/doc.md)
+#### [DMA_SearchView](../../dltmessageanalyzerplugin/src/components/searchView/doc/doc.md)
 #### [DMA_Settings](../../dltmessageanalyzerplugin/src/settings/doc/doc.md)
 ----
 
@@ -35,6 +35,7 @@ It's main purposes is to:
 
 #### [Qt](./qt.md)
 #### [DLT](./dlt.md)
+#### [DMA](./dma.md)
 
 ----
 

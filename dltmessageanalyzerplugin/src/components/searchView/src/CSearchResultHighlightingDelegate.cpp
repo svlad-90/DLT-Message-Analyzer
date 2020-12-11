@@ -9,9 +9,9 @@
 #include "QApplication"
 
 #include "CSearchResultHighlightingDelegate.hpp"
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 #include "CSearchResultModel.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -401,7 +401,7 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
     //SEND_MSG(QString("CSearchResultHighlightingDelegate::paint: row %1").arg(index.row()));
 
-    const auto* pModel = qobject_cast<const CSearchResultModel*>(index.model());
+    const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
 
     if(nullptr != pModel)
     {
@@ -503,7 +503,7 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
         case eSearchResultColumn::Ctid:
         case eSearchResultColumn::Payload:
         {
-            const auto* pModel = qobject_cast<const CSearchResultModel*>(index.model());
+            const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
 
             if(nullptr != pModel)
             {

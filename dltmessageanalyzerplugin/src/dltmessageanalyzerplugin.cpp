@@ -23,6 +23,7 @@
 
 #include "components/analyzer/api/CAnalyzerComponent.hpp"
 #include "components/log/api/CLogComponent.hpp"
+#include "components/searchView/api/CSearchViewComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -36,7 +37,8 @@ mLastAvailableNumberOfMsg(0),
 mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false),
-mComponents()
+mComponents(),
+mpSearchViewComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -134,6 +136,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pLogComponent);
     }
 
+    {
+        auto pSearchViewComponent = std::make_shared<CSearchViewComponent>(mpForm->getSearchResultTableView());
+        mpSearchViewComponent = pSearchViewComponent;
+
+        auto initResult = pSearchViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pSearchViewComponent->getName()));
+        }
+
+        mComponents.push_back(pSearchViewComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -165,7 +181,6 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getErrorLabel(),
                                                                                                       mpForm->getPatternsTableView(),
                                                                                                       mpForm->getNumberOfThreadsComboBox(),
-                                                                                                      mpForm->getSearchResultTableView(),
                                                                                                       mpForm->getContinuousSearchCheckBox(),
                                                                                                       mpForm->getCacheStatusLabel(),
                                                                                                       mpForm->getMainTabWidget(),
@@ -173,7 +188,10 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getConfigComboBox(),
                                                                                                       mpForm->getFiltersView(),
                                                                                                       mpForm->getFiltersSearchInput(),
-                                                                                                      mpForm->getUMLView());
+                                                                                                      mpForm->getUMLView(),
+                                                                                                      mpSearchViewComponent->getTableMemoryJumper(),
+                                                                                                      mpSearchViewComponent->getSearchResultView(),
+                                                                                                      mpSearchViewComponent->getSearchResultModel());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)
@@ -230,6 +248,11 @@ void DLTMessageAnalyzerPlugin::selectedIdxMsgDecoded(int, QDltMsg &/*msg*/){
 void DLTMessageAnalyzerPlugin::initFileStart(QDltFile *file)
 {
     mpFile = std::make_shared<CDLTFileWrapper>(file);
+
+    if(nullptr != mpSearchViewComponent)
+    {
+        mpSearchViewComponent->setFile(mpFile);
+    }
 
     if( mpDLTMessageAnalyzer )
     {

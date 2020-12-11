@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="332px" preserveAspectRatio="none" style="width:534px;height:332px;background:#FEFEFE;" version="1.1" viewBox="0 0 534 332" width="534px" zoomAndPan="magnify"><defs><filter height="300%" id="f1lwbapmi1ri08" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[9f15be47acc2a41528901c4fc27ec7cc]
+cluster DMA_Framework_Base--><polygon fill="#DDDDDD" filter="url(#f1lwbapmi1ri08)" points="16,6,183,6,190,29.6094,517,29.6094,517,175,16,175,16,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="190" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="161" x="20" y="22.5332">DMA_Framework_Base</text><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#f1lwbapmi1ri08)" points="152,225,365,225,372,248.6094,375,248.6094,375,325,152,325,152,225" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="152" x2="372" y1="248.6094" y2="248.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="156" y="241.5332">DMA_Framework_Component</text><!--MD5=[174df07b8ed5cfbef6aeb90929406f8b]
+class DMA::CBaseSynchronousInitializable--><rect codeLine="8" fill="#FEFECE" filter="url(#f1lwbapmi1ri08)" height="117.1797" id="DMA::CBaseSynchronousInitializable" style="stroke:#A80036;stroke-width:1.5;" width="291" x="32.5" y="42"/><ellipse cx="73.15" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M75.9156,53.875 Q76.0719,53.6563 76.2594,53.5469 Q76.4469,53.4375 76.6656,53.4375 Q77.0406,53.4375 77.275,53.6953 Q77.5094,53.9531 77.5094,54.5625 L77.5094,56.0156 Q77.5094,56.625 77.275,56.8906 Q77.0406,57.1563 76.6656,57.1563 Q76.3219,57.1563 76.1188,56.9531 Q75.9156,56.7656 75.8063,56.25 Q75.7594,55.8906 75.5719,55.7031 Q75.2438,55.3281 74.6344,55.1094 Q74.025,54.8906 73.4,54.8906 Q72.6344,54.8906 72.0016,55.2188 Q71.3688,55.5469 70.8766,56.2969 Q70.3844,57.0469 70.3844,58.0781 L70.3844,59.1719 Q70.3844,60.4063 71.275,61.2266 Q72.1656,62.0469 73.7594,62.0469 Q74.6969,62.0469 75.3531,61.7969 Q75.7438,61.6406 76.1656,61.2031 Q76.4313,60.9375 76.5797,60.8594 Q76.7281,60.7813 76.9313,60.7813 Q77.2594,60.7813 77.5172,61.0391 Q77.775,61.2969 77.775,61.6406 Q77.775,61.9844 77.4313,62.3906 Q76.9313,62.9688 76.1344,63.2969 Q75.0563,63.75 73.7594,63.75 Q72.2438,63.75 71.0406,63.125 Q70.0563,62.625 69.3688,61.5547 Q68.6813,60.4844 68.6813,59.2031 L68.6813,58.0469 Q68.6813,56.7188 69.2984,55.5703 Q69.9156,54.4219 71.0094,53.8047 Q72.1031,53.1875 73.3375,53.1875 Q74.0719,53.1875 74.7203,53.3516 Q75.3688,53.5156 75.9156,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="202" x="92.85" y="62.9102">DMA::CBaseSynchronousInitializable</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="322.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33.5" x2="322.5" y1="82" y2="82"/><polygon fill="#FFFF44" points="43.5,88,47.5,92,43.5,96,39.5,92" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="233" x="52.5" y="97.4189">virtual virtual tSyncInitOperationResult init() = 0</text><polygon fill="#FFFF44" points="43.5,101.8359,47.5,105.8359,43.5,109.8359,39.5,105.8359" style="stroke:#B38D22;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="264" x="52.5" y="111.2549">virtual virtual tSyncInitOperationResult shutdown() = 0</text><ellipse cx="43.5" cy="120.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="228" x="52.5" y="125.0908">virtual virtual tSyncInitOperationResult startInit()</text><ellipse cx="43.5" cy="134.5078" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="265" x="52.5" y="138.9268">virtual virtual tSyncInitOperationResult startShutdown()</text><ellipse cx="43.5" cy="148.3438" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="211" x="52.5" y="152.7627">virtual virtual virtual bool isInitialized () const</text><!--MD5=[1f7de4c50f1be6d876c8d2e2c56db179]
+class DMA::INamedObject--><rect codeLine="17" fill="#FEFECE" filter="url(#f1lwbapmi1ri08)" height="61.8359" id="DMA::INamedObject" style="stroke:#A80036;stroke-width:1.5;" width="142" x="359" y="69.5"/><ellipse cx="374" cy="85.5" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M376.7656,81.375 Q376.9219,81.1563 377.1094,81.0469 Q377.2969,80.9375 377.5156,80.9375 Q377.8906,80.9375 378.125,81.1953 Q378.3594,81.4531 378.3594,82.0625 L378.3594,83.5156 Q378.3594,84.125 378.125,84.3906 Q377.8906,84.6563 377.5156,84.6563 Q377.1719,84.6563 376.9688,84.4531 Q376.7656,84.2656 376.6563,83.75 Q376.6094,83.3906 376.4219,83.2031 Q376.0938,82.8281 375.4844,82.6094 Q374.875,82.3906 374.25,82.3906 Q373.4844,82.3906 372.8516,82.7188 Q372.2188,83.0469 371.7266,83.7969 Q371.2344,84.5469 371.2344,85.5781 L371.2344,86.6719 Q371.2344,87.9063 372.125,88.7266 Q373.0156,89.5469 374.6094,89.5469 Q375.5469,89.5469 376.2031,89.2969 Q376.5938,89.1406 377.0156,88.7031 Q377.2813,88.4375 377.4297,88.3594 Q377.5781,88.2813 377.7813,88.2813 Q378.1094,88.2813 378.3672,88.5391 Q378.625,88.7969 378.625,89.1406 Q378.625,89.4844 378.2813,89.8906 Q377.7813,90.4688 376.9844,90.7969 Q375.9063,91.25 374.6094,91.25 Q373.0938,91.25 371.8906,90.625 Q370.9063,90.125 370.2188,89.0547 Q369.5313,87.9844 369.5313,86.7031 L369.5313,85.5469 Q369.5313,84.2188 370.1484,83.0703 Q370.7656,81.9219 371.8594,81.3047 Q372.9531,80.6875 374.1875,80.6875 Q374.9219,80.6875 375.5703,80.8516 Q376.2188,81.0156 376.7656,81.375 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="110" x="388" y="90.4102">DMA::INamedObject</text><line style="stroke:#A80036;stroke-width:1.5;" x1="360" x2="500" y1="101.5" y2="101.5"/><line style="stroke:#A80036;stroke-width:1.5;" x1="360" x2="500" y1="109.5" y2="109.5"/><ellipse cx="370" cy="120.5" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="109" x="379" y="124.9189">char* getName() const</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="27" fill="#FEFECE" filter="url(#f1lwbapmi1ri08)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="197.5" y="261"/><ellipse cx="212.5" cy="277" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M215.2656,272.875 Q215.4219,272.6563 215.6094,272.5469 Q215.7969,272.4375 216.0156,272.4375 Q216.3906,272.4375 216.625,272.6953 Q216.8594,272.9531 216.8594,273.5625 L216.8594,275.0156 Q216.8594,275.625 216.625,275.8906 Q216.3906,276.1563 216.0156,276.1563 Q215.6719,276.1563 215.4688,275.9531 Q215.2656,275.7656 215.1563,275.25 Q215.1094,274.8906 214.9219,274.7031 Q214.5938,274.3281 213.9844,274.1094 Q213.375,273.8906 212.75,273.8906 Q211.9844,273.8906 211.3516,274.2188 Q210.7188,274.5469 210.2266,275.2969 Q209.7344,276.0469 209.7344,277.0781 L209.7344,278.1719 Q209.7344,279.4063 210.625,280.2266 Q211.5156,281.0469 213.1094,281.0469 Q214.0469,281.0469 214.7031,280.7969 Q215.0938,280.6406 215.5156,280.2031 Q215.7813,279.9375 215.9297,279.8594 Q216.0781,279.7813 216.2813,279.7813 Q216.6094,279.7813 216.8672,280.0391 Q217.125,280.2969 217.125,280.6406 Q217.125,280.9844 216.7813,281.3906 Q216.2813,281.9688 215.4844,282.2969 Q214.4063,282.75 213.1094,282.75 Q211.5938,282.75 210.3906,282.125 Q209.4063,281.625 208.7188,280.5547 Q208.0313,279.4844 208.0313,278.2031 L208.0313,277.0469 Q208.0313,275.7188 208.6484,274.5703 Q209.2656,273.4219 210.3594,272.8047 Q211.4531,272.1875 212.6875,272.1875 Q213.4219,272.1875 214.0703,272.3516 Q214.7188,272.5156 215.2656,272.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="226.5" y="281.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="198.5" x2="327.5" y1="293" y2="293"/><line style="stroke:#A80036;stroke-width:1.5;" x1="198.5" x2="327.5" y1="301" y2="301"/><!--MD5=[aaa816c28561942d8aa7773bd2dd957a]
+reverse link DMA::CBaseSynchronousInitializable to DMA::IComponent--><path codeLine="34" d="M213.42,177.548 C227.421,207.61 242.478,239.937 252.278,260.9787 " fill="none" id="DMA::CBaseSynchronousInitializable-backto-DMA::IComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="206.993,180.33,204.895,159.244,219.684,174.419,206.993,180.33" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="226" y="205.4951">extends</text><!--MD5=[bea947969257b93aacfc180fc36608da]
+reverse link DMA::INamedObject to DMA::IComponent--><path codeLine="35" d="M388.612,146.73 C355.504,182.91 310.433,232.165 284.251,260.7763 " fill="none" id="DMA::INamedObject-backto-DMA::IComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="383.757,141.665,402.423,131.636,394.086,151.117,383.757,141.665" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="347" y="205.4951">implements</text><!--MD5=[e73b412b40ece2147d9f34926df3df96]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+'====================Inheritance section====================
+DMA::CBaseSynchronousInitializable <|- - DMA::IComponent : extends
+DMA::INamedObject <|- - DMA::IComponent : implements
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Base" #DDDDDD
+{
+
+class "DMA::CBaseSynchronousInitializable"
+{
+    # {abstract} virtual virtual tSyncInitOperationResult init() = 0
+    # {abstract} virtual virtual tSyncInitOperationResult shutdown() = 0
+    + virtual virtual tSyncInitOperationResult startInit()
+    + virtual virtual tSyncInitOperationResult startShutdown()
+    + virtual virtual virtual bool isInitialized () const
+}
+
+class "DMA::INamedObject"
+{
+    + char* getName() const
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+DMA::CBaseSynchronousInitializable <|- - DMA::IComponent : extends
+DMA::INamedObject <|- - DMA::IComponent : implements
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

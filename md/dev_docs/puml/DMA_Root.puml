@@ -28,17 +28,12 @@ interface "QDltPluginViewerInterface"
 
 }
 
-package "DMA_Analyzer" #DDDDDD
+package "DMA_Analyzer_API" #DDDDDD
 {
 
 class "CAnalyzerComponent"
 {
 }
-
-}
-
-package "DMA_Analyzer_API" #DDDDDD
-{
 
 abstract class "IDLTMessageAnalyzerController"
 {
@@ -172,15 +167,21 @@ class "Ui::Form"
 
 }
 
-package "DMA_SearchView" #DDDDDD
+package "DMA_SearchView_API" #DDDDDD
 {
-
-class "CSearchResultModel"
-{
-}
 
 class "CSearchResultView"
 {
+}
+
+class "ISearchResultModel"
+{
+    + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
+    + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
+    + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void updateView(const int& fromRow = 0) = 0
 }
 
 }
@@ -216,11 +217,11 @@ CDLTMessageAnalyzer "1" *-- "1" CGroupedViewModel : contains
 CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
-CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
-CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
+CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
+CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains

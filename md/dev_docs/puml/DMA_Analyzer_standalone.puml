@@ -6,10 +6,6 @@ skinparam wrapWidth 600
 package "DMA_Analyzer" #DDDDDD
 {
 
-class "CAnalyzerComponent"
-{
-}
-
 class "CContinuousAnalyzer"
 {
 }
@@ -46,15 +42,6 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
 
 }
 
-package "DMA_Framework_Component" #DDDDDD
-{
-
-class "DMA::IComponent"
-{
-}
-
-}
-
 package "Qt" #DDDDDD
 {
 
@@ -65,15 +52,12 @@ class "QObject"
 }
 
 '====================Inheritance section====================
-DMA::IComponent <|-- CAnalyzerComponent : implements
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
 
 '====================Dependencies section====================
-CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
-CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
 
 @enduml
