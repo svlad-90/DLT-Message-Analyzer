@@ -7,7 +7,6 @@
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
-class CSearchResultModel;
 class CTableMemoryJumper;
 class CSearchResultView;
 class ISearchResultModel;
@@ -24,8 +23,6 @@ public:
 
     virtual const char* getName() const override;
 
-    void setFile( const tDLTFileWrapperPtr& pFile );
-
     std::shared_ptr<ISearchResultModel> getSearchResultModel();
 
 protected:
@@ -33,7 +30,7 @@ protected:
     virtual DMA::tSyncInitOperationResult shutdown() override;
 
 private:
-    std::shared_ptr<CSearchResultModel> mpSearchResultModel;
+    std::shared_ptr<ISearchResultModel> mpSearchResultModel;
     CSearchResultView* mpSearchResultView;
     std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
 };

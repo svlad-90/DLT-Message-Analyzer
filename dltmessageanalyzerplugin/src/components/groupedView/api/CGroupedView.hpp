@@ -3,8 +3,7 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CGroupedView class
  */
-#ifndef CGroupedView_HPP
-#define CGroupedView_HPP
+#pragma once
 
 #include <QTreeView>
 
@@ -40,5 +39,3 @@ private:
     bool mbIsVerticalScrollBarVisible;
     bool mbRootExpandingRequired;
 };
-
-#endif // CGroupedView_HPP

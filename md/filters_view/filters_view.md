@@ -9,7 +9,19 @@ When you work with a complex regex expression, it is quite complex to find an im
 E.g. the default regex, which is used in one of the projects where this plugin is used consists of 1831 characters.
 Try to find and change something in such a big string! It is a quite complex task.
 
-To keep things easier, the "filters view" was introduced within the plugin. It does the following thing:
+To keep things easier, the "filters view" was introduced within the plugin. It does the following thing.
+
+----
+
+## How to enter the "Filters view"?
+
+Currently, entering the filters view is not so transparent, thus here is a gif animation, which represents how to open it:
+
+![Screenshot of entering the filters view](./var_entering_filters_view.gif)
+
+----
+
+## How does it work?
 
 ![Screenshot of variables usage](./var_example.png)
 

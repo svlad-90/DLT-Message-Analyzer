@@ -4,25 +4,30 @@
  * @brief   Declaration of the CGroupedViewModel class
  */
 
-#ifndef CGroupedViewModel_HPP
-#define CGroupedViewModel_HPP
+#pragma once
 
 #include "memory"
 
 #include "QAbstractItemModel"
 
-#include "../common/Definitions.hpp"
-#include "../common/CTreeItem.hpp"
+#include "common/Definitions.hpp"
+#include "common/CTreeItem.hpp"
 
-class CGroupedViewModel : public QAbstractItemModel
+#include "../api/IGroupedViewModel.hpp"
+
+class CGroupedViewModel : public QAbstractItemModel, public IGroupedViewModel
 {
 public:
     explicit CGroupedViewModel(QObject *parent = nullptr);
     ~CGroupedViewModel() override;
 
-    void addMatches( const tFoundMatches& matches, bool update );
-    void resetData();
-    void setUsedRegex(const QString& regex);
+    // Implementation of the IGroupedViewModel
+    void setUsedRegex(const QString& regex) override;
+    void resetData() override;
+    void addMatches( const tFoundMatches& matches, bool update ) override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    std::pair<bool /*result*/, QString /*error*/> exportToHTML(QString& resultHTML) override;
+    // Implementation of the IGroupedViewModel ( end )
 
     QVariant data(const QModelIndex &index, int role) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -31,11 +36,7 @@ public:
     QModelIndex index(int row, int column,
                       const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex &index) const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    std::pair<bool /*result*/, QString /*error*/> exportToHTML(QString& resultHTML);
-
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
 private:
@@ -74,5 +75,3 @@ private:
 
     tAnalyzedValues mAnalyzedValues;
 };
-
-#endif // CGroupedViewModel_HPP

@@ -19,25 +19,12 @@ mpSearchViewTableJumper(nullptr)
 
 std::shared_ptr<ISearchResultModel> CSearchViewComponent::getSearchResultModel()
 {
-    return std::static_pointer_cast<ISearchResultModel>(mpSearchResultModel);
+    return mpSearchResultModel;
 }
 
 const char* CSearchViewComponent::getName() const
 {
     return "CSearchViewComponent";
-}
-
-void CSearchViewComponent::setFile( const tDLTFileWrapperPtr& pFile )
-{
-    if(nullptr != mpSearchViewTableJumper)
-    {
-        mpSearchViewTableJumper->resetSelectedRow();
-    }
-
-    if(nullptr != mpSearchResultView)
-    {
-        mpSearchResultView->setFile(pFile);
-    }
 }
 
 DMA::tSyncInitOperationResult CSearchViewComponent::init()
@@ -48,14 +35,14 @@ DMA::tSyncInitOperationResult CSearchViewComponent::init()
     {        
         if(nullptr != mpSearchResultView)
         {
-            mpSearchResultModel = std::make_shared<CSearchResultModel>();
+            auto pSearchResultModel = std::make_shared<CSearchResultModel>();
 
             mpSearchViewTableJumper = std::make_shared<CTableMemoryJumper>(mpSearchResultView);
 
-            if(nullptr != mpSearchResultView &&
-                    nullptr != mpSearchResultModel)
+            if(nullptr != pSearchResultModel)
             {
-                mpSearchResultView->setModel(mpSearchResultModel.get());
+                mpSearchResultModel = pSearchResultModel;
+                mpSearchResultView->setModel(pSearchResultModel.get());
             }
 
             connect(mpSearchResultView->selectionModel(), &QItemSelectionModel::currentChanged,
@@ -123,7 +110,8 @@ PUML_PACKAGE_BEGIN(DMA_SearchView_API)
     PUML_CLASS_BEGIN(CSearchViewComponent)
         PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, contains)
+        PUML_USE_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, using to create ISearchResultModel)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
     PUML_CLASS_END()

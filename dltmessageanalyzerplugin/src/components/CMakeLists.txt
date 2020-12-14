@@ -1,3 +1,4 @@
 DMA_add_subdirectory_with_clang_tidy(analyzer)
+DMA_add_subdirectory_with_clang_tidy(groupedView)
 DMA_add_subdirectory_with_clang_tidy(log)
 DMA_add_subdirectory_with_clang_tidy(searchView)

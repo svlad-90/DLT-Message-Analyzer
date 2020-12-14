@@ -11,7 +11,7 @@
 
 #include "CGroupedViewModel.hpp"
 #include "components/log/api/CLog.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -840,6 +840,7 @@ void CGroupedViewModel::sort(int column, Qt::SortOrder order)
 PUML_PACKAGE_BEGIN(DMA_GroupedView)
     PUML_CLASS_BEGIN_CHECKED(CGroupedViewModel)
         PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_INHERITANCE_CHECKED(IGroupedViewModel, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

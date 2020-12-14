@@ -31,12 +31,12 @@
 #include "QApplication"
 #include "QColorDialog"
 
-#include "groupedView/CGroupedView.hpp"
+#include "components/groupedView/api/CGroupedView.hpp"
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTFileWrapper.hpp"
 #include "common/CRegexDirectoryMonitor.hpp"
 
-#include "groupedView/CGroupedViewModel.hpp"
+#include "components/groupedView/api/IGroupedViewModel.hpp"
 #include "components/searchView/api/CSearchResultView.hpp"
 #include "components/searchView/api/ISearchResultModel.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
@@ -52,7 +52,8 @@
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
-                                         CGroupedView* pGroupedView, QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
+                                         const tGroupedViewModelPtr& pGroupedViewModel,
+                                         QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
                                          QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
@@ -75,8 +76,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpMainTabWidget(pMainTabWidget),
     mpFiltersSearchInput(pFiltersSearchInput),
     //custom widgets and models
-    mpGroupedResultView(pGroupedView),
-    mpGroupedViewModel( new CGroupedViewModel() ),
+    mpGroupedViewModel( pGroupedViewModel ),
     mpRegexSelectionComboBox(pRegexSelectionComboBox),
     mpSearchResultView(pSearchResultView),
     mpSearchResultModel(pSearchResultModel),
@@ -126,12 +126,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     /////////////////////////////////////////////////////////
 
     mpPatternsTreeView->setPatternsSearchInput(pPatternsSearchInput);
-
-    if( nullptr != mpGroupedResultView &&
-            nullptr != mpGroupedViewModel )
-    {
-        mpGroupedResultView->setModel(mpGroupedViewModel);
-    }
 
     if(nullptr != mpLabel)
     {
@@ -592,12 +586,6 @@ CDLTMessageAnalyzer::~CDLTMessageAnalyzer()
 {
     //qDebug() << __FUNCTION__;
 
-    if(mpGroupedViewModel)
-    {
-        delete mpGroupedViewModel;
-        mpGroupedViewModel = nullptr;
-    }
-
     if(mpAvailablePatternsModel)
     {
         delete mpAvailablePatternsModel;
@@ -691,9 +679,19 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
         });
     }
 
+    if(nullptr != mpSearchViewTableJumper)
+    {
+        mpSearchViewTableJumper->resetSelectedRow();
+    }
+
     resetSearchRange();
 
     mpFile = pFile;
+
+    if(nullptr != mpSearchResultView)
+    {
+        mpSearchResultView->setFile(pFile);
+    }
 
     if(nullptr != mpFile)
     {
@@ -1744,8 +1742,7 @@ void CDLTMessageAnalyzer::setMessageDecoder( QDltMessageDecoder* pMessageDecoder
 PUML_PACKAGE_BEGIN(DMA_Root)
     PUML_CLASS_BEGIN_CHECKED(CDLTMessageAnalyzer)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedViewModel, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
@@ -1760,7 +1757,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltPlugin, 1, many, uses)
 #endif
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexDirectoryMonitor, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, gets and uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, gets and uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, gets and uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)

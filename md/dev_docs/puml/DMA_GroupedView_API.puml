@@ -3,10 +3,10 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_Common" #DDDDDD
+package "DMA_Framework_Component" #DDDDDD
 {
 
-class "CTreeItem"
+class "DMA::IComponent"
 {
 }
 
@@ -24,6 +24,10 @@ class "CGroupedViewModel"
 package "DMA_GroupedView_API" #DDDDDD
 {
 
+class "CGroupedView"
+{
+}
+
 class "CGroupedViewComponent"
 {
 }
@@ -39,10 +43,31 @@ class "IGroupedViewModel"
 
 }
 
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractItemModel"
+class "QObject"
+{
+}
+
+class "QTreeView"
 {
 }
 
@@ -50,10 +75,16 @@ abstract class "QAbstractItemModel"
 
 '====================Inheritance section====================
 IGroupedViewModel <|-- CGroupedViewModel : implements
-QAbstractItemModel <|-- CGroupedViewModel : implements
+QTreeView <|-- CGroupedView : extends
+DMA::IComponent <|-- CGroupedViewComponent : implements
+QObject <|-- CGroupedViewComponent : extends
 
 '====================Dependencies section====================
-CGroupedViewModel "1" *-- "*" CTreeItem : contains
+CGroupedViewComponent "1" o-- "1" CGroupedView : uses
 CGroupedViewComponent "1" --> "1" CGroupedViewModel : using to create IGroupedViewModel
+CGroupedViewComponent "1" *-- "1" IGroupedViewModel : contains
+CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
+Ui::Form "1" *-- "1" CGroupedView : contains
 
 @enduml

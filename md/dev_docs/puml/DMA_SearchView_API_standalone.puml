@@ -55,5 +55,6 @@ QObject <|-- CSearchViewComponent : extends
 
 '====================Dependencies section====================
 CSearchViewComponent "1" o-- "1" CSearchResultView : uses
+CSearchViewComponent "1" *-- "1" ISearchResultModel : contains
 
 @enduml

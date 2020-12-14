@@ -11,5 +11,5 @@ add_library(DMA_searchView STATIC
     ${PROCESSED_MOCS})
 
 ################### QT ####################################
-target_link_libraries(DMA_searchView qdlt Qt5::Widgets )
+target_link_libraries(DMA_searchView PUBLIC qdlt Qt5::Widgets DMA_framework_base DMA_framework_component )
 ################### QT ( END ) ############################

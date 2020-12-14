@@ -6,12 +6,22 @@ skinparam wrapWidth 600
 package "DMA_GroupedView" #DDDDDD
 {
 
-class "CGroupedView"
+class "CGroupedViewModel"
 {
 }
 
-class "CGroupedViewModel"
+}
+
+package "DMA_GroupedView_API" #DDDDDD
 {
+
+class "IGroupedViewModel"
+{
+    + {abstract} virtual int rowCount(const QModelIndex &parent = QModelIndex()) const = 0
+    + {abstract} virtual std::pair<bool__QString> exportToHTML(QString& resultHTML) = 0
+    + {abstract} virtual void addMatches( const tFoundMatches& matches, bool update ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setUsedRegex(const QString& regex) = 0
 }
 
 }
@@ -23,14 +33,10 @@ abstract class "QAbstractItemModel"
 {
 }
 
-class "QTreeView"
-{
-}
-
 }
 
 '====================Inheritance section====================
-QTreeView <|-- CGroupedView : extends
+IGroupedViewModel <|-- CGroupedViewModel : implements
 QAbstractItemModel <|-- CGroupedViewModel : implements
 
 @enduml
