@@ -15,10 +15,10 @@
 #include <QDebug>
 #include <QStyledItemDelegate>
 
-#include "CGroupedView.hpp"
-#include "../common/CTreeItem.hpp"
+#include "../api/CGroupedView.hpp"
+#include "common/CTreeItem.hpp"
 #include "components/log/api/CLog.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -708,7 +708,7 @@ void CGroupedView::updateColumnsVisibility()
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_GroupedView)
+PUML_PACKAGE_BEGIN(DMA_GroupedView_API)
     PUML_CLASS_BEGIN_CHECKED(CGroupedView)
         PUML_INHERITANCE_CHECKED(QTreeView, extends)
     PUML_CLASS_END()

@@ -70,6 +70,6 @@ QAbstractTableModel <|-- CSearchResultModel : implements
 CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
 CSearchResultModel "1" o-- "1" CDLTFileWrapper : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
-CSearchViewComponent "1" *-- "1" CSearchResultModel : contains
+CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel
 
 @enduml

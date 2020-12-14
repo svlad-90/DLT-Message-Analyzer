@@ -3,19 +3,10 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_Common" #DDDDDD
+package "DMA_Framework_Component" #DDDDDD
 {
 
-class "CTreeItem"
-{
-}
-
-}
-
-package "DMA_GroupedView" #DDDDDD
-{
-
-class "CGroupedViewModel"
+class "DMA::IComponent"
 {
 }
 
@@ -23,6 +14,10 @@ class "CGroupedViewModel"
 
 package "DMA_GroupedView_API" #DDDDDD
 {
+
+class "CGroupedView"
+{
+}
 
 class "CGroupedViewComponent"
 {
@@ -42,18 +37,23 @@ class "IGroupedViewModel"
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractItemModel"
+class "QObject"
+{
+}
+
+class "QTreeView"
 {
 }
 
 }
 
 '====================Inheritance section====================
-IGroupedViewModel <|-- CGroupedViewModel : implements
-QAbstractItemModel <|-- CGroupedViewModel : implements
+QTreeView <|-- CGroupedView : extends
+DMA::IComponent <|-- CGroupedViewComponent : implements
+QObject <|-- CGroupedViewComponent : extends
 
 '====================Dependencies section====================
-CGroupedViewModel "1" *-- "*" CTreeItem : contains
-CGroupedViewComponent "1" --> "1" CGroupedViewModel : using to create IGroupedViewModel
+CGroupedViewComponent "1" o-- "1" CGroupedView : uses
+CGroupedViewComponent "1" *-- "1" IGroupedViewModel : contains
 
 @enduml

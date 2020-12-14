@@ -104,7 +104,7 @@ CGroupedViewModel "1" *-- "*" CTreeItem : contains
 CPatternsModel "1" *-- "*" CTreeItem : contains
 CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
-CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : gets and uses
+CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CSearchViewComponent "1" *-- "1" CTableMemoryJumper : contains
 
 @enduml

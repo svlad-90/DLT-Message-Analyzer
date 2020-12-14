@@ -22,7 +22,7 @@ It's main purposes is to:
 #### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
 #### [DMA_DLTWrappers](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
 #### [DMA_FiltersView](../../dltmessageanalyzerplugin/src/filtersView/doc/doc.md)
-#### [DMA_GroupedView](../../dltmessageanalyzerplugin/src/groupedView/doc/doc.md)
+#### [DMA_GroupedView](../../dltmessageanalyzerplugin/src/components/groupedView/doc/doc.md)
 #### [DMA_Log](../../dltmessageanalyzerplugin/src/components/log/doc/doc.md)
 #### [DMA_Logo](../../dltmessageanalyzerplugin/src/logo/doc/doc.md)
 #### [DMA_PatternsView](../../dltmessageanalyzerplugin/src/patternsView/doc/doc.md)

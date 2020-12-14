@@ -1163,7 +1163,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CGroupedView</class>
    <extends>QTreeView</extends>
-   <header>groupedView/CGroupedView.hpp</header>
+   <header>components/groupedView/api/CGroupedView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CPatternsView</class>

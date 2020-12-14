@@ -31,8 +31,8 @@ class QRegularExpression;
 class QCheckBox;
 class QPushButton;
 
-class CGroupedViewModel;
-typedef CGroupedViewModel* tGroupedViewModelPtr;
+class IGroupedViewModel;
+typedef std::shared_ptr<IGroupedViewModel> tGroupedViewModelPtr;
 class CSearchResultView;
 class CGroupedView;
 class CPatternsView;
@@ -55,7 +55,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
     public:
 
         CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
-                            CGroupedView* pGroupedView, QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
+                            const tGroupedViewModelPtr& pGroupedViewModel,
+                            QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
                             QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
                             QCheckBox* pContinuousSearchCheckBox,
                             QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
@@ -270,7 +271,6 @@ signals:
         QLineEdit* mpFiltersSearchInput;
 
         //custom widgets and models
-        CGroupedView* mpGroupedResultView;
         tGroupedViewModelPtr mpGroupedViewModel;
         QComboBox* mpRegexSelectionComboBox;
 

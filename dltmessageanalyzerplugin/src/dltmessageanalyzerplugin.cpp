@@ -24,6 +24,7 @@
 #include "components/analyzer/api/CAnalyzerComponent.hpp"
 #include "components/log/api/CLogComponent.hpp"
 #include "components/searchView/api/CSearchViewComponent.hpp"
+#include "components/groupedView/api/CGroupedViewComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -38,7 +39,8 @@ mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false),
 mComponents(),
-mpSearchViewComponent(nullptr)
+mpSearchViewComponent(nullptr),
+mpGroupedViewComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -150,6 +152,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pSearchViewComponent);
     }
 
+    {
+        auto pGroupedViewComponent = std::make_shared<CGroupedViewComponent>(mpForm->getGroupedResultView());
+        mpGroupedViewComponent = pGroupedViewComponent;
+
+        auto initResult = pGroupedViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pGroupedViewComponent->getName()));
+        }
+
+        mComponents.push_back(pGroupedViewComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -174,7 +190,7 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(pAnalyzerController,
-                                                                                                      mpForm->getGroupedResultView(),
+                                                                                                      mpGroupedViewComponent->getGroupedViewModel(),
                                                                                                       mpForm->getProgresBarLabel(),
                                                                                                       mpForm->getProgresBar(),
                                                                                                       mpForm->getRegexLineEdit(),
@@ -248,11 +264,6 @@ void DLTMessageAnalyzerPlugin::selectedIdxMsgDecoded(int, QDltMsg &/*msg*/){
 void DLTMessageAnalyzerPlugin::initFileStart(QDltFile *file)
 {
     mpFile = std::make_shared<CDLTFileWrapper>(file);
-
-    if(nullptr != mpSearchViewComponent)
-    {
-        mpSearchViewComponent->setFile(mpFile);
-    }
 
     if( mpDLTMessageAnalyzer )
     {
@@ -588,6 +599,8 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMessageAnalyzer, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CAnalyzerComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

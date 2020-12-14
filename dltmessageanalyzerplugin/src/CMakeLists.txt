@@ -106,7 +106,6 @@ DMA_add_subdirectory_with_clang_tidy(settings)
 DMA_add_subdirectory_with_clang_tidy(logo)
 DMA_add_subdirectory_with_clang_tidy(dltWrappers)
 DMA_add_subdirectory_with_clang_tidy(filtersView)
-DMA_add_subdirectory_with_clang_tidy(groupedView)
 DMA_add_subdirectory_with_clang_tidy(patternsView)
 
 add_library(DLT-Message-Analyzer MODULE

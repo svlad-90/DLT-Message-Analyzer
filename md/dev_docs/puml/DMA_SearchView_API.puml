@@ -37,6 +37,10 @@ class "CDLTMessageAnalyzer"
 {
 }
 
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
 class "Ui::Form"
 {
 }
@@ -97,11 +101,13 @@ QObject <|-- CSearchViewComponent : extends
 '====================Dependencies section====================
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 Ui::Form "1" *-- "1" CSearchResultView : contains
 CSearchResultView "1" o-- "1" CDLTFileWrapper : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
-CSearchViewComponent "1" *-- "1" CSearchResultModel : contains
+CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel
 CSearchViewComponent "1" o-- "1" CSearchResultView : uses
 CSearchViewComponent "1" *-- "1" CTableMemoryJumper : contains
+CSearchViewComponent "1" *-- "1" ISearchResultModel : contains
 
 @enduml

@@ -80,11 +80,20 @@ class "CFiltersView"
 package "DMA_GroupedView" #DDDDDD
 {
 
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_GroupedView_API" #DDDDDD
+{
+
 class "CGroupedView"
 {
 }
 
-class "CGroupedViewModel"
+class "CGroupedViewComponent"
 {
 }
 
@@ -286,8 +295,9 @@ QObject <|-- CDLTFileWrapper : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
 QAbstractItemModel <|-- CFiltersModel : implements
 QTreeView <|-- CFiltersView : implements
-QTreeView <|-- CGroupedView : extends
 QAbstractItemModel <|-- CGroupedViewModel : implements
+QTreeView <|-- CGroupedView : extends
+QObject <|-- CGroupedViewComponent : extends
 QObject <|-- CConsoleCtrl : extends
 QObject <|-- CConsoleInputProcessor : extends
 QPlainTextEdit <|-- CConsoleView : extends

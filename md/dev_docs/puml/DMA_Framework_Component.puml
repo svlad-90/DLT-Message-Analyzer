@@ -40,6 +40,15 @@ class "DMA::IComponent"
 
 }
 
+package "DMA_GroupedView_API" #DDDDDD
+{
+
+class "CGroupedViewComponent"
+{
+}
+
+}
+
 package "DMA_Log_API" #DDDDDD
 {
 
@@ -62,6 +71,7 @@ class "CSearchViewComponent"
 DMA::IComponent <|-- CAnalyzerComponent : implements
 DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
 DMA::INamedObject <|-- DMA::IComponent : implements
+DMA::IComponent <|-- CGroupedViewComponent : implements
 DMA::IComponent <|-- CLogComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements
 
