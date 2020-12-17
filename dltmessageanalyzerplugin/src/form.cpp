@@ -22,7 +22,7 @@
 
 #include "settings/CSettingsManager.hpp"
 #include "common/CBGColorAnimation.hpp"
-#include "patternsView/CPatternsView.hpp"
+#include "components/patternsView/api/CPatternsView.hpp"
 #include "components/log/api/CLog.hpp"
 #include "plant_uml/CUMLView.hpp"
 #include "common/OSHelper.hpp"
@@ -788,7 +788,6 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CConsoleView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogo, 1, 1, contains)

@@ -93,10 +93,6 @@ class "CGroupedView"
 {
 }
 
-class "CGroupedViewComponent"
-{
-}
-
 }
 
 package "DMA_Log" #DDDDDD
@@ -136,6 +132,11 @@ package "DMA_PatternsView" #DDDDDD
 class "CPatternsModel"
 {
 }
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
 
 class "CPatternsView"
 {
@@ -297,7 +298,6 @@ QAbstractItemModel <|-- CFiltersModel : implements
 QTreeView <|-- CFiltersView : implements
 QAbstractItemModel <|-- CGroupedViewModel : implements
 QTreeView <|-- CGroupedView : extends
-QObject <|-- CGroupedViewComponent : extends
 QObject <|-- CConsoleCtrl : extends
 QObject <|-- CConsoleInputProcessor : extends
 QPlainTextEdit <|-- CConsoleView : extends

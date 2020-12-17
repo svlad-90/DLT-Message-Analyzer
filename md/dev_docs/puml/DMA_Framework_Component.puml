@@ -58,6 +58,15 @@ class "CLogComponent"
 
 }
 
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsViewComponent"
+{
+}
+
+}
+
 package "DMA_SearchView_API" #DDDDDD
 {
 
@@ -73,6 +82,7 @@ DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
 DMA::INamedObject <|-- DMA::IComponent : implements
 DMA::IComponent <|-- CGroupedViewComponent : implements
 DMA::IComponent <|-- CLogComponent : implements
+DMA::IComponent <|-- CPatternsViewComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements
 
 @enduml

@@ -2,17 +2,14 @@
 
 #include "memory"
 
-#include "QObject"
-
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
 class CGroupedView;
 class IGroupedViewModel;
 
-class CGroupedViewComponent : public QObject, public DMA::IComponent
+class CGroupedViewComponent : public DMA::IComponent
 {
-    Q_OBJECT
 public:
 
     CGroupedViewComponent( CGroupedView* pGroupedView );

@@ -1,6 +1,5 @@
 qt5_wrap_cpp(PROCESSED_MOCS
-             ../api/CGroupedView.hpp
-             ../api/CGroupedViewComponent.hpp)
+             ../api/CGroupedView.hpp)
 
 add_library(DMA_groupedView STATIC
     CGroupedView.cpp

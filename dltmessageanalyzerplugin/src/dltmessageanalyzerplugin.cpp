@@ -15,7 +15,7 @@
 #include "dltWrappers/CDLTFileWrapper.hpp"
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTMsgWrapper.hpp"
-#include "patternsView/CPatternsView.hpp"
+#include "components/patternsView/api/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -25,6 +25,7 @@
 #include "components/log/api/CLogComponent.hpp"
 #include "components/searchView/api/CSearchViewComponent.hpp"
 #include "components/groupedView/api/CGroupedViewComponent.hpp"
+#include "components/patternsView/api/CPatternsViewComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -40,7 +41,8 @@ mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false),
 mComponents(),
 mpSearchViewComponent(nullptr),
-mpGroupedViewComponent(nullptr)
+mpGroupedViewComponent(nullptr),
+mpPatternsViewComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -166,6 +168,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pGroupedViewComponent);
     }
 
+    {
+        auto pPatternsViewComponent = std::make_shared<CPatternsViewComponent>(mpForm->getPatternsTableView());
+        mpPatternsViewComponent = pPatternsViewComponent;
+
+        auto initResult = pPatternsViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pPatternsViewComponent->getName()));
+        }
+
+        mComponents.push_back(pPatternsViewComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -182,6 +198,21 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         }
 
         mComponents.clear();
+
+        if(nullptr != mpSearchViewComponent)
+        {
+            mpSearchViewComponent.reset();
+        }
+
+        if(nullptr != mpGroupedViewComponent)
+        {
+            mpGroupedViewComponent.reset();
+        }
+
+        if(nullptr != mpPatternsViewComponent)
+        {
+            mpPatternsViewComponent.reset();
+        }
     });
 
     if(nullptr != mpForm->getFiltersView())
@@ -195,7 +226,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getProgresBar(),
                                                                                                       mpForm->getRegexLineEdit(),
                                                                                                       mpForm->getErrorLabel(),
-                                                                                                      mpForm->getPatternsTableView(),
+                                                                                                      mpPatternsViewComponent->getPatternsView(),
+                                                                                                      mpPatternsViewComponent->getPatternsModel(),
                                                                                                       mpForm->getNumberOfThreadsComboBox(),
                                                                                                       mpForm->getContinuousSearchCheckBox(),
                                                                                                       mpForm->getCacheStatusLabel(),

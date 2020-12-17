@@ -57,7 +57,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
         CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                             const tGroupedViewModelPtr& pGroupedViewModel,
                             QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
-                            QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
+                            QLabel* pLabel, CPatternsView* pPatternsTableView, const tPatternsModelPtr& pPatternsModel,
+                            QComboBox* pNumberOfThreadsCombobBox,
                             QCheckBox* pContinuousSearchCheckBox,
                             QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                             QLineEdit* pPatternsSearchInput,
@@ -278,7 +279,7 @@ signals:
         std::shared_ptr<ISearchResultModel> mpSearchResultModel;
 
         CPatternsView* mpPatternsTreeView;
-        tPatternsModelPtr mpAvailablePatternsModel;
+        tPatternsModelPtr mpPatternsModel;
 
         CFiltersView* mpFiltersView;
         CFiltersModel* mpFiltersModel;

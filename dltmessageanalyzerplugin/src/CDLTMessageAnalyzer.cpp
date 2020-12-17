@@ -10,8 +10,6 @@
 #include <QLineEdit>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
-#include "common/CTreeItem.hpp"
-#include "patternsView/CPatternsModel.hpp"
 #include <QRegExp>
 #include <QInputDialog>
 #include <QHeaderView>
@@ -31,6 +29,8 @@
 #include "QApplication"
 #include "QColorDialog"
 
+#include "common/CTreeItem.hpp"
+#include "components/patternsView/api/IPatternsModel.hpp"
 #include "components/groupedView/api/CGroupedView.hpp"
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTFileWrapper.hpp"
@@ -41,7 +41,7 @@
 #include "components/searchView/api/ISearchResultModel.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 #include "common/CBGColorAnimation.hpp"
-#include "patternsView/CPatternsView.hpp"
+#include "components/patternsView/api/CPatternsView.hpp"
 #include "filtersView/CFiltersView.hpp"
 #include "filtersView/CFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
@@ -54,7 +54,8 @@
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                                          const tGroupedViewModelPtr& pGroupedViewModel,
                                          QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
-                                         QLabel* pLabel, CPatternsView* pPatternsTableView, QComboBox* pNumberOfThreadsCombobBox,
+                                         QLabel* pLabel, CPatternsView* pPatternsTableView,  const tPatternsModelPtr& pPatternsModel,
+                                         QComboBox* pNumberOfThreadsCombobBox,
                                          QCheckBox* pContinuousSearchCheckBox,
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput,
@@ -81,7 +82,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpSearchResultView(pSearchResultView),
     mpSearchResultModel(pSearchResultModel),
     mpPatternsTreeView(pPatternsTableView),
-    mpAvailablePatternsModel( new CPatternsModel() ),
+    mpPatternsModel( pPatternsModel ),
     mpFiltersView(pFiltersView),
     mpFiltersModel( new CFiltersModel() ),
     mpUMLView(pUMLView),
@@ -154,11 +155,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     }
 
     if(nullptr != mpPatternsTreeView &&
-            nullptr != mpAvailablePatternsModel &&
+            nullptr != mpPatternsModel &&
             nullptr != mpFiltersModel)
     {
-        mpPatternsTreeView->setSpecificModel(mpAvailablePatternsModel);
-        mpAvailablePatternsModel->updateView();
+        mpPatternsModel->updateView();
 
         for (int c = 0; c < mpPatternsTreeView->header()->count(); ++c)
         {
@@ -537,14 +537,14 @@ void CDLTMessageAnalyzer::createSequenceDiagram() const
 
 void CDLTMessageAnalyzer::handleLoadedRegexConfig()
 {
-    if(nullptr != mpAvailablePatternsModel)
+    if(nullptr != mpPatternsModel)
     {
-        mpAvailablePatternsModel->resetData();
+        mpPatternsModel->resetData();
 
         const auto& aliases = CSettingsManager::getInstance()->getAliases();
         for(const auto& alias : aliases)
         {
-            mpAvailablePatternsModel->addData(alias.alias, alias.regex, alias.isDefault ? Qt::Checked : Qt::Unchecked );
+            mpPatternsModel->addData(alias.alias, alias.regex, alias.isDefault ? Qt::Checked : Qt::Unchecked );
         }
     }
 }
@@ -585,12 +585,6 @@ void CDLTMessageAnalyzer::handleLoadedConfig()
 CDLTMessageAnalyzer::~CDLTMessageAnalyzer()
 {
     //qDebug() << __FUNCTION__;
-
-    if(mpAvailablePatternsModel)
-    {
-        delete mpAvailablePatternsModel;
-        mpAvailablePatternsModel = nullptr;
-    }
 
     if(mpFiltersModel)
     {
@@ -1204,7 +1198,7 @@ void CDLTMessageAnalyzer::exportGroupedViewToHTML()
 
 void CDLTMessageAnalyzer::addPattern(const QString& pattern)
 {
-    if( nullptr == mpAvailablePatternsModel ||
+    if( nullptr == mpPatternsModel ||
         nullptr == mpPatternsTreeView )
     {
         return;
@@ -1264,15 +1258,15 @@ void CDLTMessageAnalyzer::addPattern(const QString& pattern)
 
 void CDLTMessageAnalyzer::updatePatternsInPersistency()
 {
-    if(nullptr != mpAvailablePatternsModel)
+    if(nullptr != mpPatternsModel)
     {
-        mpAvailablePatternsModel->updatePatternsInPersistency();
+        mpPatternsModel->updatePatternsInPersistency();
     }
 }
 
 void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QString checkedRegex, const QModelIndex editItem)
 {
-    if(nullptr == mpAvailablePatternsModel || nullptr == mpPatternsTreeView)
+    if(nullptr == mpPatternsModel || nullptr == mpPatternsTreeView)
         return;
 
     bool bContinue = false;
@@ -1304,7 +1298,7 @@ void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QS
 
     if( true == bContinue ) // if we should continue
     {
-        auto foundPattern = mpAvailablePatternsModel->search(alias);
+        auto foundPattern = mpPatternsModel->search(alias);
 
         auto overwriteItem = [this, &alias, &foundPattern, &checkedRegex, &editItem](Qt::CheckState isDefault, Qt::CheckState isCombine)
         {
@@ -1346,7 +1340,7 @@ void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QS
                                               QMessageBox::Yes|QMessageBox::No);
                 if (reply == QMessageBox::Yes)
                 {
-                    auto editedItemIdx = mpAvailablePatternsModel->editData( editItem, alias, checkedRegex, isDefault, isCombine );
+                    auto editedItemIdx = mpPatternsModel->editData( editItem, alias, checkedRegex, isDefault, isCombine );
                     mpPatternsTreeView->scrollTo(editedItemIdx, QTableView::ScrollHint::PositionAtCenter);
                     mpPatternsTreeView->setCurrentIndex(editedItemIdx);
                     mpPatternsTreeView->setFocus();
@@ -1362,13 +1356,13 @@ void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QS
         {
             if(true == edit)
             {
-                auto editedItemIdx = mpAvailablePatternsModel->editData(editItem, alias, checkedRegex, isDefault, isCombine);
+                auto editedItemIdx = mpPatternsModel->editData(editItem, alias, checkedRegex, isDefault, isCombine);
                 mpPatternsTreeView->scrollTo(editedItemIdx, QTableView::ScrollHint::PositionAtCenter);
                 mpPatternsTreeView->setCurrentIndex(editedItemIdx);
             }
             else
             {
-                QModelIndex modelIndex = mpAvailablePatternsModel->addData(alias, checkedRegex);
+                QModelIndex modelIndex = mpPatternsModel->addData(alias, checkedRegex);
                 mpPatternsTreeView->reset();
                 mpPatternsTreeView->scrollTo(modelIndex, QTableView::ScrollHint::PositionAtCenter);
                 mpPatternsTreeView->setCurrentIndex(modelIndex);
@@ -1430,7 +1424,7 @@ void CDLTMessageAnalyzer::processOverwritePattern(const QString& alias, const QS
 
 void CDLTMessageAnalyzer::deletePattern()
 {
-    if( nullptr == mpAvailablePatternsModel ||
+    if( nullptr == mpPatternsModel ||
             nullptr == mpPatternsTreeView )
     {
         return;
@@ -1445,7 +1439,7 @@ void CDLTMessageAnalyzer::deletePattern()
                                       QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes)
         {
-            mpAvailablePatternsModel->removeData(selectedRows[0]);
+            mpPatternsModel->removeData(selectedRows[0]);
 
             updateStatusLabel("Pattern deleted ...", false);
 
@@ -1464,7 +1458,7 @@ void CDLTMessageAnalyzer::deletePattern()
 
 void CDLTMessageAnalyzer::overwritePattern()
 {
-    if( nullptr == mpAvailablePatternsModel ||
+    if( nullptr == mpPatternsModel ||
             nullptr == mpPatternsTreeView ||
             nullptr == mpRegexLineEdit )
     {
@@ -1494,7 +1488,7 @@ void CDLTMessageAnalyzer::overwritePattern()
 
 void CDLTMessageAnalyzer::editPattern()
 {
-    if( nullptr == mpAvailablePatternsModel ||
+    if( nullptr == mpPatternsModel ||
             nullptr == mpPatternsTreeView )
     {
         return;
@@ -1519,8 +1513,8 @@ void CDLTMessageAnalyzer::editPattern()
         QLineEdit *aliasLineEdit = new QLineEdit(&dialog);
 
         {
-            Q_ASSERT(mpAvailablePatternsModel != nullptr);
-            aliasLineEdit->setText( mpAvailablePatternsModel->getAliasEditName(selectedRow) );
+            Q_ASSERT(mpPatternsModel != nullptr);
+            aliasLineEdit->setText( mpPatternsModel->getAliasEditName(selectedRow) );
             QString label("Alias:");
             form.addRow(label, aliasLineEdit);
             fields << aliasLineEdit;
@@ -1707,9 +1701,9 @@ void CDLTMessageAnalyzer::triggerRegexConfig()
 
 void CDLTMessageAnalyzer::filterPatterns( const QString& filter )
 {
-    if(nullptr != mpAvailablePatternsModel)
+    if(nullptr != mpPatternsModel)
     {
-        mpAvailablePatternsModel->filterPatterns(filter);
+        mpPatternsModel->filterPatterns(filter);
     }
 }
 
@@ -1744,7 +1738,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(IPatternsModel, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)

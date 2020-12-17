@@ -19,25 +19,31 @@ class "CPatternsModel"
 {
 }
 
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
 class "CPatternsView"
 {
 }
 
-class "CTreeRepresentationDelegate"
+class "CPatternsViewComponent"
 {
 }
 
-}
-
-package "DMA_Root" #DDDDDD
+class "IPatternsModel"
 {
-
-class "CDLTMessageAnalyzer"
-{
-}
-
-class "Ui::Form"
-{
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0
+    + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
+    + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
+    + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual tSearchResult search( const QString& alias ) = 0
+    + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void updatePatternsInPersistency() = 0
+    + {abstract} virtual void updateView() = 0
 }
 
 }
@@ -49,32 +55,15 @@ abstract class "QAbstractItemModel"
 {
 }
 
-class "QLineEdit"
-{
-}
-
-class "QStyledItemDelegate"
-{
-}
-
-class "QTreeView"
-{
-}
-
 }
 
 '====================Inheritance section====================
+IPatternsModel <|-- CPatternsModel : implements
 QAbstractItemModel <|-- CPatternsModel : implements
-QTreeView <|-- CPatternsView : extends
-QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 
 '====================Dependencies section====================
 CPatternsModel "1" *-- "*" CTreeItem : contains
 CPatternsView "1" o-- "1" CPatternsModel : uses
-CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
-CPatternsView "1" o-- "1" QLineEdit : patterns search input
-CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
-CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
-Ui::Form "1" *-- "1" CPatternsView : contains
+CPatternsViewComponent "1" --> "1" CPatternsModel : using to create IPatternsModel
 
 @enduml

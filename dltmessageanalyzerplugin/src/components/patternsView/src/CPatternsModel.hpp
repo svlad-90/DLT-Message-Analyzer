@@ -4,8 +4,7 @@
  * @brief   Declaration of the CPatternsModel.hpp class
  */
 
-#ifndef CPatternsModel_HPP
-#define CPatternsModel_HPP
+#pragma once
 
 #include <functional>
 
@@ -13,9 +12,11 @@
 #include "QPair"
 #include "QModelIndex"
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
-class CPatternsModel : public QAbstractItemModel
+#include "../api/IPatternsModel.hpp"
+
+class CPatternsModel : public QAbstractItemModel, public IPatternsModel
 {
     Q_OBJECT
 
@@ -24,10 +25,27 @@ public:
     CPatternsModel(QObject *parent=nullptr);
     ~CPatternsModel() override;
 
-    void updateView();
-    void beginResetModel_();
-    void endResetModel_();
-    void resetData();
+    // Implementation of the IPatternsModel
+    void updateView() override;
+    void resetData() override;
+    QModelIndex addData(const QString& alias,
+                        const QString& regex,
+                        Qt::CheckState isDefault = Qt::Unchecked) override;
+    QModelIndex addData(const QString& alias,
+                        const QString& regex,
+                        Qt::CheckState isCombine,
+                        Qt::CheckState isDefault) override;
+    void updatePatternsInPersistency() override;
+    tSearchResult search( const QString& alias ) override;
+    QModelIndex editData(const QModelIndex& idx,
+                         const QString& alias,
+                         const QString& regex,
+                         Qt::CheckState isDefault,
+                         Qt::CheckState isCombine) override;
+    void removeData(const QModelIndex& idx) override;
+    QString getAliasEditName( const QModelIndex& idx ) override;
+    void filterPatterns( const QString& filter ) override;
+    // Implementation of the IPatternsModel ( END )
 
     bool areAnyCombinedPatternsAvailable() const;
 
@@ -41,15 +59,10 @@ public:
     QModelIndex parent(const QModelIndex &index) const override;
     void sort(int column, Qt::SortOrder order) override;
 
-    QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked);
-    QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault);
-
     typedef QSet<QModelIndex> tChangedIndexes;
 
     tChangedIndexes setIsDefault( const QModelIndex& idx, Qt::CheckState checkState, bool updateFilter, bool updateView );
     tChangedIndexes setIsCombine( const QModelIndex& idx, Qt::CheckState checkState, bool updateFilter, bool updateView );
-
-    void filterPatterns( const QString& filter );
 
     /**
      * @brief getIndexCheckState - returns check state for given index
@@ -58,34 +71,7 @@ public:
      */
     Qt::CheckState getIndexCheckState( const QModelIndex& idx) const;
 
-    /**
-     * @brief editData - edits pattern
-     * @param idx - index of item to be edited
-     * @param alias - new alias value
-     * @param regex - new regex value
-     * @param isDefault - new default value
-     * @param isCombine - new combine value
-     * @return - index of new item, or index of input "idx" parameter. Depends on type of change.
-     * Anyway, client should avoid usage of input "idx" index, and stick to returned index instance after this call.
-     */
-    QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine);
-
-    void removeData(const QModelIndex& idx);
-
     QStringList getSearchKeys( const QString& alias ) const;
-
-    struct tSearchResult
-    {
-        bool bFound { false };
-        QModelIndex foundIdx;
-    };
-
-    /**
-     * @brief search - searches pattern by irs alias
-     * @param alias - alias to be searched
-     * @return - instance of tSearchResult, which provides result status of the search
-     */
-    tSearchResult search( const QString& alias );
 
     typedef std::function<bool(const QModelIndex&)> tVisitFunction;
 
@@ -106,16 +92,8 @@ public:
                 bool visitParentItem = false,
                 QModelIndex parentIdx = QModelIndex()) const;
 
-    void updatePatternsInPersistency();
     void resetPatternsToDefault();
     void clearSelectedPatterns();
-
-    /**
-     * @brief getAliasEditName - gets update name for given pattern
-     * @param idx - input model index
-     * @return - name to be used for edit purposes
-     */
-    QString getAliasEditName( const QModelIndex& idx );
 
     struct tFilteredEntry
     {
@@ -139,5 +117,3 @@ private:
     Qt::SortOrder mSortOrder;
     QString mFilter;
 };
-
-#endif // CPatternsModel_HPP

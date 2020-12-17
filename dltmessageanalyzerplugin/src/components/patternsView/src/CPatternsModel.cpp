@@ -11,9 +11,9 @@
 #include <QStack>
 #include <QRegularExpression>
 
-#include "../common/Definitions.hpp"
-#include "../common/CTreeItem.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "common/Definitions.hpp"
+#include "common/CTreeItem.hpp"
+#include "settings/CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -1469,6 +1469,7 @@ void CPatternsModel::filterPatterns( const QString& filter )
 PUML_PACKAGE_BEGIN(DMA_PatternsView)
     PUML_CLASS_BEGIN_CHECKED(CPatternsModel)
         PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_INHERITANCE_CHECKED(IPatternsModel, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

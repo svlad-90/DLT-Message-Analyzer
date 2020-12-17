@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="683px" preserveAspectRatio="none" style="width:1167px;height:683px;background:#FEFEFE;" version="1.1" viewBox="0 0 1167 683" width="1167px" zoomAndPan="magnify"><defs><filter height="300%" id="f3k9buur8p5kw" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#f3k9buur8p5kw)" points="477,6,690,6,697,29.6094,700,29.6094,700,106,477,106,477,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="477" x2="697" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="481" y="22.5332">DMA_Framework_Component</text><!--MD5=[1662d4e2812ab165537af65137c61edd]
+cluster DMA_PatternsView_API--><polygon fill="#DDDDDD" filter="url(#f3k9buur8p5kw)" points="16,156,184,156,191,179.6094,819,179.6094,819,676,16,676,16,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="191" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="162" x="20" y="172.5332">DMA_PatternsView_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#f3k9buur8p5kw)" points="843,156,865,156,872,179.6094,1150,179.6094,1150,256,843,256,843,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="843" x2="872" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="847" y="172.5332">Qt</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="8" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="522.5" y="42"/><ellipse cx="537.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M540.2656,53.875 Q540.4219,53.6563 540.6094,53.5469 Q540.7969,53.4375 541.0156,53.4375 Q541.3906,53.4375 541.625,53.6953 Q541.8594,53.9531 541.8594,54.5625 L541.8594,56.0156 Q541.8594,56.625 541.625,56.8906 Q541.3906,57.1563 541.0156,57.1563 Q540.6719,57.1563 540.4688,56.9531 Q540.2656,56.7656 540.1563,56.25 Q540.1094,55.8906 539.9219,55.7031 Q539.5938,55.3281 538.9844,55.1094 Q538.375,54.8906 537.75,54.8906 Q536.9844,54.8906 536.3516,55.2188 Q535.7188,55.5469 535.2266,56.2969 Q534.7344,57.0469 534.7344,58.0781 L534.7344,59.1719 Q534.7344,60.4063 535.625,61.2266 Q536.5156,62.0469 538.1094,62.0469 Q539.0469,62.0469 539.7031,61.7969 Q540.0938,61.6406 540.5156,61.2031 Q540.7813,60.9375 540.9297,60.8594 Q541.0781,60.7813 541.2813,60.7813 Q541.6094,60.7813 541.8672,61.0391 Q542.125,61.2969 542.125,61.6406 Q542.125,61.9844 541.7813,62.3906 Q541.2813,62.9688 540.4844,63.2969 Q539.4063,63.75 538.1094,63.75 Q536.5938,63.75 535.3906,63.125 Q534.4063,62.625 533.7188,61.5547 Q533.0313,60.4844 533.0313,59.2031 L533.0313,58.0469 Q533.0313,56.7188 533.6484,55.5703 Q534.2656,54.4219 535.3594,53.8047 Q536.4531,53.1875 537.6875,53.1875 Q538.4219,53.1875 539.0703,53.3516 Q539.7188,53.5156 540.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="551.5" y="62.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="523.5" x2="652.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="523.5" x2="652.5" y1="82" y2="82"/><!--MD5=[65c2c4cc9165a34acb321ec9a951480d]
+class CPatternsView--><rect codeLine="17" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="CPatternsView" style="stroke:#A80036;stroke-width:1.5;" width="113" x="689.5" y="403"/><ellipse cx="704.5" cy="419" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M707.2656,414.875 Q707.4219,414.6563 707.6094,414.5469 Q707.7969,414.4375 708.0156,414.4375 Q708.3906,414.4375 708.625,414.6953 Q708.8594,414.9531 708.8594,415.5625 L708.8594,417.0156 Q708.8594,417.625 708.625,417.8906 Q708.3906,418.1563 708.0156,418.1563 Q707.6719,418.1563 707.4688,417.9531 Q707.2656,417.7656 707.1563,417.25 Q707.1094,416.8906 706.9219,416.7031 Q706.5938,416.3281 705.9844,416.1094 Q705.375,415.8906 704.75,415.8906 Q703.9844,415.8906 703.3516,416.2188 Q702.7188,416.5469 702.2266,417.2969 Q701.7344,418.0469 701.7344,419.0781 L701.7344,420.1719 Q701.7344,421.4063 702.625,422.2266 Q703.5156,423.0469 705.1094,423.0469 Q706.0469,423.0469 706.7031,422.7969 Q707.0938,422.6406 707.5156,422.2031 Q707.7813,421.9375 707.9297,421.8594 Q708.0781,421.7813 708.2813,421.7813 Q708.6094,421.7813 708.8672,422.0391 Q709.125,422.2969 709.125,422.6406 Q709.125,422.9844 708.7813,423.3906 Q708.2813,423.9688 707.4844,424.2969 Q706.4063,424.75 705.1094,424.75 Q703.5938,424.75 702.3906,424.125 Q701.4063,423.625 700.7188,422.5547 Q700.0313,421.4844 700.0313,420.2031 L700.0313,419.0469 Q700.0313,417.7188 700.6484,416.5703 Q701.2656,415.4219 702.3594,414.8047 Q703.4531,414.1875 704.6875,414.1875 Q705.4219,414.1875 706.0703,414.3516 Q706.7188,414.5156 707.2656,414.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="718.5" y="423.9102">CPatternsView</text><line style="stroke:#A80036;stroke-width:1.5;" x1="690.5" x2="801.5" y1="435" y2="435"/><line style="stroke:#A80036;stroke-width:1.5;" x1="690.5" x2="801.5" y1="443" y2="443"/><!--MD5=[141f52f98b2a8ca9f9494466aee7a8bf]
+class CPatternsViewComponent--><rect codeLine="21" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="CPatternsViewComponent" style="stroke:#A80036;stroke-width:1.5;" width="178" x="499" y="192"/><ellipse cx="514" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M516.7656,203.875 Q516.9219,203.6563 517.1094,203.5469 Q517.2969,203.4375 517.5156,203.4375 Q517.8906,203.4375 518.125,203.6953 Q518.3594,203.9531 518.3594,204.5625 L518.3594,206.0156 Q518.3594,206.625 518.125,206.8906 Q517.8906,207.1563 517.5156,207.1563 Q517.1719,207.1563 516.9688,206.9531 Q516.7656,206.7656 516.6563,206.25 Q516.6094,205.8906 516.4219,205.7031 Q516.0938,205.3281 515.4844,205.1094 Q514.875,204.8906 514.25,204.8906 Q513.4844,204.8906 512.8516,205.2188 Q512.2188,205.5469 511.7266,206.2969 Q511.2344,207.0469 511.2344,208.0781 L511.2344,209.1719 Q511.2344,210.4063 512.125,211.2266 Q513.0156,212.0469 514.6094,212.0469 Q515.5469,212.0469 516.2031,211.7969 Q516.5938,211.6406 517.0156,211.2031 Q517.2813,210.9375 517.4297,210.8594 Q517.5781,210.7813 517.7813,210.7813 Q518.1094,210.7813 518.3672,211.0391 Q518.625,211.2969 518.625,211.6406 Q518.625,211.9844 518.2813,212.3906 Q517.7813,212.9688 516.9844,213.2969 Q515.9063,213.75 514.6094,213.75 Q513.0938,213.75 511.8906,213.125 Q510.9063,212.625 510.2188,211.5547 Q509.5313,210.4844 509.5313,209.2031 L509.5313,208.0469 Q509.5313,206.7188 510.1484,205.5703 Q510.7656,204.4219 511.8594,203.8047 Q512.9531,203.1875 514.1875,203.1875 Q514.9219,203.1875 515.5703,203.3516 Q516.2188,203.5156 516.7656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="146" x="528" y="212.9102">CPatternsViewComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="500" x2="676" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="500" x2="676" y1="232" y2="232"/><!--MD5=[695a96838d66354bcac5cdce8957559d]
+class CTreeRepresentationDelegate--><rect codeLine="25" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="CTreeRepresentationDelegate" style="stroke:#A80036;stroke-width:1.5;" width="201" x="601.5" y="612"/><ellipse cx="616.5" cy="628" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M619.2656,623.875 Q619.4219,623.6563 619.6094,623.5469 Q619.7969,623.4375 620.0156,623.4375 Q620.3906,623.4375 620.625,623.6953 Q620.8594,623.9531 620.8594,624.5625 L620.8594,626.0156 Q620.8594,626.625 620.625,626.8906 Q620.3906,627.1563 620.0156,627.1563 Q619.6719,627.1563 619.4688,626.9531 Q619.2656,626.7656 619.1563,626.25 Q619.1094,625.8906 618.9219,625.7031 Q618.5938,625.3281 617.9844,625.1094 Q617.375,624.8906 616.75,624.8906 Q615.9844,624.8906 615.3516,625.2188 Q614.7188,625.5469 614.2266,626.2969 Q613.7344,627.0469 613.7344,628.0781 L613.7344,629.1719 Q613.7344,630.4063 614.625,631.2266 Q615.5156,632.0469 617.1094,632.0469 Q618.0469,632.0469 618.7031,631.7969 Q619.0938,631.6406 619.5156,631.2031 Q619.7813,630.9375 619.9297,630.8594 Q620.0781,630.7813 620.2813,630.7813 Q620.6094,630.7813 620.8672,631.0391 Q621.125,631.2969 621.125,631.6406 Q621.125,631.9844 620.7813,632.3906 Q620.2813,632.9688 619.4844,633.2969 Q618.4063,633.75 617.1094,633.75 Q615.5938,633.75 614.3906,633.125 Q613.4063,632.625 612.7188,631.5547 Q612.0313,630.4844 612.0313,629.2031 L612.0313,628.0469 Q612.0313,626.7188 612.6484,625.5703 Q613.2656,624.4219 614.3594,623.8047 Q615.4531,623.1875 616.6875,623.1875 Q617.4219,623.1875 618.0703,623.3516 Q618.7188,623.5156 619.2656,623.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="169" x="630.5" y="632.9102">CTreeRepresentationDelegate</text><line style="stroke:#A80036;stroke-width:1.5;" x1="602.5" x2="801.5" y1="644" y2="644"/><line style="stroke:#A80036;stroke-width:1.5;" x1="602.5" x2="801.5" y1="652" y2="652"/><!--MD5=[24e8e76e2cdfcc5d692b02d12d65b91f]
+class IPatternsModel--><rect codeLine="29" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="214.0313" id="IPatternsModel" style="stroke:#A80036;stroke-width:1.5;" width="622" x="32" y="320"/><ellipse cx="297.75" cy="336" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M300.5156,331.875 Q300.6719,331.6563 300.8594,331.5469 Q301.0469,331.4375 301.2656,331.4375 Q301.6406,331.4375 301.875,331.6953 Q302.1094,331.9531 302.1094,332.5625 L302.1094,334.0156 Q302.1094,334.625 301.875,334.8906 Q301.6406,335.1563 301.2656,335.1563 Q300.9219,335.1563 300.7188,334.9531 Q300.5156,334.7656 300.4063,334.25 Q300.3594,333.8906 300.1719,333.7031 Q299.8438,333.3281 299.2344,333.1094 Q298.625,332.8906 298,332.8906 Q297.2344,332.8906 296.6016,333.2188 Q295.9688,333.5469 295.4766,334.2969 Q294.9844,335.0469 294.9844,336.0781 L294.9844,337.1719 Q294.9844,338.4063 295.875,339.2266 Q296.7656,340.0469 298.3594,340.0469 Q299.2969,340.0469 299.9531,339.7969 Q300.3438,339.6406 300.7656,339.2031 Q301.0313,338.9375 301.1797,338.8594 Q301.3281,338.7813 301.5313,338.7813 Q301.8594,338.7813 302.1172,339.0391 Q302.375,339.2969 302.375,339.6406 Q302.375,339.9844 302.0313,340.3906 Q301.5313,340.9688 300.7344,341.2969 Q299.6563,341.75 298.3594,341.75 Q296.8438,341.75 295.6406,341.125 Q294.6563,340.625 293.9688,339.5547 Q293.2813,338.4844 293.2813,337.2031 L293.2813,336.0469 Q293.2813,334.7188 293.8984,333.5703 Q294.5156,332.4219 295.6094,331.8047 Q296.7031,331.1875 297.9375,331.1875 Q298.6719,331.1875 299.3203,331.3516 Q299.9688,331.5156 300.5156,331.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="82" x="318.25" y="340.9102">IPatternsModel</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="653" y1="352" y2="352"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="653" y1="360" y2="360"/><ellipse cx="43" cy="371" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="580" x="52" y="375.4189">virtual QModelIndex addData(const QString&amp; alias, const QString&amp; regex, Qt::CheckState isCombine, Qt::CheckState</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="66" x="52" y="389.2549">isDefault) = 0</text><ellipse cx="43" cy="398.6719" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="596" x="52" y="403.0908">virtual QModelIndex addData(const QString&amp; alias, const QString&amp; regex, Qt::CheckState isDefault = Qt::Unchecked) = 0</text><ellipse cx="43" cy="412.5078" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="569" x="52" y="416.9268">virtual QModelIndex editData(const QModelIndex&amp; idx, const QString&amp; alias, const QString&amp; regex, Qt::CheckState</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="204" x="52" y="430.7627">isDefault, Qt::CheckState isCombine) = 0</text><ellipse cx="43" cy="440.1797" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="315" x="52" y="444.5986">virtual QString getAliasEditName( const QModelIndex&amp; idx ) = 0</text><ellipse cx="43" cy="454.0156" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="239" x="52" y="458.4346">virtual removeData(const QModelIndex&amp; idx) = 0</text><ellipse cx="43" cy="467.8516" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="274" x="52" y="472.2705">virtual tSearchResult search( const QString&amp; alias ) = 0</text><ellipse cx="43" cy="481.6875" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="251" x="52" y="486.1064">virtual void filterPatterns( const QString&amp; filter ) = 0</text><ellipse cx="43" cy="495.5234" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="130" x="52" y="499.9424">virtual void resetData() = 0</text><ellipse cx="43" cy="509.3594" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="223" x="52" y="513.7783">virtual void updatePatternsInPersistency() = 0</text><ellipse cx="43" cy="523.1953" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="138" x="52" y="527.6143">virtual void updateView() = 0</text><!--MD5=[a1b8e256eada155e9f3de67feb3af130]
+class QStyledItemDelegate--><rect codeLine="48" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="QStyledItemDelegate" style="stroke:#A80036;stroke-width:1.5;" width="148" x="986" y="192"/><ellipse cx="1001" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1003.7656,203.875 Q1003.9219,203.6563 1004.1094,203.5469 Q1004.2969,203.4375 1004.5156,203.4375 Q1004.8906,203.4375 1005.125,203.6953 Q1005.3594,203.9531 1005.3594,204.5625 L1005.3594,206.0156 Q1005.3594,206.625 1005.125,206.8906 Q1004.8906,207.1563 1004.5156,207.1563 Q1004.1719,207.1563 1003.9688,206.9531 Q1003.7656,206.7656 1003.6563,206.25 Q1003.6094,205.8906 1003.4219,205.7031 Q1003.0938,205.3281 1002.4844,205.1094 Q1001.875,204.8906 1001.25,204.8906 Q1000.4844,204.8906 999.8516,205.2188 Q999.2188,205.5469 998.7266,206.2969 Q998.2344,207.0469 998.2344,208.0781 L998.2344,209.1719 Q998.2344,210.4063 999.125,211.2266 Q1000.0156,212.0469 1001.6094,212.0469 Q1002.5469,212.0469 1003.2031,211.7969 Q1003.5938,211.6406 1004.0156,211.2031 Q1004.2813,210.9375 1004.4297,210.8594 Q1004.5781,210.7813 1004.7813,210.7813 Q1005.1094,210.7813 1005.3672,211.0391 Q1005.625,211.2969 1005.625,211.6406 Q1005.625,211.9844 1005.2813,212.3906 Q1004.7813,212.9688 1003.9844,213.2969 Q1002.9063,213.75 1001.6094,213.75 Q1000.0938,213.75 998.8906,213.125 Q997.9063,212.625 997.2188,211.5547 Q996.5313,210.4844 996.5313,209.2031 L996.5313,208.0469 Q996.5313,206.7188 997.1484,205.5703 Q997.7656,204.4219 998.8594,203.8047 Q999.9531,203.1875 1001.1875,203.1875 Q1001.9219,203.1875 1002.5703,203.3516 Q1003.2188,203.5156 1003.7656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="116" x="1015" y="212.9102">QStyledItemDelegate</text><line style="stroke:#A80036;stroke-width:1.5;" x1="987" x2="1133" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="987" x2="1133" y1="232" y2="232"/><!--MD5=[007a283508746e6e6a7bb2028196e9c2]
+class QTreeView--><rect codeLine="52" fill="#FEFECE" filter="url(#f3k9buur8p5kw)" height="48" id="QTreeView" style="stroke:#A80036;stroke-width:1.5;" width="92" x="859" y="192"/><ellipse cx="874" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M876.7656,203.875 Q876.9219,203.6563 877.1094,203.5469 Q877.2969,203.4375 877.5156,203.4375 Q877.8906,203.4375 878.125,203.6953 Q878.3594,203.9531 878.3594,204.5625 L878.3594,206.0156 Q878.3594,206.625 878.125,206.8906 Q877.8906,207.1563 877.5156,207.1563 Q877.1719,207.1563 876.9688,206.9531 Q876.7656,206.7656 876.6563,206.25 Q876.6094,205.8906 876.4219,205.7031 Q876.0938,205.3281 875.4844,205.1094 Q874.875,204.8906 874.25,204.8906 Q873.4844,204.8906 872.8516,205.2188 Q872.2188,205.5469 871.7266,206.2969 Q871.2344,207.0469 871.2344,208.0781 L871.2344,209.1719 Q871.2344,210.4063 872.125,211.2266 Q873.0156,212.0469 874.6094,212.0469 Q875.5469,212.0469 876.2031,211.7969 Q876.5938,211.6406 877.0156,211.2031 Q877.2813,210.9375 877.4297,210.8594 Q877.5781,210.7813 877.7813,210.7813 Q878.1094,210.7813 878.3672,211.0391 Q878.625,211.2969 878.625,211.6406 Q878.625,211.9844 878.2813,212.3906 Q877.7813,212.9688 876.9844,213.2969 Q875.9063,213.75 874.6094,213.75 Q873.0938,213.75 871.8906,213.125 Q870.9063,212.625 870.2188,211.5547 Q869.5313,210.4844 869.5313,209.2031 L869.5313,208.0469 Q869.5313,206.7188 870.1484,205.5703 Q870.7656,204.4219 871.8594,203.8047 Q872.9531,203.1875 874.1875,203.1875 Q874.9219,203.1875 875.5703,203.3516 Q876.2188,203.5156 876.7656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="60" x="888" y="212.9102">QTreeView</text><line style="stroke:#A80036;stroke-width:1.5;" x1="860" x2="950" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="860" x2="950" y1="232" y2="232"/><!--MD5=[4f29cfde51756d92937c641f0bc219a9]
+reverse link QTreeView to CPatternsView--><path codeLine="59" d="M875.201,256.17 C842.375,299.318 790.672,367.28 763.702,402.731 " fill="none" id="QTreeView-backto-CPatternsView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="869.696,251.844,887.377,240.165,880.838,260.321,869.696,251.844" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="863" y="286.4951">extends</text><!--MD5=[5994370399716680ea6d7b5d0488dacb]
+reverse link DMA::IComponent to CPatternsViewComponent--><path codeLine="60" d="M588,110.517 C588,137.019 588,169.842 588,191.549 " fill="none" id="DMA::IComponent-backto-CPatternsViewComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="581,110.125,588,90.125,595,110.125,581,110.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="589" y="136.4951">implements</text><!--MD5=[65b81a7646c2c2242e52497a82923247]
+reverse link QStyledItemDelegate to CTreeRepresentationDelegate--><path codeLine="61" d="M1035.47,257.622 C990.589,329.544 889.293,481.187 775,582 C763.137,592.4637 749.272,602.9206 736.831,611.7473 " fill="none" id="QStyledItemDelegate-backto-CTreeRepresentationDelegate" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="1029.67,253.697,1046.12,240.344,1041.58,261.043,1029.67,253.697" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="992" y="432.4951">extends</text><!--MD5=[73e1bd87f1f96e02d0157c56a8656a49]
+reverse link CPatternsView to CTreeRepresentationDelegate--><path codeLine="64" d="M738.323,464.115 C729.296,506.583 714.578,575.826 706.944,611.7422 " fill="none" id="CPatternsView-backto-CTreeRepresentationDelegate" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="741.038,451.343,735.8779,456.3802,738.543,463.0808,743.7031,458.0435,741.038,451.343" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="717" y="578.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="732.0812" y="472.3581">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="700.314" y="601.0163">1</text><!--MD5=[9278dd98e2a9c16e3d02cebd1a711fa6]
+reverse link CPatternsViewComponent to CPatternsView--><path codeLine="65" d="M616.324,250.431 C632.924,270.341 654.084,296.275 672,320 C693.099,347.94 715.963,381.19 730.606,402.903 " fill="none" id="CPatternsViewComponent-backto-CPatternsView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="607.861,240.327,608.6478,247.4951,615.5671,249.5257,614.7803,242.3577,607.861,240.327" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="648" y="286.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="604.6445" y="261.3384">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="718.7644" y="392.2183">1</text><!--MD5=[873c207e45cc0b556f6dad92bda39e0f]
+reverse link CPatternsViewComponent to IPatternsModel--><path codeLine="66" d="M550.702,248.818 C528.074,268.121 497.761,293.979 467.3,319.965 " fill="none" id="CPatternsViewComponent-backto-IPatternsModel" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="560.845,240.165,553.6843,241.016,551.7157,247.9532,558.8764,247.1022,560.845,240.165" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="523" y="286.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="546.3728" y="261.5432">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="469.1713" y="309.024">1</text><!--MD5=[a35bedca0d6e369615124b63c66637ee]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
+{
+}
+
+class "CTreeRepresentationDelegate"
+{
+}
+
+class "IPatternsModel"
+{
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0
+    + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
+    + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
+    + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual tSearchResult search( const QString& alias ) = 0
+    + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void updatePatternsInPersistency() = 0
+    + {abstract} virtual void updateView() = 0
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QTreeView <|- - CPatternsView : extends
+DMA::IComponent <|- - CPatternsViewComponent : implements
+QStyledItemDelegate <|- - CTreeRepresentationDelegate : extends
+
+'====================Dependencies section====================
+CPatternsView "1" *- - "1" CTreeRepresentationDelegate : contains
+CPatternsViewComponent "1" o- - "1" CPatternsView : uses
+CPatternsViewComponent "1" *- - "1" IPatternsModel : contains
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
+{
+}
+
+class "CTreeRepresentationDelegate"
+{
+}
+
+class "IPatternsModel"
+{
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0
+    + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
+    + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
+    + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual tSearchResult search( const QString& alias ) = 0
+    + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void updatePatternsInPersistency() = 0
+    + {abstract} virtual void updateView() = 0
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
+{
+}
+
+}
+
+QTreeView <|- - CPatternsView : extends
+DMA::IComponent <|- - CPatternsViewComponent : implements
+QStyledItemDelegate <|- - CTreeRepresentationDelegate : extends
+
+CPatternsView "1" *- - "1" CTreeRepresentationDelegate : contains
+CPatternsViewComponent "1" o- - "1" CPatternsView : uses
+CPatternsViewComponent "1" *- - "1" IPatternsModel : contains
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

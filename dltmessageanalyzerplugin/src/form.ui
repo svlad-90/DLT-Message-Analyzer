@@ -683,7 +683,7 @@ QPushButton:hover:!pressed{
           </widget>
          </widget>
          <widget class="QWidget" name="verticalLayoutWidget">
-          <layout class="QVBoxLayout" name="filtersLayout" stretch="0,0">
+          <layout class="QVBoxLayout" name="filtersLayout" stretch="0,0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetMinimumSize</enum>
            </property>
@@ -699,6 +699,19 @@ QPushButton:hover:!pressed{
            <property name="bottomMargin">
             <number>10</number>
            </property>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item>
             <widget class="CFiltersView" name="filtersTreeView">
              <property name="sizePolicy">
@@ -1168,7 +1181,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CPatternsView</class>
    <extends>QTreeView</extends>
-   <header>patternsView/CPatternsView.hpp</header>
+   <header>components/patternsView/api/CPatternsView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CFiltersView</class>

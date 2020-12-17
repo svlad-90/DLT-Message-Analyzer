@@ -133,15 +133,25 @@ class "CLogo"
 
 }
 
-package "DMA_PatternsView" #DDDDDD
+package "DMA_PatternsView_API" #DDDDDD
 {
-
-class "CPatternsModel"
-{
-}
 
 class "CPatternsView"
 {
+}
+
+class "IPatternsModel"
+{
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0
+    + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
+    + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
+    + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual tSearchResult search( const QString& alias ) = 0
+    + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void updatePatternsInPersistency() = 0
+    + {abstract} virtual void updateView() = 0
 }
 
 }
@@ -225,7 +235,6 @@ CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
 CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
 CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
-CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
@@ -233,6 +242,7 @@ CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
+CDLTMessageAnalyzer "1" *-- "1" IPatternsModel : contains
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
