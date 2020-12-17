@@ -3,10 +3,10 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_PatternsView" #DDDDDD
+package "DMA_Framework_Component" #DDDDDD
 {
 
-class "CPatternsModel"
+class "DMA::IComponent"
 {
 }
 
@@ -14,6 +14,18 @@ class "CPatternsModel"
 
 package "DMA_PatternsView_API" #DDDDDD
 {
+
+class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
+{
+}
+
+class "CTreeRepresentationDelegate"
+{
+}
 
 class "IPatternsModel"
 {
@@ -34,14 +46,24 @@ class "IPatternsModel"
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractItemModel"
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
 {
 }
 
 }
 
 '====================Inheritance section====================
-IPatternsModel <|-- CPatternsModel : implements
-QAbstractItemModel <|-- CPatternsModel : implements
+QTreeView <|-- CPatternsView : extends
+DMA::IComponent <|-- CPatternsViewComponent : implements
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
+
+'====================Dependencies section====================
+CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
+CPatternsViewComponent "1" o-- "1" CPatternsView : uses
+CPatternsViewComponent "1" *-- "1" IPatternsModel : contains
 
 @enduml

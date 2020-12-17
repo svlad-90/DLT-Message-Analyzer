@@ -4,7 +4,7 @@
  * @brief   Implementation of the CPatternsView class
  */
 
-#include "CPatternsView.hpp"
+#include "../api/CPatternsView.hpp"
 
 #include <functional>
 
@@ -28,7 +28,7 @@
 #include <QDesktopServices>
 #include <QClipboard>
 
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 #include "CPatternsModel.hpp"
 #include "components/log/api/CLog.hpp"
 
@@ -1159,7 +1159,7 @@ void CPatternsView::pasteSelectedRow()
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_PatternsView)
+PUML_PACKAGE_BEGIN(DMA_PatternsView_API)
     PUML_CLASS_BEGIN_CHECKED(CPatternsView)
         PUML_INHERITANCE_CHECKED(QTreeView, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeRepresentationDelegate, 1, 1, contains)

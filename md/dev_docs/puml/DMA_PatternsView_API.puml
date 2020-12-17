@@ -3,6 +3,15 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
 package "DMA_PatternsView" #DDDDDD
 {
 
@@ -14,6 +23,18 @@ class "CPatternsModel"
 
 package "DMA_PatternsView_API" #DDDDDD
 {
+
+class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
+{
+}
+
+class "CTreeRepresentationDelegate"
+{
+}
 
 class "IPatternsModel"
 {
@@ -31,10 +52,31 @@ class "IPatternsModel"
 
 }
 
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractItemModel"
+class "QLineEdit"
+{
+}
+
+class "QStyledItemDelegate"
+{
+}
+
+class "QTreeView"
 {
 }
 
@@ -42,6 +84,19 @@ abstract class "QAbstractItemModel"
 
 '====================Inheritance section====================
 IPatternsModel <|-- CPatternsModel : implements
-QAbstractItemModel <|-- CPatternsModel : implements
+QTreeView <|-- CPatternsView : extends
+DMA::IComponent <|-- CPatternsViewComponent : implements
+QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
+
+'====================Dependencies section====================
+CPatternsView "1" o-- "1" CPatternsModel : uses
+CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
+CPatternsView "1" o-- "1" QLineEdit : patterns search input
+CPatternsViewComponent "1" --> "1" CPatternsModel : using to create IPatternsModel
+CPatternsViewComponent "1" o-- "1" CPatternsView : uses
+CPatternsViewComponent "1" *-- "1" IPatternsModel : contains
+CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
+CDLTMessageAnalyzer "1" *-- "1" IPatternsModel : contains
+Ui::Form "1" *-- "1" CPatternsView : contains
 
 @enduml

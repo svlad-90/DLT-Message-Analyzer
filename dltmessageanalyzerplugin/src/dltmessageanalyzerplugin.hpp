@@ -27,6 +27,7 @@ typedef QMap<int, tQStringPtr > tMsgMap;
 class IDLTMessageAnalyzerController;
 class CSearchViewComponent;
 class CGroupedViewComponent;
+class CPatternsViewComponent;
 
 namespace DMA
 {
@@ -137,6 +138,7 @@ private: // members
 
     std::shared_ptr<CSearchViewComponent> mpSearchViewComponent;
     std::shared_ptr<CGroupedViewComponent> mpGroupedViewComponent;
+    std::shared_ptr<CPatternsViewComponent> mpPatternsViewComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

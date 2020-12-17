@@ -63,10 +63,6 @@ class "Ui::Form"
 package "Qt" #DDDDDD
 {
 
-class "QObject"
-{
-}
-
 class "QTreeView"
 {
 }
@@ -77,7 +73,6 @@ class "QTreeView"
 IGroupedViewModel <|-- CGroupedViewModel : implements
 QTreeView <|-- CGroupedView : extends
 DMA::IComponent <|-- CGroupedViewComponent : implements
-QObject <|-- CGroupedViewComponent : extends
 
 '====================Dependencies section====================
 CGroupedViewComponent "1" o-- "1" CGroupedView : uses

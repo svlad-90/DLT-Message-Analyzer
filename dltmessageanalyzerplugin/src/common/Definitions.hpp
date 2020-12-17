@@ -74,8 +74,8 @@ typedef tTreeItem* tTreeItemPtr;
 typedef QVector<tTreeItemPtr> tTreeItemPtrVec;
 typedef std::shared_ptr<CTreeItem> tTreeItemSharedPtr;
 
-class CPatternsModel;
-typedef CPatternsModel* tPatternsModelPtr;
+class IPatternsModel;
+typedef std::shared_ptr<IPatternsModel> tPatternsModelPtr;
 
 extern const QString sDefaultStatusText;
 extern const QString sDefaultRegexFileName;

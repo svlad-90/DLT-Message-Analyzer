@@ -30,7 +30,7 @@ DMA::tSyncInitOperationResult CGroupedViewComponent::init()
     DMA::tSyncInitOperationResult result;
 
     try
-    {        
+    {
         if(nullptr != mpGroupedView)
         {
             auto pGroupedViewModel= std::make_shared<CGroupedViewModel>();
@@ -89,7 +89,6 @@ CGroupedView* CGroupedViewComponent::getGroupedView() const
 
 PUML_PACKAGE_BEGIN(DMA_GroupedView_API)
     PUML_CLASS_BEGIN(CGroupedViewComponent)
-        PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, contains)
         PUML_USE_DEPENDENCY_CHECKED(CGroupedViewModel, 1, 1, using to create IGroupedViewModel)

@@ -37,10 +37,6 @@ class "IGroupedViewModel"
 package "Qt" #DDDDDD
 {
 
-class "QObject"
-{
-}
-
 class "QTreeView"
 {
 }
@@ -50,7 +46,6 @@ class "QTreeView"
 '====================Inheritance section====================
 QTreeView <|-- CGroupedView : extends
 DMA::IComponent <|-- CGroupedViewComponent : implements
-QObject <|-- CGroupedViewComponent : extends
 
 '====================Dependencies section====================
 CGroupedViewComponent "1" o-- "1" CGroupedView : uses

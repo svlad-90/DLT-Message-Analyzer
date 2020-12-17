@@ -4,12 +4,11 @@
  * @brief   Declaration of the CPatternsView class
  */
 
-#ifndef CPATTERNSVIEW_HPP
-#define CPATTERNSVIEW_HPP
+#pragma once
 
 #include <QTreeView>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 class CTreeRepresentationDelegate;
 class CPatternsModel;
@@ -78,4 +77,3 @@ private: // fields
     QLineEdit* mpPatternsSearchInput;
     tCopyPastePatternData mCopyPastePatternData;
 };
-#endif // CPATTERNSVIEW_HPP
