@@ -56,12 +56,12 @@ jobs:
            echo "D:/a/${{ github.event.repository.name }}/tools/jom/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: powershell
 
-    # Checkout dlt-viewer's revision 2.20.1
+    # Checkout dlt-viewer's revision v2.21.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v2
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.20.1
+        ref: v2.21.0
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
@@ -70,18 +70,6 @@ jobs:
         repository: svlad-90/${{ github.event.repository.name }}
         path: .\plugin\${{ github.event.repository.name }}
         ref: ${{ github.ref }}
-        
-    # Adjust dlt-viewer's  main CMakeLists.txt in order to avoid setting gcc specific compiler flags
-    - name: Patch dlt-viewer's CMakeLists.txt
-      run: |
-         $filePath = ".\CMakeLists.txt"
-         $find_1 = "SET(CMAKE_C_FLAGS  ""`${CMAKE_C_FLAGS} -std=gnu99"")"
-         $replace_1 = "{0}if(NOT CMAKE_CXX_COMPILER_ID MATCHES ""MSVC""){1}{2}" -f [environment]::NewLine, [environment]::NewLine, $find_1
-         (Get-Content $filePath).Replace( $find_1 , $replace_1 ) | Set-Content $filePath
-         $find_2 = "add_definitions( ""-Wno-strict-aliasing"" )"
-         $replace_2 = "{0}{1}endif()" -f $find_2, [environment]::NewLine
-         (Get-Content $filePath).Replace( $find_2 , $replace_2 ) | Set-Content $filePath
-      shell: powershell
         
     # Adjust dlt-viewer's plugin CMakeLists.txt file to sub-include the plugin
     - name: Patch dlt-viewer's plugin CMakeLists.txt
