@@ -12,11 +12,11 @@
 
 > **Note!**
 > 
-> Currently plugin can be built against the v2.20.1 release.
+> Currently plugin can be built against the v2.21.0 release.
 >
-> The build under the v2.19.0 is also supported. But you will need to use the compatibility mode. Such an option is described below. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
+> The build under the earlier versions, down to the the v2.19.0 is also supported. But you will need to use the compatibility mode. Such an option is described below later on down this page. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
 >
-> Be sure, that you've checked out the compatible base-line and used needed options. 
+> Make sure, that you've checked out the compatible base-line and used required build options. 
 
 ----
 
@@ -170,6 +170,17 @@ As of now, they are Linux and Windows.
 > **./dlt-viewer/plugin/ DLT-Message-Analyzer/ dltmessageanalyzerplugin/ src/ CMakeLists.txt**:
 > 
 > ![Screenshot enable 1.0.0 compatibility define in CMakeLists.txt](./installation_guide_enable_define_cmake.png)
+
+----
+
+> **Note!** 
+> 
+> To run dlt-viewer and DLT_Message-Analyzer, which are built with msvc, you will need to install the corresponding version of the Visual C++ Redistributable package.
+> 
+> Here is a link, by which you can find such packages for 2015, 2017, 2019 versions of the msvc - https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
+>
+> In case if the link will become irrelevant, just google for the "Visual C++ Redistributable package" keyword in your browser.
+> 
 
 ----
 

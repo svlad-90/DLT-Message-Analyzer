@@ -38,12 +38,12 @@ jobs:
          dir: ../Qt 
          cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
-    # Checkout dlt-viewer's revision 2.20.1
+    # Checkout dlt-viewer's revision v2.21.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v2
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.20.1
+        ref: v2.21.0
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the ${{ github.event.repository.name }}

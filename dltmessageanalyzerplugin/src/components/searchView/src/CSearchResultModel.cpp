@@ -421,6 +421,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                         case eUML_ID::UML_SERVICE:
                                         {
                                             QString str;
+                                            str.append("\"");
                                             str.append(message.mid(range.from, range.to - range.from + 1));
 
                                             if(true == stringCoverageMapItem.second.bAddSeparator)
@@ -428,7 +429,8 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                                 str.append(" ");
                                             }
 
-                                            str.replace(" ", "_");
+                                            str.append("\"");
+
                                             UMLRepresentationResult.second.append(str);
                                         }
                                             break;
@@ -564,8 +566,6 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
     }
 
     outputString.append("@enduml");
-
-    SEND_MSG(result.second);
 
     return result;
 }

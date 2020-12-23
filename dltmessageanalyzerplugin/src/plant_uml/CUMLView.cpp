@@ -408,6 +408,7 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
         else
         {
             SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
+            SEND_ERR(mDiagramContent);
             diagramGenerationFinished(false);
         }
 

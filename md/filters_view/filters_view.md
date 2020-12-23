@@ -15,9 +15,11 @@ To keep things easier, the "filters view" was introduced within the plugin. It d
 
 ## How to enter the "Filters view"?
 
-Currently, entering the filters view is not so transparent, thus here is a gif animation, which represents how to open it:
+Currently, entering the filters view is not so transparent. Thus, here is a gif animation, which represents how exactly to open it:
 
 ![Screenshot of entering the filters view](./var_entering_filters_view.gif)
+
+In future releases, we will think of how to make it more transparent for the user to enter it. We promise ))
 
 ----
 
