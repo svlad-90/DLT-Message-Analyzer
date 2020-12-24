@@ -42,8 +42,8 @@
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
-#include "filtersView/CFiltersView.hpp"
-#include "filtersView/CFiltersModel.hpp"
+#include "components/filtersView/api/CFiltersView.hpp"
+#include "components/filtersView/api/IFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "common/CTableMemoryJumper.hpp"
 #include "plant_uml/CUMLView.hpp"
@@ -60,7 +60,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                                          QLineEdit* pPatternsSearchInput,
                                          QComboBox* pRegexSelectionComboBox,
-                                         CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
+                                         CFiltersView* pFiltersView, const std::shared_ptr<IFiltersModel>& pFiltersModel,
+                                         QLineEdit* pFiltersSearchInput,
                                          CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                                          CSearchResultView* pSearchResultView,
                                          const std::shared_ptr<ISearchResultModel>& pSearchResultModel):
@@ -84,7 +85,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     mpPatternsTreeView(pPatternsTableView),
     mpPatternsModel( pPatternsModel ),
     mpFiltersView(pFiltersView),
-    mpFiltersModel( new CFiltersModel() ),
+    mpFiltersModel( pFiltersModel ),
     mpUMLView(pUMLView),
     // internal states
     mSearchRange(),
@@ -133,11 +134,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         mpLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     }
 
-    if(nullptr != mpFiltersView &&
-            nullptr != mpFiltersModel)
+    if(nullptr != mpFiltersModel)
     {
-        mpFiltersView->setSpecificModel(mpFiltersModel);
-
         if(nullptr != mpRegexLineEdit)
         {
             connect( mpRegexLineEdit, &QLineEdit::textChanged, [this](const QString& regex)
@@ -180,7 +178,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             }
         });
 
-        connect ( mpFiltersModel, &CFiltersModel::regexUpdatedByUser, [this](const QString& regex)
+        connect ( mpFiltersModel.get(), &IFiltersModel::regexUpdatedByUser, [this](const QString& regex)
         {
             mpRegexLineEdit->selectAll();
             mpRegexLineEdit->insert( regex );
@@ -223,7 +221,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpFiltersModel && nullptr != mpFiltersView)
     {
-        connect ( mpFiltersModel, &CFiltersModel::regexUpdatedByUserInvalid,
+        connect ( mpFiltersModel.get(), &IFiltersModel::regexUpdatedByUserInvalid,
         [this](const QModelIndex& index, const QString& error)
         {
             mpFiltersView->highlightInvalidRegex(index);
@@ -579,17 +577,6 @@ void CDLTMessageAnalyzer::handleLoadedConfig()
         Qt::CheckState checkState =
                 CSettingsManager::getInstance()->getContinuousSearch() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
         mpContinuousSearchCheckBox->setCheckState( checkState );
-    }
-}
-
-CDLTMessageAnalyzer::~CDLTMessageAnalyzer()
-{
-    //qDebug() << __FUNCTION__;
-
-    if(mpFiltersModel)
-    {
-        delete mpFiltersModel;
-        mpFiltersModel = nullptr;
     }
 }
 
@@ -1738,9 +1725,9 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(IPatternsModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IPatternsModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IFiltersModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(CBGColorAnimation, 1, 1, uses)

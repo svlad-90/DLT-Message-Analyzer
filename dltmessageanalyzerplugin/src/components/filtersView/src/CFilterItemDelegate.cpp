@@ -5,8 +5,8 @@
 #include <QStringListModel>
 
 #include "components/log/api/CLog.hpp"
-#include "../settings/CSettingsManager.hpp"
-#include "../common/Definitions.hpp"
+#include "settings/CSettingsManager.hpp"
+#include "common/Definitions.hpp"
 #include "CFiltersModel.hpp"
 #include "CFilterItemDelegate.hpp"
 

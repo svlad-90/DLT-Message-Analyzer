@@ -12,6 +12,15 @@ class "CAnalyzerComponent"
 
 }
 
+package "DMA_FiltersView_API" #DDDDDD
+{
+
+class "CFiltersViewComponent"
+{
+}
+
+}
+
 package "DMA_Framework_Base" #DDDDDD
 {
 
@@ -78,6 +87,7 @@ class "CSearchViewComponent"
 
 '====================Inheritance section====================
 DMA::IComponent <|-- CAnalyzerComponent : implements
+DMA::IComponent <|-- CFiltersViewComponent : implements
 DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
 DMA::INamedObject <|-- DMA::IComponent : implements
 DMA::IComponent <|-- CGroupedViewComponent : implements

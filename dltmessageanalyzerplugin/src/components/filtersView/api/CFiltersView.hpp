@@ -1,9 +1,8 @@
-#ifndef CFILTERSVIEW_HPP
-#define CFILTERSVIEW_HPP
+#pragma once
 
 #include <QTreeView>
 
-#include "../common/Definitions.hpp"
+#include "common/Definitions.hpp"
 
 class CFiltersModel;
 class CFilterItemDelegate;
@@ -50,5 +49,3 @@ private: // fields
     QLineEdit* mpRegexInputField;
     CFilterItemDelegate* mpFilerItemDelegate;
 };
-
-#endif // CFILTERSVIEW_HPP

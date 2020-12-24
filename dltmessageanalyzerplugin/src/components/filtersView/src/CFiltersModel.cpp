@@ -12,15 +12,15 @@
 #include "QElapsedTimer"
 #endif
 
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 #include "CFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
-#include "../common/PCRE/PCREHelper.hpp"
+#include "common/PCRE/PCREHelper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
 CFiltersModel::CFiltersModel(QObject *parent)
-    : QAbstractItemModel(parent),
+    : IFiltersModel(parent),
       mRegex(),
       mSortingColumn(eRegexFiltersColumn::Index),
       mSortOrder(Qt::SortOrder::AscendingOrder),
@@ -804,7 +804,7 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
 
 PUML_PACKAGE_BEGIN(DMA_FiltersView)
     PUML_CLASS_BEGIN_CHECKED(CFiltersModel)
-        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
+        PUML_INHERITANCE_CHECKED(IFiltersModel, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

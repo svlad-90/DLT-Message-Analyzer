@@ -1,5 +1,4 @@
-#ifndef CFILTERITEMDELEGATE_HPP
-#define CFILTERITEMDELEGATE_HPP
+#pragma once
 
 #include <QMap>
 #include <QElapsedTimer>
@@ -85,5 +84,3 @@ private:
     QTreeView* mpParentTree;
     CFiltersModel* mpModel;
 };
-
-#endif // CFILTERITEMDELEGATE_HPP

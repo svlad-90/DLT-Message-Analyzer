@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>857</width>
-    <height>348</height>
+    <height>372</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1186,7 +1186,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CFiltersView</class>
    <extends>QTreeView</extends>
-   <header>filtersView/CFiltersView.hpp</header>
+   <header>components/filtersView/api/CFiltersView.hpp</header>
   </customwidget>
   <customwidget>
    <class>CConsoleView</class>

@@ -67,12 +67,22 @@ class "CFilterItemDelegate"
 {
 }
 
-class "CFiltersModel"
-{
 }
+
+package "DMA_FiltersView_API" #DDDDDD
+{
 
 class "CFiltersView"
 {
+}
+
+class "IFiltersModel"
+{
+    + {abstract} virtual void addCompletionData( const tFoundMatches& foundMatches ) = 0
+    + {abstract} virtual void filterRegexTokens( const QString& filter ) = 0
+    + {abstract} virtual void resetCompletionData() = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setUsedRegex(const QString& regexStr) = 0
 }
 
 }
@@ -294,8 +304,8 @@ QObject <|-- CBGColorAnimation : extends
 QObject <|-- CRegexDirectoryMonitor : extends
 QObject <|-- CDLTFileWrapper : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
-QAbstractItemModel <|-- CFiltersModel : implements
 QTreeView <|-- CFiltersView : implements
+QAbstractItemModel <|-- IFiltersModel : implements
 QAbstractItemModel <|-- CGroupedViewModel : implements
 QTreeView <|-- CGroupedView : extends
 QObject <|-- CConsoleCtrl : extends

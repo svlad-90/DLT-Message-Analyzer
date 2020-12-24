@@ -1,25 +1,26 @@
-#ifndef CFILTERSMODEL_HPP
-#define CFILTERSMODEL_HPP
+#pragma once
 
 #include "memory"
 
-#include "QAbstractItemModel"
+#include "common/Definitions.hpp"
+#include "common/CTreeItem.hpp"
 
-#include "../common/Definitions.hpp"
-#include "../common/CTreeItem.hpp"
+#include "../api/IFiltersModel.hpp"
 
-class CFiltersModel : public QAbstractItemModel
+class CFiltersModel : public IFiltersModel
 {
     Q_OBJECT
 
 public:
     explicit CFiltersModel(QObject *parent = nullptr);
 
-    void resetData();
-    void setUsedRegex(const QString& regexStr);
-
-    void addCompletionData( const tFoundMatches& foundMatches );
-    void resetCompletionData();
+    // Implementation of the IFiltersModel
+    void setUsedRegex(const QString& regexStr) override;
+    void addCompletionData( const tFoundMatches& foundMatches ) override;
+    void resetCompletionData() override;
+    void resetData() override;
+    void filterRegexTokens( const QString& filter ) override;
+    // Implementation of the IFiltersModel ( END )
 
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
@@ -34,22 +35,7 @@ public:
 
     virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    void filterRegexTokens( const QString& filter );
-
-    struct tFilteredEntry
-    {
-        QModelIndex parentIdx;
-        int row;
-        bool filtered;
-    };
-    typedef std::vector<tFilteredEntry> tFilteredEntryVec;
-
     QStringList getCompletionData( const int& groupIndex, const QString& input, const int& maxNumberOfSuggestions, const int& maxLengthOfSuggestions );
-
-signals:
-    void filteredEntriesChanged(const tFilteredEntryVec& filteredEntryVec, bool expandVisible);
-    void regexUpdatedByUser( const QString& regex );
-    void regexUpdatedByUserInvalid( const QModelIndex& index, const QString& error );
 
 private:
 
@@ -87,5 +73,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(CFiltersModel::tFilteredEntryVec)
-
-#endif // CFILTERSMODEL_HPP
