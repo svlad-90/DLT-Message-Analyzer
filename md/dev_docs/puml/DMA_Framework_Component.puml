@@ -76,6 +76,15 @@ class "CPatternsViewComponent"
 
 }
 
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
 package "DMA_SearchView_API" #DDDDDD
 {
 
@@ -93,6 +102,7 @@ DMA::INamedObject <|-- DMA::IComponent : implements
 DMA::IComponent <|-- CGroupedViewComponent : implements
 DMA::IComponent <|-- CLogComponent : implements
 DMA::IComponent <|-- CPatternsViewComponent : implements
+DMA::IComponent <|-- CUMLViewComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements
 
 @enduml

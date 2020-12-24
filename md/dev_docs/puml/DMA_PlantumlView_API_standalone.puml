@@ -1,0 +1,44 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QWidget <|-- CUMLView : extends
+DMA::IComponent <|-- CUMLViewComponent : implements
+
+'====================Dependencies section====================
+CUMLViewComponent "1" o-- "1" CUMLView : uses
+
+@enduml

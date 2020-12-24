@@ -1,5 +1,4 @@
-#ifndef CIMAGEVIEWER_HPP
-#define CIMAGEVIEWER_HPP
+#pragma once
 
 #include <QWidget>
 #include <QImage>
@@ -20,5 +19,3 @@ private:
 private:
     QImage mImage;
 };
-
-#endif // CIMAGEVIEWER_HPP

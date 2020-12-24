@@ -45,8 +45,8 @@
 #include "components/filtersView/api/CFiltersView.hpp"
 #include "components/filtersView/api/IFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
+#include "components/plant_uml/api/CUMLView.hpp"
 #include "common/CTableMemoryJumper.hpp"
-#include "plant_uml/CUMLView.hpp"
 
 #include "DMA_Plantuml.hpp"
 
