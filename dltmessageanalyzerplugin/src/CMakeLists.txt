@@ -88,6 +88,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 ################### PROJECT ###############################
 enable_testing()
 DMA_Prepare()
+include(cmake/CMakeHelper.cmake)
 ################### PROJECT ( END ) #######################
 
 set(TURN_OFF_RCC OFF)
@@ -105,7 +106,6 @@ DMA_add_subdirectory_with_clang_tidy(plant_uml)
 DMA_add_subdirectory_with_clang_tidy(settings)
 DMA_add_subdirectory_with_clang_tidy(logo)
 DMA_add_subdirectory_with_clang_tidy(dltWrappers)
-DMA_add_subdirectory_with_clang_tidy(filtersView)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp

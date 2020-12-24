@@ -16,7 +16,6 @@
 #include "settings/CSettingsManager.hpp"
 #include "dltWrappers/CDLTMsgWrapper.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
-#include "filtersView/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
 #include "components/log/api/CLog.hpp"
@@ -26,6 +25,8 @@
 #include "components/searchView/api/CSearchViewComponent.hpp"
 #include "components/groupedView/api/CGroupedViewComponent.hpp"
 #include "components/patternsView/api/CPatternsViewComponent.hpp"
+#include "components/filtersView/api/CFiltersViewComponent.hpp"
+#include "components/filtersView/api/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -42,7 +43,8 @@ mbAnalysisRunning(false),
 mComponents(),
 mpSearchViewComponent(nullptr),
 mpGroupedViewComponent(nullptr),
-mpPatternsViewComponent(nullptr)
+mpPatternsViewComponent(nullptr),
+mpFiltersViewComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -182,6 +184,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pPatternsViewComponent);
     }
 
+    {
+        auto pFiltersViewComponent = std::make_shared<CFiltersViewComponent>(mpForm->getFiltersView());
+        mpFiltersViewComponent = pFiltersViewComponent;
+
+        auto initResult = pFiltersViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pFiltersViewComponent->getName()));
+        }
+
+        mComponents.push_back(pFiltersViewComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -234,7 +250,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpForm->getMainTabWidget(),
                                                                                                       mpForm->getPatternSearchInput(),
                                                                                                       mpForm->getConfigComboBox(),
-                                                                                                      mpForm->getFiltersView(),
+                                                                                                      mpFiltersViewComponent->getFiltersView(),
+                                                                                                      mpFiltersViewComponent->getFiltersModel(),
                                                                                                       mpForm->getFiltersSearchInput(),
                                                                                                       mpForm->getUMLView(),
                                                                                                       mpSearchViewComponent->getTableMemoryJumper(),
@@ -633,6 +650,8 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CGroupedViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

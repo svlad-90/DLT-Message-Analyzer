@@ -28,6 +28,7 @@ class IDLTMessageAnalyzerController;
 class CSearchViewComponent;
 class CGroupedViewComponent;
 class CPatternsViewComponent;
+class CFiltersViewComponent;
 
 namespace DMA
 {
@@ -139,6 +140,7 @@ private: // members
     std::shared_ptr<CSearchViewComponent> mpSearchViewComponent;
     std::shared_ptr<CGroupedViewComponent> mpGroupedViewComponent;
     std::shared_ptr<CPatternsViewComponent> mpPatternsViewComponent;
+    std::shared_ptr<CFiltersViewComponent> mpFiltersViewComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

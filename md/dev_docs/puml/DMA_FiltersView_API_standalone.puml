@@ -3,21 +3,16 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_FiltersView" #DDDDDD
-{
-
-class "CFilterItemDelegate"
-{
-}
-
-class "CFiltersModel"
-{
-}
-
-}
-
 package "DMA_FiltersView_API" #DDDDDD
 {
+
+class "CFiltersView"
+{
+}
+
+class "CFiltersViewComponent"
+{
+}
 
 class "IFiltersModel"
 {
@@ -30,20 +25,35 @@ class "IFiltersModel"
 
 }
 
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
-class "QStyledItemDelegate"
+abstract class "QAbstractItemModel"
+{
+}
+
+class "QTreeView"
 {
 }
 
 }
 
 '====================Inheritance section====================
-QStyledItemDelegate <|-- CFilterItemDelegate : extends
-IFiltersModel <|-- CFiltersModel : implements
+QTreeView <|-- CFiltersView : implements
+DMA::IComponent <|-- CFiltersViewComponent : implements
+QAbstractItemModel <|-- IFiltersModel : implements
 
 '====================Dependencies section====================
-CFilterItemDelegate "1" o-- "1" CFiltersModel : uses
+CFiltersViewComponent "1" o-- "1" CFiltersView : uses
+CFiltersViewComponent "1" *-- "1" IFiltersModel : contains
 
 @enduml

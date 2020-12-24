@@ -38,7 +38,7 @@ class CGroupedView;
 class CPatternsView;
 class CRegexDirectoryMonitor;
 class CFiltersView;
-class CFiltersModel;
+class IFiltersModel;
 class CUMLView;
 class CSearchResultView;
 class ISearchResultModel;
@@ -63,15 +63,11 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             QLabel* pCacheStatusLabel, QTabWidget* pMainTabWidget,
                             QLineEdit* pPatternsSearchInput,
                             QComboBox* pRegexSelectionComboBox,
-                            CFiltersView* pFiltersView, QLineEdit* pFiltersSearchInput,
+                            CFiltersView* pFiltersView, const std::shared_ptr<IFiltersModel>& pFiltersModel,
+                            QLineEdit* pFiltersSearchInput,
                             CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                             CSearchResultView* pSearchResultView,
                             const std::shared_ptr<ISearchResultModel>& pSearchResultModel);
-
-        /**
-         * Destructor
-         */
-        ~CDLTMessageAnalyzer();
 
         /**
          * @brief setFile - set's the file to be used for analysis
@@ -282,7 +278,7 @@ signals:
         tPatternsModelPtr mpPatternsModel;
 
         CFiltersView* mpFiltersView;
-        CFiltersModel* mpFiltersModel;
+        std::shared_ptr<IFiltersModel> mpFiltersModel;
 
         CUMLView* mpUMLView;
 

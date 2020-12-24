@@ -76,15 +76,24 @@ class "CDLTFileWrapper"
 
 }
 
-package "DMA_FiltersView" #DDDDDD
+package "DMA_FiltersView_API" #DDDDDD
 {
-
-class "CFiltersModel"
-{
-}
 
 class "CFiltersView"
 {
+}
+
+class "CFiltersViewComponent"
+{
+}
+
+class "IFiltersModel"
+{
+    + {abstract} virtual void addCompletionData( const tFoundMatches& foundMatches ) = 0
+    + {abstract} virtual void filterRegexTokens( const QString& filter ) = 0
+    + {abstract} virtual void resetCompletionData() = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setUsedRegex(const QString& regexStr) = 0
 }
 
 }
@@ -137,6 +146,10 @@ package "DMA_PatternsView_API" #DDDDDD
 {
 
 class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
 {
 }
 
@@ -233,7 +246,6 @@ QWidget <|-- Form : extends
 '====================Dependencies section====================
 CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
 CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
-CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
@@ -241,16 +253,19 @@ CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
+CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses
 CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
-CDLTMessageAnalyzer "1" *-- "1" IPatternsModel : contains
+CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses

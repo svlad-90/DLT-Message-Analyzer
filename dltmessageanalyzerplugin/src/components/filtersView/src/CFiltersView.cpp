@@ -12,12 +12,12 @@
 #include "QKeyEvent"
 
 #include "CFiltersModel.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "settings/CSettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
-#include "../common/CQtHelper.hpp"
+#include "common/CQtHelper.hpp"
 
 #include "CFilterItemDelegate.hpp"
-#include "CFiltersView.hpp"
+#include "../api/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -543,7 +543,7 @@ void CFiltersView::keyPressEvent ( QKeyEvent * event )
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_FiltersView)
+PUML_PACKAGE_BEGIN(DMA_FiltersView_API)
     PUML_CLASS_BEGIN_CHECKED(CFiltersView)
         PUML_INHERITANCE_CHECKED(QTreeView, implements)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CFilterItemDelegate, 1, 1, contains)
