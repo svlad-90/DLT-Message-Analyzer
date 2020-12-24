@@ -29,6 +29,7 @@ class CSearchViewComponent;
 class CGroupedViewComponent;
 class CPatternsViewComponent;
 class CFiltersViewComponent;
+class CUMLViewComponent;
 
 namespace DMA
 {
@@ -141,6 +142,7 @@ private: // members
     std::shared_ptr<CGroupedViewComponent> mpGroupedViewComponent;
     std::shared_ptr<CPatternsViewComponent> mpPatternsViewComponent;
     std::shared_ptr<CFiltersViewComponent> mpFiltersViewComponent;
+    std::shared_ptr<CUMLViewComponent> mpUMLViewComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

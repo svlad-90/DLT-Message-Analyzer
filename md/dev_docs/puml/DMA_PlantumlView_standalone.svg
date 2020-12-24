@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="263px" preserveAspectRatio="none" style="width:182px;height:263px;background:#FEFEFE;" version="1.1" viewBox="0 0 182 263" width="182px" zoomAndPan="magnify"><defs><filter height="300%" id="fdlx0hw5v601h" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[9eace720f92aed4610e31080c0d9b99a]
+cluster DMA_PlantumlView--><polygon fill="#DDDDDD" filter="url(#fdlx0hw5v601h)" points="16,156,155,156,162,179.6094,165,179.6094,165,256,16,256,16,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="162" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="133" x="20" y="172.5332">DMA_PlantumlView</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fdlx0hw5v601h)" points="34,6,56,6,63,29.6094,146,29.6094,146,106,34,106,34,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="34" x2="63" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="38" y="22.5332">Qt</text><!--MD5=[95e275fee6d661fba6aa4d8c7c13a98b]
+class CImageViewer--><rect codeLine="8" fill="#FEFECE" filter="url(#fdlx0hw5v601h)" height="48" id="CImageViewer" style="stroke:#A80036;stroke-width:1.5;" width="113" x="33.5" y="192"/><ellipse cx="48.5" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M51.2656,203.875 Q51.4219,203.6563 51.6094,203.5469 Q51.7969,203.4375 52.0156,203.4375 Q52.3906,203.4375 52.625,203.6953 Q52.8594,203.9531 52.8594,204.5625 L52.8594,206.0156 Q52.8594,206.625 52.625,206.8906 Q52.3906,207.1563 52.0156,207.1563 Q51.6719,207.1563 51.4688,206.9531 Q51.2656,206.7656 51.1563,206.25 Q51.1094,205.8906 50.9219,205.7031 Q50.5938,205.3281 49.9844,205.1094 Q49.375,204.8906 48.75,204.8906 Q47.9844,204.8906 47.3516,205.2188 Q46.7188,205.5469 46.2266,206.2969 Q45.7344,207.0469 45.7344,208.0781 L45.7344,209.1719 Q45.7344,210.4063 46.625,211.2266 Q47.5156,212.0469 49.1094,212.0469 Q50.0469,212.0469 50.7031,211.7969 Q51.0938,211.6406 51.5156,211.2031 Q51.7813,210.9375 51.9297,210.8594 Q52.0781,210.7813 52.2813,210.7813 Q52.6094,210.7813 52.8672,211.0391 Q53.125,211.2969 53.125,211.6406 Q53.125,211.9844 52.7813,212.3906 Q52.2813,212.9688 51.4844,213.2969 Q50.4063,213.75 49.1094,213.75 Q47.5938,213.75 46.3906,213.125 Q45.4063,212.625 44.7188,211.5547 Q44.0313,210.4844 44.0313,209.2031 L44.0313,208.0469 Q44.0313,206.7188 44.6484,205.5703 Q45.2656,204.4219 46.3594,203.8047 Q47.4531,203.1875 48.6875,203.1875 Q49.4219,203.1875 50.0703,203.3516 Q50.7188,203.5156 51.2656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="62.5" y="212.9102">CImageViewer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="34.5" x2="145.5" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="34.5" x2="145.5" y1="232" y2="232"/><!--MD5=[3e3f16721f1fb369e45a968cb01568b2]
+class QWidget--><rect codeLine="17" fill="#FEFECE" filter="url(#fdlx0hw5v601h)" height="48" id="QWidget" style="stroke:#A80036;stroke-width:1.5;" width="79" x="50.5" y="42"/><ellipse cx="65.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M68.2656,53.875 Q68.4219,53.6563 68.6094,53.5469 Q68.7969,53.4375 69.0156,53.4375 Q69.3906,53.4375 69.625,53.6953 Q69.8594,53.9531 69.8594,54.5625 L69.8594,56.0156 Q69.8594,56.625 69.625,56.8906 Q69.3906,57.1563 69.0156,57.1563 Q68.6719,57.1563 68.4688,56.9531 Q68.2656,56.7656 68.1563,56.25 Q68.1094,55.8906 67.9219,55.7031 Q67.5938,55.3281 66.9844,55.1094 Q66.375,54.8906 65.75,54.8906 Q64.9844,54.8906 64.3516,55.2188 Q63.7188,55.5469 63.2266,56.2969 Q62.7344,57.0469 62.7344,58.0781 L62.7344,59.1719 Q62.7344,60.4063 63.625,61.2266 Q64.5156,62.0469 66.1094,62.0469 Q67.0469,62.0469 67.7031,61.7969 Q68.0938,61.6406 68.5156,61.2031 Q68.7813,60.9375 68.9297,60.8594 Q69.0781,60.7813 69.2813,60.7813 Q69.6094,60.7813 69.8672,61.0391 Q70.125,61.2969 70.125,61.6406 Q70.125,61.9844 69.7813,62.3906 Q69.2813,62.9688 68.4844,63.2969 Q67.4063,63.75 66.1094,63.75 Q64.5938,63.75 63.3906,63.125 Q62.4063,62.625 61.7188,61.5547 Q61.0313,60.4844 61.0313,59.2031 L61.0313,58.0469 Q61.0313,56.7188 61.6484,55.5703 Q62.2656,54.4219 63.3594,53.8047 Q64.4531,53.1875 65.6875,53.1875 Q66.4219,53.1875 67.0703,53.3516 Q67.7188,53.5156 68.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="47" x="79.5" y="62.9102">QWidget</text><line style="stroke:#A80036;stroke-width:1.5;" x1="51.5" x2="128.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="51.5" x2="128.5" y1="82" y2="82"/><!--MD5=[40d74cb6cda27ae80516c53696d28715]
+reverse link QWidget to CImageViewer--><path codeLine="24" d="M90,110.517 C90,137.019 90,169.842 90,191.549 " fill="none" id="QWidget-backto-CImageViewer" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="83.0001,110.125,90,90.125,97.0001,110.125,83.0001,110.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="91" y="136.4951">extends</text><!--MD5=[7b62a5f50eaf84523b7dda22a72396eb]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_PlantumlView" #DDDDDD
+{
+
+class "CImageViewer"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QWidget <|- - CImageViewer : extends
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_PlantumlView" #DDDDDD
+{
+
+class "CImageViewer"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QWidget"
+{
+}
+
+}
+
+QWidget <|- - CImageViewer : extends
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

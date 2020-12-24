@@ -3,27 +3,19 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_PlantUML" #DDDDDD
+package "DMA_PlantumlView" #DDDDDD
 {
 
 class "CImageViewer"
 {
 }
 
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
 class "CUMLView"
-{
-}
-
-}
-
-package "DMA_Root" #DDDDDD
-{
-
-class "CDLTMessageAnalyzer"
-{
-}
-
-class "Ui::Form"
 {
 }
 
@@ -36,10 +28,6 @@ class "QImage"
 {
 }
 
-class "QProcess"
-{
-}
-
 class "QWidget"
 {
 }
@@ -48,13 +36,9 @@ class "QWidget"
 
 '====================Inheritance section====================
 QWidget <|-- CImageViewer : extends
-QWidget <|-- CUMLView : extends
 
 '====================Dependencies section====================
 CImageViewer "1" *-- "1" QImage : contains
 CUMLView "1" *-- "1" CImageViewer : contains
-CUMLView "1" *-- "2" QProcess : contains
-CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
-Ui::Form "1" *-- "1" CUMLView : contains
 
 @enduml

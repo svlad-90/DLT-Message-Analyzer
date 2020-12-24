@@ -4,8 +4,7 @@
  * @brief   Declaration of the CUMLView class
  */
 
-#ifndef CUMLVIEW_H
-#define CUMLVIEW_H
+#pragma once
 
 #include "memory"
 #include "functional"
@@ -60,5 +59,3 @@ private:
     bool mbDiagramGenerationInProgress;
     QString mLastSelectedFolder;
 };
-
-#endif // CUMLVIEW_H

@@ -24,7 +24,7 @@
 #include "common/CBGColorAnimation.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
 #include "components/log/api/CLog.hpp"
-#include "plant_uml/CUMLView.hpp"
+#include "components/plant_uml/api/CUMLView.hpp"
 #include "common/OSHelper.hpp"
 #include "common/CQtHelper.hpp"
 

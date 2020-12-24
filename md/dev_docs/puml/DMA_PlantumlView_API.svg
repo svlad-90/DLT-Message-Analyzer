@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="539px" preserveAspectRatio="none" style="width:808px;height:539px;background:#FEFEFE;" version="1.1" viewBox="0 0 808 539" width="808px" zoomAndPan="magnify"><defs><filter height="300%" id="fh2flia3n55us" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#fh2flia3n55us)" points="16,6,229,6,236,29.6094,239,29.6094,239,106,16,106,16,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="236" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="20" y="22.5332">DMA_Framework_Component</text><!--MD5=[9eace720f92aed4610e31080c0d9b99a]
+cluster DMA_PlantumlView--><polygon fill="#DDDDDD" filter="url(#fh2flia3n55us)" points="208,432,347,432,354,455.6094,357,455.6094,357,532,208,532,208,432" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="208" x2="354" y1="455.6094" y2="455.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="133" x="212" y="448.5332">DMA_PlantumlView</text><!--MD5=[a7b8d79a7f74ac5164dfe83598ce98a7]
+cluster DMA_PlantumlView_API--><polygon fill="#DDDDDD" filter="url(#fh2flia3n55us)" points="313,156,482,156,489,179.6094,503,179.6094,503,382,313,382,313,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="313" x2="489" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="163" x="317" y="172.5332">DMA_PlantumlView_API</text><!--MD5=[8783dc687c912be3a190a2183cc7b433]
+cluster DMA_Root--><polygon fill="#DDDDDD" filter="url(#fh2flia3n55us)" points="263,6,342,6,349,29.6094,791,29.6094,791,106,263,106,263,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="263" x2="349" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="73" x="267" y="22.5332">DMA_Root</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fh2flia3n55us)" points="381,432,403,432,410,455.6094,615,455.6094,615,532,381,532,381,432" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="381" x2="410" y1="455.6094" y2="455.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="385" y="448.5332">Qt</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="8" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="91.5" y="42"/><ellipse cx="106.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M109.2656,53.875 Q109.4219,53.6563 109.6094,53.5469 Q109.7969,53.4375 110.0156,53.4375 Q110.3906,53.4375 110.625,53.6953 Q110.8594,53.9531 110.8594,54.5625 L110.8594,56.0156 Q110.8594,56.625 110.625,56.8906 Q110.3906,57.1563 110.0156,57.1563 Q109.6719,57.1563 109.4688,56.9531 Q109.2656,56.7656 109.1563,56.25 Q109.1094,55.8906 108.9219,55.7031 Q108.5938,55.3281 107.9844,55.1094 Q107.375,54.8906 106.75,54.8906 Q105.9844,54.8906 105.3516,55.2188 Q104.7188,55.5469 104.2266,56.2969 Q103.7344,57.0469 103.7344,58.0781 L103.7344,59.1719 Q103.7344,60.4063 104.625,61.2266 Q105.5156,62.0469 107.1094,62.0469 Q108.0469,62.0469 108.7031,61.7969 Q109.0938,61.6406 109.5156,61.2031 Q109.7813,60.9375 109.9297,60.8594 Q110.0781,60.7813 110.2813,60.7813 Q110.6094,60.7813 110.8672,61.0391 Q111.125,61.2969 111.125,61.6406 Q111.125,61.9844 110.7813,62.3906 Q110.2813,62.9688 109.4844,63.2969 Q108.4063,63.75 107.1094,63.75 Q105.5938,63.75 104.3906,63.125 Q103.4063,62.625 102.7188,61.5547 Q102.0313,60.4844 102.0313,59.2031 L102.0313,58.0469 Q102.0313,56.7188 102.6484,55.5703 Q103.2656,54.4219 104.3594,53.8047 Q105.4531,53.1875 106.6875,53.1875 Q107.4219,53.1875 108.0703,53.3516 Q108.7188,53.5156 109.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="120.5" y="62.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="92.5" x2="221.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="92.5" x2="221.5" y1="82" y2="82"/><!--MD5=[95e275fee6d661fba6aa4d8c7c13a98b]
+class CImageViewer--><rect codeLine="17" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="CImageViewer" style="stroke:#A80036;stroke-width:1.5;" width="113" x="227.5" y="468"/><ellipse cx="242.5" cy="484" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M245.2656,479.875 Q245.4219,479.6563 245.6094,479.5469 Q245.7969,479.4375 246.0156,479.4375 Q246.3906,479.4375 246.625,479.6953 Q246.8594,479.9531 246.8594,480.5625 L246.8594,482.0156 Q246.8594,482.625 246.625,482.8906 Q246.3906,483.1563 246.0156,483.1563 Q245.6719,483.1563 245.4688,482.9531 Q245.2656,482.7656 245.1563,482.25 Q245.1094,481.8906 244.9219,481.7031 Q244.5938,481.3281 243.9844,481.1094 Q243.375,480.8906 242.75,480.8906 Q241.9844,480.8906 241.3516,481.2188 Q240.7188,481.5469 240.2266,482.2969 Q239.7344,483.0469 239.7344,484.0781 L239.7344,485.1719 Q239.7344,486.4063 240.625,487.2266 Q241.5156,488.0469 243.1094,488.0469 Q244.0469,488.0469 244.7031,487.7969 Q245.0938,487.6406 245.5156,487.2031 Q245.7813,486.9375 245.9297,486.8594 Q246.0781,486.7813 246.2813,486.7813 Q246.6094,486.7813 246.8672,487.0391 Q247.125,487.2969 247.125,487.6406 Q247.125,487.9844 246.7813,488.3906 Q246.2813,488.9688 245.4844,489.2969 Q244.4063,489.75 243.1094,489.75 Q241.5938,489.75 240.3906,489.125 Q239.4063,488.625 238.7188,487.5547 Q238.0313,486.4844 238.0313,485.2031 L238.0313,484.0469 Q238.0313,482.7188 238.6484,481.5703 Q239.2656,480.4219 240.3594,479.8047 Q241.4531,479.1875 242.6875,479.1875 Q243.4219,479.1875 244.0703,479.3516 Q244.7188,479.5156 245.2656,479.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="256.5" y="488.9102">CImageViewer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="228.5" x2="339.5" y1="500" y2="500"/><line style="stroke:#A80036;stroke-width:1.5;" x1="228.5" x2="339.5" y1="508" y2="508"/><!--MD5=[8627995bcaa22f2ec103094efbcbd46a]
+class CUMLView--><rect codeLine="26" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="CUMLView" style="stroke:#A80036;stroke-width:1.5;" width="92" x="395" y="318"/><ellipse cx="410" cy="334" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M412.7656,329.875 Q412.9219,329.6563 413.1094,329.5469 Q413.2969,329.4375 413.5156,329.4375 Q413.8906,329.4375 414.125,329.6953 Q414.3594,329.9531 414.3594,330.5625 L414.3594,332.0156 Q414.3594,332.625 414.125,332.8906 Q413.8906,333.1563 413.5156,333.1563 Q413.1719,333.1563 412.9688,332.9531 Q412.7656,332.7656 412.6563,332.25 Q412.6094,331.8906 412.4219,331.7031 Q412.0938,331.3281 411.4844,331.1094 Q410.875,330.8906 410.25,330.8906 Q409.4844,330.8906 408.8516,331.2188 Q408.2188,331.5469 407.7266,332.2969 Q407.2344,333.0469 407.2344,334.0781 L407.2344,335.1719 Q407.2344,336.4063 408.125,337.2266 Q409.0156,338.0469 410.6094,338.0469 Q411.5469,338.0469 412.2031,337.7969 Q412.5938,337.6406 413.0156,337.2031 Q413.2813,336.9375 413.4297,336.8594 Q413.5781,336.7813 413.7813,336.7813 Q414.1094,336.7813 414.3672,337.0391 Q414.625,337.2969 414.625,337.6406 Q414.625,337.9844 414.2813,338.3906 Q413.7813,338.9688 412.9844,339.2969 Q411.9063,339.75 410.6094,339.75 Q409.0938,339.75 407.8906,339.125 Q406.9063,338.625 406.2188,337.5547 Q405.5313,336.4844 405.5313,335.2031 L405.5313,334.0469 Q405.5313,332.7188 406.1484,331.5703 Q406.7656,330.4219 407.8594,329.8047 Q408.9531,329.1875 410.1875,329.1875 Q410.9219,329.1875 411.5703,329.3516 Q412.2188,329.5156 412.7656,329.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="60" x="424" y="338.9102">CUMLView</text><line style="stroke:#A80036;stroke-width:1.5;" x1="396" x2="486" y1="350" y2="350"/><line style="stroke:#A80036;stroke-width:1.5;" x1="396" x2="486" y1="358" y2="358"/><!--MD5=[f4832fe6c5a4af44c7367fe8aa4c18b1]
+class CUMLViewComponent--><rect codeLine="30" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="CUMLViewComponent" style="stroke:#A80036;stroke-width:1.5;" width="157" x="329.5" y="192"/><ellipse cx="344.5" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M347.2656,203.875 Q347.4219,203.6563 347.6094,203.5469 Q347.7969,203.4375 348.0156,203.4375 Q348.3906,203.4375 348.625,203.6953 Q348.8594,203.9531 348.8594,204.5625 L348.8594,206.0156 Q348.8594,206.625 348.625,206.8906 Q348.3906,207.1563 348.0156,207.1563 Q347.6719,207.1563 347.4688,206.9531 Q347.2656,206.7656 347.1563,206.25 Q347.1094,205.8906 346.9219,205.7031 Q346.5938,205.3281 345.9844,205.1094 Q345.375,204.8906 344.75,204.8906 Q343.9844,204.8906 343.3516,205.2188 Q342.7188,205.5469 342.2266,206.2969 Q341.7344,207.0469 341.7344,208.0781 L341.7344,209.1719 Q341.7344,210.4063 342.625,211.2266 Q343.5156,212.0469 345.1094,212.0469 Q346.0469,212.0469 346.7031,211.7969 Q347.0938,211.6406 347.5156,211.2031 Q347.7813,210.9375 347.9297,210.8594 Q348.0781,210.7813 348.2813,210.7813 Q348.6094,210.7813 348.8672,211.0391 Q349.125,211.2969 349.125,211.6406 Q349.125,211.9844 348.7813,212.3906 Q348.2813,212.9688 347.4844,213.2969 Q346.4063,213.75 345.1094,213.75 Q343.5938,213.75 342.3906,213.125 Q341.4063,212.625 340.7188,211.5547 Q340.0313,210.4844 340.0313,209.2031 L340.0313,208.0469 Q340.0313,206.7188 340.6484,205.5703 Q341.2656,204.4219 342.3594,203.8047 Q343.4531,203.1875 344.6875,203.1875 Q345.4219,203.1875 346.0703,203.3516 Q346.7188,203.5156 347.2656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="125" x="358.5" y="212.9102">CUMLViewComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="330.5" x2="485.5" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="330.5" x2="485.5" y1="232" y2="232"/><!--MD5=[65cf5b7ad40f1b0ece06d7cb106e6435]
+class CDLTMessageAnalyzer--><rect codeLine="39" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="CDLTMessageAnalyzer" style="stroke:#A80036;stroke-width:1.5;" width="160" x="500" y="42"/><ellipse cx="515" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M517.7656,53.875 Q517.9219,53.6563 518.1094,53.5469 Q518.2969,53.4375 518.5156,53.4375 Q518.8906,53.4375 519.125,53.6953 Q519.3594,53.9531 519.3594,54.5625 L519.3594,56.0156 Q519.3594,56.625 519.125,56.8906 Q518.8906,57.1563 518.5156,57.1563 Q518.1719,57.1563 517.9688,56.9531 Q517.7656,56.7656 517.6563,56.25 Q517.6094,55.8906 517.4219,55.7031 Q517.0938,55.3281 516.4844,55.1094 Q515.875,54.8906 515.25,54.8906 Q514.4844,54.8906 513.8516,55.2188 Q513.2188,55.5469 512.7266,56.2969 Q512.2344,57.0469 512.2344,58.0781 L512.2344,59.1719 Q512.2344,60.4063 513.125,61.2266 Q514.0156,62.0469 515.6094,62.0469 Q516.5469,62.0469 517.2031,61.7969 Q517.5938,61.6406 518.0156,61.2031 Q518.2813,60.9375 518.4297,60.8594 Q518.5781,60.7813 518.7813,60.7813 Q519.1094,60.7813 519.3672,61.0391 Q519.625,61.2969 519.625,61.6406 Q519.625,61.9844 519.2813,62.3906 Q518.7813,62.9688 517.9844,63.2969 Q516.9063,63.75 515.6094,63.75 Q514.0938,63.75 512.8906,63.125 Q511.9063,62.625 511.2188,61.5547 Q510.5313,60.4844 510.5313,59.2031 L510.5313,58.0469 Q510.5313,56.7188 511.1484,55.5703 Q511.7656,54.4219 512.8594,53.8047 Q513.9531,53.1875 515.1875,53.1875 Q515.9219,53.1875 516.5703,53.3516 Q517.2188,53.5156 517.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="128" x="529" y="62.9102">CDLTMessageAnalyzer</text><line style="stroke:#A80036;stroke-width:1.5;" x1="501" x2="659" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="501" x2="659" y1="82" y2="82"/><!--MD5=[944d763c6b816963c06dc32b52e3fd4a]
+class DLTMessageAnalyzerPlugin--><rect codeLine="43" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="DLTMessageAnalyzerPlugin" style="stroke:#A80036;stroke-width:1.5;" width="186" x="279" y="42"/><ellipse cx="294" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M296.7656,53.875 Q296.9219,53.6563 297.1094,53.5469 Q297.2969,53.4375 297.5156,53.4375 Q297.8906,53.4375 298.125,53.6953 Q298.3594,53.9531 298.3594,54.5625 L298.3594,56.0156 Q298.3594,56.625 298.125,56.8906 Q297.8906,57.1563 297.5156,57.1563 Q297.1719,57.1563 296.9688,56.9531 Q296.7656,56.7656 296.6563,56.25 Q296.6094,55.8906 296.4219,55.7031 Q296.0938,55.3281 295.4844,55.1094 Q294.875,54.8906 294.25,54.8906 Q293.4844,54.8906 292.8516,55.2188 Q292.2188,55.5469 291.7266,56.2969 Q291.2344,57.0469 291.2344,58.0781 L291.2344,59.1719 Q291.2344,60.4063 292.125,61.2266 Q293.0156,62.0469 294.6094,62.0469 Q295.5469,62.0469 296.2031,61.7969 Q296.5938,61.6406 297.0156,61.2031 Q297.2813,60.9375 297.4297,60.8594 Q297.5781,60.7813 297.7813,60.7813 Q298.1094,60.7813 298.3672,61.0391 Q298.625,61.2969 298.625,61.6406 Q298.625,61.9844 298.2813,62.3906 Q297.7813,62.9688 296.9844,63.2969 Q295.9063,63.75 294.6094,63.75 Q293.0938,63.75 291.8906,63.125 Q290.9063,62.625 290.2188,61.5547 Q289.5313,60.4844 289.5313,59.2031 L289.5313,58.0469 Q289.5313,56.7188 290.1484,55.5703 Q290.7656,54.4219 291.8594,53.8047 Q292.9531,53.1875 294.1875,53.1875 Q294.9219,53.1875 295.5703,53.3516 Q296.2188,53.5156 296.7656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="154" x="308" y="62.9102">DLTMessageAnalyzerPlugin</text><line style="stroke:#A80036;stroke-width:1.5;" x1="280" x2="464" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="280" x2="464" y1="82" y2="82"/><!--MD5=[b1d639026a64f7feb39d803aafe5f2b4]
+class Ui::Form--><rect codeLine="47" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="Ui::Form" style="stroke:#A80036;stroke-width:1.5;" width="79" x="695.5" y="42"/><ellipse cx="710.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M713.2656,53.875 Q713.4219,53.6563 713.6094,53.5469 Q713.7969,53.4375 714.0156,53.4375 Q714.3906,53.4375 714.625,53.6953 Q714.8594,53.9531 714.8594,54.5625 L714.8594,56.0156 Q714.8594,56.625 714.625,56.8906 Q714.3906,57.1563 714.0156,57.1563 Q713.6719,57.1563 713.4688,56.9531 Q713.2656,56.7656 713.1563,56.25 Q713.1094,55.8906 712.9219,55.7031 Q712.5938,55.3281 711.9844,55.1094 Q711.375,54.8906 710.75,54.8906 Q709.9844,54.8906 709.3516,55.2188 Q708.7188,55.5469 708.2266,56.2969 Q707.7344,57.0469 707.7344,58.0781 L707.7344,59.1719 Q707.7344,60.4063 708.625,61.2266 Q709.5156,62.0469 711.1094,62.0469 Q712.0469,62.0469 712.7031,61.7969 Q713.0938,61.6406 713.5156,61.2031 Q713.7813,60.9375 713.9297,60.8594 Q714.0781,60.7813 714.2813,60.7813 Q714.6094,60.7813 714.8672,61.0391 Q715.125,61.2969 715.125,61.6406 Q715.125,61.9844 714.7813,62.3906 Q714.2813,62.9688 713.4844,63.2969 Q712.4063,63.75 711.1094,63.75 Q709.5938,63.75 708.3906,63.125 Q707.4063,62.625 706.7188,61.5547 Q706.0313,60.4844 706.0313,59.2031 L706.0313,58.0469 Q706.0313,56.7188 706.6484,55.5703 Q707.2656,54.4219 708.3594,53.8047 Q709.4531,53.1875 710.6875,53.1875 Q711.4219,53.1875 712.0703,53.3516 Q712.7188,53.5156 713.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="47" x="724.5" y="62.9102">Ui::Form</text><line style="stroke:#A80036;stroke-width:1.5;" x1="696.5" x2="773.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="696.5" x2="773.5" y1="82" y2="82"/><!--MD5=[19da0fc8a1dae7706e89bee6ef9b80b7]
+class QProcess--><rect codeLine="56" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="QProcess" style="stroke:#A80036;stroke-width:1.5;" width="87" x="397.5" y="468"/><ellipse cx="412.5" cy="484" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M415.2656,479.875 Q415.4219,479.6563 415.6094,479.5469 Q415.7969,479.4375 416.0156,479.4375 Q416.3906,479.4375 416.625,479.6953 Q416.8594,479.9531 416.8594,480.5625 L416.8594,482.0156 Q416.8594,482.625 416.625,482.8906 Q416.3906,483.1563 416.0156,483.1563 Q415.6719,483.1563 415.4688,482.9531 Q415.2656,482.7656 415.1563,482.25 Q415.1094,481.8906 414.9219,481.7031 Q414.5938,481.3281 413.9844,481.1094 Q413.375,480.8906 412.75,480.8906 Q411.9844,480.8906 411.3516,481.2188 Q410.7188,481.5469 410.2266,482.2969 Q409.7344,483.0469 409.7344,484.0781 L409.7344,485.1719 Q409.7344,486.4063 410.625,487.2266 Q411.5156,488.0469 413.1094,488.0469 Q414.0469,488.0469 414.7031,487.7969 Q415.0938,487.6406 415.5156,487.2031 Q415.7813,486.9375 415.9297,486.8594 Q416.0781,486.7813 416.2813,486.7813 Q416.6094,486.7813 416.8672,487.0391 Q417.125,487.2969 417.125,487.6406 Q417.125,487.9844 416.7813,488.3906 Q416.2813,488.9688 415.4844,489.2969 Q414.4063,489.75 413.1094,489.75 Q411.5938,489.75 410.3906,489.125 Q409.4063,488.625 408.7188,487.5547 Q408.0313,486.4844 408.0313,485.2031 L408.0313,484.0469 Q408.0313,482.7188 408.6484,481.5703 Q409.2656,480.4219 410.3594,479.8047 Q411.4531,479.1875 412.6875,479.1875 Q413.4219,479.1875 414.0703,479.3516 Q414.7188,479.5156 415.2656,479.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="55" x="426.5" y="488.9102">QProcess</text><line style="stroke:#A80036;stroke-width:1.5;" x1="398.5" x2="483.5" y1="500" y2="500"/><line style="stroke:#A80036;stroke-width:1.5;" x1="398.5" x2="483.5" y1="508" y2="508"/><!--MD5=[3e3f16721f1fb369e45a968cb01568b2]
+class QWidget--><rect codeLine="60" fill="#FEFECE" filter="url(#fh2flia3n55us)" height="48" id="QWidget" style="stroke:#A80036;stroke-width:1.5;" width="79" x="519.5" y="468"/><ellipse cx="534.5" cy="484" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M537.2656,479.875 Q537.4219,479.6563 537.6094,479.5469 Q537.7969,479.4375 538.0156,479.4375 Q538.3906,479.4375 538.625,479.6953 Q538.8594,479.9531 538.8594,480.5625 L538.8594,482.0156 Q538.8594,482.625 538.625,482.8906 Q538.3906,483.1563 538.0156,483.1563 Q537.6719,483.1563 537.4688,482.9531 Q537.2656,482.7656 537.1563,482.25 Q537.1094,481.8906 536.9219,481.7031 Q536.5938,481.3281 535.9844,481.1094 Q535.375,480.8906 534.75,480.8906 Q533.9844,480.8906 533.3516,481.2188 Q532.7188,481.5469 532.2266,482.2969 Q531.7344,483.0469 531.7344,484.0781 L531.7344,485.1719 Q531.7344,486.4063 532.625,487.2266 Q533.5156,488.0469 535.1094,488.0469 Q536.0469,488.0469 536.7031,487.7969 Q537.0938,487.6406 537.5156,487.2031 Q537.7813,486.9375 537.9297,486.8594 Q538.0781,486.7813 538.2813,486.7813 Q538.6094,486.7813 538.8672,487.0391 Q539.125,487.2969 539.125,487.6406 Q539.125,487.9844 538.7813,488.3906 Q538.2813,488.9688 537.4844,489.2969 Q536.4063,489.75 535.1094,489.75 Q533.5938,489.75 532.3906,489.125 Q531.4063,488.625 530.7188,487.5547 Q530.0313,486.4844 530.0313,485.2031 L530.0313,484.0469 Q530.0313,482.7188 530.6484,481.5703 Q531.2656,480.4219 532.3594,479.8047 Q533.4531,479.1875 534.6875,479.1875 Q535.4219,479.1875 536.0703,479.3516 Q536.7188,479.5156 537.2656,479.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="47" x="548.5" y="488.9102">QWidget</text><line style="stroke:#A80036;stroke-width:1.5;" x1="520.5" x2="597.5" y1="500" y2="500"/><line style="stroke:#A80036;stroke-width:1.5;" x1="520.5" x2="597.5" y1="508" y2="508"/><!--MD5=[032e34eb1f0db10dc300d3bb39e77804]
+reverse link QWidget to CUMLView--><path codeLine="67" d="M536.308,450.3482 C526.118,433.477 513.383,414.119 500,398 C490.608,386.687 478.995,375.402 468.562,366.025 " fill="none" id="QWidget-backto-CUMLView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="542.412,446.92,546.454,467.7204,530.323,453.98,542.412,446.92" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="513" y="412.4951">extends</text><!--MD5=[5214ea560b88a5444a4cf8b6da69a8e5]
+reverse link DMA::IComponent to CUMLViewComponent--><path codeLine="68" d="M213.624,100.388 C260.873,128.248 326.991,167.233 368.643,191.794 " fill="none" id="DMA::IComponent-backto-CUMLViewComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="209.891,106.313,196.219,90.125,217.002,94.254,209.891,106.313" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="276" y="136.4951">implements</text><!--MD5=[4cbaa7a6f03709053cb8a00ef0211089]
+reverse link CUMLView to CImageViewer--><path codeLine="71" d="M406.21,375.335 C398.242,382.767 389.818,390.647 382,398 C356.884,421.623 328.299,448.7809 308.51,467.6252 " fill="none" id="CUMLView-backto-CImageViewer" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="415.978,366.234,408.8614,367.3979,407.1987,374.4147,414.3152,373.2508,415.978,366.234" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="383" y="412.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="402.0258" y="387.629">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="306.6312" y="457.2718">1</text><!--MD5=[baa2cda36405ee533415805d2380a8dc]
+reverse link CUMLView to QProcess--><path codeLine="72" d="M441,379.15 C441,406.682 441,443.78 441,467.549 " fill="none" id="CUMLView-backto-QProcess" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="441,366.125,437,372.125,441,378.125,445,372.125,441,366.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="442" y="412.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="433.1469" y="387.4934">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="433.1469" y="457.177">2</text><!--MD5=[a7de0a24f0f4e8a529292dffab1fc8c7]
+reverse link CUMLViewComponent to CUMLView--><path codeLine="73" d="M417.479,252.616 C423.042,273.522 429.915,299.346 434.791,317.67 " fill="none" id="CUMLViewComponent-backto-CUMLView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="414.13,240.033,411.8081,246.8601,417.2169,251.6292,419.5389,244.8021,414.13,240.033" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="427" y="284.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="407.7711" y="261.379">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="425.4244" y="307.3275">1</text><!--MD5=[8269fe1df8c28066ff0ec29cd5808493]
+reverse link CDLTMessageAnalyzer to CUMLView--><path codeLine="74" d="M566.257,102.245 C552.03,137.704 528.488,193.624 504,240 C489.429,267.595 470.128,297.776 456.747,317.892 " fill="none" id="CDLTMessageAnalyzer-backto-CUMLView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="571.062,90.163,565.1283,94.2607,566.6285,101.314,572.5622,97.2163,571.062,90.163" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="547" y="221.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="561.0302" y="111.5407">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="452.8853" y="307.2045">1</text><!--MD5=[623b836e4f1202dde144d72f57acfd9c]
+reverse link DLTMessageAnalyzerPlugin to CUMLViewComponent--><path codeLine="75" d="M380.702,102.774 C387.408,130.343 396.488,167.671 402.296,191.549 " fill="none" id="DLTMessageAnalyzerPlugin-backto-CUMLViewComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="377.625,90.125,375.1566,96.9005,380.4615,101.7849,382.9299,95.0095,377.625,90.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="389" y="136.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="371.143" y="111.4934">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="393.0525" y="181.177">1</text><!--MD5=[b4fb165a9b4e1c4409e8caf1989b7fe1]
+reverse link Ui::Form to CUMLView--><path codeLine="76" d="M709.571,100.677 C681.146,137.174 632.686,196.072 584,240 C550.827,269.931 508.6,298.79 478.655,317.94 " fill="none" id="Ui::Form-backto-CUMLView" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="717.728,90.111,710.8952,92.4159,710.3947,99.6096,717.2276,97.3047,717.728,90.111" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="49" x="670" y="221.4951">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="705.6648" y="111.476">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="480.4072" y="307.2648">1</text><!--MD5=[8bdbe68e132355eec137cb8faf1b976e]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PlantumlView" #DDDDDD
+{
+
+class "CImageViewer"
+{
+}
+
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QProcess"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QWidget <|- - CUMLView : extends
+DMA::IComponent <|- - CUMLViewComponent : implements
+
+'====================Dependencies section====================
+CUMLView "1" *- - "1" CImageViewer : contains
+CUMLView "1" *- - "2" QProcess : contains
+CUMLViewComponent "1" o- - "1" CUMLView : uses
+CDLTMessageAnalyzer "1" o- - "1" CUMLView : uses
+DLTMessageAnalyzerPlugin "1" *- - "1" CUMLViewComponent : contains
+Ui::Form "1" *- - "1" CUMLView : contains
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PlantumlView" #DDDDDD
+{
+
+class "CImageViewer"
+{
+}
+
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QProcess"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+QWidget <|- - CUMLView : extends
+DMA::IComponent <|- - CUMLViewComponent : implements
+
+CUMLView "1" *- - "1" CImageViewer : contains
+CUMLView "1" *- - "2" QProcess : contains
+CUMLViewComponent "1" o- - "1" CUMLView : uses
+CDLTMessageAnalyzer "1" o- - "1" CUMLView : uses
+DLTMessageAnalyzerPlugin "1" *- - "1" CUMLViewComponent : contains
+Ui::Form "1" *- - "1" CUMLView : contains
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

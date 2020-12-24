@@ -39,10 +39,6 @@ interface "QDltPluginViewerInterface"
 package "DMA_Analyzer" #DDDDDD
 {
 
-class "CAnalyzerComponent"
-{
-}
-
 class "CContinuousAnalyzer"
 {
 }
@@ -63,6 +59,10 @@ class "CSubConsumer"
 
 package "DMA_Analyzer_API" #DDDDDD
 {
+
+class "CAnalyzerComponent"
+{
+}
 
 abstract class "IDLTMessageAnalyzerController"
 {
@@ -128,8 +128,26 @@ class "CFiltersModel"
 {
 }
 
+}
+
+package "DMA_FiltersView_API" #DDDDDD
+{
+
 class "CFiltersView"
 {
+}
+
+class "CFiltersViewComponent"
+{
+}
+
+class "IFiltersModel"
+{
+    + {abstract} virtual void addCompletionData( const tFoundMatches& foundMatches ) = 0
+    + {abstract} virtual void filterRegexTokens( const QString& filter ) = 0
+    + {abstract} virtual void resetCompletionData() = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setUsedRegex(const QString& regexStr) = 0
 }
 
 }
@@ -172,12 +190,30 @@ class "DMA::IComponent"
 package "DMA_GroupedView" #DDDDDD
 {
 
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_GroupedView_API" #DDDDDD
+{
+
 class "CGroupedView"
 {
 }
 
-class "CGroupedViewModel"
+class "CGroupedViewComponent"
 {
+}
+
+class "IGroupedViewModel"
+{
+    + {abstract} virtual int rowCount(const QModelIndex &parent = QModelIndex()) const = 0
+    + {abstract} virtual std::pair<bool__QString> exportToHTML(QString& resultHTML) = 0
+    + {abstract} virtual void addMatches( const tFoundMatches& matches, bool update ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setUsedRegex(const QString& regex) = 0
 }
 
 }
@@ -193,7 +229,16 @@ class "CConsoleInputProcessor"
 {
 }
 
+}
+
+package "DMA_Log_API" #DDDDDD
+{
+
 class "CConsoleView"
+{
+}
+
+class "CLogComponent"
 {
 }
 
@@ -215,7 +260,16 @@ class "CPatternsModel"
 {
 }
 
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
 class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
 {
 }
 
@@ -223,16 +277,39 @@ class "CTreeRepresentationDelegate"
 {
 }
 
+class "IPatternsModel"
+{
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0
+    + {abstract} virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0
+    + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
+    + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
+    + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual tSearchResult search( const QString& alias ) = 0
+    + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void updatePatternsInPersistency() = 0
+    + {abstract} virtual void updateView() = 0
 }
 
-package "DMA_PlantUML" #DDDDDD
+}
+
+package "DMA_PlantumlView" #DDDDDD
 {
 
 class "CImageViewer"
 {
 }
 
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
 class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
 {
 }
 
@@ -270,8 +347,27 @@ class "CSearchResultModel"
 {
 }
 
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
 class "CSearchResultView"
 {
+}
+
+class "CSearchViewComponent"
+{
+}
+
+class "ISearchResultModel"
+{
+    + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
+    + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
+    + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void updateView(const int& fromRow = 0) = 0
 }
 
 }
@@ -385,11 +481,11 @@ class "QWidget"
 }
 
 '====================Inheritance section====================
-DMA::IComponent <|-- CAnalyzerComponent : implements
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
+DMA::IComponent <|-- CAnalyzerComponent : implements
 QObject <|-- IDLTMessageAnalyzerController : extends
 QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends
 std::enable_shared_from_this_IDLTMessageAnalyzerControllerConsumer_ <|-- IDLTMessageAnalyzerControllerConsumer : extends
@@ -397,22 +493,30 @@ QObject <|-- CBGColorAnimation : extends
 QObject <|-- CRegexDirectoryMonitor : extends
 QObject <|-- CDLTFileWrapper : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
-QAbstractItemModel <|-- CFiltersModel : implements
+IFiltersModel <|-- CFiltersModel : implements
 QTreeView <|-- CFiltersView : implements
+DMA::IComponent <|-- CFiltersViewComponent : implements
+QAbstractItemModel <|-- IFiltersModel : implements
 DMA::ISynchronousInitializable <|-- DMA::CBaseSynchronousInitializable : implements
 DMA::CBaseSynchronousInitializable <|-- DMA::IComponent : extends
 DMA::INamedObject <|-- DMA::IComponent : implements
-QTreeView <|-- CGroupedView : extends
+IGroupedViewModel <|-- CGroupedViewModel : implements
 QAbstractItemModel <|-- CGroupedViewModel : implements
+QTreeView <|-- CGroupedView : extends
+DMA::IComponent <|-- CGroupedViewComponent : implements
 QObject <|-- CConsoleCtrl : extends
 QObject <|-- CConsoleInputProcessor : extends
 QPlainTextEdit <|-- CConsoleView : extends
+DMA::IComponent <|-- CLogComponent : implements
 QPushButton <|-- CLogo : extends
+IPatternsModel <|-- CPatternsModel : implements
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
+DMA::IComponent <|-- CPatternsViewComponent : implements
 QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 QWidget <|-- CImageViewer : extends
 QWidget <|-- CUMLView : extends
+DMA::IComponent <|-- CUMLViewComponent : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
 QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
@@ -420,19 +524,22 @@ QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
 QObject <|-- DLTMessageAnalyzerPlugin : extends
 QWidget <|-- Form : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
+ISearchResultModel <|-- CSearchResultModel : implements
 QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
+DMA::IComponent <|-- CSearchViewComponent : implements
+QObject <|-- CSearchViewComponent : extends
 ISettingItem <|-- CSettingItem : partially implements
 QObject <|-- CSettingsManager : extends
 CSettingItem <|-- TSettingItem_T_ : extends
 
 '====================Dependencies section====================
-CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
-CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 CContinuousAnalyzer "1" o-- "1" IDLTMessageAnalyzerController : uses
 CContinuousAnalyzer "1" *-- "1" IDLTMessageAnalyzerControllerConsumer : contains
 CMTAnalyzer "1" *-- "*" CDLTRegexAnalyzerWorker : contains
 CMTAnalyzer "1" *-- "*" QThread : contains
+CAnalyzerComponent "1" *-- "1" CContinuousAnalyzer : contains
+CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousAnalyzer
 IDLTMessageAnalyzerControllerConsumer "1" o-- "1" IDLTMessageAnalyzerController : uses
 CBGColorAnimation "1" o-- "1" QWidget : animation widget
 CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
@@ -448,38 +555,53 @@ CFiltersModel "1" *-- "*" CTreeItem : contains
 CFiltersView "1" *-- "1" CFilterItemDelegate : contains
 CFiltersView "1" o-- "1" CFiltersModel : uses
 CFiltersView "1" o-- "1" QLineEdit : regex input field
+CFiltersViewComponent "1" --> "1" CFiltersModel : using to create IFiltersModel
+CFiltersViewComponent "1" o-- "1" CFiltersView : uses
+CFiltersViewComponent "1" *-- "1" IFiltersModel : contains
 CGroupedViewModel "1" *-- "*" CTreeItem : contains
+CGroupedViewComponent "1" o-- "1" CGroupedView : uses
+CGroupedViewComponent "1" --> "1" CGroupedViewModel : using to create IGroupedViewModel
+CGroupedViewComponent "1" *-- "1" IGroupedViewModel : contains
 CConsoleCtrl "1" o-- "1" QPlainTextEdit : console text edit
 CConsoleCtrl "1" o-- "1" QTabWidget : console view tab widget
 CConsoleCtrl "1" o-- "1" QWidget : console tab
 CConsoleInputProcessor "1" o-- "1" QLineEdit : console input
+CLogComponent "1" *-- "1" CConsoleInputProcessor : contains
 CPatternsModel "1" *-- "*" CTreeItem : contains
 CPatternsView "1" o-- "1" CPatternsModel : uses
 CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
 CPatternsView "1" o-- "1" QLineEdit : patterns search input
+CPatternsViewComponent "1" --> "1" CPatternsModel : using to create IPatternsModel
+CPatternsViewComponent "1" o-- "1" CPatternsView : uses
+CPatternsViewComponent "1" *-- "1" IPatternsModel : contains
 CImageViewer "1" *-- "1" QImage : contains
 CUMLView "1" *-- "1" CImageViewer : contains
 CUMLView "1" *-- "2" QProcess : contains
+CUMLViewComponent "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
-CDLTMessageAnalyzer "1" *-- "1" CConsoleInputProcessor : contains
 CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
-CDLTMessageAnalyzer "1" *-- "1" CFiltersModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
-CDLTMessageAnalyzer "1" o-- "1" CGroupedView : uses
-CDLTMessageAnalyzer "1" *-- "1" CGroupedViewModel : contains
-CDLTMessageAnalyzer "1" *-- "1" CPatternsModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
-CDLTMessageAnalyzer "1" *-- "1" CSearchResultModel : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
-CDLTMessageAnalyzer "1" *-- "1" CTableMemoryJumper : contains
+CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
+CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses
+CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
+CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
+CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains
@@ -494,6 +616,10 @@ CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
 CSearchResultModel "1" o-- "1" CDLTFileWrapper : uses
 CSearchResultView "1" o-- "1" CDLTFileWrapper : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
+CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel
+CSearchViewComponent "1" o-- "1" CSearchResultView : uses
+CSearchViewComponent "1" *-- "1" CTableMemoryJumper : contains
+CSearchViewComponent "1" *-- "1" ISearchResultModel : contains
 CSettingsManager "1" *-- "*" TSettingItem_T_ : contains
 
 @enduml

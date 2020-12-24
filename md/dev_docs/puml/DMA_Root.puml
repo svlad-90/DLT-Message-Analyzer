@@ -169,10 +169,14 @@ class "IPatternsModel"
 
 }
 
-package "DMA_PlantUML" #DDDDDD
+package "DMA_PlantumlView_API" #DDDDDD
 {
 
 class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
 {
 }
 
@@ -267,6 +271,7 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains

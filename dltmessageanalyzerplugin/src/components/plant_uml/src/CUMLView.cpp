@@ -14,8 +14,8 @@
 #include "QCoreApplication"
 
 #include "CImageViewer.hpp"
-#include "CUMLView.hpp"
-#include "../settings/CSettingsManager.hpp"
+#include "../api/CUMLView.hpp"
+#include "settings/CSettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -453,7 +453,7 @@ bool CUMLView::isDiagramShown() const
     return mbDiagramShown;
 }
 
-PUML_PACKAGE_BEGIN(DMA_PlantUML)
+PUML_PACKAGE_BEGIN(DMA_PlantumlView_API)
     PUML_CLASS_BEGIN_CHECKED(CUMLView)
         PUML_INHERITANCE_CHECKED(QWidget, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CImageViewer, 1, 1, contains)

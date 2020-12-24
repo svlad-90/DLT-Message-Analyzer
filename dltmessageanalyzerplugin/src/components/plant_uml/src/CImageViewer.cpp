@@ -49,7 +49,7 @@ void CImageViewer::paintEvent(QPaintEvent*)
     painter.drawImage(0, 0, mImage);
 }
 
-PUML_PACKAGE_BEGIN(DMA_PlantUML)
+PUML_PACKAGE_BEGIN(DMA_PlantumlView)
     PUML_CLASS_BEGIN_CHECKED(CImageViewer)
         PUML_INHERITANCE_CHECKED(QWidget, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QImage, 1, 1, contains)

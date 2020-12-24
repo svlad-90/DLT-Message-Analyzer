@@ -1,5 +1,4 @@
-#ifndef CSVGVIEW_HPP
-#define CSVGVIEW_HPP
+#pragma once
 
 #include <QGraphicsView>
 
@@ -54,5 +53,3 @@ private:
 
     QImage m_image;
 };
-
-#endif // CSVGVIEW_HPP

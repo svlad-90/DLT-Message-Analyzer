@@ -26,6 +26,8 @@
 #include "components/groupedView/api/CGroupedViewComponent.hpp"
 #include "components/patternsView/api/CPatternsViewComponent.hpp"
 #include "components/filtersView/api/CFiltersViewComponent.hpp"
+#include "components/plant_uml/api/CUMLViewComponent.hpp"
+
 #include "components/filtersView/api/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -44,7 +46,8 @@ mComponents(),
 mpSearchViewComponent(nullptr),
 mpGroupedViewComponent(nullptr),
 mpPatternsViewComponent(nullptr),
-mpFiltersViewComponent(nullptr)
+mpFiltersViewComponent(nullptr),
+mpUMLViewComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -198,6 +201,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pFiltersViewComponent);
     }
 
+    {
+        auto pUMLViewComponent = std::make_shared<CUMLViewComponent>(mpForm->getUMLView());
+        mpUMLViewComponent = pUMLViewComponent;
+
+        auto initResult = pUMLViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pUMLViewComponent->getName()));
+        }
+
+        mComponents.push_back(pUMLViewComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -253,7 +270,7 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpFiltersViewComponent->getFiltersView(),
                                                                                                       mpFiltersViewComponent->getFiltersModel(),
                                                                                                       mpForm->getFiltersSearchInput(),
-                                                                                                      mpForm->getUMLView(),
+                                                                                                      mpUMLViewComponent->getUMLView(),
                                                                                                       mpSearchViewComponent->getTableMemoryJumper(),
                                                                                                       mpSearchViewComponent->getSearchResultView(),
                                                                                                       mpSearchViewComponent->getSearchResultModel());
@@ -652,6 +669,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

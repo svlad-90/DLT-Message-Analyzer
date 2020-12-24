@@ -1196,7 +1196,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CUMLView</class>
    <extends>QGraphicsView</extends>
-   <header>plant_uml/CUMLView.hpp</header>
+   <header>components/plant_uml/api/CUMLView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
