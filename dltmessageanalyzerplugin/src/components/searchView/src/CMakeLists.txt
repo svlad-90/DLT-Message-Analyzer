@@ -10,6 +10,4 @@ add_library(DMA_searchView STATIC
     ISearchResultModel.cpp
     ${PROCESSED_MOCS})
 
-################### QT ####################################
 target_link_libraries(DMA_searchView PUBLIC qdlt Qt5::Widgets DMA_framework_base DMA_framework_component )
-################### QT ( END ) ############################

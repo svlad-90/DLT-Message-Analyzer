@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="391px" preserveAspectRatio="none" style="width:361px;height:391px;background:#FEFEFE;" version="1.1" viewBox="0 0 361 391" width="361px" zoomAndPan="magnify"><defs><filter height="300%" id="fkaplmc9r28l7" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#fkaplmc9r28l7)" points="17,6,230,6,237,29.6094,240,29.6094,240,106,17,106,17,6" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="17" x2="237" y1="29.6094" y2="29.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="207" x="21" y="22.5332">DMA_Framework_Component</text><!--MD5=[52d3619b34f821a2651c605e218f14c9]
+cluster DMA_Logo_API--><polygon fill="#DDDDDD" filter="url(#fkaplmc9r28l7)" points="16,156,127,156,134,179.6094,182,179.6094,182,384,16,384,16,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="16" x2="134" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="105" x="20" y="172.5332">DMA_Logo_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fkaplmc9r28l7)" points="206,156,228,156,235,179.6094,344,179.6094,344,256,206,256,206,156" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="206" x2="235" y1="179.6094" y2="179.6094"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="16" x="210" y="172.5332">Qt</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect codeLine="8" fill="#FEFECE" filter="url(#fkaplmc9r28l7)" height="48" id="DMA::IComponent" style="stroke:#A80036;stroke-width:1.5;" width="131" x="33.5" y="42"/><ellipse cx="48.5" cy="58" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M51.2656,53.875 Q51.4219,53.6563 51.6094,53.5469 Q51.7969,53.4375 52.0156,53.4375 Q52.3906,53.4375 52.625,53.6953 Q52.8594,53.9531 52.8594,54.5625 L52.8594,56.0156 Q52.8594,56.625 52.625,56.8906 Q52.3906,57.1563 52.0156,57.1563 Q51.6719,57.1563 51.4688,56.9531 Q51.2656,56.7656 51.1563,56.25 Q51.1094,55.8906 50.9219,55.7031 Q50.5938,55.3281 49.9844,55.1094 Q49.375,54.8906 48.75,54.8906 Q47.9844,54.8906 47.3516,55.2188 Q46.7188,55.5469 46.2266,56.2969 Q45.7344,57.0469 45.7344,58.0781 L45.7344,59.1719 Q45.7344,60.4063 46.625,61.2266 Q47.5156,62.0469 49.1094,62.0469 Q50.0469,62.0469 50.7031,61.7969 Q51.0938,61.6406 51.5156,61.2031 Q51.7813,60.9375 51.9297,60.8594 Q52.0781,60.7813 52.2813,60.7813 Q52.6094,60.7813 52.8672,61.0391 Q53.125,61.2969 53.125,61.6406 Q53.125,61.9844 52.7813,62.3906 Q52.2813,62.9688 51.4844,63.2969 Q50.4063,63.75 49.1094,63.75 Q47.5938,63.75 46.3906,63.125 Q45.4063,62.625 44.7188,61.5547 Q44.0313,60.4844 44.0313,59.2031 L44.0313,58.0469 Q44.0313,56.7188 44.6484,55.5703 Q45.2656,54.4219 46.3594,53.8047 Q47.4531,53.1875 48.6875,53.1875 Q49.4219,53.1875 50.0703,53.3516 Q50.7188,53.5156 51.2656,53.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="99" x="62.5" y="62.9102">DMA::IComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="34.5" x2="163.5" y1="74" y2="74"/><line style="stroke:#A80036;stroke-width:1.5;" x1="34.5" x2="163.5" y1="82" y2="82"/><!--MD5=[853c94eb1cacd7f8f52526d9ae567b27]
+class CLogo--><rect codeLine="17" fill="#FEFECE" filter="url(#fkaplmc9r28l7)" height="48" id="CLogo" style="stroke:#A80036;stroke-width:1.5;" width="69" x="88.5" y="320"/><ellipse cx="103.5" cy="336" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M106.2656,331.875 Q106.4219,331.6563 106.6094,331.5469 Q106.7969,331.4375 107.0156,331.4375 Q107.3906,331.4375 107.625,331.6953 Q107.8594,331.9531 107.8594,332.5625 L107.8594,334.0156 Q107.8594,334.625 107.625,334.8906 Q107.3906,335.1563 107.0156,335.1563 Q106.6719,335.1563 106.4688,334.9531 Q106.2656,334.7656 106.1563,334.25 Q106.1094,333.8906 105.9219,333.7031 Q105.5938,333.3281 104.9844,333.1094 Q104.375,332.8906 103.75,332.8906 Q102.9844,332.8906 102.3516,333.2188 Q101.7188,333.5469 101.2266,334.2969 Q100.7344,335.0469 100.7344,336.0781 L100.7344,337.1719 Q100.7344,338.4063 101.625,339.2266 Q102.5156,340.0469 104.1094,340.0469 Q105.0469,340.0469 105.7031,339.7969 Q106.0938,339.6406 106.5156,339.2031 Q106.7813,338.9375 106.9297,338.8594 Q107.0781,338.7813 107.2813,338.7813 Q107.6094,338.7813 107.8672,339.0391 Q108.125,339.2969 108.125,339.6406 Q108.125,339.9844 107.7813,340.3906 Q107.2813,340.9688 106.4844,341.2969 Q105.4063,341.75 104.1094,341.75 Q102.5938,341.75 101.3906,341.125 Q100.4063,340.625 99.7188,339.5547 Q99.0313,338.4844 99.0313,337.2031 L99.0313,336.0469 Q99.0313,334.7188 99.6484,333.5703 Q100.2656,332.4219 101.3594,331.8047 Q102.4531,331.1875 103.6875,331.1875 Q104.4219,331.1875 105.0703,331.3516 Q105.7188,331.5156 106.2656,331.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="37" x="117.5" y="340.9102">CLogo</text><line style="stroke:#A80036;stroke-width:1.5;" x1="89.5" x2="156.5" y1="352" y2="352"/><line style="stroke:#A80036;stroke-width:1.5;" x1="89.5" x2="156.5" y1="360" y2="360"/><!--MD5=[c35323c51eb751f17f5b026a29c69241]
+class CLogoComponent--><rect codeLine="21" fill="#FEFECE" filter="url(#fkaplmc9r28l7)" height="48" id="CLogoComponent" style="stroke:#A80036;stroke-width:1.5;" width="134" x="32" y="192"/><ellipse cx="47" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M49.7656,203.875 Q49.9219,203.6563 50.1094,203.5469 Q50.2969,203.4375 50.5156,203.4375 Q50.8906,203.4375 51.125,203.6953 Q51.3594,203.9531 51.3594,204.5625 L51.3594,206.0156 Q51.3594,206.625 51.125,206.8906 Q50.8906,207.1563 50.5156,207.1563 Q50.1719,207.1563 49.9688,206.9531 Q49.7656,206.7656 49.6563,206.25 Q49.6094,205.8906 49.4219,205.7031 Q49.0938,205.3281 48.4844,205.1094 Q47.875,204.8906 47.25,204.8906 Q46.4844,204.8906 45.8516,205.2188 Q45.2188,205.5469 44.7266,206.2969 Q44.2344,207.0469 44.2344,208.0781 L44.2344,209.1719 Q44.2344,210.4063 45.125,211.2266 Q46.0156,212.0469 47.6094,212.0469 Q48.5469,212.0469 49.2031,211.7969 Q49.5938,211.6406 50.0156,211.2031 Q50.2813,210.9375 50.4297,210.8594 Q50.5781,210.7813 50.7813,210.7813 Q51.1094,210.7813 51.3672,211.0391 Q51.625,211.2969 51.625,211.6406 Q51.625,211.9844 51.2813,212.3906 Q50.7813,212.9688 49.9844,213.2969 Q48.9063,213.75 47.6094,213.75 Q46.0938,213.75 44.8906,213.125 Q43.9063,212.625 43.2188,211.5547 Q42.5313,210.4844 42.5313,209.2031 L42.5313,208.0469 Q42.5313,206.7188 43.1484,205.5703 Q43.7656,204.4219 44.8594,203.8047 Q45.9531,203.1875 47.1875,203.1875 Q47.9219,203.1875 48.5703,203.3516 Q49.2188,203.5156 49.7656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="102" x="61" y="212.9102">CLogoComponent</text><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="165" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="33" x2="165" y1="232" y2="232"/><!--MD5=[e245a7021b10efa7658a36f116e5d6fd]
+class QPushButton--><rect codeLine="30" fill="#FEFECE" filter="url(#fkaplmc9r28l7)" height="48" id="QPushButton" style="stroke:#A80036;stroke-width:1.5;" width="105" x="222.5" y="192"/><ellipse cx="237.5" cy="208" fill="#ADD1B2" rx="11" ry="11" style="stroke:#A80036;stroke-width:1.0;"/><path d="M240.2656,203.875 Q240.4219,203.6563 240.6094,203.5469 Q240.7969,203.4375 241.0156,203.4375 Q241.3906,203.4375 241.625,203.6953 Q241.8594,203.9531 241.8594,204.5625 L241.8594,206.0156 Q241.8594,206.625 241.625,206.8906 Q241.3906,207.1563 241.0156,207.1563 Q240.6719,207.1563 240.4688,206.9531 Q240.2656,206.7656 240.1563,206.25 Q240.1094,205.8906 239.9219,205.7031 Q239.5938,205.3281 238.9844,205.1094 Q238.375,204.8906 237.75,204.8906 Q236.9844,204.8906 236.3516,205.2188 Q235.7188,205.5469 235.2266,206.2969 Q234.7344,207.0469 234.7344,208.0781 L234.7344,209.1719 Q234.7344,210.4063 235.625,211.2266 Q236.5156,212.0469 238.1094,212.0469 Q239.0469,212.0469 239.7031,211.7969 Q240.0938,211.6406 240.5156,211.2031 Q240.7813,210.9375 240.9297,210.8594 Q241.0781,210.7813 241.2813,210.7813 Q241.6094,210.7813 241.8672,211.0391 Q242.125,211.2969 242.125,211.6406 Q242.125,211.9844 241.7813,212.3906 Q241.2813,212.9688 240.4844,213.2969 Q239.4063,213.75 238.1094,213.75 Q236.5938,213.75 235.3906,213.125 Q234.4063,212.625 233.7188,211.5547 Q233.0313,210.4844 233.0313,209.2031 L233.0313,208.0469 Q233.0313,206.7188 233.6484,205.5703 Q234.2656,204.4219 235.3594,203.8047 Q236.4531,203.1875 237.6875,203.1875 Q238.4219,203.1875 239.0703,203.3516 Q239.7188,203.5156 240.2656,203.875 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="73" x="251.5" y="212.9102">QPushButton</text><line style="stroke:#A80036;stroke-width:1.5;" x1="223.5" x2="326.5" y1="224" y2="224"/><line style="stroke:#A80036;stroke-width:1.5;" x1="223.5" x2="326.5" y1="232" y2="232"/><!--MD5=[d2f08fdc73b0c51a4edd78dbe37bd857]
+reverse link QPushButton to CLogo--><path codeLine="37" d="M231.548,253.019 C205.642,274.494 173.516,301.1247 150.959,319.8232 " fill="none" id="QPushButton-backto-CLogo" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="227.256,247.485,247.121,240.11,236.191,258.263,227.256,247.485" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="46" x="209" y="286.4951">extends</text><!--MD5=[d1bb79ef7a1961b6d5c441e6e7c20478]
+reverse link DMA::IComponent to CLogoComponent--><path codeLine="38" d="M99,110.517 C99,137.019 99,169.842 99,191.549 " fill="none" id="DMA::IComponent-backto-CLogoComponent" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="none" points="92.0001,110.125,99,90.125,106,110.125,92.0001,110.125" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="67" x="100" y="136.4951">implements</text><!--MD5=[735c98a2b15b95158cc77a9fb62a6014]
+reverse link CLogoComponent to CLogo--><path codeLine="41" d="M105.853,252.976 C109.929,274.376 114.983,300.9097 118.545,319.6095 " fill="none" id="CLogoComponent-backto-CLogo" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#FEFEFE" points="103.402,240.11,100.5956,246.7526,105.6478,251.898,108.4542,245.2554,103.402,240.11" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="28" x="114" y="286.4951">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="96.6219" y="261.4748">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="7" x="109.606" y="309.2523">1</text><!--MD5=[085a4c157fbdfbb5ea61a282cfde0f3c]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Logo_API" #DDDDDD
+{
+
+class "CLogo"
+{
+}
+
+class "CLogoComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QPushButton"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QPushButton <|- - CLogo : extends
+DMA::IComponent <|- - CLogoComponent : implements
+
+'====================Dependencies section====================
+CLogoComponent "1" o- - "1" CLogo : uses
+
+@enduml
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Logo_API" #DDDDDD
+{
+
+class "CLogo"
+{
+}
+
+class "CLogoComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QPushButton"
+{
+}
+
+}
+
+QPushButton <|- - CLogo : extends
+DMA::IComponent <|- - CLogoComponent : implements
+
+CLogoComponent "1" o- - "1" CLogo : uses
+
+@enduml
+
+PlantUML version 1.2020.22(Sun Dec 06 11:36:27 EET 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Default Encoding: Cp1251
+Language: en
+Country: US
+--></g></svg>

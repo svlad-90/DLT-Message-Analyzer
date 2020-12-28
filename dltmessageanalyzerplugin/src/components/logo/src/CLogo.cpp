@@ -6,7 +6,7 @@
 
 #include "QPaintEvent"
 #include "QPainter"
-#include "CLogo.hpp"
+#include "../api/CLogo.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -28,7 +28,7 @@ void CLogo::paintEvent(QPaintEvent *ev)
     painter.drawRect(QRect(ev->rect().x() + 1, ev->rect().y() + 1, ev->rect().width() - 2, ev->rect().height() - 2));
 }
 
-PUML_PACKAGE_BEGIN(DMA_Logo)
+PUML_PACKAGE_BEGIN(DMA_Logo_API)
     PUML_CLASS_BEGIN_CHECKED(CLogo)
         PUML_INHERITANCE_CHECKED(QPushButton, extends)
     PUML_CLASS_END()

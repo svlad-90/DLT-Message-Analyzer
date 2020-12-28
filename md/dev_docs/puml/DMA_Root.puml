@@ -133,10 +133,14 @@ class "CLogComponent"
 
 }
 
-package "DMA_Logo" #DDDDDD
+package "DMA_Logo_API" #DDDDDD
 {
 
 class "CLogo"
+{
+}
+
+class "CLogoComponent"
 {
 }
 
@@ -269,6 +273,7 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains

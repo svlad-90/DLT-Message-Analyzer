@@ -3,8 +3,7 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CLogo class
  */
-#ifndef CLOGO_HPP
-#define CLOGO_HPP
+#pragma once
 
 #include "QPushButton"
 
@@ -16,5 +15,3 @@ public:
     CLogo( QWidget* pParent );
     void paintEvent(QPaintEvent *ev);
 };
-
-#endif // CLOGO_HPP

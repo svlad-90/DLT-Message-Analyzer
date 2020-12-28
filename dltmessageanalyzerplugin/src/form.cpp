@@ -631,6 +631,18 @@ QPushButton* Form::getCreateSequenceDiagramButton()
     return pResult;
 }
 
+CLogo* Form::getLogo()
+{
+    CLogo* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->iconButton;
+    }
+
+    return pResult;
+}
+
 void Form::on_regex_returnPressed()
 {
     if(nullptr != mpDLTMessageAnalyzerPlugin)

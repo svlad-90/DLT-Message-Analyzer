@@ -127,7 +127,7 @@ class "CConsoleView"
 
 }
 
-package "DMA_Logo" #DDDDDD
+package "DMA_Logo_API" #DDDDDD
 {
 
 class "CLogo"
