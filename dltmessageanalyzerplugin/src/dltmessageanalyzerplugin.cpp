@@ -27,6 +27,7 @@
 #include "components/patternsView/api/CPatternsViewComponent.hpp"
 #include "components/filtersView/api/CFiltersViewComponent.hpp"
 #include "components/plant_uml/api/CUMLViewComponent.hpp"
+#include "components/logo/api/CLogoComponent.hpp"
 
 #include "components/filtersView/api/CFiltersView.hpp"
 
@@ -47,7 +48,8 @@ mpSearchViewComponent(nullptr),
 mpGroupedViewComponent(nullptr),
 mpPatternsViewComponent(nullptr),
 mpFiltersViewComponent(nullptr),
-mpUMLViewComponent(nullptr)
+mpUMLViewComponent(nullptr),
+mpLogoComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -213,6 +215,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         }
 
         mComponents.push_back(pUMLViewComponent);
+    }
+
+    {
+        auto pLogoComponent = std::make_shared<CLogoComponent>(mpForm->getLogo());
+        mpLogoComponent = pLogoComponent;
+
+        auto initResult = pLogoComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pLogoComponent->getName()));
+        }
+
+        mComponents.push_back(pLogoComponent);
     }
 
     connect( qApp, &QApplication::aboutToQuit, [this]()
@@ -670,6 +686,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CFiltersViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogoComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

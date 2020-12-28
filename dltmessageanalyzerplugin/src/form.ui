@@ -1171,7 +1171,7 @@ color: rgb(0, 0, 0);</string>
   <customwidget>
    <class>CLogo</class>
    <extends>QPushButton</extends>
-   <header>logo/CLogo.hpp</header>
+   <header>components/logo/api/CLogo.hpp</header>
   </customwidget>
   <customwidget>
    <class>CGroupedView</class>

@@ -37,6 +37,7 @@ class CGroupedView;
 class CPatternsView;
 class CFiltersView;
 class CUMLView;
+class CLogo;
 
 namespace Ui {
     class Form;
@@ -75,6 +76,7 @@ public:
     QLineEdit* getConsoleViewInput();
     CUMLView* getUMLView();
     QPushButton* getCreateSequenceDiagramButton();
+    CLogo* getLogo();
 
 private slots:
     void on_analyze_clicked();

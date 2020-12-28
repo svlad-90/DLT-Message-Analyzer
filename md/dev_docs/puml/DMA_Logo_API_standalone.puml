@@ -1,0 +1,44 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Logo_API" #DDDDDD
+{
+
+class "CLogo"
+{
+}
+
+class "CLogoComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QPushButton"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QPushButton <|-- CLogo : extends
+DMA::IComponent <|-- CLogoComponent : implements
+
+'====================Dependencies section====================
+CLogoComponent "1" o-- "1" CLogo : uses
+
+@enduml

@@ -244,10 +244,14 @@ class "CLogComponent"
 
 }
 
-package "DMA_Logo" #DDDDDD
+package "DMA_Logo_API" #DDDDDD
 {
 
 class "CLogo"
+{
+}
+
+class "CLogoComponent"
 {
 }
 
@@ -509,6 +513,7 @@ QObject <|-- CConsoleInputProcessor : extends
 QPlainTextEdit <|-- CConsoleView : extends
 DMA::IComponent <|-- CLogComponent : implements
 QPushButton <|-- CLogo : extends
+DMA::IComponent <|-- CLogoComponent : implements
 IPatternsModel <|-- CPatternsModel : implements
 QAbstractItemModel <|-- CPatternsModel : implements
 QTreeView <|-- CPatternsView : extends
@@ -567,6 +572,7 @@ CConsoleCtrl "1" o-- "1" QTabWidget : console view tab widget
 CConsoleCtrl "1" o-- "1" QWidget : console tab
 CConsoleInputProcessor "1" o-- "1" QLineEdit : console input
 CLogComponent "1" *-- "1" CConsoleInputProcessor : contains
+CLogoComponent "1" o-- "1" CLogo : uses
 CPatternsModel "1" *-- "*" CTreeItem : contains
 CPatternsView "1" o-- "1" CPatternsModel : uses
 CPatternsView "1" *-- "1" CTreeRepresentationDelegate : contains
@@ -599,6 +605,7 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains

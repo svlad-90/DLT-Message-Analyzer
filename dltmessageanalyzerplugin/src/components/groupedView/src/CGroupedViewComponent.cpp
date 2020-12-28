@@ -1,4 +1,4 @@
- #include "../api/CGroupedViewComponent.hpp"
+#include "../api/CGroupedViewComponent.hpp"
 
 #include "CGroupedViewModel.hpp"
 
