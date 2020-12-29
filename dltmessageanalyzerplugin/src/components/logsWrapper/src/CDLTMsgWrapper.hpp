@@ -3,8 +3,7 @@
  * @author  vgoncharuk
  * @brief   Declaration of the CDLTMsgWrapper class
  */
-#ifndef CDLTMSGWRAPPER_HPP
-#define CDLTMSGWRAPPER_HPP
+#pragma once
 
 #include "memory"
 
@@ -12,43 +11,45 @@
 
 #include "qdlt.h"
 
+#include "../api/IMsgWrapper.hpp"
+
 /**
  * @brief The CDLTMsgWrapper class - wrapper on top of QDltMsg.
  * Used to extend the QDltMsg with required additional functionality.
  */
-class CDLTMsgWrapper
+class CDLTMsgWrapper : public IMsgWrapper
 {
 public:
     CDLTMsgWrapper();
     CDLTMsgWrapper(const QDltMsg& msg);
     ~CDLTMsgWrapper();
 
-    QString getTimeString() const;
-    const unsigned int& getMicroseconds() const;
-    const unsigned int& getTimestamp() const;
-    const unsigned char& getMessageCounter() const;
-    QString getEcuid() const;
-    QString getApid() const;
-    QString getCtid() const;
-    const unsigned int& getSessionid() const;
-    QString getTypeString() const;
-    QString getSubtypeString() const;
-    QString getModeString() const;
-    const unsigned int& getNumberOfArguments() const;
-    QString getPayload() const;
-    QString getCtrlServiceIdString() const;
-    QString getCtrlReturnTypeString() const;
+    QString getTimeString() const override;
+    const unsigned int& getMicroseconds() const override;
+    const unsigned int& getTimestamp() const override;
+    const unsigned char& getMessageCounter() const override;
+    QString getEcuid() const override;
+    QString getApid() const override;
+    QString getCtid() const override;
+    const unsigned int& getSessionid() const override;
+    QString getTypeString() const override;
+    QString getSubtypeString() const override;
+    QString getModeString() const override;
+    const unsigned int& getNumberOfArguments() const override;
+    QString getPayload() const override;
+    QString getCtrlServiceIdString() const override;
+    QString getCtrlReturnTypeString() const override;
 
     /**
      * @brief getInitialMessageSize - gets size of initial message
      * @return - size of initial dlt msg, which is calculated as sum of its header & payload.
      */
-    unsigned int getInitialMessageSize() const;
+    unsigned int getInitialMessageSize() const override;
 
     //returnes approximal size of structure instance in bytes
-    unsigned int getSize() const;
-    void dumpSize() const;
-    void dumpPayload() const;
+    unsigned int getSize() const override;
+    void dumpSize() const override;
+    void dumpPayload() const override;
 
     CDLTMsgWrapper( const CDLTMsgWrapper& ) = delete;
     CDLTMsgWrapper( CDLTMsgWrapper&& ) = delete;
@@ -79,7 +80,3 @@ private:
 
     unsigned int mInitialMsgSize;
 };
-
-typedef std::shared_ptr<CDLTMsgWrapper> tDLTMsgWrapperPtr;
-
-#endif // CDLTMSGWRAPPER_HPP

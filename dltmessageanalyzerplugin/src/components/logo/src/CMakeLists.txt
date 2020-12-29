@@ -6,6 +6,4 @@ add_library(DMA_logo STATIC
     CLogoComponent.cpp
     ${PROCESSED_MOCS})
 
-################### QT ####################################
-target_link_libraries(DMA_logo PUBLIC qdlt Qt5::Widgets DMA_framework_base DMA_framework_component )
-################### QT ( END ) ############################
+target_link_libraries( DMA_logo PUBLIC qdlt Qt5::Widgets DMA_framework_base DMA_framework_component )

@@ -38,13 +38,13 @@ class "CAnalyzerComponent"
 abstract class "IDLTMessageAnalyzerController"
 {
     + {abstract} virtual int getMaximumNumberOfThreads() const = 0
-    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
     + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
 }
 
 abstract class "IDLTMessageAnalyzerControllerConsumer"
 {
-    + tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + tRequestId requestAnalyze( const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
     + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
 }
 
@@ -62,15 +62,6 @@ class "CRegexDirectoryMonitor"
 }
 
 class "CTableMemoryJumper"
-{
-}
-
-}
-
-package "DMA_DLTWrappers" #DDDDDD
-{
-
-class "CDLTFileWrapper"
 {
 }
 
@@ -142,6 +133,46 @@ class "CLogo"
 
 class "CLogoComponent"
 {
+}
+
+}
+
+package "DMA_LogsWrapper_API" #DDDDDD
+{
+
+class "CLogsWrapperComponent"
+{
+}
+
+class "IFileWrapper"
+{
+    + {abstract} virtual QString getCacheStatusAsString() const = 0
+    + {abstract} virtual QString getFileName(int num = 0) = 0
+    + {abstract} virtual bool cacheMsgByIndex( const tMsgId& msgId ) = 0
+    + {abstract} virtual bool cacheMsgByIndexes( const QSet<tMsgId> msgIdSet ) = 0
+    + {abstract} virtual bool cacheMsgByRange( const tIntRange& msgRange ) = 0
+    + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
+    + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
+    + {abstract} virtual bool isFiltered() const = 0
+    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getNumberOfFiles() const = 0
+    + {abstract} virtual int size() const = 0
+    + {abstract} virtual int sizeNonFiltered() const = 0
+    + signal void currentSizeMbChanged(tCacheSizeMB MBytes)
+    + signal void fullChanged(bool isFull)
+    + signal void isEnabledChanged(bool isEnabled)
+    + signal void loadChanged(unsigned int percents)
+    + signal void maxSizeMbChanged(tCacheSizeMB MBytes)
+    + {abstract} virtual tIntRangeProperty normalizeSearchRange( const tIntRangeProperty& inputRange) = 0
+    + {abstract} virtual tMsgWrapperPtr getMsg(const tMsgId& msgId) = 0
+    + {abstract} virtual virtual tIntRangeList getSubFilesSizeRanges() const = 0
+    + {abstract} virtual void copyFileNameToClipboard( const int& msgId ) const = 0
+    + {abstract} virtual void copyFileNamesToClipboard( const tIntRange& msgsRange ) const = 0
+    + {abstract} virtual void resetCache() = 0
+    + {abstract} virtual void setEnableCache(bool isEnabled) = 0
+    + {abstract} virtual void setMaxCacheSize(const tCacheSizeB& cacheSize ) = 0
+    + {abstract} virtual void setMessageDecoder( IMsgDecoder* pMessageDecoder ) = 0
+    + {abstract} virtual void setSubFilesHandlingStatus(const bool& val) = 0
 }
 
 }
@@ -224,7 +255,7 @@ class "ISearchResultModel"
     + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
     + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
     + {abstract} virtual void resetData() = 0
-    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
     + {abstract} virtual void updateView(const int& fromRow = 0) = 0
 }
 
@@ -253,7 +284,6 @@ QWidget <|-- Form : extends
 
 '====================Dependencies section====================
 CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
-CDLTMessageAnalyzer "1" o-- "1" CDLTFileWrapper : uses
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
@@ -261,6 +291,7 @@ CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
+CDLTMessageAnalyzer "1" o-- "1" IFileWrapper : uses
 CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses
 CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
 CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
@@ -268,12 +299,12 @@ CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
-DLTMessageAnalyzerPlugin "1" *-- "1" CDLTFileWrapper : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains

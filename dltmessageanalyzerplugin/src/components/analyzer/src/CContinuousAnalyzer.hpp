@@ -53,7 +53,7 @@ public:
      * @brief requestAnalyze - check IDLTMessageAnalyzerController for details
      */
     tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                               const tDLTFileWrapperPtr& pFile,
+                               const tFileWrapperPtr& pFile,
                                const int& fromMessage,
                                const int& numberOfMessages,
                                const QRegularExpression& regex,
@@ -91,7 +91,7 @@ private:// fields
                      const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient_,
                      const tRequestId& subRequestId_,
                      bool bIsContinuousAnalysis_,
-                     const tDLTFileWrapperPtr& pFile,
+                     const tFileWrapperPtr& pFile,
                      const QRegularExpression& regex_,
                      const int& numberOfThreads_,
                      const tRegexScriptingMetadata& regexScriptingMetadata_);
@@ -101,7 +101,7 @@ private:// fields
         bool bIsContinuousAnalysis;
         int fromMessage;
         int toMessage;
-        tDLTFileWrapperPtr mpFile;
+        tFileWrapperPtr mpFile;
         QRegularExpression regex;
         tRegexScriptingMetadata regexScriptingMetadata;
         int numberOfThreads;

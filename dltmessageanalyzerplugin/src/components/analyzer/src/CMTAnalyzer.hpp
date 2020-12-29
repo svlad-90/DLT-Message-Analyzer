@@ -30,7 +30,7 @@ class CMTAnalyzer: public IDLTMessageAnalyzerController
 
         //IDLTMessageAnalyzerController implementation
         tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                   const tDLTFileWrapperPtr& pFile,
+                                   const tFileWrapperPtr& pFile,
                                    const int& fromMessage,
                                    const int& numberOfMessages,
                                    const QRegularExpression& regex,
@@ -53,14 +53,14 @@ private: // methods
     struct tRequestData
     {
         tRequestData( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient_,
-                      const tDLTFileWrapperPtr& pFile_,
+                      const tFileWrapperPtr& pFile_,
                       const int& fromMessage_,
                       const int& numberOfMessages,
                       const QRegularExpression& regex_,
                       const tRegexScriptingMetadata& regexScriptingMetadata_,
                       const int& numberOfThreads_);
         std::weak_ptr<IDLTMessageAnalyzerControllerConsumer> pClient;
-        tDLTFileWrapperPtr pFile; // file, which should be analyzed
+        tFileWrapperPtr pFile; // file, which should be analyzed
         int requestedRegexMatches;  // number of strings, which were requested to be analyzed from the regex analyzer thread
         int processedRegexMatches; // number of strings, which were already analyzed by the regex analyzer thread
         int numberOfMessagesToBeAnalyzed; // overall number of messages, which were requested to be analyzed

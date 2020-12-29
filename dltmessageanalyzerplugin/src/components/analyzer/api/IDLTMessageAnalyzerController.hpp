@@ -40,7 +40,7 @@ public:
      * @return - request id, if search was successfully started. Or INVALID_REQUEST_ID otherwise
      */
     virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                       const tDLTFileWrapperPtr& pFile,
+                                       const tFileWrapperPtr& pFile,
                                        const int& fromMessage,
                                        const int& numberOfMessages,
                                        const QRegularExpression& regex,

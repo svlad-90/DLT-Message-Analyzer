@@ -103,7 +103,6 @@ include_directories(../../thirdparty/DMA_Plantuml/src)
 DMA_add_subdirectory_with_clang_tidy(common)
 DMA_add_subdirectory_with_clang_tidy(components)
 DMA_add_subdirectory_with_clang_tidy(settings)
-DMA_add_subdirectory_with_clang_tidy(dltWrappers)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp
@@ -120,7 +119,7 @@ target_link_libraries(DLT-Message-Analyzer
     DMA_log
     DMA_settings
     DMA_logo
-    DMA_dltWrappers
+    DMA_logsWrapper
     DMA_filtersView
     DMA_filtersView_no_clang_tidy
     DMA_groupedView

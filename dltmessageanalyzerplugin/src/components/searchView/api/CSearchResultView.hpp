@@ -19,7 +19,7 @@ class CSearchResultView : public QTableView
 public:
     explicit CSearchResultView(QWidget *parent = nullptr);
 
-    void setFile( const tDLTFileWrapperPtr& pFile );
+    void setFile( const tFileWrapperPtr& pFile );
     virtual void setModel(QAbstractItemModel *model) override;
     void copySelectionToClipboard( bool copyAsHTML, bool copyOnlyPayload ) const;
     void newSearchStarted();
@@ -58,7 +58,7 @@ private:
     bool mbIsVerticalScrollBarVisible;
     bool mbIsViewFull;
     bool mbUserManuallyAdjustedLastVisibleColumnWidth;
-    tDLTFileWrapperPtr mpFile;
+    tFileWrapperPtr mpFile;
     tIntRangeProperty mSearchRange;
     CSearchResultModel* mpSpecificModel;
 

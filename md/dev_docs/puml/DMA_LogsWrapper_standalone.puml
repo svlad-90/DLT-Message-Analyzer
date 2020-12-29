@@ -1,0 +1,95 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_LogsWrapper" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+class "CDLTMsgDecoder"
+{
+}
+
+class "CDLTMsgWrapper"
+{
+}
+
+}
+
+package "DMA_LogsWrapper_API" #DDDDDD
+{
+
+class "IFileWrapper"
+{
+    + {abstract} virtual QString getCacheStatusAsString() const = 0
+    + {abstract} virtual QString getFileName(int num = 0) = 0
+    + {abstract} virtual bool cacheMsgByIndex( const tMsgId& msgId ) = 0
+    + {abstract} virtual bool cacheMsgByIndexes( const QSet<tMsgId> msgIdSet ) = 0
+    + {abstract} virtual bool cacheMsgByRange( const tIntRange& msgRange ) = 0
+    + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
+    + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
+    + {abstract} virtual bool isFiltered() const = 0
+    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getNumberOfFiles() const = 0
+    + {abstract} virtual int size() const = 0
+    + {abstract} virtual int sizeNonFiltered() const = 0
+    + signal void currentSizeMbChanged(tCacheSizeMB MBytes)
+    + signal void fullChanged(bool isFull)
+    + signal void isEnabledChanged(bool isEnabled)
+    + signal void loadChanged(unsigned int percents)
+    + signal void maxSizeMbChanged(tCacheSizeMB MBytes)
+    + {abstract} virtual tIntRangeProperty normalizeSearchRange( const tIntRangeProperty& inputRange) = 0
+    + {abstract} virtual tMsgWrapperPtr getMsg(const tMsgId& msgId) = 0
+    + {abstract} virtual virtual tIntRangeList getSubFilesSizeRanges() const = 0
+    + {abstract} virtual void copyFileNameToClipboard( const int& msgId ) const = 0
+    + {abstract} virtual void copyFileNamesToClipboard( const tIntRange& msgsRange ) const = 0
+    + {abstract} virtual void resetCache() = 0
+    + {abstract} virtual void setEnableCache(bool isEnabled) = 0
+    + {abstract} virtual void setMaxCacheSize(const tCacheSizeB& cacheSize ) = 0
+    + {abstract} virtual void setMessageDecoder( IMsgDecoder* pMessageDecoder ) = 0
+    + {abstract} virtual void setSubFilesHandlingStatus(const bool& val) = 0
+}
+
+class "IMsgDecoder"
+{
+    + {abstract} virtual void decodeMsg(QDltMsg&, int) = 0
+}
+
+class "IMsgWrapper"
+{
+    + {abstract} virtual QString getApid() const = 0
+    + {abstract} virtual QString getCtid() const = 0
+    + {abstract} virtual QString getCtrlReturnTypeString() const = 0
+    + {abstract} virtual QString getCtrlServiceIdString() const = 0
+    + {abstract} virtual QString getEcuid() const = 0
+    + {abstract} virtual QString getModeString() const = 0
+    + {abstract} virtual QString getPayload() const = 0
+    + {abstract} virtual QString getSubtypeString() const = 0
+    + {abstract} virtual QString getTimeString() const = 0
+    + {abstract} virtual QString getTypeString() const = 0
+    + {abstract} virtual const unsigned char& getMessageCounter() const = 0
+    + {abstract} virtual const unsigned int& getMicroseconds() const = 0
+    + {abstract} virtual const unsigned int& getNumberOfArguments() const = 0
+    + {abstract} virtual const unsigned int& getSessionid() const = 0
+    + {abstract} virtual const unsigned int& getTimestamp() const = 0
+    + {abstract} virtual unsigned int getInitialMessageSize() const = 0
+    + {abstract} virtual unsigned int getSize() const = 0
+    + {abstract} virtual void dumpPayload() const = 0
+    + {abstract} virtual void dumpSize() const = 0
+}
+
+}
+
+'====================Inheritance section====================
+IFileWrapper <|-- CDLTFileWrapper : implements
+IMsgDecoder <|-- CDLTMsgDecoder : implements
+IMsgWrapper <|-- CDLTMsgWrapper : implements
+
+'====================Dependencies section====================
+CDLTFileWrapper "1" --> "*" CDLTMsgWrapper : creates
+
+@enduml

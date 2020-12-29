@@ -1,0 +1,210 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+class "QDltFile"
+{
+}
+
+class "QDltMsg"
+{
+}
+
+class "QDltPlugin"
+{
+}
+
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerController"
+{
+    + {abstract} virtual int getMaximumNumberOfThreads() const = 0
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
+}
+
+abstract class "IDLTMessageAnalyzerControllerConsumer"
+{
+    + tRequestId requestAnalyze( const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
+    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_LogsWrapper" #DDDDDD
+{
+
+class "CDLTFileWrapper"
+{
+}
+
+class "CDLTMsgDecoder"
+{
+}
+
+class "CDLTMsgWrapper"
+{
+}
+
+}
+
+package "DMA_LogsWrapper_API" #DDDDDD
+{
+
+class "CLogsWrapperComponent"
+{
+}
+
+class "IDLTLogsWrapperCreator"
+{
+    + {abstract} virtual tFileWrapperPtr createDLTFileWrapper( QDltFile* pFile ) const = 0
+    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(const tPluginPtrList& decoderPlugins) const = 0
+    + {abstract} virtual tMsgWrapperPtr createDLTMsgWrapper( QDltMsg& msg ) const = 0
+}
+
+class "IFileWrapper"
+{
+    + {abstract} virtual QString getCacheStatusAsString() const = 0
+    + {abstract} virtual QString getFileName(int num = 0) = 0
+    + {abstract} virtual bool cacheMsgByIndex( const tMsgId& msgId ) = 0
+    + {abstract} virtual bool cacheMsgByIndexes( const QSet<tMsgId> msgIdSet ) = 0
+    + {abstract} virtual bool cacheMsgByRange( const tIntRange& msgRange ) = 0
+    + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
+    + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
+    + {abstract} virtual bool isFiltered() const = 0
+    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getNumberOfFiles() const = 0
+    + {abstract} virtual int size() const = 0
+    + {abstract} virtual int sizeNonFiltered() const = 0
+    + signal void currentSizeMbChanged(tCacheSizeMB MBytes)
+    + signal void fullChanged(bool isFull)
+    + signal void isEnabledChanged(bool isEnabled)
+    + signal void loadChanged(unsigned int percents)
+    + signal void maxSizeMbChanged(tCacheSizeMB MBytes)
+    + {abstract} virtual tIntRangeProperty normalizeSearchRange( const tIntRangeProperty& inputRange) = 0
+    + {abstract} virtual tMsgWrapperPtr getMsg(const tMsgId& msgId) = 0
+    + {abstract} virtual virtual tIntRangeList getSubFilesSizeRanges() const = 0
+    + {abstract} virtual void copyFileNameToClipboard( const int& msgId ) const = 0
+    + {abstract} virtual void copyFileNamesToClipboard( const tIntRange& msgsRange ) const = 0
+    + {abstract} virtual void resetCache() = 0
+    + {abstract} virtual void setEnableCache(bool isEnabled) = 0
+    + {abstract} virtual void setMaxCacheSize(const tCacheSizeB& cacheSize ) = 0
+    + {abstract} virtual void setMessageDecoder( IMsgDecoder* pMessageDecoder ) = 0
+    + {abstract} virtual void setSubFilesHandlingStatus(const bool& val) = 0
+}
+
+class "IMsgDecoder"
+{
+    + {abstract} virtual void decodeMsg(QDltMsg&, int) = 0
+}
+
+class "IMsgWrapper"
+{
+    + {abstract} virtual QString getApid() const = 0
+    + {abstract} virtual QString getCtid() const = 0
+    + {abstract} virtual QString getCtrlReturnTypeString() const = 0
+    + {abstract} virtual QString getCtrlServiceIdString() const = 0
+    + {abstract} virtual QString getEcuid() const = 0
+    + {abstract} virtual QString getModeString() const = 0
+    + {abstract} virtual QString getPayload() const = 0
+    + {abstract} virtual QString getSubtypeString() const = 0
+    + {abstract} virtual QString getTimeString() const = 0
+    + {abstract} virtual QString getTypeString() const = 0
+    + {abstract} virtual const unsigned char& getMessageCounter() const = 0
+    + {abstract} virtual const unsigned int& getMicroseconds() const = 0
+    + {abstract} virtual const unsigned int& getNumberOfArguments() const = 0
+    + {abstract} virtual const unsigned int& getSessionid() const = 0
+    + {abstract} virtual const unsigned int& getTimestamp() const = 0
+    + {abstract} virtual unsigned int getInitialMessageSize() const = 0
+    + {abstract} virtual unsigned int getSize() const = 0
+    + {abstract} virtual void dumpPayload() const = 0
+    + {abstract} virtual void dumpSize() const = 0
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultModel"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchResultView"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+IFileWrapper <|-- CDLTFileWrapper : implements
+IMsgDecoder <|-- CDLTMsgDecoder : implements
+IMsgWrapper <|-- CDLTMsgWrapper : implements
+DMA::IComponent <|-- CLogsWrapperComponent : implements
+IDLTLogsWrapperCreator <|-- CLogsWrapperComponent : implements
+QObject <|-- IFileWrapper : extends
+
+'====================Dependencies section====================
+IDLTMessageAnalyzerController "1" --> "1" IFileWrapper : uses
+IDLTMessageAnalyzerControllerConsumer "1" --> "1" IFileWrapper : uses
+CDLTFileWrapper "1" *-- "*" IMsgWrapper : cache
+CLogsWrapperComponent "1" --> "*" CDLTFileWrapper : creates instances
+CLogsWrapperComponent "1" --> "*" CDLTMsgDecoder : creates instances
+CLogsWrapperComponent "1" --> "*" CDLTMsgWrapper : creates instances
+IDLTLogsWrapperCreator "1" --> "*" IFileWrapper : creates
+IDLTLogsWrapperCreator "1" --> "*" IMsgDecoder : creates
+IDLTLogsWrapperCreator "1" --> "*" IMsgWrapper : creates
+IDLTLogsWrapperCreator "1" --> "*" QDltFile : uses
+IDLTLogsWrapperCreator "1" --> "*" QDltMsg : uses
+IDLTLogsWrapperCreator "1" --> "*" QDltPlugin : uses
+IFileWrapper "1" --> "1" IMsgDecoder : uses
+IFileWrapper "1" --> "1" IMsgWrapper : provides
+CDLTMessageAnalyzer "1" o-- "1" IFileWrapper : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains
+CSearchResultModel "1" o-- "1" IFileWrapper : uses
+CSearchResultView "1" o-- "1" IFileWrapper : uses
+
+@enduml

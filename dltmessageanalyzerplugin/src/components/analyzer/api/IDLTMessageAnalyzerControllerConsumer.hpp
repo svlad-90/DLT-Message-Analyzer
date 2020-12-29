@@ -36,7 +36,7 @@ public slots:
 
 protected:
     IDLTMessageAnalyzerControllerConsumer( const std::weak_ptr<IDLTMessageAnalyzerController>& pController );
-    tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile,
+    tRequestId requestAnalyze( const tFileWrapperPtr& pFile,
                                const int& fromMessage,
                                const int& numberOfMessages,
                                const QRegularExpression& regex,

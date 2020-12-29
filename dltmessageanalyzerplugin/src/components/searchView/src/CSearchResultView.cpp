@@ -28,7 +28,7 @@
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "CSearchResultModel.hpp"
 #include "settings/CSettingsManager.hpp"
-#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "components/logsWrapper/api/IFileWrapper.hpp"
 #include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -847,7 +847,7 @@ void CSearchResultView::getUserSearchRange()
     }
 }
 
-void CSearchResultView::setFile( const tDLTFileWrapperPtr& pFile )
+void CSearchResultView::setFile( const tFileWrapperPtr& pFile )
 {
     mSearchRange = tIntRangeProperty();
     searchRangeChanged( mSearchRange, true );
@@ -1639,6 +1639,6 @@ PUML_PACKAGE_BEGIN(DMA_SearchView_API)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultView)
         PUML_INHERITANCE_CHECKED(QTableView, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

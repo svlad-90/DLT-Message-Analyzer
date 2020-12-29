@@ -13,9 +13,9 @@
 #include "qdlt.h"
 
 #include "CMTAnalyzer.hpp"
-#include "dltWrappers/CDLTFileWrapper.hpp"
 #include "../api/IDLTMessageAnalyzerControllerConsumer.hpp"
-#include "dltWrappers/CDLTMsgWrapper.hpp"
+#include "components/logsWrapper/api/IFileWrapper.hpp"
+#include "components/logsWrapper/api/IMsgWrapper.hpp"
 #include "components/log/api/CLog.hpp"
 #include "common/cpp_extensions.hpp"
 
@@ -73,7 +73,7 @@ CMTAnalyzer::~CMTAnalyzer()
 }
 
 tRequestId CMTAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                        const tDLTFileWrapperPtr& pFile,
+                                        const tFileWrapperPtr& pFile,
                                         const int& fromMessage,
                                         const int& numberOfMessages,
                                         const QRegularExpression& regex,
@@ -154,7 +154,7 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
 
     const tRequestId requestId = inputIt.key();
 
-    const tDLTFileWrapperPtr& pFile = inputIt.value().pFile;
+    const tFileWrapperPtr& pFile = inputIt.value().pFile;
 
     auto analysisIterationSpecificThread = [pFile](const tRequestId& requestId_,
             tRequestMap::iterator& inputIt_,
@@ -437,7 +437,7 @@ CMTAnalyzer::tWorkerItem::tWorkerItem(const tQThreadPtr& pQThread_, const tDLTRe
 
 //CMTAnalyzer::tRequestData
 CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient_,
-                                         const tDLTFileWrapperPtr& pFile_,
+                                         const tFileWrapperPtr& pFile_,
                                          const int& fromMessage_,
                                          const int& numberOfMessages_,
                                          const QRegularExpression& regex_,
