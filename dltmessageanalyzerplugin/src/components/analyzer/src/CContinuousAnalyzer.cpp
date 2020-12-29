@@ -12,7 +12,7 @@
 #include "QTimer"
 #include "QDebug"
 
-#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "components/logsWrapper/api/IFileWrapper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -161,7 +161,7 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
 }
 
 tRequestId CContinuousAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                           const tDLTFileWrapperPtr& pFile,
+                           const tFileWrapperPtr& pFile,
                            const int& fromMessage,
                            const int& numberOfMessages,
                            const QRegularExpression& regex,
@@ -304,7 +304,7 @@ CContinuousAnalyzer::tRequestData::tRequestData(const tRequestId& requestId_,
             const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient_,
             const tRequestId& subRequestId_,
             bool bIsContinuousAnalysis_,
-            const tDLTFileWrapperPtr& pFile,
+            const tFileWrapperPtr& pFile,
             const QRegularExpression& regex_,
             const int& numberOfThreads_,
             const tRegexScriptingMetadata& regexScriptingMetadata_): requestId(requestId_),

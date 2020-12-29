@@ -33,7 +33,7 @@
 #include "components/patternsView/api/IPatternsModel.hpp"
 #include "components/groupedView/api/CGroupedView.hpp"
 #include "settings/CSettingsManager.hpp"
-#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "components/logsWrapper/api/IFileWrapper.hpp"
 #include "common/CRegexDirectoryMonitor.hpp"
 
 #include "components/groupedView/api/IGroupedViewModel.hpp"
@@ -47,6 +47,8 @@
 #include "components/log/api/CLog.hpp"
 #include "components/plant_uml/api/CUMLView.hpp"
 #include "common/CTableMemoryJumper.hpp"
+
+#include "components/logsWrapper/api/IDLTLogsWrapperCreator.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -64,7 +66,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          QLineEdit* pFiltersSearchInput,
                                          CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                                          CSearchResultView* pSearchResultView,
-                                         const std::shared_ptr<ISearchResultModel>& pSearchResultModel):
+                                         const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
+                                         const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator):
     IDLTMessageAnalyzerControllerConsumer (pController),
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
@@ -105,6 +108,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   #endif
   , mMeasurementRequestTimer()
   , mpSearchViewTableJumper(pSearchViewTableJumper)
+  , mpDLTLogsWrapperCreator(pDLTLogsWrapperCreator)
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
@@ -494,11 +498,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     handleLoadedRegexConfig();
 
     // set initial cache status
-    mpCacheStatusLabel->setText(CDLTFileWrapper::formCacheStatusString(0,
-                                                                       MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
-                                                                       0,
-                                                                       CSettingsManager::getInstance()->getCacheEnabled(),
-                                                                       false));
+    mpCacheStatusLabel->setText(formCacheStatusString(0,
+                                                      MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
+                                                      0,
+                                                      CSettingsManager::getInstance()->getCacheEnabled(),
+                                                      false));
 }
 
 void CDLTMessageAnalyzer::decodeMsg(QDltMsg& msg) const
@@ -644,7 +648,7 @@ void CDLTMessageAnalyzer::resetSearchRange()
     mSearchRange = tIntRangeProperty();
 }
 
-void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
+void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
 {
     if(nullptr != mpFile)
     {
@@ -679,13 +683,18 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
         mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB()) ) );
         mpFile->setEnableCache( CSettingsManager::getInstance()->getCacheEnabled() );
 
+
+
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
-        if(nullptr != mpMessageDecoder)
+        if(nullptr != mpMessageDecoder && false == mpDLTLogsWrapperCreator.expired())
         {
-            mpFile->setMessageDecoder(mpMessageDecoder);
-        }
+            mpFile->setMessageDecoder(mpDLTLogsWrapperCreator.lock()->createMsgDecoder(mpMessageDecoder));
+        }  
 #else
-        mpFile->setDecoderPlugins(mDecoderPluginsList);
+        if(false == mpDLTLogsWrapperCreator.expired())
+        {
+            mpFile->setMessageDecoder(mpDLTLogsWrapperCreator.lock()->createMsgDecoder(mDecoderPluginsList));
+        }
 #endif
     }
 
@@ -699,36 +708,36 @@ void CDLTMessageAnalyzer::setFile(const tDLTFileWrapperPtr& pFile)
             }
             else
             {
-                mpCacheStatusLabel->setText(CDLTFileWrapper::formCacheStatusString(0,
-                                                                                   MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
-                                                                                   0,
-                                                                                   CSettingsManager::getInstance()->getCacheEnabled(),
-                                                                                   false));
+                mpCacheStatusLabel->setText(formCacheStatusString(0,
+                                                                  MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
+                                                                  0,
+                                                                  CSettingsManager::getInstance()->getCacheEnabled(),
+                                                                  false));
             }
         }
     };
 
-    connect( mpFile.get(), &CDLTFileWrapper::isEnabledChanged, [updateCacheStatus](bool)
+    connect( mpFile.get(), &IFileWrapper::isEnabledChanged, [updateCacheStatus](bool)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &CDLTFileWrapper::loadChanged, [updateCacheStatus](unsigned int)
+    connect( mpFile.get(), &IFileWrapper::loadChanged, [updateCacheStatus](unsigned int)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &CDLTFileWrapper::currentSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
+    connect( mpFile.get(), &IFileWrapper::currentSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &CDLTFileWrapper::maxSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
+    connect( mpFile.get(), &IFileWrapper::maxSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &CDLTFileWrapper::fullChanged, [updateCacheStatus](bool)
+    connect( mpFile.get(), &IFileWrapper::fullChanged, [updateCacheStatus](bool)
     {
         updateCacheStatus();
     });
@@ -772,14 +781,18 @@ bool CDLTMessageAnalyzer::analyze()
         return false;
     }
 
+
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
-    if(nullptr != mpMessageDecoder)
-    {
-        mpFile->setMessageDecoder(mpMessageDecoder);
-    }
+        if(nullptr != mpMessageDecoder && false == mpDLTLogsWrapperCreator.expired())
+        {
+            mpFile->setMessageDecoder(mpDLTLogsWrapperCreator.lock()->createMsgDecoder(mpMessageDecoder));
+        }
 #else
-    tryLoadDecoderPlugins();
-    mpFile->setDecoderPlugins(mDecoderPluginsList);
+        if(false == mpDLTLogsWrapperCreator.expired())
+        {
+            tryLoadDecoderPlugins();
+            mpFile->setMessageDecoder(mpDLTLogsWrapperCreator.lock()->createMsgDecoder(mDecoderPluginsList));
+        }
 #endif
 
     mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB() ) ) );
@@ -1729,7 +1742,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IFiltersModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(CBGColorAnimation, 1, 1, uses)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltMessageDecoder, 1, 1, uses)

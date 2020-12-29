@@ -12,9 +12,7 @@
 
 #include "dltmessageanalyzerplugin.hpp"
 #include "CDLTMessageAnalyzer.hpp"
-#include "dltWrappers/CDLTFileWrapper.hpp"
 #include "settings/CSettingsManager.hpp"
-#include "dltWrappers/CDLTMsgWrapper.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -28,12 +26,16 @@
 #include "components/filtersView/api/CFiltersViewComponent.hpp"
 #include "components/plant_uml/api/CUMLViewComponent.hpp"
 #include "components/logo/api/CLogoComponent.hpp"
+#include "components/logsWrapper/api/CLogsWrapperComponent.hpp"
+
+#include "components/logsWrapper/api/IFileWrapper.hpp"
+#include "components/logsWrapper/api/IMsgWrapper.hpp"
 
 #include "components/filtersView/api/CFiltersView.hpp"
 
 #include "DMA_Plantuml.hpp"
 
-Q_DECLARE_METATYPE(tDltMsgWrapperPtr)
+Q_DECLARE_METATYPE(tMsgWrapperPtr)
 
 DLTMessageAnalyzerPlugin::DLTMessageAnalyzerPlugin():
 mpForm(nullptr),
@@ -49,13 +51,14 @@ mpGroupedViewComponent(nullptr),
 mpPatternsViewComponent(nullptr),
 mpFiltersViewComponent(nullptr),
 mpUMLViewComponent(nullptr),
-mpLogoComponent(nullptr)
+mpLogoComponent(nullptr),
+mpLogsWrapperComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
 {
     //qDebug() << "DLTMessageAnalyzerPlugin lives in thread - " << QThread::currentThreadId();
-    qRegisterMetaType<tDltMsgWrapperPtr>("tDLTMsgWrapperPtr");
+    qRegisterMetaType<tMsgWrapperPtr>("tMsgWrapperPtr");
 
     DMA::PlantUML::Creator::getInstance().initialize();
     DMA::PlantUML::Creator::getInstance().setBackgroundColor("#FEFEFE");
@@ -231,6 +234,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pLogoComponent);
     }
 
+    {
+        auto pLogsWrapperComponent = std::make_shared<CLogsWrapperComponent>();
+        mpLogsWrapperComponent = pLogsWrapperComponent;
+
+        auto initResult = pLogsWrapperComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pLogsWrapperComponent->getName()));
+        }
+
+        mComponents.push_back(pLogsWrapperComponent);
+    }
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -289,7 +306,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpUMLViewComponent->getUMLView(),
                                                                                                       mpSearchViewComponent->getTableMemoryJumper(),
                                                                                                       mpSearchViewComponent->getSearchResultView(),
-                                                                                                      mpSearchViewComponent->getSearchResultModel());
+                                                                                                      mpSearchViewComponent->getSearchResultModel(),
+                                                                                                      mpLogsWrapperComponent);
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)
@@ -345,47 +363,50 @@ void DLTMessageAnalyzerPlugin::selectedIdxMsgDecoded(int, QDltMsg &/*msg*/){
 
 void DLTMessageAnalyzerPlugin::initFileStart(QDltFile *file)
 {
-    mpFile = std::make_shared<CDLTFileWrapper>(file);
-
-    if( mpDLTMessageAnalyzer )
+    if(nullptr != mpLogsWrapperComponent)
     {
-       mpDLTMessageAnalyzer->setFile(mpFile);
-       mpDLTMessageAnalyzer->cancel();
-    }
+        mpFile = mpLogsWrapperComponent->createDLTFileWrapper(file);
 
-    auto* pFilesLineEdit = mpForm->getFilesLineEdit();
-
-    if(nullptr != pFilesLineEdit)
-    {
-        if(nullptr != mpFile)
+        if( mpDLTMessageAnalyzer )
         {
-            QString text;
+           mpDLTMessageAnalyzer->setFile(mpFile);
+           mpDLTMessageAnalyzer->cancel();
+        }
 
-            const int iSize = mpFile->getNumberOfFiles();
+        auto* pFilesLineEdit = mpForm->getFilesLineEdit();
 
-            if(iSize > 0)
+        if(nullptr != pFilesLineEdit)
+        {
+            if(nullptr != mpFile)
             {
-                pFilesLineEdit->show();
+                QString text;
 
-                for(int i = 0; i < iSize; ++i)
+                const int iSize = mpFile->getNumberOfFiles();
+
+                if(iSize > 0)
                 {
-                    text.append(mpFile->getFileName(i)).append("\n");
-                }
+                    pFilesLineEdit->show();
 
-                pFilesLineEdit->setText(text);
+                    for(int i = 0; i < iSize; ++i)
+                    {
+                        text.append(mpFile->getFileName(i)).append("\n");
+                    }
+
+                    pFilesLineEdit->setText(text);
+                }
+                else
+                {
+                    pFilesLineEdit->hide();
+                }
             }
             else
             {
                 pFilesLineEdit->hide();
             }
         }
-        else
-        {
-            pFilesLineEdit->hide();
-        }
-    }
 
-    //mpForm->setEnabled(false);
+        //mpForm->setEnabled(false);
+    }
 }
 
 void DLTMessageAnalyzerPlugin::initMsg(int, QDltMsg &)
@@ -395,20 +416,23 @@ void DLTMessageAnalyzerPlugin::initMsg(int, QDltMsg &)
 
 void DLTMessageAnalyzerPlugin::initMsgDecoded(int index, QDltMsg &msg)
 {
-    if(nullptr != mpDLTMessageAnalyzer)
+    if(nullptr != mpLogsWrapperComponent)
     {
-        mpDLTMessageAnalyzer->decodeMsg(msg);
+        if(nullptr != mpDLTMessageAnalyzer)
+        {
+            mpDLTMessageAnalyzer->decodeMsg(msg);
+        }
+
+        tMsgWrapperPtr pMessageWrapper = mpLogsWrapperComponent->createDLTMsgWrapper(msg);
+
+        //qDebug() << "initMsgDecoded comes from thread - " << QThread::currentThreadId();
+        QMetaObject::invokeMethod(this, "initMsgDecodedForwarded", Qt::QueuedConnection,
+                                  Q_ARG(int, index),
+                                  Q_ARG(tMsgWrapperPtr, pMessageWrapper));
     }
-
-    tDltMsgWrapperPtr pMessageWrapper = std::make_shared<CDLTMsgWrapper>(msg);
-
-    //qDebug() << "initMsgDecoded comes from thread - " << QThread::currentThreadId();
-    QMetaObject::invokeMethod(this, "initMsgDecodedForwarded", Qt::QueuedConnection,
-                              Q_ARG(int, index),
-                              Q_ARG(tDLTMsgWrapperPtr, pMessageWrapper));
 }
 
-void DLTMessageAnalyzerPlugin::initMsgDecodedForwarded(int index, tDLTMsgWrapperPtr pMessageWrapper)
+void DLTMessageAnalyzerPlugin::initMsgDecodedForwarded(int index, tMsgWrapperPtr pMessageWrapper)
 {
     if(nullptr != mpFile)
     {
@@ -687,6 +711,6 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPatternsViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogoComponent, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogsWrapperComponent, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

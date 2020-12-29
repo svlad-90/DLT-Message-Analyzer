@@ -237,8 +237,9 @@ void CDLTMsgWrapper::dumpPayload() const
     qDebug() << "payload - " << QString::fromUtf8(mPayloadUTF8);
 }
 
-PUML_PACKAGE_BEGIN(DMA_DLTWrappers)
+PUML_PACKAGE_BEGIN(DMA_LogsWrapper)
     PUML_CLASS_BEGIN_CHECKED(CDLTMsgWrapper)
+        PUML_INHERITANCE_CHECKED(IMsgWrapper, implements)
         PUML_USE_DEPENDENCY_CHECKED(QDltMsg, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

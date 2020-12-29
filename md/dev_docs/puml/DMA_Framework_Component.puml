@@ -76,6 +76,15 @@ class "CLogoComponent"
 
 }
 
+package "DMA_LogsWrapper_API" #DDDDDD
+{
+
+class "CLogsWrapperComponent"
+{
+}
+
+}
+
 package "DMA_PatternsView_API" #DDDDDD
 {
 
@@ -111,6 +120,7 @@ DMA::INamedObject <|-- DMA::IComponent : implements
 DMA::IComponent <|-- CGroupedViewComponent : implements
 DMA::IComponent <|-- CLogComponent : implements
 DMA::IComponent <|-- CLogoComponent : implements
+DMA::IComponent <|-- CLogsWrapperComponent : implements
 DMA::IComponent <|-- CPatternsViewComponent : implements
 DMA::IComponent <|-- CUMLViewComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements

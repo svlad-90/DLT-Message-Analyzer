@@ -24,7 +24,7 @@ public:
     CSearchResultModel(QObject *parent=nullptr);
 
     // implementation of the ISearchResultModel
-    void setFile(const tDLTFileWrapperPtr& pFile) override;
+    void setFile(const tFileWrapperPtr& pFile) override;
     void updateView(const int& fromRow = 0) override;
     void resetData() override;
     int getFileIdx( const QModelIndex& idx ) const override;
@@ -46,10 +46,10 @@ public:
 
 private:
 
-    tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const;
+    tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field) const;
 
 private:
 
     tFoundMatchesPack mFoundMatchesPack;
-    tDLTFileWrapperPtr mpFile;
+    tFileWrapperPtr mpFile;
 };

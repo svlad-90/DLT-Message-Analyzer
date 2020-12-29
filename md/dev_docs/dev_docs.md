@@ -20,11 +20,11 @@ It's main purposes is to:
 ----
 #### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/components/analyzer/doc/doc.md)
 #### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
-#### [DMA_DLTWrappers](../../dltmessageanalyzerplugin/src/dltWrappers/doc/doc.md)
 #### [DMA_FiltersView](../../dltmessageanalyzerplugin/src/components/filtersView/doc/doc.md)
 #### [DMA_GroupedView](../../dltmessageanalyzerplugin/src/components/groupedView/doc/doc.md)
 #### [DMA_Log](../../dltmessageanalyzerplugin/src/components/log/doc/doc.md)
 #### [DMA_Logo](../../dltmessageanalyzerplugin/src/components/logo/doc/doc.md)
+#### [DMA_LogsWrapper](../../dltmessageanalyzerplugin/src/components/logsWrapper/doc/doc.md)
 #### [DMA_PatternsView](../../dltmessageanalyzerplugin/src/components/patternsView/doc/doc.md)
 #### [DMA_PlantumlView](../../dltmessageanalyzerplugin/src/components/plant_uml/doc/doc.md)
 #### [DMA_SearchView](../../dltmessageanalyzerplugin/src/components/searchView/doc/doc.md)

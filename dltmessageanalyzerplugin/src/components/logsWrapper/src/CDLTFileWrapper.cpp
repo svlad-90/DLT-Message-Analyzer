@@ -9,10 +9,11 @@
 #include "QClipboard"
 #include "QApplication"
 
+#include "components/log/api/CLog.hpp"
+
 #include "CDLTFileWrapper.hpp"
 #include "CDLTMsgWrapper.hpp"
-
-#include "components/log/api/CLog.hpp"
+#include "../api/IMsgDecoder.hpp"
 
 #include "qdlt.h"
 
@@ -20,11 +21,7 @@
 
 CDLTFileWrapper::CDLTFileWrapper(QDltFile* pFile):
     mpFile(pFile),
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     mpMessageDecoder(nullptr),
-#else
-    mDecoderPlugins(),
-#endif
     mMaxCacheSize(0),
     mCurrentCacheSize(0),
     mbCacheEnabled(false),
@@ -78,9 +75,9 @@ int CDLTFileWrapper::sizeNonFiltered() const
     return result;
 }
 
-tDltMsgWrapperPtr CDLTFileWrapper::getMsg(const tMsgId& msgId)
+tMsgWrapperPtr CDLTFileWrapper::getMsg(const tMsgId& msgId)
 {
-    tDltMsgWrapperPtr pResult;
+    tMsgWrapperPtr pResult;
 
     auto getMessageFromFile = [this, &pResult, &msgId]()
     {
@@ -90,17 +87,10 @@ tDltMsgWrapperPtr CDLTFileWrapper::getMsg(const tMsgId& msgId)
 
         msg.setMsg(byteArray);
 
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         if(nullptr != mpMessageDecoder)
         {
             mpMessageDecoder->decodeMsg(msg,false);
         }
-#else
-        for(auto* pPlugin: mDecoderPlugins)
-        {
-            pPlugin->decodeMsg(msg,false);
-        }
-#endif
 
         pResult = std::make_shared<CDLTMsgWrapper>(msg);
     };
@@ -214,7 +204,7 @@ bool CDLTFileWrapper::cacheDecodedMsg( const int& msgId, const QDltMsg& msg )
 
         if(foundMsg == mCache.cache.end())
         {
-            tDltMsgWrapperPtr pMsgWrapper = std::make_shared<CDLTMsgWrapper>(msg); // create wrapper
+            tMsgWrapperPtr pMsgWrapper = std::make_shared<CDLTMsgWrapper>(msg); // create wrapper
 
             mCache.cache.insert(msgId, pMsgWrapper); // cache wrapper
 
@@ -260,19 +250,12 @@ bool CDLTFileWrapper::decodeAndCacheMsg( const int& msgId, QDltMsg& msg )
 
         if(foundMsg == mCache.cache.end())
         {
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
             if(nullptr != mpMessageDecoder)
             {
                 mpMessageDecoder->decodeMsg(msg,false);
             }
-#else
-            for(auto* pPlugin: mDecoderPlugins) // decode message in all plugins
-            {
-                pPlugin->decodeMsg(msg,false);
-            }
-#endif
 
-            tDltMsgWrapperPtr pMsgWrapper = std::make_shared<CDLTMsgWrapper>(msg); // create wrapper
+            tMsgWrapperPtr pMsgWrapper = std::make_shared<CDLTMsgWrapper>(msg); // create wrapper
 
             mCache.cache.insert(msgId, pMsgWrapper); // cache wrapper
 
@@ -295,7 +278,7 @@ bool CDLTFileWrapper::decodeAndCacheMsg( const int& msgId, QDltMsg& msg )
     return bResult;
 }
 
-bool CDLTFileWrapper::cacheMsgWrapper( const int& msgId, const tDltMsgWrapperPtr& pMsgWrapper )
+bool CDLTFileWrapper::cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper )
 {
     bool bResult = false;
 
@@ -410,17 +393,10 @@ void CDLTFileWrapper::resetCache()
     handleCacheFull(false);
 }
 
-#ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
-void CDLTFileWrapper::setMessageDecoder( QDltMessageDecoder* pMessageDecoder )
+void CDLTFileWrapper::setMessageDecoder( const tMsgDecoderPtr& pMessageDecoder )
 {
     mpMessageDecoder = pMessageDecoder;
 }
-#else
-void CDLTFileWrapper::setDecoderPlugins( const tPluginPtrList& decoderPlugins )
-{
-    mDecoderPlugins = decoderPlugins;
-}
-#endif
 
 void CDLTFileWrapper::setEnableCache(bool isEnabled)
 {
@@ -580,39 +556,6 @@ void CDLTFileWrapper::copyFileNamesToClipboard( const tIntRange& msgsRange ) con
     {
         mpSubFilesHandler->copyFileNamesToClipboard(msgsRange);
     }
-}
-
-QString CDLTFileWrapper::formCacheStatusString( const tCacheSizeB& currentCacheSize,
-                                                const tCacheSizeB& maxCacheSize,
-                                                const unsigned int& cacheLoadPercentage,
-                                                bool bCacheEnabled,
-                                                bool bIsFull )
-{
-    QString result;
-
-    if(false == bCacheEnabled)
-    {
-        result = "Disabled.";
-    }
-    else
-    {
-        if(true == bIsFull)
-        {
-            result = QString("Enabled. Load - %1% ( Full ). Size - %2 Mb / %3 Mb")
-                    .arg(cacheLoadPercentage)
-                    .arg(BToMB(currentCacheSize))
-                    .arg(BToMB(maxCacheSize));
-        }
-        else
-        {
-            result = QString("Enabled. Load - %1%. Size - %2 Mb / %3 Mb")
-                    .arg(cacheLoadPercentage)
-                    .arg(BToMB(currentCacheSize))
-                    .arg(BToMB(maxCacheSize));
-        }
-    }
-
-    return result;
 }
 
 CDLTFileWrapper::CSubFilesHandler::CSubFilesHandler():
@@ -991,10 +934,11 @@ int CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::size()
     return mIndexAll.size();
 }
 
-PUML_PACKAGE_BEGIN(DMA_DLTWrappers)
+PUML_PACKAGE_BEGIN(DMA_LogsWrapper)
     PUML_CLASS_BEGIN_CHECKED(CDLTFileWrapper)
-        PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_INHERITANCE_CHECKED(IFileWrapper, implements)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QDltFile, 1, 1, uses)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTMsgWrapper, 1, *, cache)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(IMsgWrapper, 1, *, cache)
+        PUML_USE_DEPENDENCY_CHECKED(CDLTMsgWrapper, 1, *, creates)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -9,8 +9,8 @@
 #include "CSearchResultModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "settings/CSettingsManager.hpp"
-#include "dltWrappers/CDLTMsgWrapper.hpp"
-#include "dltWrappers/CDLTFileWrapper.hpp"
+#include "components/logsWrapper/api/IMsgWrapper.hpp"
+#include "components/logsWrapper/api/IFileWrapper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -21,7 +21,7 @@ CSearchResultModel::CSearchResultModel(QObject *):
 
 }
 
-void CSearchResultModel::setFile(const tDLTFileWrapperPtr& pFile)
+void CSearchResultModel::setFile(const tFileWrapperPtr& pFile)
 {
     mpFile = pFile;
 }
@@ -135,7 +135,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-tQStringPtr CSearchResultModel::getDataStrFromMsg(const tMsgId& msgId, const tDLTMsgWrapperPtr &pMsg, eSearchResultColumn field) const
+tQStringPtr CSearchResultModel::getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field) const
 {
     if(nullptr == pMsg)
     {
@@ -588,6 +588,6 @@ PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultModel)
         PUML_INHERITANCE_CHECKED(QAbstractTableModel, implements)
         PUML_INHERITANCE_CHECKED(ISearchResultModel, implements)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -67,13 +67,14 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             QLineEdit* pFiltersSearchInput,
                             CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                             CSearchResultView* pSearchResultView,
-                            const std::shared_ptr<ISearchResultModel>& pSearchResultModel);
+                            const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
+                            const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator);
 
         /**
          * @brief setFile - set's the file to be used for analysis
          * @param pFile - pointer to file to be used
          */
-        void setFile(const tDLTFileWrapperPtr& pFile);
+        void setFile(const tFileWrapperPtr& pFile);
 
         /**
          * @brief setMainTableView - sets main table view, which is used for jumping functioanlity
@@ -287,7 +288,7 @@ signals:
         tRequestId mRequestId;
         int mNumberOfDots;
         bool mbIsConnected;
-        tDLTFileWrapperPtr mpFile;
+        tFileWrapperPtr mpFile;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         QDltMessageDecoder* mpMessageDecoder;
@@ -304,6 +305,7 @@ signals:
 
         QElapsedTimer mMeasurementRequestTimer;
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
+        std::weak_ptr<IDLTLogsWrapperCreator> mpDLTLogsWrapperCreator;
 };
 
 #endif // CDLTMESSAGEANALYZER_HPP

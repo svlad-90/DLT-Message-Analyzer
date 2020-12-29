@@ -3,11 +3,38 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DMA_DLTWrappers" #DDDDDD
+package "DMA_LogsWrapper_API" #DDDDDD
 {
 
-class "CDLTFileWrapper"
+class "IFileWrapper"
 {
+    + {abstract} virtual QString getCacheStatusAsString() const = 0
+    + {abstract} virtual QString getFileName(int num = 0) = 0
+    + {abstract} virtual bool cacheMsgByIndex( const tMsgId& msgId ) = 0
+    + {abstract} virtual bool cacheMsgByIndexes( const QSet<tMsgId> msgIdSet ) = 0
+    + {abstract} virtual bool cacheMsgByRange( const tIntRange& msgRange ) = 0
+    + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
+    + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
+    + {abstract} virtual bool isFiltered() const = 0
+    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getNumberOfFiles() const = 0
+    + {abstract} virtual int size() const = 0
+    + {abstract} virtual int sizeNonFiltered() const = 0
+    + signal void currentSizeMbChanged(tCacheSizeMB MBytes)
+    + signal void fullChanged(bool isFull)
+    + signal void isEnabledChanged(bool isEnabled)
+    + signal void loadChanged(unsigned int percents)
+    + signal void maxSizeMbChanged(tCacheSizeMB MBytes)
+    + {abstract} virtual tIntRangeProperty normalizeSearchRange( const tIntRangeProperty& inputRange) = 0
+    + {abstract} virtual tMsgWrapperPtr getMsg(const tMsgId& msgId) = 0
+    + {abstract} virtual virtual tIntRangeList getSubFilesSizeRanges() const = 0
+    + {abstract} virtual void copyFileNameToClipboard( const int& msgId ) const = 0
+    + {abstract} virtual void copyFileNamesToClipboard( const tIntRange& msgsRange ) const = 0
+    + {abstract} virtual void resetCache() = 0
+    + {abstract} virtual void setEnableCache(bool isEnabled) = 0
+    + {abstract} virtual void setMaxCacheSize(const tCacheSizeB& cacheSize ) = 0
+    + {abstract} virtual void setMessageDecoder( IMsgDecoder* pMessageDecoder ) = 0
+    + {abstract} virtual void setSubFilesHandlingStatus(const bool& val) = 0
 }
 
 }
@@ -42,7 +69,7 @@ class "ISearchResultModel"
     + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
     + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
     + {abstract} virtual void resetData() = 0
-    + {abstract} virtual void setFile(const tDLTFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
     + {abstract} virtual void updateView(const int& fromRow = 0) = 0
 }
 
@@ -68,7 +95,7 @@ QAbstractTableModel <|-- CSearchResultModel : implements
 
 '====================Dependencies section====================
 CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
-CSearchResultModel "1" o-- "1" CDLTFileWrapper : uses
+CSearchResultModel "1" o-- "1" IFileWrapper : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
 CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel
 

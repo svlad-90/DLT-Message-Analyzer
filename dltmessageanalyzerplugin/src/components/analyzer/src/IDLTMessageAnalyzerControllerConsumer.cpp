@@ -25,7 +25,7 @@ IDLTMessageAnalyzerControllerConsumer::IDLTMessageAnalyzerControllerConsumer( co
 
 }
 
-tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tDLTFileWrapperPtr& pFile,
+tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tFileWrapperPtr& pFile,
                                                                   const int& fromMessage,
                                                                   const int& numberOfMessages,
                                                                   const QRegularExpression& regex,
@@ -87,12 +87,13 @@ PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
                                                                 const eRequestState& requestState,
                                                                 const int8_t& progress,
                                                                 const tFoundMatchesPack& processedMatches) )
-        PUML_METHOD( +, tRequestId requestAnalyze( const tDLTFileWrapperPtr& pFile,
+        PUML_METHOD( +, tRequestId requestAnalyze( const tFileWrapperPtr& pFile,
                                                    const int& fromMessage,
                                                    const int& numberOfMessages,
                                                    const QRegularExpression& regex,
                                                    const int& numberOfThreads,
                                                    bool isContinuous ) )
         PUML_AGGREGATION_DEPENDENCY(IDLTMessageAnalyzerController, 1, 1, uses)
+        PUML_USE_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
     PUML_ABSTRACT_CLASS_END()
 PUML_PACKAGE_END()

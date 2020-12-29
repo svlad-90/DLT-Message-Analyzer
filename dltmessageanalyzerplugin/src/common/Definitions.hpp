@@ -608,11 +608,16 @@ QString getName(eRequestState field);
 
 typedef int tWorkerId;
 
-class CDLTFileWrapper;
-typedef std::shared_ptr<CDLTFileWrapper> tDLTFileWrapperPtr;
+class IFileWrapper;
+typedef std::shared_ptr<IFileWrapper> tFileWrapperPtr;
 
-class CDLTMsgWrapper;
-typedef std::shared_ptr<CDLTMsgWrapper> tDLTMsgWrapperPtr;
+class IMsgWrapper;
+typedef std::shared_ptr<IMsgWrapper> tMsgWrapperPtr;
+
+class IMsgDecoder;
+typedef std::shared_ptr<IMsgDecoder> tMsgDecoderPtr;
+
+class IDLTLogsWrapperCreator;
 
 typedef uint32_t tCacheSizeMB;
 typedef uint64_t tCacheSizeB;

@@ -31,6 +31,7 @@ class CPatternsViewComponent;
 class CFiltersViewComponent;
 class CUMLViewComponent;
 class CLogoComponent;
+class CLogsWrapperComponent;
 
 namespace DMA
 {
@@ -82,7 +83,7 @@ signals:
     void analysisWithEmptyStringRequested();
 
 public slots:
-    void initMsgDecodedForwarded(int index, tDLTMsgWrapperPtr pMsg);
+    void initMsgDecodedForwarded(int index, tMsgWrapperPtr pMsg);
 
 private: // methods
 
@@ -128,7 +129,7 @@ private: // members
     /* internal variables */
     Form *mpForm;
     tDLTMessageAnalyzerPtr mpDLTMessageAnalyzer;
-    tDLTFileWrapperPtr mpFile;
+    tFileWrapperPtr mpFile;
     int mLastAvailableNumberOfMsg;
     QMap<QString, QDltConnection::QDltConnectionState> mConnecitonsMap;
     QDltConnection::QDltConnectionState mConnectionState;
@@ -145,6 +146,7 @@ private: // members
     std::shared_ptr<CFiltersViewComponent> mpFiltersViewComponent;
     std::shared_ptr<CUMLViewComponent> mpUMLViewComponent;
     std::shared_ptr<CLogoComponent> mpLogoComponent;
+    std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;
