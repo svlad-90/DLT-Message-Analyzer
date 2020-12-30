@@ -4,60 +4,27 @@
  * @brief   Declaration of the CSettingsManager class
  * Class is not thread-safe!
  */
-#ifndef CSETTINGSMANAGER_HPP
-#define CSETTINGSMANAGER_HPP
+#pragma once
 
 #include "memory"
 #include <mutex>
 
-#include "QObject"
-#include "QVector"
-#include "QPair"
-#include "QColor"
-#include "QVariant"
-#include "QFont"
-
-#include "../common/Definitions.hpp"
-#include "../common/cpp_extensions.hpp"
+#include "../api/ISettingsManager.hpp"
 #include "TSettingItem.hpp"
 
-class CSettingsManager;
-typedef std::shared_ptr<CSettingsManager> tSettingsManagerPtr;
-
-class CSettingsManager : public QObject
+class CSettingsManager : public ISettingsManager
 {
     Q_OBJECT
 
 public:
 
-    static tSettingsManagerPtr getInstance();
-
-    struct tOperationResult
-    {
-        bool bResult = false;
-        QString err;
-    };
-
     /**
-     * @brief storeConfigs - stores all types of configuration ( root, settings, regex-es ) from memory to JSON files
+     * @brief CSettingsManager - default constructor.
      */
+    CSettingsManager();
+
     tOperationResult storeConfigs();
-
-    /**
-     * @brief loadConfigs - loads all types of configuration ( root, settings, regex-es ) from JSON files to memory
-     */
     tOperationResult loadConfigs();
-
-    struct tAliasItem
-    {
-        tAliasItem();
-        tAliasItem(bool isDefault_, const QString& alias_, const QString& regex_);
-        bool operator==(const tAliasItem&) const;
-        bool isDefault;
-        QString alias;
-        QString regex;
-    };
-    typedef QVector<tAliasItem> tAliasItemVec;
 
     //helpers
     bool areAnyDefaultAliasesAvailable() const;
@@ -77,178 +44,113 @@ public:
 ////////////////////////SETTERS/////////////////////////////
 
     // root settings
-    void setSettingsManagerVersion(const tSettingsManagerVersion& val);
+    void setSettingsManagerVersion(const tSettingsManagerVersion& val) override;
 
     // regex settings
-    void setAliases(const tAliasItemVec& val);
-    void setAliasIsDefault(const QString& alias, bool isDefault);
+    void setAliases(const tAliasItemVec& val) override;
+    void setAliasIsDefault(const QString& alias, bool isDefault) override;
 
     // general settings
-    void setNumberOfThreads(const int& val);
-    void setContinuousSearch(bool val);
-    void setCopySearchResultAsHTML(bool val);
-    void setMinimizePatternsViewOnSelection(bool val);
-    void setWriteSettingsOnEachUpdate(bool val);
-    void setCacheEnabled(bool val);
-    void setCacheMaxSizeMB(tCacheSizeMB val);
-    void setRDPMode(bool val);
-    void setRegexMonoHighlightingColor(const QColor& val);
-    void setHighlightActivePatterns(bool val);
-    void setPatternsHighlightingColor(const QColor& val);
-    void setSearchResultMonoColorHighlighting(bool val);
+    void setNumberOfThreads(const int& val) override;
+    void setContinuousSearch(bool val) override;
+    void setCopySearchResultAsHTML(bool val) override;
+    void setMinimizePatternsViewOnSelection(bool val) override;
+    void setWriteSettingsOnEachUpdate(bool val) override;
+    void setCacheEnabled(bool val) override;
+    void setCacheMaxSizeMB(tCacheSizeMB val) override;
+    void setRDPMode(bool val) override;
+    void setRegexMonoHighlightingColor(const QColor& val) override;
+    void setHighlightActivePatterns(bool val) override;
+    void setPatternsHighlightingColor(const QColor& val) override;
+    void setSearchResultMonoColorHighlighting(bool val) override;
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
-    void setSearchResultHighlightingGradient(const tHighlightingGradient& val);
-    void setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val);
-    void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val);
-    void setMarkTimeStampWithBold(bool val);
-    void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val);
-    void setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val);
-    void setCaseSensitiveRegex(bool val);
-    void setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val);
-    void setFilterVariables(bool val);
-    void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val);
-    void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val);
-    void setSubFilesHandlingStatus( const bool& val );
-    void setFont_SearchView( const QFont& val );
+    void setSearchResultHighlightingGradient(const tHighlightingGradient& val) override;
+    void setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val) override;
+    void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val) override;
+    void setMarkTimeStampWithBold(bool val) override;
+    void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val) override;
+    void setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val) override;
+    void setCaseSensitiveRegex(bool val) override;
+    void setRegexFiltersColumnsVisibilityMap(const tRegexFiltersColumnsVisibilityMap& val) override;
+    void setFilterVariables(bool val) override;
+    void setGroupedViewColumnsVisibilityMap(const tGroupedViewColumnsVisibilityMap& val) override;
+    void setGroupedViewColumnsCopyPasteMap(const tGroupedViewColumnsVisibilityMap& val) override;
+    void setSubFilesHandlingStatus( const bool& val ) override;
+    void setFont_SearchView( const QFont& val ) override;
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
-    void setUML_FeatureActive(const bool& val);
-    void setUML_MaxNumberOfRowsInDiagram(const int& val);
-    void setUML_ShowArguments(const bool& val);
-    void setUML_WrapOutput(const bool& val);
-    void setUML_Autonumber(const bool& val);
-    void setFiltersCompletion_CaseSensitive(const bool& val);
-    void setFiltersCompletion_MaxNumberOfSuggestions(const int& val);
-    void setFiltersCompletion_MaxCharactersInSuggestion(const int& val);
-    void setFiltersCompletion_CompletionPopUpWidth(const int& val);
-    void setFiltersCompletion_SearchPolicy(const bool& val);
-    void setSearchViewLastColumnWidthStrategy(const int& val);
+    void setUML_FeatureActive(const bool& val) override;
+    void setUML_MaxNumberOfRowsInDiagram(const int& val) override;
+    void setUML_ShowArguments(const bool& val) override;
+    void setUML_WrapOutput(const bool& val) override;
+    void setUML_Autonumber(const bool& val) override;
+    void setFiltersCompletion_CaseSensitive(const bool& val) override;
+    void setFiltersCompletion_MaxNumberOfSuggestions(const int& val) override;
+    void setFiltersCompletion_MaxCharactersInSuggestion(const int& val) override;
+    void setFiltersCompletion_CompletionPopUpWidth(const int& val) override;
+    void setFiltersCompletion_SearchPolicy(const bool& val) override;
+    void setSearchViewLastColumnWidthStrategy(const int& val) override;
 
-    /**
-     * @brief setSelectedRegexFile - updates selected regex file
-     * @param val - file name ( with extension ) of the file, which is located in the regex dir.
-     * Path to regex dir is hard-coded at can't be changed as of now.
-     */
-    void setSelectedRegexFile(const QString& val);
+    void setSelectedRegexFile(const QString& val) override;
 
 ////////////////////////GETTERS/////////////////////////////
 
     // root settings
-    const tSettingsManagerVersion& getSettingsManagerVersion() const;
+    const tSettingsManagerVersion& getSettingsManagerVersion() const override;
 
     // regex settings
-    const tAliasItemVec& getAliases() const;
+    const tAliasItemVec& getAliases() const override;
 
     // general settings
-    const int& getNumberOfThreads() const;
-    bool getContinuousSearch() const;
-    bool getCopySearchResultAsHTML() const;
-    bool getMinimizePatternsViewOnSelection()const;
-    bool getWriteSettingsOnEachUpdate()const;
-    bool getCacheEnabled() const;
-    const tCacheSizeMB& getCacheMaxSizeMB() const;
-    bool getRDPMode() const;
-    const QColor& getRegexMonoHighlightingColor() const;
-    bool getHighlightActivePatterns() const;
-    const QColor& getPatternsHighlightingColor() const;
-    bool getSearchResultMonoColorHighlighting() const;
+    const int& getNumberOfThreads() const override;
+    bool getContinuousSearch() const override;
+    bool getCopySearchResultAsHTML() const override;
+    bool getMinimizePatternsViewOnSelection()const override;
+    bool getWriteSettingsOnEachUpdate()const override;
+    bool getCacheEnabled() const override;
+    const tCacheSizeMB& getCacheMaxSizeMB() const override;
+    bool getRDPMode() const override;
+    const QColor& getRegexMonoHighlightingColor() const override;
+    bool getHighlightActivePatterns() const override;
+    const QColor& getPatternsHighlightingColor() const override;
+    bool getSearchResultMonoColorHighlighting() const override;
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
-    tHighlightingGradient getSearchResultHighlightingGradient() const;
-    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsVisibilityMap() const;
-    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const;
-    bool getMarkTimeStampWithBold() const;
-    const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const;
-    const tPatternsColumnsVisibilityMap& getPatternsColumnsCopyPasteMap() const;
-    bool getCaseSensitiveRegex() const;
-    const tRegexFiltersColumnsVisibilityMap& getRegexFiltersColumnsVisibilityMap() const;
-    bool getFilterVariables() const;
-    QString getSelectedRegexFile() const;
-    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const;
-    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const;
-    bool getSubFilesHandlingStatus() const;
-    const QFont& getFont_SearchView() const;
+    tHighlightingGradient getSearchResultHighlightingGradient() const override;
+    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsVisibilityMap() const override;
+    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const override;
+    bool getMarkTimeStampWithBold() const override;
+    const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const override;
+    const tPatternsColumnsVisibilityMap& getPatternsColumnsCopyPasteMap() const override;
+    bool getCaseSensitiveRegex() const override;
+    const tRegexFiltersColumnsVisibilityMap& getRegexFiltersColumnsVisibilityMap() const override;
+    bool getFilterVariables() const override;
+    QString getSelectedRegexFile() const override;
+    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsVisibilityMap() const override;
+    const tGroupedViewColumnsVisibilityMap& getGroupedViewColumnsCopyPasteMap() const override;
+    bool getSubFilesHandlingStatus() const override;
+    const QFont& getFont_SearchView() const override;
     // this method can be called from context of multiple threads, thus it is designed as thread-safe
-    const bool& getUML_FeatureActive() const;
-    const int& getUML_MaxNumberOfRowsInDiagram() const;
-    const bool& getUML_ShowArguments() const;
-    const bool& getUML_WrapOutput() const;
-    const bool& getUML_Autonumber() const;
-    const bool& getFiltersCompletion_CaseSensitive() const;
-    const int& getFiltersCompletion_MaxNumberOfSuggestions() const;
-    const int& getFiltersCompletion_MaxCharactersInSuggestion() const;
-    const int& getFiltersCompletion_CompletionPopUpWidth() const;
-    const bool& getFiltersCompletion_SearchPolicy() const;
-    const int& getSearchViewLastColumnWidthStrategy() const;
+    const bool& getUML_FeatureActive() const override;
+    const int& getUML_MaxNumberOfRowsInDiagram() const override;
+    const bool& getUML_ShowArguments() const override;
+    const bool& getUML_WrapOutput() const override;
+    const bool& getUML_Autonumber() const override;
+    const bool& getFiltersCompletion_CaseSensitive() const override;
+    const int& getFiltersCompletion_MaxNumberOfSuggestions() const override;
+    const int& getFiltersCompletion_MaxCharactersInSuggestion() const override;
+    const int& getFiltersCompletion_CompletionPopUpWidth() const override;
+    const bool& getFiltersCompletion_SearchPolicy() const override;
+    const int& getSearchViewLastColumnWidthStrategy() const override;
 
     // allowed ranges
-    const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const;
-    const TRangedSettingItem<tCacheSizeMB>::tOptionalAllowedRange& getSetting_CacheMaxSizeMB_AllowedRange() const;
-    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange() const;
-    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange() const;
-    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_CompletionPopUpWidth_AllowedRange() const;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
+    const TRangedSettingItem<tCacheSizeMB>::tOptionalAllowedRange& getSetting_CacheMaxSizeMB_AllowedRange() const override;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange() const override;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange() const override;
+    const TRangedSettingItem<int>::tOptionalAllowedRange& getFiltersCompletion_CompletionPopUpWidth_AllowedRange() const override;
 
-////////////////////////NOTIFICATIONS/////////////////////////////
-
-signals:
-
-    // root settings
-    void settingsManagerVersionChanged( const tSettingsManagerVersion& settingsManagerVersion ) const;
-
-    // regex settings
-    void aliasesChanged( const tAliasItemVec& aliases );
-
-    // general settings
-    void numberOfThreadsChanged( int numberOfThreads );
-    void continuousSearchChanged( bool continuousSearch );
-    void copySearchResultAsHTMLChanged( bool copySearchResultAsHTML );
-    void minimizePatternsViewOnSelectionChanged( bool minimizePatternsViewOnSelection );
-    void writeSettingsOnEachUpdateChanged( bool writeSettingsOnEachUpdate );
-    void cacheEnabledChanged( bool cacheEnabled );
-    void cacheMaxSizeMBChanged( const tCacheSizeMB& cacheMaxSizeMB );
-    void RDPModeChanged( bool RDPMode );
-    void regexMonoHighlightingColorChanged(const QColor& highlightingColor);
-    void highlightActivePatternsChanged(bool highlightActivePatterns);
-    void patternsHighlightingColorChanged(const QColor& patternsHighlightingColor);
-    void searchResultMonoColorHighlightingChanged(bool searchResultMonoColorHighlighting);
-    void searchResultHighlightingGradientChanged(const tHighlightingGradient& searchResultHighlightingGradient);
-    void searchResultColumnsVisibilityMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsVisibilityMap);
-    void searchResultColumnsCopyPasteMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsCopyPasteMap);
-    void markTimeStampWithBoldChanged(bool markTimeStampWithBold);
-    void patternsColumnsVisibilityMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsVisibilityMap);
-    void patternsColumnsCopyPasteMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsCopyPasteMap);
-    void caseSensitiveRegexChanged(bool bCaseSensitiveRegex);
-    void regexFiltersColumnsVisibilityMapChanged(const tRegexFiltersColumnsVisibilityMap& regexFiltersColumnsVisibilityMap);
-    void filterVariablesChanged(bool filterVariables);
-    void selectedRegexFileChanged( const QString& regexDirectory );
-    void groupedViewColumnsVisibilityMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsVisibilityMap);
-    void groupedViewColumnsCopyPasteMapChanged(const tGroupedViewColumnsVisibilityMap& groupedViewColumnsCopyPasteMap);
-    void subFilesHandlingStatusChanged(const bool& subFilesHandlingStatus);
-    void font_SearchViewChanged(const QFont& font_SearchView);
-    void UML_FeatureActiveChanged(const bool& UML_FeatureActive);
-    void UML_MaxNumberOfRowsInDiagramChanged(const int& UML_MaxNumberOfRowsInDiagram);
-    void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
-    void UML_WrapOutputChanged(const bool& UML_WrapOutput);
-    void UML_AutonumberChanged(const bool& UML_Autonumber);
-    void filtersCompletion_CaseSensitiveChanged(const bool& filtersCompletion_CaseSensitive);
-    void filtersCompletion_MaxNumberOfSuggestionsChanged(const int& filtersCompletion_MaxNumberOfSuggestions);
-    void filtersCompletion_MaxCharactersInSuggestionChanged(const int& filtersCompletion_MaxCharactersInSuggestion);
-    void filtersCompletion_CompletionPopUpWidthChanged(const int& filtersCompletion_CompletionPopUpWidth);
-    void filtersCompletion_SearchPolicyChanged(const bool& filtersCompletion_SearchPolicy);
-    void searchViewLastColumnWidthStrategyChanged(const int& payloadWidthChanged);
+    tOperationResult setUp() override;
 
 private: // methods
-
-    /**
-     * @brief CSettingsManager - default constructor.
-     * Private, since this is a single-tone class.
-     */
-    CSettingsManager();
-
-    /**
-     * @brief setUp - this method is using other methods of this class in order to set it up for further usage.
-     * Called from constructor of instance of this single-tone class
-     * @return - result of the operation
-     */
-    tOperationResult setUp();
 
     ////////////////BACKWARD_COMPATIBILITY//////////////////////////////////////////////
 
@@ -526,5 +428,3 @@ private: // fields
 
     bool mbRootConfigInitialised;
 };
-
-#endif // CSETTINGSMANAGER_HPP

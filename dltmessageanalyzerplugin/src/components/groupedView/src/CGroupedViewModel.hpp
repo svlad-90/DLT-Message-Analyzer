@@ -14,11 +14,15 @@
 #include "common/CTreeItem.hpp"
 
 #include "../api/IGroupedViewModel.hpp"
+#include "components/settings/api/CSettingsManagerClient.hpp"
 
-class CGroupedViewModel : public QAbstractItemModel, public IGroupedViewModel
+class CGroupedViewModel : public QAbstractItemModel,
+                          public IGroupedViewModel,
+                          public CSettingsManagerClient
 {
 public:
-    explicit CGroupedViewModel(QObject *parent = nullptr);
+    explicit CGroupedViewModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                               QObject *parent = nullptr);
     ~CGroupedViewModel() override;
 
     // Implementation of the IGroupedViewModel

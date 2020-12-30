@@ -39,6 +39,15 @@ class "IGroupedViewModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -49,6 +58,7 @@ abstract class "QAbstractItemModel"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CGroupedViewModel : extends
 IGroupedViewModel <|-- CGroupedViewModel : implements
 QAbstractItemModel <|-- CGroupedViewModel : implements
 

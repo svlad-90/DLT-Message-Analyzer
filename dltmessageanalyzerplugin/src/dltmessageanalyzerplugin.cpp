@@ -12,7 +12,6 @@
 
 #include "dltmessageanalyzerplugin.hpp"
 #include "CDLTMessageAnalyzer.hpp"
-#include "settings/CSettingsManager.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -27,6 +26,7 @@
 #include "components/plant_uml/api/CUMLViewComponent.hpp"
 #include "components/logo/api/CLogoComponent.hpp"
 #include "components/logsWrapper/api/CLogsWrapperComponent.hpp"
+#include "components/settings/api/CSettingsComponent.hpp"
 
 #include "components/logsWrapper/api/IFileWrapper.hpp"
 #include "components/logsWrapper/api/IMsgWrapper.hpp"
@@ -52,7 +52,8 @@ mpPatternsViewComponent(nullptr),
 mpFiltersViewComponent(nullptr),
 mpUMLViewComponent(nullptr),
 mpLogoComponent(nullptr),
-mpLogsWrapperComponent(nullptr)
+mpLogsWrapperComponent(nullptr),
+mpSettingsComponent(nullptr)
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -113,12 +114,28 @@ QStringList DLTMessageAnalyzerPlugin::infoConfig()
 
 QWidget* DLTMessageAnalyzerPlugin::initViewer()
 {    
-    mpForm = new Form(this);
+    {
+        auto pSettingsComponent = std::make_shared<CSettingsComponent>();
+        mpSettingsComponent = pSettingsComponent;
+
+        auto initResult = pSettingsComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pSettingsComponent->getName()));
+        }
+
+        mComponents.push_back(pSettingsComponent);
+    }
+
+    // it also uses the settings manager, thus we create the form after the
+    // settings component
+    mpForm = new Form(this, mpSettingsComponent->getSettingsManager());
 
     std::shared_ptr<IDLTMessageAnalyzerController> pAnalyzerController = nullptr;
 
     {
-        auto pAnalyzerComponent = std::make_shared<CAnalyzerComponent>();
+        auto pAnalyzerComponent = std::make_shared<CAnalyzerComponent>(mpSettingsComponent->getSettingsManager());
 
         auto initResult = pAnalyzerComponent->startInit();
 
@@ -151,7 +168,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pSearchViewComponent = std::make_shared<CSearchViewComponent>(mpForm->getSearchResultTableView());
+        auto pSearchViewComponent = std::make_shared<CSearchViewComponent>(mpForm->getSearchResultTableView(),
+                                                                           mpSettingsComponent->getSettingsManager());
         mpSearchViewComponent = pSearchViewComponent;
 
         auto initResult = pSearchViewComponent->startInit();
@@ -165,7 +183,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pGroupedViewComponent = std::make_shared<CGroupedViewComponent>(mpForm->getGroupedResultView());
+        auto pGroupedViewComponent = std::make_shared<CGroupedViewComponent>(mpForm->getGroupedResultView(),
+                                                                             mpSettingsComponent->getSettingsManager());
         mpGroupedViewComponent = pGroupedViewComponent;
 
         auto initResult = pGroupedViewComponent->startInit();
@@ -179,7 +198,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pPatternsViewComponent = std::make_shared<CPatternsViewComponent>(mpForm->getPatternsTableView());
+        auto pPatternsViewComponent = std::make_shared<CPatternsViewComponent>(mpForm->getPatternsTableView(),
+                                                                               mpSettingsComponent->getSettingsManager());
         mpPatternsViewComponent = pPatternsViewComponent;
 
         auto initResult = pPatternsViewComponent->startInit();
@@ -193,7 +213,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pFiltersViewComponent = std::make_shared<CFiltersViewComponent>(mpForm->getFiltersView());
+        auto pFiltersViewComponent = std::make_shared<CFiltersViewComponent>(mpForm->getFiltersView(),
+                                                                             mpSettingsComponent->getSettingsManager());
         mpFiltersViewComponent = pFiltersViewComponent;
 
         auto initResult = pFiltersViewComponent->startInit();
@@ -207,7 +228,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pUMLViewComponent = std::make_shared<CUMLViewComponent>(mpForm->getUMLView());
+        auto pUMLViewComponent = std::make_shared<CUMLViewComponent>(mpForm->getUMLView(),
+                                                                     mpSettingsComponent->getSettingsManager());
         mpUMLViewComponent = pUMLViewComponent;
 
         auto initResult = pUMLViewComponent->startInit();
@@ -307,7 +329,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpSearchViewComponent->getTableMemoryJumper(),
                                                                                                       mpSearchViewComponent->getSearchResultView(),
                                                                                                       mpSearchViewComponent->getSearchResultModel(),
-                                                                                                      mpLogsWrapperComponent);
+                                                                                                      mpLogsWrapperComponent,
+                                                                                                      mpSettingsComponent->getSettingsManager());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)

@@ -14,7 +14,7 @@
 #include "QElapsedTimer"
 #endif
 
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
@@ -25,9 +25,10 @@ Q_DECLARE_METATYPE(CDLTRegexAnalyzerWorker::ePortionAnalysisState)
 static std::atomic<tWorkerId> sWorkerIdCounter(0);
 
 //CDLTRegexAnalyzerWorker
-CDLTRegexAnalyzerWorker::CDLTRegexAnalyzerWorker():
-    mWorkerId(++sWorkerIdCounter),
-    mColors()
+CDLTRegexAnalyzerWorker::CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManagerPtr):
+CSettingsManagerClient(pSettingsManagerPtr),
+mWorkerId(++sWorkerIdCounter),
+mColors()
 {
     qRegisterMetaType<tFoundMatchesPack>("tFoundMatchesPack");
     qRegisterMetaType<ePortionAnalysisState>("ePortionAnalysisState");
@@ -36,13 +37,13 @@ CDLTRegexAnalyzerWorker::CDLTRegexAnalyzerWorker():
     qRegisterMetaType<tWorkerThreadCookie>("tWorkerThreadCookie");
     qRegisterMetaType<tRegexScriptingMetadata>("tRegexScriptingMetadata");
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::searchResultHighlightingGradientChanged,
+    connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged,
              [this]( const tHighlightingGradient& gradient )
     {
         mColors = generateColors(gradient);
     });
 
-    mColors = generateColors(CSettingsManager::getInstance()->getSearchResultHighlightingGradient());
+    mColors = generateColors(getSettingsManager()->getSearchResultHighlightingGradient());
 }
 
 tWorkerId CDLTRegexAnalyzerWorker::getWorkerId() const
@@ -67,7 +68,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
 
     bool bAnalyzeUML = false;
 
-    if(true == CSettingsManager::getInstance()->getUML_FeatureActive() &&
+    if(true == getSettingsManager()->getUML_FeatureActive() &&
        true == regexMetadata.doesContainAnyUMLGroup() &&
        true == regexMetadata.doesContainConsistentUMLData(false).first)
     {
@@ -141,5 +142,6 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
 PUML_PACKAGE_BEGIN(DMA_Analyzer)
     PUML_CLASS_BEGIN_CHECKED(CDLTRegexAnalyzerWorker)
         PUML_INHERITANCE_CHECKED(QObject, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

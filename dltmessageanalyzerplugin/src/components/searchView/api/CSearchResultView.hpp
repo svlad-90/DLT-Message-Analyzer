@@ -8,9 +8,12 @@
 #include <QTableView>
 #include "common/Definitions.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CSearchResultModel;
 
-class CSearchResultView : public QTableView
+class CSearchResultView : public QTableView,
+                          public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -36,6 +39,8 @@ protected:
                           const QModelIndex &previous) override;
     virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
     virtual void keyPressEvent ( QKeyEvent * event ) override;
+
+    void handleSettingsManagerChange() override;
 
 private:
     bool isVerticalScrollBarVisible() const;

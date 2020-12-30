@@ -5,14 +5,18 @@
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CPatternsView;
 class IPatternsModel;
 
-class CPatternsViewComponent : public DMA::IComponent
+class CPatternsViewComponent : public DMA::IComponent,
+                               public CSettingsManagerClient
 {
 public:
 
-    CPatternsViewComponent( CPatternsView* pPatternsView );
+    CPatternsViewComponent( CPatternsView* pPatternsView,
+                            const tSettingsManagerPtr& pSettingsManagerPtr );
 
     CPatternsView* getPatternsView() const;
 

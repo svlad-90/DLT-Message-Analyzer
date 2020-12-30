@@ -7,7 +7,8 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CAnalyzerComponent::CAnalyzerComponent():
+CAnalyzerComponent::CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManagerPtr):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpMessageAnalyzerController(nullptr)
 {
     // force linkage references in order to have consistent diagrams
@@ -25,7 +26,7 @@ DMA::tSyncInitOperationResult CAnalyzerComponent::init()
 
     try
     {
-        auto pMTController = IDLTMessageAnalyzerController::createInstance<CMTAnalyzer>();
+        auto pMTController = IDLTMessageAnalyzerController::createInstance<CMTAnalyzer>(getSettingsManager());
         mpMessageAnalyzerController = IDLTMessageAnalyzerController::createInstance<CContinuousAnalyzer>(pMTController);
 
         result.bIsOperationSuccessful = true;
@@ -72,6 +73,7 @@ CAnalyzerComponent::getAnalyzerController() const
 PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
     PUML_CLASS_BEGIN(CAnalyzerComponent)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CContinuousAnalyzer, 1, 1, contains)
         PUML_USE_DEPENDENCY_CHECKED(CMTAnalyzer, 1, 1, creates and feeds into CContinuousAnalyzer)
     PUML_CLASS_END()

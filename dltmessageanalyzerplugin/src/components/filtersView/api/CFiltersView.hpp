@@ -4,10 +4,13 @@
 
 #include "common/Definitions.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CFiltersModel;
 class CFilterItemDelegate;
 
-class CFiltersView : public QTreeView
+class CFiltersView : public QTreeView,
+                     public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -24,6 +27,8 @@ public:
 protected:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
     void keyPressEvent ( QKeyEvent * event ) override;
+
+    void handleSettingsManagerChange() override;
 
 private:
     void setModel(QAbstractItemModel *model) override;
@@ -47,5 +52,5 @@ private: // fields
     bool mbResizeOnExpandCollapse;
     bool mbSkipFirstUpdateWidth;
     QLineEdit* mpRegexInputField;
-    CFilterItemDelegate* mpFilerItemDelegate;
+    CFilterItemDelegate* mpFilterItemDelegate;
 };

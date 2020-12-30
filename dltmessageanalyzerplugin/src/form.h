@@ -31,6 +31,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QPlainTextEdit>
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class DLTMessageAnalyzerPlugin;
 class CSearchResultView;
 class CGroupedView;
@@ -43,12 +45,15 @@ namespace Ui {
     class Form;
 }
 
-class Form : public QWidget
+class Form : public QWidget,
+             public CSettingsManagerClient
 {
     Q_OBJECT
 
 public:
-    explicit Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent = nullptr);
+    explicit Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
+                  const tSettingsManagerPtr& pSettingsManager,
+                  QWidget *parent = nullptr);
     ~Form() override;
 
     CGroupedView* getGroupedResultView();

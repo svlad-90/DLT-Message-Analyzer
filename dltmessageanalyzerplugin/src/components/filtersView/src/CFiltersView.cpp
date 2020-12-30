@@ -12,7 +12,7 @@
 #include "QKeyEvent"
 
 #include "CFiltersModel.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
 #include "common/CQtHelper.hpp"
 
@@ -41,7 +41,7 @@ CFiltersView::CFiltersView(QWidget *parent):
     mbIsVerticalScrollBarVisible(false),
     mbResizeOnExpandCollapse(true),
     mbSkipFirstUpdateWidth(true),
-    mpFilerItemDelegate(new CFilterItemDelegate(this))
+    mpFilterItemDelegate(nullptr)
 {
     header()->setDefaultAlignment(Qt::AlignCenter);
     header()->setSectionsMovable(false);
@@ -61,268 +61,6 @@ CFiltersView::CFiltersView(QWidget *parent):
             isExpanded(index) ? collapse(index) : expand(index);
         }
     });
-
-    auto showContextMenu = [this](const QPoint &pos)
-    {
-        QMenu contextMenu("Context menu", this);
-
-        {
-            QAction* pAction = new QAction("Copy", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                copySelectedRowToClipboard();
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Filter variables", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setFilterVariables(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getFilterVariables());
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Switch to regex edit", this);
-            pAction->setShortcut(QKeySequence(tr("Enter")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                if(nullptr != mpRegexInputField)
-                {
-                    mpRegexInputField->setFocus();
-                }
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Columns settings", this);
-
-            {
-                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
-
-                {
-                    const auto& regexFiltersColumnsVisibilityMap =
-                            CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
-
-                    for( int i = static_cast<int>(eRegexFiltersColumn::Value);
-                         i < static_cast<int>(eRegexFiltersColumn::AfterLastVisible);
-                         ++i)
-                    {
-                        auto foundItem = regexFiltersColumnsVisibilityMap.find(static_cast<eRegexFiltersColumn>(i));
-
-                        if(foundItem != regexFiltersColumnsVisibilityMap.end())
-                        {
-                            QAction* pAction = new QAction(getName(static_cast<eRegexFiltersColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
-                            {
-                                auto regexFiltersColumnsVisibilityMap_ =
-                                        CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
-
-                                auto foundItem_ = regexFiltersColumnsVisibilityMap_.find(static_cast<eRegexFiltersColumn>(i));
-
-                                if(foundItem_ != regexFiltersColumnsVisibilityMap_.end()) // if item is in the map
-                                {
-                                    foundItem_.value() = checked; // let's update visibility value
-                                    CSettingsManager::getInstance()->setRegexFiltersColumnsVisibilityMap(regexFiltersColumnsVisibilityMap_);
-                                }
-                            });
-                            pAction->setCheckable(true);
-                            pAction->setChecked(foundItem.value());
-                            pSubSubMenu->addAction(pAction);
-                        }
-                    }
-                }
-
-                pSubMenu->addMenu(pSubSubMenu);
-            }
-
-            {
-                QAction* pAction = new QAction("Reset visible columns", this);
-                connect(pAction, &QAction::triggered, []()
-                {
-                    CSettingsManager::getInstance()->resetRegexFiltersColumnsVisibilityMap();
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Completion settings", this);
-
-//            TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
-
-            {
-                QAction* pAction = new QAction("Case sensitive", this);
-                connect(pAction, &QAction::triggered, [](bool checked)
-                {
-                    CSettingsManager::getInstance()->setFiltersCompletion_CaseSensitive(checked);
-                });
-                pAction->setCheckable(true);
-                pAction->setChecked(CSettingsManager::getInstance()->getFiltersCompletion_CaseSensitive());
-                pSubMenu->addAction(pAction);
-            }
-
-            {
-                QAction* pAction = new QAction("Max number of suggestions...", this);
-                connect(pAction, &QAction::triggered, [this]()
-                {
-                    int inputVal;
-
-                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange();
-
-                    if(true == allowedRange.isSet())
-                    {
-                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
-                                                                           allowedRange.getValue().from,
-                                                                           allowedRange.getValue().to,
-                                                                           CSettingsManager::getInstance()->getFiltersCompletion_MaxNumberOfSuggestions(),
-                                                                           this,
-                                                                           "max number of suggestions",
-                                                                           "Max number of suggestions",
-                                                                           [](bool* ok, const QString& str)->int
-                                                                           {
-                                                                               return str.toInt(ok);
-                                                                           });
-
-                        if(true == bInputSuccess)
-                        {
-                            CSettingsManager::getInstance()->setFiltersCompletion_MaxNumberOfSuggestions(inputVal);
-                        }
-                    }
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            {
-                QAction* pAction = new QAction("Max characters in suggestion...", this);
-                connect(pAction, &QAction::triggered, [this]()
-                {
-                    int inputVal;
-
-                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange();
-
-                    if(true == allowedRange.isSet())
-                    {
-                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
-                                                                           allowedRange.getValue().from,
-                                                                           allowedRange.getValue().to,
-                                                                           CSettingsManager::getInstance()->getFiltersCompletion_MaxCharactersInSuggestion(),
-                                                                           this,
-                                                                           "max characters in suggestion",
-                                                                           "Max characters in suggestion",
-                                                                           [](bool* ok, const QString& str)->int
-                                                                           {
-                                                                               return str.toInt(ok);
-                                                                           });
-
-                        if(true == bInputSuccess)
-                        {
-                            CSettingsManager::getInstance()->setFiltersCompletion_MaxCharactersInSuggestion(inputVal);
-                        }
-                    }
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            {
-                QAction* pAction = new QAction("Pop-up width...", this);
-                connect(pAction, &QAction::triggered, [this]()
-                {
-                    int inputVal;
-
-                    const auto& allowedRange = CSettingsManager::getInstance()->getFiltersCompletion_CompletionPopUpWidth_AllowedRange();
-
-                    if(true == allowedRange.isSet())
-                    {
-                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
-                                                                           allowedRange.getValue().from,
-                                                                           allowedRange.getValue().to,
-                                                                           CSettingsManager::getInstance()->getFiltersCompletion_CompletionPopUpWidth(),
-                                                                           this,
-                                                                           "pop up width",
-                                                                           "Pop up width",
-                                                                           [](bool* ok, const QString& str)->int
-                                                                           {
-                                                                               return str.toInt(ok);
-                                                                           });
-
-                        if(true == bInputSuccess)
-                        {
-                            CSettingsManager::getInstance()->setFiltersCompletion_CompletionPopUpWidth(inputVal);
-                        }
-                    }
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            {
-                QMenu* pSubSubMenu = new QMenu("Search policy", this);
-
-                QActionGroup* pActionGroup = new QActionGroup(this);
-                pActionGroup->setExclusive(true);
-
-                {
-                    QAction* pAction = new QAction("\"Starts with\"", this);
-                    connect(pAction, &QAction::triggered, []()
-                    {
-                        CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(false);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(!CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy());
-
-                    pSubSubMenu->addAction(pAction);
-                    pActionGroup->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("\"Contains\"", this);
-                    connect(pAction, &QAction::triggered, []()
-                    {
-                        CSettingsManager::getInstance()->setFiltersCompletion_SearchPolicy(true);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy());
-
-                    pSubSubMenu->addAction(pAction);
-                    pActionGroup->addAction(pAction);
-                }
-
-                pSubMenu->addMenu(pSubSubMenu);
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        contextMenu.exec(mapToGlobal(pos));
-    };
-
-    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
-
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::regexFiltersColumnsVisibilityMapChanged,
-             [this](const tRegexFiltersColumnsVisibilityMap&)
-    {
-        updateColumnsVisibility();
-        updateWidth();
-    });
-
-    setItemDelegate(mpFilerItemDelegate);
 }
 
 void CFiltersView::setRegexInputField(QLineEdit* pRegexInputField)
@@ -359,10 +97,10 @@ void CFiltersView::currentChanged(const QModelIndex &current, const QModelIndex 
 
 CFiltersView::~CFiltersView()
 {
-    if(nullptr != mpFilerItemDelegate)
+    if(nullptr != mpFilterItemDelegate)
     {
-        delete mpFilerItemDelegate;
-        mpFilerItemDelegate = nullptr;
+        delete mpFilterItemDelegate;
+        mpFilterItemDelegate = nullptr;
     }
 }
 
@@ -374,7 +112,7 @@ void CFiltersView::setModel(QAbstractItemModel *model)
 
 void CFiltersView::updateColumnsVisibility()
 {
-    const tRegexFiltersColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getRegexFiltersColumnsVisibilityMap();
+    const tRegexFiltersColumnsVisibilityMap& visibilityMap = getSettingsManager()->getRegexFiltersColumnsVisibilityMap();
 
     for( int i = static_cast<int>(eRegexFiltersColumn::Value);
          i < static_cast<int>(eRegexFiltersColumn::Last);
@@ -409,11 +147,11 @@ void CFiltersView::updateColumnsVisibility()
 
 void CFiltersView::highlightInvalidRegex(const QModelIndex &index)
 {
-    if(true == index.isValid() && nullptr != mpFilerItemDelegate)
+    if(true == index.isValid() && nullptr != mpFilterItemDelegate)
     {
         QVector<QModelIndex> animatedRows;
         animatedRows.push_back(index);
-        mpFilerItemDelegate->animateRows(animatedRows, QColor(255,0,0), 300);
+        mpFilterItemDelegate->animateRows(animatedRows, QColor(255,0,0), 300);
     }
 }
 
@@ -423,9 +161,9 @@ void CFiltersView::setSpecificModel( CFiltersModel* pModel )
     {
         mpModel = pModel;
 
-        if(nullptr != mpFilerItemDelegate)
+        if(nullptr != mpFilterItemDelegate)
         {
-            mpFilerItemDelegate->setSpecificModel(mpModel);
+            mpFilterItemDelegate->setSpecificModel(mpModel);
         }
 
         connect( mpModel, &CFiltersModel::filteredEntriesChanged, this,
@@ -543,9 +281,279 @@ void CFiltersView::keyPressEvent ( QKeyEvent * event )
     }
 }
 
+void CFiltersView::handleSettingsManagerChange()
+{
+    if(nullptr == mpFilterItemDelegate)
+    {
+        mpFilterItemDelegate = new CFilterItemDelegate(this);
+        setItemDelegate(mpFilterItemDelegate);
+    }
+
+    auto showContextMenu = [this](const QPoint &pos)
+    {
+        QMenu contextMenu("Context menu", this);
+
+        {
+            QAction* pAction = new QAction("Copy", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                copySelectedRowToClipboard();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Filter variables", this);
+            connect(pAction, &QAction::triggered, [this](bool checked)
+            {
+                getSettingsManager()->setFilterVariables(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(getSettingsManager()->getFilterVariables());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Switch to regex edit", this);
+            pAction->setShortcut(QKeySequence(tr("Enter")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                if(nullptr != mpRegexInputField)
+                {
+                    mpRegexInputField->setFocus();
+                }
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Columns settings", this);
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
+
+                {
+                    const auto& regexFiltersColumnsVisibilityMap =
+                            getSettingsManager()->getRegexFiltersColumnsVisibilityMap();
+
+                    for( int i = static_cast<int>(eRegexFiltersColumn::Value);
+                         i < static_cast<int>(eRegexFiltersColumn::AfterLastVisible);
+                         ++i)
+                    {
+                        auto foundItem = regexFiltersColumnsVisibilityMap.find(static_cast<eRegexFiltersColumn>(i));
+
+                        if(foundItem != regexFiltersColumnsVisibilityMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eRegexFiltersColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            {
+                                auto regexFiltersColumnsVisibilityMap_ =
+                                        getSettingsManager()->getRegexFiltersColumnsVisibilityMap();
+
+                                auto foundItem_ = regexFiltersColumnsVisibilityMap_.find(static_cast<eRegexFiltersColumn>(i));
+
+                                if(foundItem_ != regexFiltersColumnsVisibilityMap_.end()) // if item is in the map
+                                {
+                                    foundItem_.value() = checked; // let's update visibility value
+                                    getSettingsManager()->setRegexFiltersColumnsVisibilityMap(regexFiltersColumnsVisibilityMap_);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset visible columns", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    getSettingsManager()->resetRegexFiltersColumnsVisibilityMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Completion settings", this);
+
+//            TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
+
+            {
+                QAction* pAction = new QAction("Case sensitive", this);
+                connect(pAction, &QAction::triggered, [this](bool checked)
+                {
+                    getSettingsManager()->setFiltersCompletion_CaseSensitive(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(getSettingsManager()->getFiltersCompletion_CaseSensitive());
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Max number of suggestions...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = getSettingsManager()->getFiltersCompletion_MaxNumberOfSuggestions_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           getSettingsManager()->getFiltersCompletion_MaxNumberOfSuggestions(),
+                                                                           this,
+                                                                           "max number of suggestions",
+                                                                           "Max number of suggestions",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            getSettingsManager()->setFiltersCompletion_MaxNumberOfSuggestions(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Max characters in suggestion...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = getSettingsManager()->getFiltersCompletion_MaxCharactersInSuggestion_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           getSettingsManager()->getFiltersCompletion_MaxCharactersInSuggestion(),
+                                                                           this,
+                                                                           "max characters in suggestion",
+                                                                           "Max characters in suggestion",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            getSettingsManager()->setFiltersCompletion_MaxCharactersInSuggestion(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Pop-up width...", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    int inputVal;
+
+                    const auto& allowedRange = getSettingsManager()->getFiltersCompletion_CompletionPopUpWidth_AllowedRange();
+
+                    if(true == allowedRange.isSet())
+                    {
+                        bool bInputSuccess = getRangedArithmeticValue<int>(inputVal,
+                                                                           allowedRange.getValue().from,
+                                                                           allowedRange.getValue().to,
+                                                                           getSettingsManager()->getFiltersCompletion_CompletionPopUpWidth(),
+                                                                           this,
+                                                                           "pop up width",
+                                                                           "Pop up width",
+                                                                           [](bool* ok, const QString& str)->int
+                                                                           {
+                                                                               return str.toInt(ok);
+                                                                           });
+
+                        if(true == bInputSuccess)
+                        {
+                            getSettingsManager()->setFiltersCompletion_CompletionPopUpWidth(inputVal);
+                        }
+                    }
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Search policy", this);
+
+                QActionGroup* pActionGroup = new QActionGroup(this);
+                pActionGroup->setExclusive(true);
+
+                {
+                    QAction* pAction = new QAction("\"Starts with\"", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        getSettingsManager()->setFiltersCompletion_SearchPolicy(false);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(!getSettingsManager()->getFiltersCompletion_SearchPolicy());
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("\"Contains\"", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        getSettingsManager()->setFiltersCompletion_SearchPolicy(true);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getFiltersCompletion_SearchPolicy());
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.exec(mapToGlobal(pos));
+    };
+
+    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
+
+    connect( getSettingsManager().get(),
+             &ISettingsManager::regexFiltersColumnsVisibilityMapChanged,
+             [this](const tRegexFiltersColumnsVisibilityMap&)
+    {
+        updateColumnsVisibility();
+        updateWidth();
+    });
+}
+
 PUML_PACKAGE_BEGIN(DMA_FiltersView_API)
     PUML_CLASS_BEGIN_CHECKED(CFiltersView)
         PUML_INHERITANCE_CHECKED(QTreeView, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CFilterItemDelegate, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, regex input field)

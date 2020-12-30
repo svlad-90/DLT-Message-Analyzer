@@ -8,7 +8,9 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CFiltersViewComponent::CFiltersViewComponent( CFiltersView* pFiltersView ):
+CFiltersViewComponent::CFiltersViewComponent( CFiltersView* pFiltersView,
+                                              const tSettingsManagerPtr& pSettingsManagerPtr ):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpFiltersModel(nullptr),
 mpFiltersView(pFiltersView)
 {
@@ -33,10 +35,11 @@ DMA::tSyncInitOperationResult CFiltersViewComponent::init()
    {
        if(nullptr != mpFiltersView)
        {
-           auto pFiltersModel= std::make_shared<CFiltersModel>();
+           auto pFiltersModel= std::make_shared<CFiltersModel>(getSettingsManager());
 
            if( nullptr != pFiltersModel )
            {
+               mpFiltersView->setSettingsManager(getSettingsManager());
                mpFiltersModel = pFiltersModel;
                mpFiltersView->setSpecificModel(pFiltersModel.get());
            }
@@ -90,6 +93,7 @@ CFiltersView* CFiltersViewComponent::getFiltersView() const
 PUML_PACKAGE_BEGIN(DMA_FiltersView_API)
    PUML_CLASS_BEGIN(CFiltersViewComponent)
        PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+       PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
        PUML_COMPOSITION_DEPENDENCY_CHECKED(IFiltersModel, 1, 1, contains)
        PUML_USE_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, using to create IFiltersModel)
        PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersView, 1, 1, uses)

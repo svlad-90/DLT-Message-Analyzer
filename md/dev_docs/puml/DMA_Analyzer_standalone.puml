@@ -42,6 +42,15 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -53,7 +62,9 @@ class "QObject"
 
 '====================Inheritance section====================
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
+CSettingsManagerClient <|-- CDLTRegexAnalyzerWorker : extends
 QObject <|-- CDLTRegexAnalyzerWorker : extends
+CSettingsManagerClient <|-- CMTAnalyzer : extends
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
 

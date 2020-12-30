@@ -5,7 +5,7 @@
 #include <QStringListModel>
 
 #include "components/log/api/CLog.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "common/Definitions.hpp"
 #include "CFiltersModel.hpp"
 #include "CFilterItemDelegate.hpp"
@@ -145,7 +145,7 @@ void CFilterItemDelegate::delayedComplete()
 
              if(nullptr != mCompletionData.pPopUp)
              {
-                 mCompletionData.pPopUp->resize(CSettingsManager::getInstance()->getFiltersCompletion_CompletionPopUpWidth(),
+                 mCompletionData.pPopUp->resize(getSettingsManager()->getFiltersCompletion_CompletionPopUpWidth(),
                                                 mCompletionData.pPopUp->height());
              }
         });
@@ -207,8 +207,8 @@ void CFilterItemDelegate::updateSuggestions(const QString& input)
 
                         pModel->setStringList(mpModel->getCompletionData(groupIndex,
                                                                          normalizedInput,
-                                                                         CSettingsManager::getInstance()->getFiltersCompletion_MaxNumberOfSuggestions(),
-                                                                         CSettingsManager::getInstance()->getFiltersCompletion_MaxCharactersInSuggestion()));
+                                                                         getSettingsManager()->getFiltersCompletion_MaxNumberOfSuggestions(),
+                                                                         getSettingsManager()->getFiltersCompletion_MaxCharactersInSuggestion()));
                     }
                     else
                     {
@@ -524,6 +524,7 @@ void CFilterItemDelegate::setSpecificModel( CFiltersModel* pModel )
 PUML_PACKAGE_BEGIN(DMA_FiltersView)
     PUML_CLASS_BEGIN_CHECKED(CFilterItemDelegate)
         PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CFiltersModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QTreeView, 1, 1, parent view)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QCompleter, 1, 1, uses)

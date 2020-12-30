@@ -52,6 +52,15 @@ class "Ui::Form"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -66,11 +75,13 @@ class "QWidget"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
 QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
 QObject <|-- DLTMessageAnalyzerPlugin : extends
+CSettingsManagerClient <|-- Form : extends
 QWidget <|-- Form : extends
 
 '====================Dependencies section====================

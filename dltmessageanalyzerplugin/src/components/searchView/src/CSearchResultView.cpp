@@ -27,7 +27,7 @@
 #include "common/Definitions.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "CSearchResultModel.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/logsWrapper/api/IFileWrapper.hpp"
 #include "components/log/api/CLog.hpp"
 
@@ -43,631 +43,6 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     mpSpecificModel(nullptr),
     mContentSizeMap()
 {
-    setItemDelegate(new CSearchResultHighlightingDelegate());
-
-    auto showContextMenu = [this](const QPoint &pos)
-    {
-        QMenu contextMenu("Context menu", this);
-
-        {
-            QAction* pAction = new QAction("Copy", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), false );
-            });
-
-            if(true == selectionModel()->selectedRows().empty())
-            {
-                pAction->setEnabled(false);
-            }
-
-            contextMenu.addAction(pAction);
-        }
-
-        {
-            QAction* pAction = new QAction("Copy payload", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), true );
-            });
-
-            if(true == selectionModel()->selectedRows().empty())
-            {
-                pAction->setEnabled(false);
-            }
-
-            contextMenu.addAction(pAction);
-        }
-
-        {
-            QAction* pAction = new QAction("Select all", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+A")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                selectAll();
-            });
-
-            if(0 == model()->rowCount())
-            {
-                pAction->setEnabled(false);
-            }
-
-            contextMenu.addAction(pAction);
-        }
-
-        if(model()->rowCount() > 0)
-        {
-            QAction* pAction = new QAction("Clear search results", this);
-            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+Space")));
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                clearSearchResultsRequested();
-            });
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QAction* pAction = new QAction("Copy as HTML", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setCopySearchResultAsHTML(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getCopySearchResultAsHTML());
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        const auto* pSelectionModel = selectionModel();
-        auto selectedRows = pSelectionModel->selectedRows();
-        const int selectedRowsSize = selectedRows.size();
-
-        auto minSelectedRow = std::min_element( selectedRows.begin(), selectedRows.end(),
-                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-        auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
-                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-
-        {
-            QAction* pAction = new QAction("Monitor sub-files", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
-            {
-                CSettingsManager::getInstance()->setSubFilesHandlingStatus(checked);
-            });
-            pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
-            contextMenu.addAction(pAction);
-        }
-
-        {
-            if(nullptr != mpFile && true == mpFile->getSubFilesHandlingStatus())
-            {
-                if(selectedRowsSize >= 1)
-                {
-                    QString msg = QString("Copy file name(s)");
-
-                    QAction* pAction = new QAction(msg, this);
-                    pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+C")));
-                    connect(pAction, &QAction::triggered, [this, selectedRows]()
-                    {
-                        copyMessageFiles();
-                    });
-                    contextMenu.addAction(pAction);
-                }
-            }
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            if(nullptr != mpFile)
-            {
-                contextMenu.addSeparator();
-
-                QMenu* pSubMenu = new QMenu("Search range settings", this);
-
-                {
-                    QString msg = QString("Set search range ...");
-
-                    QAction* pAction = new QAction(msg, this);
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                       getUserSearchRange();
-                    });
-                    pSubMenu->addAction(pAction);
-                }
-
-                if(selectedRowsSize >= 2)
-                {
-                    tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
-                    tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
-
-                    tIntRangeProperty prop;
-                    prop.isSet = true;
-                    prop.from = from;
-                    prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
-                    prop = mpFile->normalizeSearchRange( prop );
-
-                    QString msg = QString("Lock search range from id %1 to id %2").arg(prop.from).arg(prop.to);
-
-                    QAction* pAction = new QAction(msg, this);
-                    connect(pAction, &QAction::triggered, [this, prop]()
-                    {
-                        mSearchRange = prop;
-                        searchRangeChanged( mSearchRange, false );
-                    });
-                    pSubMenu->addAction(pAction);
-                }
-                else if(selectedRowsSize == 1)
-                {
-                    auto pSelectedRow = selectedRows.begin();
-                    tMsgId targetMsgId = pSelectedRow->sibling(pSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
-
-                    {
-                        QString msg = QString("Search \"starting from\" id %1").arg(targetMsgId);
-
-                        QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
-                        {
-                            tIntRangeProperty prop;
-                            prop.isSet = true;
-                            prop.from = targetMsgId;
-
-                            if( mSearchRange.to >= mpFile->sizeNonFiltered() - 1 )
-                            {
-                                prop.to = mpFile->sizeNonFiltered() - 1;
-                            }
-                            else
-                            {
-                                if(mSearchRange.to > 0)
-                                {
-                                    prop.to = mSearchRange.to;
-                                }
-                                else
-                                {
-                                    prop.to = mpFile->sizeNonFiltered() - 1;
-                                }
-                            }
-
-                            prop = mpFile->normalizeSearchRange( prop );
-
-                            mSearchRange = prop;
-                            searchRangeChanged( mSearchRange, false );
-                        });
-                        pSubMenu->addAction(pAction);
-                    }
-
-                    {
-                        QString msg = QString("Search \"up to\" id %1").arg(targetMsgId);
-
-                        QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
-                        {
-                            tIntRangeProperty prop;
-                            prop.isSet = true;
-                            prop.from = mSearchRange.from;
-                            prop.to = ( targetMsgId >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : targetMsgId;
-                            prop = mpFile->normalizeSearchRange( prop );
-
-                            mSearchRange = prop;
-                            searchRangeChanged( mSearchRange, false );
-                        });
-                        pSubMenu->addAction(pAction);
-                    }
-                }
-
-                {
-                    pSubMenu->addSeparator();
-
-                    if(true == mSearchRange.isSet)
-                    {
-                        QString msg = QString("(*) Remove lock on search range from id %1 to id %2").arg( mSearchRange.from ).arg( mSearchRange.to );
-
-                        QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this]()
-                        {
-                            mSearchRange = tIntRangeProperty();
-                            searchRangeChanged( mSearchRange, true );
-                        });
-                        pSubMenu->addAction(pAction);
-                    }
-                }
-
-                contextMenu.addMenu(pSubMenu);
-            }
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Columns settings", this);
-
-            {
-                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
-
-                {
-                    const auto& searchResultColumnsVisibilityMap =
-                            CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
-
-                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
-                         i < static_cast<int>(eSearchResultColumn::Last);
-                         ++i)
-                    {
-                        auto foundItem = searchResultColumnsVisibilityMap.find(static_cast<eSearchResultColumn>(i));
-
-                        if(foundItem != searchResultColumnsVisibilityMap.end())
-                        {
-                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
-                            {
-                                auto searchResultColumnsVisibilityMapInner =
-                                        CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
-
-                                auto foundItemInner = searchResultColumnsVisibilityMapInner.find(static_cast<eSearchResultColumn>(i));
-
-                                if(foundItemInner != searchResultColumnsVisibilityMapInner.end()) // if item is in the map
-                                {
-                                    foundItemInner.value() = checked; // let's update visibility value
-                                    CSettingsManager::getInstance()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMapInner);
-                                }
-                            });
-                            pAction->setCheckable(true);
-                            pAction->setChecked(foundItem.value());
-
-                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                            && false == CSettingsManager::getInstance()->getUML_FeatureActive())
-                            {
-                                pAction->setEnabled(false);
-                            }
-
-                            pSubSubMenu->addAction(pAction);
-                        }
-                    }
-                }
-
-                pSubMenu->addMenu(pSubSubMenu);
-            }
-
-            {
-                QAction* pAction = new QAction("Reset visible columns", this);
-                connect(pAction, &QAction::triggered, []()
-                {
-                    CSettingsManager::getInstance()->resetSearchResultColumnsVisibilityMap();
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            pSubMenu->addSeparator();
-
-            {
-                QMenu* pSubSubMenu = new QMenu("Copy columns", this);
-
-                {
-                    const auto& searchResultColumnsCopyPasteMap =
-                            CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
-
-                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
-                         i < static_cast<int>(eSearchResultColumn::Last);
-                         ++i)
-                    {
-                        auto foundItem = searchResultColumnsCopyPasteMap.find(static_cast<eSearchResultColumn>(i));
-
-                        if(foundItem != searchResultColumnsCopyPasteMap.end())
-                        {
-                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
-                            {
-                                auto searchResultColumnsCopyPasteMapInner =
-                                        CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
-
-                                auto foundItemInner = searchResultColumnsCopyPasteMapInner.find(static_cast<eSearchResultColumn>(i));
-
-                                if(foundItemInner != searchResultColumnsCopyPasteMapInner.end()) // if item is in the map
-                                {
-                                    foundItemInner.value() = checked; // let's update copy paste value
-                                    CSettingsManager::getInstance()->setSearchResultColumnsCopyPasteMap(searchResultColumnsCopyPasteMapInner);
-                                }
-                            });
-                            pAction->setCheckable(true);
-                            pAction->setChecked(foundItem.value());
-
-                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                            && false == CSettingsManager::getInstance()->getUML_FeatureActive())
-                            {
-                                pAction->setEnabled(false);
-                            }
-
-                            pSubSubMenu->addAction(pAction);
-                        }
-                    }
-                }
-
-                pSubMenu->addMenu(pSubSubMenu);
-            }
-
-            {
-                QAction* pAction = new QAction("Reset copy columns", this);
-                connect(pAction, &QAction::triggered, []()
-                {
-                    CSettingsManager::getInstance()->resetSearchResultColumnsCopyPasteMap();
-                });
-                pSubMenu->addAction(pAction);
-            }
-
-            pSubMenu->addSeparator();
-
-            {
-                QMenu* pSubSubMenu = new QMenu("Last column width policy", this);
-
-                QActionGroup* pActionGroup = new QActionGroup(this);
-                pActionGroup->setExclusive(true);
-
-                for(int i = static_cast<int>(eSearchViewLastColumnWidthStrategy::eReset);
-                    i < static_cast<int>(eSearchViewLastColumnWidthStrategy::eLast);
-                    i++)
-                {
-                    QAction* pAction = new QAction(getPayloadWidthAsString(static_cast<eSearchViewLastColumnWidthStrategy>(i)), this);
-                    connect(pAction, &QAction::triggered, [i]()
-                    {
-                        CSettingsManager::getInstance()->setSearchViewLastColumnWidthStrategy(i);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(CSettingsManager::getInstance()->getSearchViewLastColumnWidthStrategy() == i);
-
-                    pSubSubMenu->addAction(pAction);
-                    pActionGroup->addAction(pAction);
-                }
-
-                pSubMenu->addMenu(pSubSubMenu);
-            }
-
-            contextMenu.addMenu(pSubMenu);
-
-            pSubMenu->addSeparator();
-
-            {
-                QAction* pAction = new QAction("Mark timestamp with bold", this);
-                connect(pAction, &QAction::triggered, [](bool checked)
-                {
-                    CSettingsManager::getInstance()->setMarkTimeStampWithBold(checked);
-                });
-                pAction->setCheckable(true);
-                pAction->setChecked(CSettingsManager::getInstance()->getMarkTimeStampWithBold());
-                pSubMenu->addAction(pAction);
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("Highlighting settings", this);
-
-            {
-                QAction* pAction = new QAction("Highlight with single color", this);
-                connect(pAction, &QAction::triggered, [](bool checked)
-                {
-                    CSettingsManager::getInstance()->setSearchResultMonoColorHighlighting(checked);
-                });
-                pAction->setCheckable(true);
-                pAction->setChecked(CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting());
-                pSubMenu->addAction(pAction);
-            }
-
-            if(true == CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting())
-            {
-                {
-                    QAction* pAction = new QAction("Highlighting color ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getRegexMonoHighlightingColor(), this );
-                        if( color.isValid() )
-                        {
-                            CSettingsManager::getInstance()->setRegexMonoHighlightingColor(color);
-                        }
-                    });
-                    pSubMenu->addAction(pAction);
-                }
-
-                pSubMenu->addSeparator();
-            }
-            else
-            {
-                {
-                    QMenu* pSubSubMenu = new QMenu("Gradient highlighting", this);
-
-                    {
-                        QAction* pAction = new QAction("Set \"from\" color ...", this);
-                        connect(pAction, &QAction::triggered, [this]()
-                        {
-                            const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                            QColor color = QColorDialog::getColor( currentGradientValue.from, this );
-                            if( color.isValid() )
-                            {
-                                CSettingsManager::getInstance()->
-                                setSearchResultHighlightingGradient( tHighlightingGradient( color, currentGradientValue.to, currentGradientValue.numberOfColors ) );
-                            }
-                        });
-                        pSubSubMenu->addAction(pAction);
-                    }
-
-                    {
-                        QAction* pAction = new QAction("Set \"to\" color ...", this);
-                        connect(pAction, &QAction::triggered, [this]()
-                        {
-                            const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                            QColor color = QColorDialog::getColor( currentGradientValue.to, this );
-                            if( color.isValid() )
-                            {
-                                CSettingsManager::getInstance()->
-                                setSearchResultHighlightingGradient( tHighlightingGradient( currentGradientValue.from, color, currentGradientValue.numberOfColors ) );
-                            }
-                        });
-                        pSubSubMenu->addAction(pAction);
-                    }
-
-                    {
-                        const auto& currentGradientValue = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-                        QString msg = QString("Set number of colors ( cur. val. - %1 ) ...").arg(currentGradientValue.numberOfColors);
-
-                        QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, []()
-                        {
-                            bool ok;
-
-                            const auto& currentGradientValue_ = CSettingsManager::getInstance()->getSearchResultHighlightingGradient();
-
-                            QString numberOfColorsStr = QInputDialog::getText(  nullptr, "Set number of gradient colors",
-                                       "Provide number of gradient colors ( from 2 to 100 ):",
-                                       QLineEdit::Normal,
-                                       QString::number(currentGradientValue_.numberOfColors), &ok );
-
-                            if(true == ok)
-                            {
-                                auto numberOfColors = numberOfColorsStr.toInt(&ok);
-
-                                if(true == ok)
-                                {
-                                    if(numberOfColors < 2)
-                                    {
-                                        numberOfColors = 2;
-                                    }
-                                    else if( numberOfColors > 100 )
-                                    {
-                                        numberOfColors = 100;
-                                    }
-
-                                    CSettingsManager::getInstance()->
-                                            setSearchResultHighlightingGradient(
-                                                tHighlightingGradient(
-                                                    currentGradientValue_.from, currentGradientValue_.to, numberOfColors
-                                                    ));
-                                }
-                            }
-                        });
-                        pSubSubMenu->addAction(pAction);
-                    }
-
-                    pSubMenu->addMenu(pSubSubMenu);
-                }
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        contextMenu.addSeparator();
-
-        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
-        {
-            {
-                QMenu* pSubMenu = new QMenu("UML settings", this);
-                pSubMenu->setToolTipsVisible(true);
-
-                {
-                    QAction* pAction = new QAction("Select all UML items", this);
-                    pAction->setToolTip(tr("Same as Ctrl+A, then Space"));
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        selectAllUMLItems(true);
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Unselect all UML items", this);
-                    pAction->setToolTip(tr("Same as Ctrl+A then Space"));
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        selectAllUMLItems(false);
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                pSubMenu->addSeparator();
-
-                {
-                    QAction* pAction = new QAction("Find previous UML item", this);
-                    pAction->setShortcut(QKeySequence(tr("Alt+Up")));
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        switchToNextUMLItem(false);
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Find next UML item", this);
-                    pAction->setShortcut(QKeySequence(tr("Alt+Down")));
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        switchToNextUMLItem(true);
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                contextMenu.addMenu(pSubMenu);
-            }
-
-            contextMenu.addSeparator();
-        }
-
-        contextMenu.addSeparator();
-
-        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
-        {
-            {
-                QMenu* pSubMenu = new QMenu("Font settings", this);
-                pSubMenu->setToolTipsVisible(true);
-
-                {
-                    QAction* pAction = new QAction("Select font ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
-                    {
-                        bool ok;
-                        QFont selectedFont = QFontDialog::getFont(&ok, font(), this);
-                        if (ok)
-                        {
-                            CSettingsManager::getInstance()->setFont_SearchView( selectedFont );
-                        }
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                contextMenu.addMenu(pSubMenu);
-            }
-
-            contextMenu.addSeparator();
-        }
-
-        contextMenu.exec(mapToGlobal(pos));
-    };
-
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [this](bool)
-    {
-        updateColumnsVisibility();
-    });
-
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::font_SearchViewChanged, [this](const QFont& font)
-    {
-        setFont(font);
-
-        QFontMetrics fontMetrics( font );
-        verticalHeader()->setDefaultSectionSize(fontMetrics.height());
-        forceUpdateWidthAndResetContentMap();
-    });
-
     connect(this, &QTableView::clicked, [this](const QModelIndex &index)
     {
         if(false == index.isValid())
@@ -683,27 +58,6 @@ CSearchResultView::CSearchResultView(QWidget *parent):
                 mpSpecificModel->setUML_Applicability(index, !siblingIdx.data(Qt::CheckStateRole).value<bool>());
             }
         }
-    });
-
-    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
-
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [this]()
-    {
-        restartSearch();
-    });
-
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::searchResultColumnsVisibilityMapChanged,
-             [this](const tSearchResultColumnsVisibilityMap&)
-    {
-        updateColumnsVisibility();
-    });
-
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::searchViewLastColumnWidthStrategyChanged,
-             [this](const int&)
-    {
-        forceUpdateWidthAndResetContentMap();
     });
 }
 
@@ -919,7 +273,7 @@ void CSearchResultView::updateWidth(bool force, tUpdateWidthSet updateWidthSet)
 
     auto widthWithoutLastVisible = updateAllColumnsExceptLastVisibleOne();
 
-    const auto searchViewLastColumnWidthStrategy = static_cast<eSearchViewLastColumnWidthStrategy>(CSettingsManager::getInstance()->getSearchViewLastColumnWidthStrategy());
+    const auto searchViewLastColumnWidthStrategy = static_cast<eSearchViewLastColumnWidthStrategy>(getSettingsManager()->getSearchViewLastColumnWidthStrategy());
 
     switch(searchViewLastColumnWidthStrategy)
     {
@@ -1047,7 +401,7 @@ void CSearchResultView::updateWidthLogic(const int& rowFrom, const int& rowTo)
 
 void CSearchResultView::updateColumnsVisibility()
 {
-    const tSearchResultColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getSearchResultColumnsVisibilityMap();
+    const tSearchResultColumnsVisibilityMap& visibilityMap = getSettingsManager()->getSearchResultColumnsVisibilityMap();
 
     for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
          i < static_cast<int>(eSearchResultColumn::Last);
@@ -1060,7 +414,7 @@ void CSearchResultView::updateColumnsVisibility()
             if(true == foundColumn.value()) // if column is visible
             {
                 if(i != static_cast<int>(eSearchResultColumn::UML_Applicability) ||
-                  ((i == static_cast<int>(eSearchResultColumn::UML_Applicability) && (true == CSettingsManager::getInstance()->getUML_FeatureActive() ) ) ) )
+                  ((i == static_cast<int>(eSearchResultColumn::UML_Applicability) && (true == getSettingsManager()->getUML_FeatureActive() ) ) ) )
                 {
                     showColumn(i);
 
@@ -1107,7 +461,7 @@ void CSearchResultView::setModel(QAbstractItemModel *model)
 
     {
         //restore font from persistency
-        const auto& usedFont = CSettingsManager::getInstance()->getFont_SearchView();
+        const auto& usedFont = getSettingsManager()->getFont_SearchView();
         setFont(usedFont);
         verticalHeader->resizeSections(QHeaderView::Fixed);
         QFontMetrics fontMetrics( usedFont );
@@ -1172,7 +526,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
     copyPasteColumns.reserve((static_cast<int>(eSearchResultColumn::Last)));
 
     {
-        const auto& copyPasteColumnsMap = CSettingsManager::getInstance()->getSearchResultColumnsCopyPasteMap();
+        const auto& copyPasteColumnsMap = getSettingsManager()->getSearchResultColumnsCopyPasteMap();
 
         int columnsCounter = 0;
         int copyPasteColumnsCounter = 0;
@@ -1204,11 +558,11 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
     for(const auto& index : sortedSelectedRows)
     {
-        auto getHighlightedColor = [](const tHighlightingRange& range)
+        auto getHighlightedColor = [this](const tHighlightingRange& range)
         {
             QColor result;
 
-            bool isMonoColorHighlighting = CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting();
+            bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
             bool isExplicitColor = range.explicitColor;
 
             if(true == isExplicitColor)
@@ -1219,7 +573,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
             {
                 if(true == isMonoColorHighlighting)
                 {
-                    result = CSettingsManager::getInstance()->getRegexMonoHighlightingColor();
+                    result = getSettingsManager()->getRegexMonoHighlightingColor();
                 }
                 else
                 {
@@ -1245,11 +599,11 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [&clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [this, &clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field
-                                                 && true == CSettingsManager::getInstance()->getMarkTimeStampWithBold() ) );
+                                                 && true == getSettingsManager()->getMarkTimeStampWithBold() ) );
 
                 QString subStr = columnStr.mid( range.from, range.to - range.from + 1 );
 
@@ -1398,7 +752,7 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     {
         if(hasFocus())
         {
-            copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), false );
+            copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), false );
         }
     }
     else if( ((event->modifiers() & Qt::ShiftModifier) != 0)
@@ -1407,7 +761,7 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     {
         if(hasFocus())
         {
-            copySelectionToClipboard( CSettingsManager::getInstance()->getCopySearchResultAsHTML(), true );
+            copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), true );
         }
     }
     else if(((event->modifiers() & Qt::ControlModifier) != 0
@@ -1424,7 +778,7 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     }
     else if(event->key() == Qt::Key::Key_Space)
     {
-        if(true == CSettingsManager::getInstance()->getUML_FeatureActive())
+        if(true == getSettingsManager()->getUML_FeatureActive())
         {
             if(nullptr != mpSpecificModel)
             {
@@ -1522,7 +876,7 @@ void CSearchResultView::copyMessageFiles()
 
 void CSearchResultView::switchToNextUMLItem(bool bNext)
 {
-    if(true == CSettingsManager::getInstance()->getUML_FeatureActive()) // if UML feature is active
+    if(true == getSettingsManager()->getUML_FeatureActive()) // if UML feature is active
     {
         auto selectedRows = selectionModel()->selectedRows();
 
@@ -1598,7 +952,7 @@ void CSearchResultView::switchToNextUMLItem(bool bNext)
 
 void CSearchResultView::selectAllUMLItems(bool select)
 {
-    if(true == CSettingsManager::getInstance()->getUML_FeatureActive()) // if UML feature is active
+    if(true == getSettingsManager()->getUML_FeatureActive()) // if UML feature is active
     {
         const auto iSize = model()->rowCount();
         for( int i = 0; i < iSize; ++i )
@@ -1633,6 +987,657 @@ void CSearchResultView::scrollTo(const QModelIndex &index, ScrollHint hint)
     {
         horizontalScrollBar()->setValue(scrollPosition);
     }
+}
+
+void CSearchResultView::handleSettingsManagerChange()
+{
+    auto pDelegate = new CSearchResultHighlightingDelegate(this);
+    pDelegate->setSettingsManager(getSettingsManager());
+    setItemDelegate(pDelegate);
+
+    auto showContextMenu = [this](const QPoint &pos)
+    {
+        QMenu contextMenu("Context menu", this);
+
+        {
+            QAction* pAction = new QAction("Copy", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), false );
+            });
+
+            if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        {
+            QAction* pAction = new QAction("Copy payload", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), true );
+            });
+
+            if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        {
+            QAction* pAction = new QAction("Select all", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+A")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                selectAll();
+            });
+
+            if(0 == model()->rowCount())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        if(model()->rowCount() > 0)
+        {
+            QAction* pAction = new QAction("Clear search results", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+Space")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                clearSearchResultsRequested();
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Copy as HTML", this);
+            connect(pAction, &QAction::triggered, [this](bool checked)
+            {
+                getSettingsManager()->setCopySearchResultAsHTML(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(getSettingsManager()->getCopySearchResultAsHTML());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        const auto* pSelectionModel = selectionModel();
+        auto selectedRows = pSelectionModel->selectedRows();
+        const int selectedRowsSize = selectedRows.size();
+
+        auto minSelectedRow = std::min_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+        auto maxSelectedRow = std::max_element( selectedRows.begin(), selectedRows.end(),
+                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+
+        {
+            QAction* pAction = new QAction("Monitor sub-files", this);
+            connect(pAction, &QAction::triggered, [this](bool checked)
+            {
+                getSettingsManager()->setSubFilesHandlingStatus(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(getSettingsManager()->getSubFilesHandlingStatus());
+            contextMenu.addAction(pAction);
+        }
+
+        {
+            if(nullptr != mpFile && true == mpFile->getSubFilesHandlingStatus())
+            {
+                if(selectedRowsSize >= 1)
+                {
+                    QString msg = QString("Copy file name(s)");
+
+                    QAction* pAction = new QAction(msg, this);
+                    pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+C")));
+                    connect(pAction, &QAction::triggered, [this, selectedRows]()
+                    {
+                        copyMessageFiles();
+                    });
+                    contextMenu.addAction(pAction);
+                }
+            }
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            if(nullptr != mpFile)
+            {
+                contextMenu.addSeparator();
+
+                QMenu* pSubMenu = new QMenu("Search range settings", this);
+
+                {
+                    QString msg = QString("Set search range ...");
+
+                    QAction* pAction = new QAction(msg, this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                       getUserSearchRange();
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+
+                if(selectedRowsSize >= 2)
+                {
+                    tMsgId from = minSelectedRow->sibling(minSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
+                    tMsgId to = maxSelectedRow->sibling(maxSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<tMsgId>();
+
+                    tIntRangeProperty prop;
+                    prop.isSet = true;
+                    prop.from = from;
+                    prop.to = ( to >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : to;
+                    prop = mpFile->normalizeSearchRange( prop );
+
+                    QString msg = QString("Lock search range from id %1 to id %2").arg(prop.from).arg(prop.to);
+
+                    QAction* pAction = new QAction(msg, this);
+                    connect(pAction, &QAction::triggered, [this, prop]()
+                    {
+                        mSearchRange = prop;
+                        searchRangeChanged( mSearchRange, false );
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+                else if(selectedRowsSize == 1)
+                {
+                    auto pSelectedRow = selectedRows.begin();
+                    tMsgId targetMsgId = pSelectedRow->sibling(pSelectedRow->row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
+
+                    {
+                        QString msg = QString("Search \"starting from\" id %1").arg(targetMsgId);
+
+                        QAction* pAction = new QAction(msg, this);
+                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
+                        {
+                            tIntRangeProperty prop;
+                            prop.isSet = true;
+                            prop.from = targetMsgId;
+
+                            if( mSearchRange.to >= mpFile->sizeNonFiltered() - 1 )
+                            {
+                                prop.to = mpFile->sizeNonFiltered() - 1;
+                            }
+                            else
+                            {
+                                if(mSearchRange.to > 0)
+                                {
+                                    prop.to = mSearchRange.to;
+                                }
+                                else
+                                {
+                                    prop.to = mpFile->sizeNonFiltered() - 1;
+                                }
+                            }
+
+                            prop = mpFile->normalizeSearchRange( prop );
+
+                            mSearchRange = prop;
+                            searchRangeChanged( mSearchRange, false );
+                        });
+                        pSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QString msg = QString("Search \"up to\" id %1").arg(targetMsgId);
+
+                        QAction* pAction = new QAction(msg, this);
+                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
+                        {
+                            tIntRangeProperty prop;
+                            prop.isSet = true;
+                            prop.from = mSearchRange.from;
+                            prop.to = ( targetMsgId >= mpFile->sizeNonFiltered() - 1 ) ? mpFile->sizeNonFiltered() - 1 : targetMsgId;
+                            prop = mpFile->normalizeSearchRange( prop );
+
+                            mSearchRange = prop;
+                            searchRangeChanged( mSearchRange, false );
+                        });
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+
+                {
+                    pSubMenu->addSeparator();
+
+                    if(true == mSearchRange.isSet)
+                    {
+                        QString msg = QString("(*) Remove lock on search range from id %1 to id %2").arg( mSearchRange.from ).arg( mSearchRange.to );
+
+                        QAction* pAction = new QAction(msg, this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            mSearchRange = tIntRangeProperty();
+                            searchRangeChanged( mSearchRange, true );
+                        });
+                        pSubMenu->addAction(pAction);
+                    }
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Columns settings", this);
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Visible columns", this);
+
+                {
+                    const auto& searchResultColumnsVisibilityMap =
+                            getSettingsManager()->getSearchResultColumnsVisibilityMap();
+
+                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
+                         i < static_cast<int>(eSearchResultColumn::Last);
+                         ++i)
+                    {
+                        auto foundItem = searchResultColumnsVisibilityMap.find(static_cast<eSearchResultColumn>(i));
+
+                        if(foundItem != searchResultColumnsVisibilityMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            {
+                                auto searchResultColumnsVisibilityMapInner =
+                                        getSettingsManager()->getSearchResultColumnsVisibilityMap();
+
+                                auto foundItemInner = searchResultColumnsVisibilityMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                                if(foundItemInner != searchResultColumnsVisibilityMapInner.end()) // if item is in the map
+                                {
+                                    foundItemInner.value() = checked; // let's update visibility value
+                                    getSettingsManager()->setSearchResultColumnsVisibilityMap(searchResultColumnsVisibilityMapInner);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+
+                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                            && false == getSettingsManager()->getUML_FeatureActive())
+                            {
+                                pAction->setEnabled(false);
+                            }
+
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset visible columns", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    getSettingsManager()->resetSearchResultColumnsVisibilityMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Copy columns", this);
+
+                {
+                    const auto& searchResultColumnsCopyPasteMap =
+                            getSettingsManager()->getSearchResultColumnsCopyPasteMap();
+
+                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
+                         i < static_cast<int>(eSearchResultColumn::Last);
+                         ++i)
+                    {
+                        auto foundItem = searchResultColumnsCopyPasteMap.find(static_cast<eSearchResultColumn>(i));
+
+                        if(foundItem != searchResultColumnsCopyPasteMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            {
+                                auto searchResultColumnsCopyPasteMapInner =
+                                        getSettingsManager()->getSearchResultColumnsCopyPasteMap();
+
+                                auto foundItemInner = searchResultColumnsCopyPasteMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                                if(foundItemInner != searchResultColumnsCopyPasteMapInner.end()) // if item is in the map
+                                {
+                                    foundItemInner.value() = checked; // let's update copy paste value
+                                    getSettingsManager()->setSearchResultColumnsCopyPasteMap(searchResultColumnsCopyPasteMapInner);
+                                }
+                            });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+
+                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                            && false == getSettingsManager()->getUML_FeatureActive())
+                            {
+                                pAction->setEnabled(false);
+                            }
+
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset copy columns", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    getSettingsManager()->resetSearchResultColumnsCopyPasteMap();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
+                QMenu* pSubSubMenu = new QMenu("Last column width policy", this);
+
+                QActionGroup* pActionGroup = new QActionGroup(this);
+                pActionGroup->setExclusive(true);
+
+                for(int i = static_cast<int>(eSearchViewLastColumnWidthStrategy::eReset);
+                    i < static_cast<int>(eSearchViewLastColumnWidthStrategy::eLast);
+                    i++)
+                {
+                    QAction* pAction = new QAction(getPayloadWidthAsString(static_cast<eSearchViewLastColumnWidthStrategy>(i)), this);
+                    connect(pAction, &QAction::triggered, [this, i]()
+                    {
+                        getSettingsManager()->setSearchViewLastColumnWidthStrategy(i);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getSearchViewLastColumnWidthStrategy() == i);
+
+                    pSubSubMenu->addAction(pAction);
+                    pActionGroup->addAction(pAction);
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+
+            pSubMenu->addSeparator();
+
+            {
+                QAction* pAction = new QAction("Mark timestamp with bold", this);
+                connect(pAction, &QAction::triggered, [this](bool checked)
+                {
+                    getSettingsManager()->setMarkTimeStampWithBold(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(getSettingsManager()->getMarkTimeStampWithBold());
+                pSubMenu->addAction(pAction);
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("Highlighting settings", this);
+
+            {
+                QAction* pAction = new QAction("Highlight with single color", this);
+                connect(pAction, &QAction::triggered, [this](bool checked)
+                {
+                    getSettingsManager()->setSearchResultMonoColorHighlighting(checked);
+                });
+                pAction->setCheckable(true);
+                pAction->setChecked(getSettingsManager()->getSearchResultMonoColorHighlighting());
+                pSubMenu->addAction(pAction);
+            }
+
+            if(true == getSettingsManager()->getSearchResultMonoColorHighlighting())
+            {
+                {
+                    QAction* pAction = new QAction("Highlighting color ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        QColor color = QColorDialog::getColor( getSettingsManager()->getRegexMonoHighlightingColor(), this );
+                        if( color.isValid() )
+                        {
+                            getSettingsManager()->setRegexMonoHighlightingColor(color);
+                        }
+                    });
+                    pSubMenu->addAction(pAction);
+                }
+
+                pSubMenu->addSeparator();
+            }
+            else
+            {
+                {
+                    QMenu* pSubSubMenu = new QMenu("Gradient highlighting", this);
+
+                    {
+                        QAction* pAction = new QAction("Set \"from\" color ...", this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            const auto& currentGradientValue = getSettingsManager()->getSearchResultHighlightingGradient();
+
+                            QColor color = QColorDialog::getColor( currentGradientValue.from, this );
+                            if( color.isValid() )
+                            {
+                                getSettingsManager()->
+                                setSearchResultHighlightingGradient( tHighlightingGradient( color, currentGradientValue.to, currentGradientValue.numberOfColors ) );
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Set \"to\" color ...", this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            const auto& currentGradientValue = getSettingsManager()->getSearchResultHighlightingGradient();
+
+                            QColor color = QColorDialog::getColor( currentGradientValue.to, this );
+                            if( color.isValid() )
+                            {
+                                getSettingsManager()->
+                                setSearchResultHighlightingGradient( tHighlightingGradient( currentGradientValue.from, color, currentGradientValue.numberOfColors ) );
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        const auto& currentGradientValue = getSettingsManager()->getSearchResultHighlightingGradient();
+                        QString msg = QString("Set number of colors ( cur. val. - %1 ) ...").arg(currentGradientValue.numberOfColors);
+
+                        QAction* pAction = new QAction(msg, this);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            bool ok;
+
+                            const auto& currentGradientValue_ = getSettingsManager()->getSearchResultHighlightingGradient();
+
+                            QString numberOfColorsStr = QInputDialog::getText(  nullptr, "Set number of gradient colors",
+                                       "Provide number of gradient colors ( from 2 to 100 ):",
+                                       QLineEdit::Normal,
+                                       QString::number(currentGradientValue_.numberOfColors), &ok );
+
+                            if(true == ok)
+                            {
+                                auto numberOfColors = numberOfColorsStr.toInt(&ok);
+
+                                if(true == ok)
+                                {
+                                    if(numberOfColors < 2)
+                                    {
+                                        numberOfColors = 2;
+                                    }
+                                    else if( numberOfColors > 100 )
+                                    {
+                                        numberOfColors = 100;
+                                    }
+
+                                    getSettingsManager()->
+                                            setSearchResultHighlightingGradient(
+                                                tHighlightingGradient(
+                                                    currentGradientValue_.from, currentGradientValue_.to, numberOfColors
+                                                    ));
+                                }
+                            }
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.addSeparator();
+
+        if(true == getSettingsManager()->getUML_FeatureActive())
+        {
+            {
+                QMenu* pSubMenu = new QMenu("UML settings", this);
+                pSubMenu->setToolTipsVisible(true);
+
+                {
+                    QAction* pAction = new QAction("Select all UML items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A, then Space"));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        selectAllUMLItems(true);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Unselect all UML items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A then Space"));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        selectAllUMLItems(false);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                pSubMenu->addSeparator();
+
+                {
+                    QAction* pAction = new QAction("Find previous UML item", this);
+                    pAction->setShortcut(QKeySequence(tr("Alt+Up")));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        switchToNextUMLItem(false);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Find next UML item", this);
+                    pAction->setShortcut(QKeySequence(tr("Alt+Down")));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        switchToNextUMLItem(true);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
+        }
+
+        contextMenu.addSeparator();
+
+        if(true == getSettingsManager()->getUML_FeatureActive())
+        {
+            {
+                QMenu* pSubMenu = new QMenu("Font settings", this);
+                pSubMenu->setToolTipsVisible(true);
+
+                {
+                    QAction* pAction = new QAction("Select font ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        bool ok;
+                        QFont selectedFont = QFontDialog::getFont(&ok, font(), this);
+                        if (ok)
+                        {
+                            getSettingsManager()->setFont_SearchView( selectedFont );
+                        }
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
+        }
+
+        contextMenu.exec(mapToGlobal(pos));
+    };
+
+    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
+
+    connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [this](bool)
+    {
+        updateColumnsVisibility();
+    });
+
+    connect(getSettingsManager().get(), &ISettingsManager::font_SearchViewChanged, [this](const QFont& font)
+    {
+        setFont(font);
+
+        QFontMetrics fontMetrics( font );
+        verticalHeader()->setDefaultSectionSize(fontMetrics.height());
+        forceUpdateWidthAndResetContentMap();
+    });
+
+    connect( getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [this]()
+    {
+        restartSearch();
+    });
+
+    connect( getSettingsManager().get(),
+             &ISettingsManager::searchResultColumnsVisibilityMapChanged,
+             [this](const tSearchResultColumnsVisibilityMap&)
+    {
+        updateColumnsVisibility();
+    });
+
+    connect( getSettingsManager().get(),
+             &ISettingsManager::searchViewLastColumnWidthStrategyChanged,
+             [this](const int&)
+    {
+        forceUpdateWidthAndResetContentMap();
+    });
 }
 
 PUML_PACKAGE_BEGIN(DMA_SearchView_API)

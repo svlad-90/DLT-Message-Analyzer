@@ -4,8 +4,7 @@
  * @brief   Declaration of the DLTMessageAnalyzerPlugin class
  */
 
-#ifndef DLTMESSAGEANALYZERPLUGIN_H
-#define DLTMESSAGEANALYZERPLUGIN_H
+#pragma once
 
 #include "memory"
 
@@ -32,6 +31,7 @@ class CFiltersViewComponent;
 class CUMLViewComponent;
 class CLogoComponent;
 class CLogsWrapperComponent;
+class CSettingsComponent;
 
 namespace DMA
 {
@@ -147,10 +147,9 @@ private: // members
     std::shared_ptr<CUMLViewComponent> mpUMLViewComponent;
     std::shared_ptr<CLogoComponent> mpLogoComponent;
     std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
+    std::shared_ptr<CSettingsComponent> mpSettingsComponent;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;
 #endif
 };
-
-#endif // DLTMESSAGEANALYZERPLUGIN_H

@@ -29,7 +29,8 @@ Q_DECLARE_METATYPE(tWorkerId)
 static const int CHUNK_SIZE = 4000;
 
 //CMTAnalyzer
-CMTAnalyzer::CMTAnalyzer():
+CMTAnalyzer::CMTAnalyzer(const tSettingsManagerPtr& pSettingsManagerPtr):
+CSettingsManagerClient(pSettingsManagerPtr),
 mWorkerItemMap(),
 mRequestIdCounter( static_cast<uint64_t>(-1) )
 {
@@ -40,7 +41,7 @@ mRequestIdCounter( static_cast<uint64_t>(-1) )
 
     for(int i = 0; i < threadsNumber; ++i )
     {
-        CDLTRegexAnalyzerWorker* pWorker = new CDLTRegexAnalyzerWorker();
+        CDLTRegexAnalyzerWorker* pWorker = new CDLTRegexAnalyzerWorker(getSettingsManager());
 
         // instance of CDLTRegexAnalyzerWorker, located in QThread will send updates to CMTAnalyzer
         connect(pWorker, &CDLTRegexAnalyzerWorker::portionAnalysisFinished, this, &CMTAnalyzer::portionRegexAnalysisFinished, Qt::QueuedConnection);
@@ -467,6 +468,7 @@ CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzer
 PUML_PACKAGE_BEGIN(DMA_Analyzer)
     PUML_CLASS_BEGIN_CHECKED(CMTAnalyzer)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerController, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QThread, 1, *, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CDLTRegexAnalyzerWorker, 1, *, contains)
     PUML_CLASS_END()

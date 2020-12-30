@@ -51,6 +51,15 @@ class "Ui::Form"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -65,7 +74,9 @@ class "QWidget"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CUMLView : extends
 QWidget <|-- CUMLView : extends
+CSettingsManagerClient <|-- CUMLViewComponent : extends
 DMA::IComponent <|-- CUMLViewComponent : implements
 
 '====================Dependencies section====================

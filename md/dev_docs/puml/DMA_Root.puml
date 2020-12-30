@@ -261,6 +261,19 @@ class "ISearchResultModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+class "ISettingsManager"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -275,11 +288,13 @@ class "QWidget"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
 QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
 QObject <|-- DLTMessageAnalyzerPlugin : extends
+CSettingsManagerClient <|-- Form : extends
 QWidget <|-- Form : extends
 
 '====================Dependencies section====================
@@ -296,6 +311,7 @@ CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses
 CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
 CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
+CDLTMessageAnalyzer "1" o-- "1" ISettingsManager : gets and uses
 CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
 CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains

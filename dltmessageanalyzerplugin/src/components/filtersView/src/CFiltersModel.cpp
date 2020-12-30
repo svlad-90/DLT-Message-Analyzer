@@ -12,15 +12,17 @@
 #include "QElapsedTimer"
 #endif
 
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "CFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "common/PCRE/PCREHelper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
-CFiltersModel::CFiltersModel(QObject *parent)
+CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                             QObject *parent)
     : IFiltersModel(parent),
+      CSettingsManagerClient(pSettingsManagerPtr),
       mRegex(),
       mSortingColumn(eRegexFiltersColumn::Index),
       mSortOrder(Qt::SortOrder::AscendingOrder),
@@ -124,7 +126,7 @@ CFiltersModel::CFiltersModel(QObject *parent)
         return result;
     };
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::filterVariablesChanged,
+    connect(getSettingsManager().get(), &ISettingsManager::filterVariablesChanged,
     [this](bool)
     {
         filterRegexTokensInternal();
@@ -548,7 +550,7 @@ void CFiltersModel::filterRegexTokensInternal()
 
     //time.start();
 
-    bool bFilterVariables = CSettingsManager::getInstance()->getFilterVariables();
+    bool bFilterVariables = getSettingsManager()->getFilterVariables();
 
     if(nullptr != mpRootItem)
     {
@@ -771,13 +773,13 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
 
         for(const auto& completionItem : foundCompletionSet->second)
         {
-            auto caseSensitiveOption = CSettingsManager::getInstance()->getFiltersCompletion_CaseSensitive() ?
+            auto caseSensitiveOption = getSettingsManager()->getFiltersCompletion_CaseSensitive() ?
                         Qt::CaseSensitive :
                         Qt::CaseInsensitive;
 
             bool bStringFound = false;
 
-            if(false == CSettingsManager::getInstance()->getFiltersCompletion_SearchPolicy())
+            if(false == getSettingsManager()->getFiltersCompletion_SearchPolicy())
             {
                 bStringFound = completionItem.pString->startsWith(input, caseSensitiveOption);
             }
@@ -805,6 +807,7 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
 PUML_PACKAGE_BEGIN(DMA_FiltersView)
     PUML_CLASS_BEGIN_CHECKED(CFiltersModel)
         PUML_INHERITANCE_CHECKED(IFiltersModel, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

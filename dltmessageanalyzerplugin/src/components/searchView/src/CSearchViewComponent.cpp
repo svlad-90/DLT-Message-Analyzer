@@ -9,7 +9,9 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CSearchViewComponent::CSearchViewComponent( CSearchResultView* pSearchResultView ):
+CSearchViewComponent::CSearchViewComponent( CSearchResultView* pSearchResultView,
+                                            const tSettingsManagerPtr& pSettingsManagerPtr ):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpSearchResultModel(nullptr),
 mpSearchResultView(pSearchResultView),
 mpSearchViewTableJumper(nullptr)
@@ -35,9 +37,11 @@ DMA::tSyncInitOperationResult CSearchViewComponent::init()
     {        
         if(nullptr != mpSearchResultView)
         {
-            auto pSearchResultModel = std::make_shared<CSearchResultModel>();
+            auto pSearchResultModel = std::make_shared<CSearchResultModel>(getSettingsManager());
 
             mpSearchViewTableJumper = std::make_shared<CTableMemoryJumper>(mpSearchResultView);
+
+            mpSearchResultView->setSettingsManager(getSettingsManager());
 
             if(nullptr != pSearchResultModel)
             {
@@ -110,6 +114,7 @@ PUML_PACKAGE_BEGIN(DMA_SearchView_API)
     PUML_CLASS_BEGIN(CSearchViewComponent)
         PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, contains)
         PUML_USE_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, using to create ISearchResultModel)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)

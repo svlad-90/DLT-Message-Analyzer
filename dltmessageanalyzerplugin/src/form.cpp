@@ -20,7 +20,7 @@
 #include "QDialogButtonBox"
 #include "QDesktopServices"
 
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "common/CBGColorAnimation.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
 #include "components/log/api/CLog.hpp"
@@ -30,8 +30,11 @@
 
 #include "DMA_Plantuml.hpp"
 
-Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent) :
+Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
+           const tSettingsManagerPtr& pSettingsManager,
+           QWidget *parent) :
     QWidget(parent),
+    CSettingsManagerClient(pSettingsManager),
     mpUI(new Ui::Form),
     mpDLTMessageAnalyzerPlugin(pDLTMessageAnalyzerPlugin),
     mSavedSplitterSizes(),
@@ -133,12 +136,12 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
         {
             QAction* pAction = new QAction("Write settings on each update", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
+            connect(pAction, &QAction::triggered, [this](bool checked)
             {
-                CSettingsManager::getInstance()->setWriteSettingsOnEachUpdate(checked);
+                getSettingsManager()->setWriteSettingsOnEachUpdate(checked);
             });
             pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getWriteSettingsOnEachUpdate());
+            pAction->setChecked(getSettingsManager()->getWriteSettingsOnEachUpdate());
             contextMenu.addAction(pAction);
         }
 
@@ -146,19 +149,19 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
         {
             QAction* pAction = new QAction("Enable cache", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
+            connect(pAction, &QAction::triggered, [this](bool checked)
             {
-                CSettingsManager::getInstance()->setCacheEnabled(checked);
+                getSettingsManager()->setCacheEnabled(checked);
             });
             pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getCacheEnabled());
+            pAction->setChecked(getSettingsManager()->getCacheEnabled());
             contextMenu.addAction(pAction);
         }
 
         {
-            if(true == CSettingsManager::getInstance()->getCacheEnabled())
+            if(true == getSettingsManager()->getCacheEnabled())
             {
-                QString msg = QString("Set cache size (cur. value - %1 Mb) ...").arg(CSettingsManager::getInstance()->getCacheMaxSizeMB());
+                QString msg = QString("Set cache size (cur. value - %1 Mb) ...").arg(getSettingsManager()->getCacheMaxSizeMB());
 
                 QAction* pAction = new QAction(msg, this);
                 connect(pAction, &QAction::triggered, [this]()
@@ -172,7 +175,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
                         bool bInputSuccess = getRangedArithmeticValue<tCacheSizeMB>(inputVal,
                                                                                     0,
                                                                                     maxRAMSize,
-                                                                                    CSettingsManager::getInstance()->getCacheMaxSizeMB(),
+                                                                                    getSettingsManager()->getCacheMaxSizeMB(),
                                                                                     this,
                                                                                     "RAM cache size",
                                                                                     "RAM cache size",
@@ -183,7 +186,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
                         if(true == bInputSuccess)
                         {
-                            CSettingsManager::getInstance()->setCacheMaxSizeMB(inputVal);
+                            getSettingsManager()->setCacheMaxSizeMB(inputVal);
                         }
                     }
                 });
@@ -192,7 +195,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
         }
 
         {
-            if(true == CSettingsManager::getInstance()->getCacheEnabled())
+            if(true == getSettingsManager()->getCacheEnabled())
             {
                 QAction* pAction = new QAction("Reset cache ...", this);
                 connect(pAction, &QAction::triggered, [this]()
@@ -210,12 +213,12 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
         {
             QAction* pAction = new QAction("PlantUML", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
+            connect(pAction, &QAction::triggered, [this](bool checked)
             {
-                CSettingsManager::getInstance()->setUML_FeatureActive(checked);
+                getSettingsManager()->setUML_FeatureActive(checked);
             });
             pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getUML_FeatureActive());
+            pAction->setChecked(getSettingsManager()->getUML_FeatureActive());
             contextMenu.addAction(pAction);
         }
 
@@ -223,12 +226,12 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
         {
             QAction* pAction = new QAction("Open settings folder", this);
-            connect(pAction, &QAction::triggered, []()
+            connect(pAction, &QAction::triggered, [this]()
             {
                 SEND_MSG(QString("[Form]: Attempt to open path - \"%1\"")
-                         .arg(CSettingsManager::getInstance()->getSettingsFilepath()));
+                         .arg(getSettingsManager()->getSettingsFilepath()));
 
-                QDesktopServices::openUrl( QUrl::fromLocalFile( CSettingsManager::getInstance()->getSettingsFilepath() ) );
+                QDesktopServices::openUrl( QUrl::fromLocalFile( getSettingsManager()->getSettingsFilepath() ) );
             });
             contextMenu.addAction(pAction);
         }
@@ -237,12 +240,12 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
 
         {
             QAction* pAction = new QAction("RDP mode", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
+            connect(pAction, &QAction::triggered, [this](bool checked)
             {
-                CSettingsManager::getInstance()->setRDPMode(checked);
+                getSettingsManager()->setRDPMode(checked);
             });
             pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getRDPMode());
+            pAction->setChecked(getSettingsManager()->getRDPMode());
             contextMenu.addAction(pAction);
         }
 
@@ -257,7 +260,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
         {
             if(nullptr != mpDLTMessageAnalyzerPlugin)
             {
-                if(true == CSettingsManager::getInstance()->getMinimizePatternsViewOnSelection())
+                if(true == getSettingsManager()->getMinimizePatternsViewOnSelection())
                 {
                     hidePatternLogic(true);
                 }
@@ -301,9 +304,9 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin, QWidget *parent)
                     }
                 };
 
-                enableUMLWidget(CSettingsManager::getInstance()->getUML_FeatureActive());
+                enableUMLWidget(getSettingsManager()->getUML_FeatureActive());
 
-                connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_FeatureActiveChanged, [enableUMLWidget](bool val)
+                connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [enableUMLWidget](bool val)
                 {
                     enableUMLWidget(val);
                 });
@@ -791,6 +794,7 @@ void Form::on_createSequenceDiagram_clicked()
 PUML_PACKAGE_BEGIN(DMA_Root)
     PUML_CLASS_BEGIN_CHECKED(Form)
         PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(Ui::Form, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(DLTMessageAnalyzerPlugin, 1, 1, uses)
     PUML_CLASS_END()

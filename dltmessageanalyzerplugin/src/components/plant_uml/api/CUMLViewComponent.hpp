@@ -5,14 +5,18 @@
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CUMLView;
 class IUMLModel;
 
-class CUMLViewComponent : public DMA::IComponent
+class CUMLViewComponent : public DMA::IComponent,
+                          public CSettingsManagerClient
 {
 public:
 
-    CUMLViewComponent( CUMLView* pUMLView );
+    CUMLViewComponent( CUMLView* pUMLView,
+                       const tSettingsManagerPtr& pSettingsManagerPtr);
 
     CUMLView* getUMLView() const;
 

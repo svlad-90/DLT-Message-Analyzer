@@ -64,6 +64,15 @@ class "Ui::Form"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -83,7 +92,9 @@ class "QTreeView"
 
 '====================Inheritance section====================
 IFiltersModel <|-- CFiltersModel : implements
+CSettingsManagerClient <|-- CFiltersView : extends
 QTreeView <|-- CFiltersView : implements
+CSettingsManagerClient <|-- CFiltersViewComponent : extends
 DMA::IComponent <|-- CFiltersViewComponent : implements
 QAbstractItemModel <|-- IFiltersModel : implements
 

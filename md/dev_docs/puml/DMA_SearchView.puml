@@ -75,6 +75,15 @@ class "ISearchResultModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -89,7 +98,9 @@ class "QStyledItemDelegate"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
+CSettingsManagerClient <|-- CSearchResultModel : extends
 ISearchResultModel <|-- CSearchResultModel : implements
 QAbstractTableModel <|-- CSearchResultModel : implements
 

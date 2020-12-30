@@ -8,15 +8,16 @@
 
 #include "CSearchResultModel.hpp"
 #include "components/log/api/CLog.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/logsWrapper/api/IMsgWrapper.hpp"
 #include "components/logsWrapper/api/IFileWrapper.hpp"
 
 #include "DMA_Plantuml.hpp"
 
-CSearchResultModel::CSearchResultModel(QObject *):
-    mFoundMatchesPack(),
-    mpFile(nullptr)
+CSearchResultModel::CSearchResultModel(const tSettingsManagerPtr& pSettingsManagerPtr, QObject *):
+CSettingsManagerClient(pSettingsManagerPtr),
+mFoundMatchesPack(),
+mpFile(nullptr)
 {
 
 }
@@ -336,7 +337,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
     outputString.append("@startuml\n");
 
-    if(true == CSettingsManager::getInstance()->getUML_Autonumber())
+    if(true == getSettingsManager()->getUML_Autonumber())
     {
         outputString.append("autonumber\n");
     }
@@ -496,7 +497,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
             insertMethodFormattingRange.to = subStr.size();
             subStr.append("(");
 
-            if(true == CSettingsManager::getInstance()->getUML_ShowArguments())
+            if(true == getSettingsManager()->getUML_ShowArguments())
             {
                 appendUMLData(eUML_ID::UML_ARGUMENTS);
             }
@@ -511,7 +512,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
             // wrapping logic
             {
-                if(true == CSettingsManager::getInstance()->getUML_WrapOutput())
+                if(true == getSettingsManager()->getUML_WrapOutput())
                 {
                     const int insertNewLineRange = 100;
 
@@ -551,7 +552,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
             ++numberOfRows;
 
-            const auto& maxRowsNumber = CSettingsManager::getInstance()->getUML_MaxNumberOfRowsInDiagram();
+            const auto& maxRowsNumber = getSettingsManager()->getUML_MaxNumberOfRowsInDiagram();
 
             // if we've reached the limit
             if(numberOfRows >= maxRowsNumber)
@@ -588,6 +589,7 @@ PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultModel)
         PUML_INHERITANCE_CHECKED(QAbstractTableModel, implements)
         PUML_INHERITANCE_CHECKED(ISearchResultModel, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

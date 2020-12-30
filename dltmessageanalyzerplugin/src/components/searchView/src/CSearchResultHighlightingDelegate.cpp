@@ -11,7 +11,7 @@
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "common/Definitions.hpp"
 #include "CSearchResultModel.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -22,15 +22,10 @@
 #include <QElapsedTimer>
 #endif
 
-CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate():
-mbMarkTimestampWithBold(CSettingsManager::getInstance()->getMarkTimeStampWithBold())
+CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate(QObject *parent):
+QStyledItemDelegate(parent),
+mbMarkTimestampWithBold(false)
 {
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::markTimeStampWithBoldChanged,
-             [this](bool val)
-    {
-        mbMarkTimestampWithBold = val;
-    });
 }
 
 CSearchResultHighlightingDelegate::~CSearchResultHighlightingDelegate()
@@ -113,7 +108,9 @@ static void collectDrawData(const QString& inputStr,
                             tDrawDataPack& drawDataPack,
                             const QStyleOptionViewItem &option,
                             const tHighlightingRange& range,
-                            bool isHighlighted)
+                            bool isHighlighted,
+                            bool isMonoColorHighlighting,
+                            const QColor& regexMonoHighlightingColor)
 {
     tDrawData drawData;
 
@@ -142,7 +139,6 @@ static void collectDrawData(const QString& inputStr,
 
         if(true == isHighlighted)
         {
-            bool isMonoColorHighlighting = CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting();
             bool isExplicitColor = range.explicitColor;
 
             if(true == isExplicitColor)
@@ -153,7 +149,7 @@ static void collectDrawData(const QString& inputStr,
             {
                 if(true == isMonoColorHighlighting)
                 {
-                    drawData.color = CSettingsManager::getInstance()->getRegexMonoHighlightingColor();
+                    drawData.color = regexMonoHighlightingColor;
                 }
                 else
                 {
@@ -258,7 +254,9 @@ static void drawText( const tDrawDataPack& drawDataPack,
 static void collectDrawDataPack(const QString& inputStr,
                                 const tHighlightingRangeSet& highlightingData,
                                 tDrawDataPack& drawDataPack,
-                                const QStyleOptionViewItem& option)
+                                const QStyleOptionViewItem& option,
+                                bool isMonoColorHighlighting,
+                                const QColor& regexMonoHighlightingColor)
 {
     if (option.state & QStyle::State_Selected)
     {
@@ -278,14 +276,18 @@ static void collectDrawDataPack(const QString& inputStr,
                                  drawDataPack,
                                  option,
                                  tHighlightingRange(0, range.from - 1, range.color, range.explicitColor),
-                                 false );
+                                 false,
+                                 isMonoColorHighlighting,
+                                 regexMonoHighlightingColor);
             }
 
             collectDrawData( inputStr,
                              drawDataPack,
                              option,
                              tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
-                             true );
+                             true,
+                             isMonoColorHighlighting,
+                             regexMonoHighlightingColor );
         }
         else if(0 < i)
         {
@@ -299,14 +301,18 @@ static void collectDrawDataPack(const QString& inputStr,
                                  drawDataPack,
                                  option,
                                  tHighlightingRange(prevRange.to + 1, range.from - 1, range.color, range.explicitColor),
-                                 false );
+                                 false,
+                                 isMonoColorHighlighting,
+                                 regexMonoHighlightingColor );
             }
 
             collectDrawData( inputStr,
                              drawDataPack,
                              option,
                              tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
-                             true );
+                             true,
+                             isMonoColorHighlighting,
+                             regexMonoHighlightingColor );
         }
 
         if(i == static_cast<int>(highlightingData.size() - 1)) // last element
@@ -317,7 +323,9 @@ static void collectDrawDataPack(const QString& inputStr,
                                  drawDataPack,
                                  option,
                                  tHighlightingRange(range.to + 1, inputStr.size() - 1, range.color, range.explicitColor),
-                                 false );
+                                 false,
+                                 isMonoColorHighlighting,
+                                 regexMonoHighlightingColor );
             }
         }
 
@@ -329,7 +337,9 @@ static void drawHighlightedText(eSearchResultColumn field,
                     const tFoundMatchesPackItem& foundMatchPackItem,
                     const QString& inputStr,
                     QPainter *painter,
-                    const QStyleOptionViewItem& option)
+                    const QStyleOptionViewItem& option,
+                    bool isMonoColorHighlighting,
+                    const QColor& regexMonoHighlightingColor)
 {
     tDrawDataPack drawDataPack;
 
@@ -352,7 +362,9 @@ static void drawHighlightedText(eSearchResultColumn field,
             collectDrawDataPack(inputStr,
                                 highlightingData,
                                 drawDataPack,
-                                option);
+                                option,
+                                isMonoColorHighlighting,
+                                regexMonoHighlightingColor);
 
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             SEND_MSG(QString("collectDrawData - %1").arg(timer.elapsed()));
@@ -434,7 +446,16 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
                          .arg(index.column()));
 #endif
                 const auto& matchData = pModel->getFoundMatchesItemPack(index);
-                drawHighlightedText(field, matchData, stringData, painter, opt);
+
+                bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
+                const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
+
+                drawHighlightedText(field,
+                                    matchData,
+                                    stringData,
+                                    painter, opt,
+                                    isMonoColorHighlighting,
+                                    regexMonoHighlightingColor);
 #ifdef DEBUG_CSearchResultHighlightingDelegate
                 SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(end:<index:row-%2:col-%3>): took %1 ms")
                          .arg(elapsedTimer.elapsed())
@@ -524,10 +545,15 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
                     {
                         auto inputStr = pModel->data(index, Qt::DisplayRole).value<QString>();
 
+                        bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
+                        const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
+
                         collectDrawDataPack(inputStr,
                                             highlightingData,
                                             drawDataPack,
-                                            option);
+                                            option,
+                                            isMonoColorHighlighting,
+                                            regexMonoHighlightingColor);
 
                         int shift = calculateShifts(drawDataPack, option);
 
@@ -567,9 +593,22 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
     return result;
 }
 
+void CSearchResultHighlightingDelegate::handleSettingsManagerChange()
+{
+    mbMarkTimestampWithBold = getSettingsManager()->getMarkTimeStampWithBold();
+
+    connect( getSettingsManager().get(),
+             &ISettingsManager::markTimeStampWithBoldChanged,
+             [this](bool val)
+    {
+        mbMarkTimestampWithBold = val;
+    });
+}
+
 PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultHighlightingDelegate)
         PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

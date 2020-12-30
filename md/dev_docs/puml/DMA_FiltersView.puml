@@ -47,6 +47,15 @@ class "IFiltersModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -65,7 +74,9 @@ class "QTreeView"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CFilterItemDelegate : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
+CSettingsManagerClient <|-- CFiltersModel : extends
 IFiltersModel <|-- CFiltersModel : implements
 
 '====================Dependencies section====================

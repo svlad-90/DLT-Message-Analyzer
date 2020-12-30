@@ -5,14 +5,17 @@
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CFiltersView;
 class IFiltersModel;
 
-class CFiltersViewComponent : public DMA::IComponent
+class CFiltersViewComponent : public DMA::IComponent, CSettingsManagerClient
 {
 public:
 
-    CFiltersViewComponent( CFiltersView* pFiltersView );
+    CFiltersViewComponent( CFiltersView* pFiltersView,
+                           const tSettingsManagerPtr& pSettingsManagerPtr );
 
     CFiltersView* getFiltersView() const;
 
