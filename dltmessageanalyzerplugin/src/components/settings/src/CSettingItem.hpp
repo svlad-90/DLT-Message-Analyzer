@@ -1,5 +1,4 @@
-#ifndef CSETTINGITEM_HPP
-#define CSETTINGITEM_HPP
+#pragma once
 
 #include "ISettingItem.hpp"
 
@@ -31,5 +30,3 @@ public:
     QString mKey;
     tUpdateSettingsFileFunc mUpdateFielFunc;
 };
-
-#endif // CSETTINGITEM_HPP

@@ -41,7 +41,8 @@ protected:
                                const int& numberOfMessages,
                                const QRegularExpression& regex,
                                const int& numberOfThreads,
-                               bool isContinuous );
+                               bool isContinuous,
+                               bool bUMLFeatureActive );
     void cancelRequest( const tRequestId& requestId );
 
 protected: // fields

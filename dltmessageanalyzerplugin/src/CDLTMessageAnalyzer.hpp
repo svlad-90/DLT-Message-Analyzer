@@ -4,8 +4,7 @@
  * @brief   Definition of the CDLTMessageAnalyzer class
  */
 
-#ifndef CDLTMESSAGEANALYZER_HPP
-#define CDLTMESSAGEANALYZER_HPP
+#pragma once
 
 #include "memory"
 
@@ -24,6 +23,7 @@
 
 #include "common/Definitions.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerControllerConsumer.hpp"
+#include "components/settings/api/CSettingsManagerClient.hpp"
 
 #include "QElapsedTimer"
 
@@ -48,7 +48,8 @@ class CTableMemoryJumper;
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
  * Entry point to majority of plugin's business-logic.
  */
-class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
+class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
+                            public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -68,7 +69,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer
                             CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                             CSearchResultView* pSearchResultView,
                             const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
-                            const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator);
+                            const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
+                            const tSettingsManagerPtr& pSettingsManagerPtr);
 
         /**
          * @brief setFile - set's the file to be used for analysis
@@ -307,5 +309,3 @@ signals:
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
         std::weak_ptr<IDLTLogsWrapperCreator> mpDLTLogsWrapperCreator;
 };
-
-#endif // CDLTMESSAGEANALYZER_HPP

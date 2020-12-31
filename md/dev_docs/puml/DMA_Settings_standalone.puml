@@ -12,7 +12,7 @@ abstract class "CSettingItem"
     + virtual const tUpdateSettingsFileFunc& getUpdateFileFunc() override
 }
 
-class "CSettingsManager"<< (S,#FF7700) Singleton >>
+class "CSettingsManager"
 {
 }
 
@@ -34,10 +34,10 @@ class "TSettingItem<T>" as TSettingItem_T_
 
 }
 
-package "Qt" #DDDDDD
+package "DMA_Settings_API" #DDDDDD
 {
 
-class "QObject"
+class "ISettingsManager"
 {
 }
 
@@ -45,7 +45,7 @@ class "QObject"
 
 '====================Inheritance section====================
 ISettingItem <|-- CSettingItem : partially implements
-QObject <|-- CSettingsManager : extends
+ISettingsManager <|-- CSettingsManager : implements
 CSettingItem <|-- TSettingItem_T_ : extends
 
 '====================Dependencies section====================

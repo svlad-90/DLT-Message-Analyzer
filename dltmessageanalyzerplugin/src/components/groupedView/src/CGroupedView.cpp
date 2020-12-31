@@ -18,7 +18,7 @@
 #include "../api/CGroupedView.hpp"
 #include "common/CTreeItem.hpp"
 #include "components/log/api/CLog.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -200,6 +200,30 @@ CGroupedView::CGroupedView(QWidget *parent):
     setSortingEnabled(true);
     sortByColumn( static_cast<int>(eGroupedViewColumn::Messages), Qt::SortOrder::DescendingOrder );
 
+    connect(this, &QTreeView::doubleClicked, [this](const QModelIndex &index)
+    {
+        if(false == index.isValid())
+        {
+            return;
+        }
+
+        if( toGroupedViewColumn(index.column()) == eGroupedViewColumn::SubString )
+        {
+            isExpanded(index)? collapse(index) : expand(index);
+        }
+    });
+}
+
+void CGroupedView::handleSettingsManagerChange()
+{
+    connect( getSettingsManager().get(),
+             &ISettingsManager::groupedViewColumnsVisibilityMapChanged,
+             [this](const tGroupedViewColumnsVisibilityMap&)
+    {
+        updateColumnsVisibility();
+        updateWidth();
+    });
+
     auto showContextMenu = [this](const QPoint &pos)
     {
         QMenu contextMenu("Context menu", this);
@@ -232,7 +256,7 @@ CGroupedView::CGroupedView(QWidget *parent):
 
                 {
                     const auto& gorupedViewColumnsVisibilityMap =
-                            CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+                            getSettingsManager()->getGroupedViewColumnsVisibilityMap();
 
                     for( int i = static_cast<int>(eGroupedViewColumn::SubString);
                          i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
@@ -243,17 +267,17 @@ CGroupedView::CGroupedView(QWidget *parent):
                         if(foundItem != gorupedViewColumnsVisibilityMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<eGroupedViewColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
                             {
                                 auto groupedViewColumnsVisibilityMap_ =
-                                        CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+                                        getSettingsManager()->getGroupedViewColumnsVisibilityMap();
 
                                 auto foundItem_ = groupedViewColumnsVisibilityMap_.find(static_cast<eGroupedViewColumn>(i));
 
                                 if(foundItem_ != groupedViewColumnsVisibilityMap_.end()) // if item is in the map
                                 {
                                     foundItem_.value() = checked; // let's update visibility value
-                                    CSettingsManager::getInstance()->setGroupedViewColumnsVisibilityMap(groupedViewColumnsVisibilityMap_);
+                                    getSettingsManager()->setGroupedViewColumnsVisibilityMap(groupedViewColumnsVisibilityMap_);
                                 }
                             });
                             pAction->setCheckable(true);
@@ -268,9 +292,9 @@ CGroupedView::CGroupedView(QWidget *parent):
 
             {
                 QAction* pAction = new QAction("Reset visible columns", this);
-                connect(pAction, &QAction::triggered, []()
+                connect(pAction, &QAction::triggered, [this]()
                 {
-                    CSettingsManager::getInstance()->resetGroupedViewColumnsVisibilityMap();
+                    getSettingsManager()->resetGroupedViewColumnsVisibilityMap();
                 });
                 pSubMenu->addAction(pAction);
             }
@@ -282,7 +306,7 @@ CGroupedView::CGroupedView(QWidget *parent):
 
                 {
                     const auto& gorupedViewColumnsCopyPasteMap =
-                            CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
+                            getSettingsManager()->getGroupedViewColumnsCopyPasteMap();
 
                     for( int i = static_cast<int>(eGroupedViewColumn::SubString);
                          i < static_cast<int>(eGroupedViewColumn::AfterLastVisible);
@@ -293,17 +317,17 @@ CGroupedView::CGroupedView(QWidget *parent):
                         if(foundItem != gorupedViewColumnsCopyPasteMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<eGroupedViewColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
                             {
                                 auto groupedViewColumnsCopyPasteMap_ =
-                                        CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
+                                        getSettingsManager()->getGroupedViewColumnsCopyPasteMap();
 
                                 auto foundItem_ = groupedViewColumnsCopyPasteMap_.find(static_cast<eGroupedViewColumn>(i));
 
                                 if(foundItem_ != groupedViewColumnsCopyPasteMap_.end()) // if item is in the map
                                 {
                                     foundItem_.value() = checked; // let's update copy paste value
-                                    CSettingsManager::getInstance()->setGroupedViewColumnsCopyPasteMap(groupedViewColumnsCopyPasteMap_);
+                                    getSettingsManager()->setGroupedViewColumnsCopyPasteMap(groupedViewColumnsCopyPasteMap_);
                                 }
                             });
                             pAction->setCheckable(true);
@@ -318,9 +342,9 @@ CGroupedView::CGroupedView(QWidget *parent):
 
             {
                 QAction* pAction = new QAction("Reset copy columns", this);
-                connect(pAction, &QAction::triggered, []()
+                connect(pAction, &QAction::triggered, [this]()
                 {
-                    CSettingsManager::getInstance()->resetGroupedViewColumnsCopyPasteMap();
+                    getSettingsManager()->resetGroupedViewColumnsCopyPasteMap();
                 });
                 pSubMenu->addAction(pAction);
             }
@@ -399,27 +423,6 @@ CGroupedView::CGroupedView(QWidget *parent):
     };
 
     connect( this, &QWidget::customContextMenuRequested, showContextMenu );
-
-    connect(this, &QTreeView::doubleClicked, [this](const QModelIndex &index)
-    {
-        if(false == index.isValid())
-        {
-            return;
-        }
-
-        if( toGroupedViewColumn(index.column()) == eGroupedViewColumn::SubString )
-        {
-            isExpanded(index)? collapse(index) : expand(index);
-        }
-    });
-
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::groupedViewColumnsVisibilityMapChanged,
-             [this](const tGroupedViewColumnsVisibilityMap&)
-    {
-        updateColumnsVisibility();
-        updateWidth();
-    });
 }
 
 void CGroupedView::setModel(QAbstractItemModel *model)
@@ -556,7 +559,7 @@ void CGroupedView::copyGroupedViewSelection() const
 
     QString finalText;
 
-    const auto& copyColumns = CSettingsManager::getInstance()->getGroupedViewColumnsCopyPasteMap();
+    const auto& copyColumns = getSettingsManager()->getGroupedViewColumnsCopyPasteMap();
 
     bool bAnythingToCopy = false;
 
@@ -682,7 +685,7 @@ void CGroupedView::updateWidth()
 
 void CGroupedView::updateColumnsVisibility()
 {
-    const tGroupedViewColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+    const tGroupedViewColumnsVisibilityMap& visibilityMap = getSettingsManager()->getGroupedViewColumnsVisibilityMap();
 
     for( int i = static_cast<int>(eGroupedViewColumn::SubString);
          i < static_cast<int>(eGroupedViewColumn::Last);
@@ -711,5 +714,6 @@ void CGroupedView::updateColumnsVisibility()
 PUML_PACKAGE_BEGIN(DMA_GroupedView_API)
     PUML_CLASS_BEGIN_CHECKED(CGroupedView)
         PUML_INHERITANCE_CHECKED(QTreeView, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

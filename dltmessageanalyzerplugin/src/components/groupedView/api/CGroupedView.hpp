@@ -7,7 +7,10 @@
 
 #include <QTreeView>
 
-class CGroupedView : public QTreeView
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CGroupedView : public QTreeView,
+                     public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -21,6 +24,9 @@ public:
 protected:
     virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
     void keyPressEvent ( QKeyEvent * event ) override;
+
+protected:
+    void handleSettingsManagerChange() override;
 
 private:
     void changeLevelExpansion(const QModelIndex& expandIdx, bool bExpand);

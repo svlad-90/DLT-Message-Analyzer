@@ -10,10 +10,13 @@
 
 #include "common/Definitions.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CTreeRepresentationDelegate;
 class CPatternsModel;
 
-class CPatternsView : public QTreeView
+class CPatternsView : public QTreeView,
+                      public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -45,6 +48,8 @@ public:
 
 protected:
     bool eventFilter(QObject* pObj, QEvent* pEvent) override;
+
+    void handleSettingsManagerChange() override;
 
 public slots:
 

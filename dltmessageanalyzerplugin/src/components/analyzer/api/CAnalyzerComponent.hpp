@@ -6,11 +6,14 @@
 
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 
-class CAnalyzerComponent : public DMA::IComponent
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CAnalyzerComponent : public DMA::IComponent,
+                           public CSettingsManagerClient
 {
 public:
 
-    CAnalyzerComponent();
+    CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManagerPtr);
     std::shared_ptr<IDLTMessageAnalyzerController> getAnalyzerController() const;
 
     virtual const char* getName() const override;

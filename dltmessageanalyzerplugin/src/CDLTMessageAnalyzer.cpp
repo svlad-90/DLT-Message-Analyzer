@@ -32,7 +32,7 @@
 #include "common/CTreeItem.hpp"
 #include "components/patternsView/api/IPatternsModel.hpp"
 #include "components/groupedView/api/CGroupedView.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/logsWrapper/api/IFileWrapper.hpp"
 #include "common/CRegexDirectoryMonitor.hpp"
 
@@ -67,8 +67,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          CUMLView* pUMLView, const std::shared_ptr<CTableMemoryJumper>& pSearchViewTableJumper,
                                          CSearchResultView* pSearchResultView,
                                          const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
-                                         const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator):
+                                         const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
+                                         const tSettingsManagerPtr& pSettingsManagerPtr):
     IDLTMessageAnalyzerControllerConsumer (pController),
+    CSettingsManagerClient(pSettingsManagerPtr),
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
     mpProgressBar(pProgressBar),
@@ -202,7 +204,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         connect( mpPatternsTreeView, &CPatternsView::pastePatternTriggered, [this](const CPatternsView::tCopyPastePatternData& copyPastePatternData)
         {
             // if we paste form one file to another
-            if(copyPastePatternData.file != CSettingsManager::getInstance()->getSelectedRegexFile())
+            if(copyPastePatternData.file != getSettingsManager()->getSelectedRegexFile())
             {
                 // let's paste all the items.
                 for( const auto& copyPastePatternItem : copyPastePatternData.items )
@@ -243,12 +245,12 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
             {
                 QAction* pAction = new QAction("Case sensitive search", this);
-                connect(pAction, &QAction::triggered, [](bool checked)
+                connect(pAction, &QAction::triggered, [this](bool checked)
                 {
-                    CSettingsManager::getInstance()->setCaseSensitiveRegex(checked);
+                    getSettingsManager()->setCaseSensitiveRegex(checked);
                 });
                 pAction->setCheckable(true);
-                pAction->setChecked(CSettingsManager::getInstance()->getCaseSensitiveRegex());
+                pAction->setChecked(getSettingsManager()->getCaseSensitiveRegex());
                 pContextMenu->addAction(pAction);
             }
 
@@ -324,12 +326,12 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     }
 #endif
 
-    connect( qApp, &QApplication::aboutToQuit, []()
+    connect( qApp, &QApplication::aboutToQuit, [this]()
     {
-        CSettingsManager::getInstance()->storeConfigs();
+        getSettingsManager()->storeConfigs();
     });
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::cacheEnabledChanged, [this](bool val)
+    connect( getSettingsManager().get(), &ISettingsManager::cacheEnabledChanged, [this](bool val)
     {
         if(nullptr != mpFile)
         {
@@ -338,7 +340,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::cacheMaxSizeMBChanged, [this](const tCacheSizeMB& val)
+    connect( getSettingsManager().get(), &ISettingsManager::cacheMaxSizeMBChanged, [this](const tCacheSizeMB& val)
     {
         if(nullptr != mpFile)
         {
@@ -347,7 +349,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::RDPModeChanged, [this](bool val)
+    connect( getSettingsManager().get(), &ISettingsManager::RDPModeChanged, [this](bool val)
     {
         if(nullptr != mpProgressBar &&
                 nullptr != mpProgressBarLabel)
@@ -395,7 +397,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         });
     }
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::regexMonoHighlightingColorChanged, [this](const QColor&)
+    connect( getSettingsManager().get(), &ISettingsManager::regexMonoHighlightingColorChanged, [this](const QColor&)
     {
         if(nullptr != mpSearchResultModel)
         {
@@ -403,9 +405,9 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( CSettingsManager::getInstance().get(), &CSettingsManager::searchResultHighlightingGradientChanged, [this](const tHighlightingGradient&)
+    connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged, [this](const tHighlightingGradient&)
     {
-        if(false == CSettingsManager::getInstance()->getSearchResultMonoColorHighlighting())
+        if(false == getSettingsManager()->getSearchResultMonoColorHighlighting())
         {
             analyze();
         }
@@ -423,7 +425,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         connect(mpRegexDirectoryMonitor.get(), &CRegexDirectoryMonitor::regexItemSetChanged,
         [this](const CRegexDirectoryMonitor::tFoundRegexItemSet& regexFiles)
         {
-            //SEND_MSG(QString("[CDLTMessageAnalyzer]: Fetched selected regex file is - \"%1\"").arg(CSettingsManager::getInstance()->getSelectedRegexFile()));
+            //SEND_MSG(QString("[CDLTMessageAnalyzer]: Fetched selected regex file is - \"%1\"").arg(getSettingsManager()->getSelectedRegexFile()));
 
             if(nullptr != mpRegexSelectionComboBox)
             {
@@ -431,7 +433,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 {
                     unsigned int foundSelectedItemIndex = static_cast<unsigned int>(-1);
                     unsigned int counter = 0;
-                    QString selectedItemName = CSettingsManager::getInstance()->getSelectedRegexFile();
+                    QString selectedItemName = getSettingsManager()->getSelectedRegexFile();
 
                     mpRegexSelectionComboBox->clear();
 
@@ -458,38 +460,38 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     else
                     {
                         // fallback to 0 element of collection ( check on emptiness somwhere above )
-                        CSettingsManager::getInstance()->setSelectedRegexFile(*regexFiles.begin());
+                        getSettingsManager()->setSelectedRegexFile(*regexFiles.begin());
                         mpRegexSelectionComboBox->setCurrentIndex(0);
                     }
                 }
             }
         });
 
-        mpRegexDirectoryMonitor->setPath(CSettingsManager::getInstance()->getRegexDirectory());
+        mpRegexDirectoryMonitor->setPath(getSettingsManager()->getRegexDirectory());
     }
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::selectedRegexFileChanged,
+    connect(getSettingsManager().get(), &ISettingsManager::selectedRegexFileChanged,
     [this](const QString& /*regexDirectory*/)
     {
         handleLoadedRegexConfig();
     });
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
     {
         createSequenceDiagram();
     });
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_ShowArgumentsChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_ShowArgumentsChanged, [this](bool)
     {
         createSequenceDiagram();
     });
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_WrapOutputChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_WrapOutputChanged, [this](bool)
     {
         createSequenceDiagram();
     });
 
-    connect(CSettingsManager::getInstance().get(), &CSettingsManager::UML_AutonumberChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_AutonumberChanged, [this](bool)
     {
         createSequenceDiagram();
     });
@@ -499,9 +501,9 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     // set initial cache status
     mpCacheStatusLabel->setText(formCacheStatusString(0,
-                                                      MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
+                                                      MBToB( getSettingsManager()->getCacheMaxSizeMB() ),
                                                       0,
-                                                      CSettingsManager::getInstance()->getCacheEnabled(),
+                                                      getSettingsManager()->getCacheEnabled(),
                                                       false));
 }
 
@@ -543,7 +545,7 @@ void CDLTMessageAnalyzer::handleLoadedRegexConfig()
     {
         mpPatternsModel->resetData();
 
-        const auto& aliases = CSettingsManager::getInstance()->getAliases();
+        const auto& aliases = getSettingsManager()->getAliases();
         for(const auto& alias : aliases)
         {
             mpPatternsModel->addData(alias.alias, alias.regex, alias.isDefault ? Qt::Checked : Qt::Unchecked );
@@ -557,7 +559,7 @@ void CDLTMessageAnalyzer::handleLoadedConfig()
     {
         bool bMatchFound = false;
 
-        const auto& storedNumberOfThreads = CSettingsManager::getInstance()->getNumberOfThreads();
+        const auto& storedNumberOfThreads = getSettingsManager()->getNumberOfThreads();
 
         for( int i = 0; i < mpNumberOfThreadsCombobBox->count(); ++i )
         {
@@ -579,7 +581,7 @@ void CDLTMessageAnalyzer::handleLoadedConfig()
     if(nullptr != mpContinuousSearchCheckBox)
     {
         Qt::CheckState checkState =
-                CSettingsManager::getInstance()->getContinuousSearch() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+                getSettingsManager()->getContinuousSearch() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
         mpContinuousSearchCheckBox->setCheckState( checkState );
     }
 }
@@ -594,7 +596,7 @@ std::shared_ptr<QRegularExpression> CDLTMessageAnalyzer::createRegex( const QStr
 {
     QString regex_ = addRegexOptions( regex );
 
-    auto caseSensitiveOption = CSettingsManager::getInstance()->getCaseSensitiveRegex() ?
+    auto caseSensitiveOption = getSettingsManager()->getCaseSensitiveRegex() ?
                 QRegularExpression::NoPatternOption:
                 QRegularExpression::CaseInsensitiveOption;
 
@@ -652,10 +654,10 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
 {
     if(nullptr != mpFile)
     {
-        mpFile->setSubFilesHandlingStatus(CSettingsManager::getInstance()->getSubFilesHandlingStatus());
+        mpFile->setSubFilesHandlingStatus(getSettingsManager()->getSubFilesHandlingStatus());
         mpFile->resetCache();
 
-        connect( CSettingsManager::getInstance().get(), &CSettingsManager::subFilesHandlingStatusChanged, [this](bool val)
+        connect( getSettingsManager().get(), &ISettingsManager::subFilesHandlingStatusChanged, [this](bool val)
         {
             if(nullptr != mpFile)
             {
@@ -680,8 +682,8 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
 
     if(nullptr != mpFile)
     {
-        mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB()) ) );
-        mpFile->setEnableCache( CSettingsManager::getInstance()->getCacheEnabled() );
+        mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(getSettingsManager()->getCacheMaxSizeMB()) ) );
+        mpFile->setEnableCache( getSettingsManager()->getCacheEnabled() );
 
 
 
@@ -709,9 +711,9 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
             else
             {
                 mpCacheStatusLabel->setText(formCacheStatusString(0,
-                                                                  MBToB( CSettingsManager::getInstance()->getCacheMaxSizeMB() ),
+                                                                  MBToB( getSettingsManager()->getCacheMaxSizeMB() ),
                                                                   0,
-                                                                  CSettingsManager::getInstance()->getCacheEnabled(),
+                                                                  getSettingsManager()->getCacheEnabled(),
                                                                   false));
             }
         }
@@ -795,8 +797,8 @@ bool CDLTMessageAnalyzer::analyze()
         }
 #endif
 
-    mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(CSettingsManager::getInstance()->getCacheMaxSizeMB() ) ) );
-    mpFile->setEnableCache( CSettingsManager::getInstance()->getCacheEnabled() );
+    mpFile->setMaxCacheSize( MBToB( static_cast<unsigned int>(getSettingsManager()->getCacheMaxSizeMB() ) ) );
+    mpFile->setEnableCache( getSettingsManager()->getCacheEnabled() );
 
     tryStop();
 
@@ -848,7 +850,8 @@ bool CDLTMessageAnalyzer::analyze()
                                      requestedMessages.to - requestedMessages.from + 1,
                                      *pRegex,
                                      mpNumberOfThreadsCombobBox->currentData().value<int>(),
-                                     isContinuousAnalysis());
+                                     isContinuousAnalysis(),
+                                     getSettingsManager()->getUML_FeatureActive());
 
         setReuqestId(requestId);
 
@@ -1680,14 +1683,14 @@ void CDLTMessageAnalyzer::triggerContinuousAnalysis(bool checked)
         }
     }
 
-    CSettingsManager::getInstance()->setContinuousSearch(checked);
+    getSettingsManager()->setContinuousSearch(checked);
 }
 
 void CDLTMessageAnalyzer::triggerNumberOfThreads()
 {
     if(nullptr != mpNumberOfThreadsCombobBox)
     {
-        CSettingsManager::getInstance()->setNumberOfThreads( mpNumberOfThreadsCombobBox->currentData().value<int>() );
+        getSettingsManager()->setNumberOfThreads( mpNumberOfThreadsCombobBox->currentData().value<int>() );
     }
 }
 
@@ -1695,7 +1698,7 @@ void CDLTMessageAnalyzer::triggerRegexConfig()
 {
     if(nullptr != mpRegexSelectionComboBox)
     {
-        CSettingsManager::getInstance()->setSelectedRegexFile(mpRegexSelectionComboBox->currentText());
+        getSettingsManager()->setSelectedRegexFile(mpRegexSelectionComboBox->currentText());
     }
 }
 
@@ -1736,6 +1739,7 @@ void CDLTMessageAnalyzer::setMessageDecoder( QDltMessageDecoder* pMessageDecoder
 PUML_PACKAGE_BEGIN(DMA_Root)
     PUML_CLASS_BEGIN_CHECKED(CDLTMessageAnalyzer)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IPatternsModel, 1, 1, uses)
@@ -1754,6 +1758,7 @@ PUML_PACKAGE_BEGIN(DMA_Root)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, gets and uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, gets and uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, gets and uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

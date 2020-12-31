@@ -13,7 +13,7 @@
 
 #include "common/Definitions.hpp"
 #include "common/CTreeItem.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -202,8 +202,11 @@ static QVector<tTreeItemPtr> sortingFunction (const QVector<tTreeItemPtr>& child
     return result;
 }
 
-CPatternsModel::CPatternsModel(QObject *parent):
-    QAbstractItemModel(parent), mpRootItem(nullptr),
+CPatternsModel::CPatternsModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                               QObject *parent):
+    QAbstractItemModel(parent),
+    CSettingsManagerClient(pSettingsManagerPtr),
+    mpRootItem(nullptr),
     mSortingColumn(ePatternsColumn::AliasTreeLevel),
     mSortOrder(Qt::SortOrder::DescendingOrder),
     mFilter()
@@ -662,7 +665,7 @@ QModelIndex CPatternsModel::editData(const QModelIndex& idx, const QString& alia
 
                         auto getCheckStateFromParentCheckState = [](Qt::CheckState parentVal, Qt::CheckState myCurVal)->Qt::CheckState
                         {
-                            Qt::CheckState res;
+                            Qt::CheckState res = Qt::Checked;
 
                             switch(parentVal)
                             {
@@ -835,7 +838,7 @@ void CPatternsModel::updatePatternsInPersistency()
 {
     if(nullptr != mpRootItem)
     {
-        CSettingsManager::tAliasItemVec aliasVec;
+        ISettingsManager::tAliasItemVec aliasVec;
 
         auto preVisitFunction = [&aliasVec](const tTreeItem* pItem)
         {
@@ -854,7 +857,7 @@ void CPatternsModel::updatePatternsInPersistency()
 
                         const QString& alias = pItem->data(static_cast<int>(ePatternsColumn::Alias)).get<QString>();
 
-                        CSettingsManager::tAliasItem aliasItem(isDefault == Qt::Checked, alias, regex);
+                        ISettingsManager::tAliasItem aliasItem(isDefault == Qt::Checked, alias, regex);
                         aliasVec.push_back(aliasItem);
                     }
                 }
@@ -867,7 +870,7 @@ void CPatternsModel::updatePatternsInPersistency()
 
         if(false == aliasVec.empty())
         {
-            CSettingsManager::getInstance()->setAliases( aliasVec );
+            getSettingsManager()->setAliases( aliasVec );
         }
     }
 }
@@ -1470,6 +1473,7 @@ PUML_PACKAGE_BEGIN(DMA_PatternsView)
     PUML_CLASS_BEGIN_CHECKED(CPatternsModel)
         PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
         PUML_INHERITANCE_CHECKED(IPatternsModel, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

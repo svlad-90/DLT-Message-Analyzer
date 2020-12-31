@@ -104,6 +104,15 @@ class "DLTMessageAnalyzerPlugin"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -117,6 +126,7 @@ class "QObject"
 IDLTMessageAnalyzerController <|-- CContinuousAnalyzer : implements
 IDLTMessageAnalyzerController <|-- CMTAnalyzer : implements
 IDLTMessageAnalyzerControllerConsumer <|-- CSubConsumer : implements
+CSettingsManagerClient <|-- CAnalyzerComponent : extends
 DMA::IComponent <|-- CAnalyzerComponent : implements
 QObject <|-- IDLTMessageAnalyzerController : extends
 QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends

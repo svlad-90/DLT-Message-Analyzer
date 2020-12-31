@@ -242,10 +242,10 @@ class "CSearchViewComponent"
 
 }
 
-package "DMA_Settings" #DDDDDD
+package "DMA_Settings_API" #DDDDDD
 {
 
-class "CSettingsManager"<< (S,#FF7700) Singleton >>
+class "ISettingsManager"
 {
 }
 
@@ -355,7 +355,7 @@ QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
 QObject <|-- CSearchViewComponent : extends
-QObject <|-- CSettingsManager : extends
+QObject <|-- ISettingsManager : extends
 
 '====================Dependencies section====================
 CMTAnalyzer "1" *-- "*" QThread : contains

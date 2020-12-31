@@ -6,13 +6,16 @@
 #include "common/CTreeItem.hpp"
 
 #include "../api/IFiltersModel.hpp"
+#include "components/settings/api/CSettingsManagerClient.hpp"
 
-class CFiltersModel : public IFiltersModel
+class CFiltersModel : public IFiltersModel,
+                      public CSettingsManagerClient
 {
     Q_OBJECT
 
 public:
-    explicit CFiltersModel(QObject *parent = nullptr);
+    explicit CFiltersModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                           QObject *parent = nullptr);
 
     // Implementation of the IFiltersModel
     void setUsedRegex(const QString& regexStr) override;

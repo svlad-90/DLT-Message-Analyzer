@@ -15,7 +15,7 @@
 #include <QStandardPaths>
 
 #include "components/log/api/CLog.hpp"
-#include "../common/OSHelper.hpp"
+#include "common/OSHelper.hpp"
 #include "CSettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -432,17 +432,6 @@ CSettingsManager::CSettingsManager():
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
-
-    CSettingsManager::tOperationResult result = setUp();
-
-    if(false == result.bResult)
-    {
-        SEND_ERR(QString("[CSettingsManager][setUp] Error - %1").arg(result.err));
-    }
-    else
-    {
-        SEND_MSG(QString("[CSettingsManager][setUp] set up is successful"));
-    }
 }
 
 void CSettingsManager::tryStoreSettingsConfig()
@@ -1350,12 +1339,6 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
     return result;
 }
 
-tSettingsManagerPtr CSettingsManager::getInstance()
-{
-    static tSettingsManagerPtr sInstance = std::shared_ptr<CSettingsManager>( new CSettingsManager() );
-    return sInstance;
-}
-
 void CSettingsManager::setSettingsManagerVersion(const tSettingsManagerVersion& val)
 {
     mSetting_SettingsManagerVersion.setData(val);
@@ -2050,8 +2033,8 @@ const TRangedSettingItem<int>::tOptionalAllowedRange& CSettingsManager::getFilte
 }
 
 PUML_PACKAGE_BEGIN(DMA_Settings)
-    PUML_SINGLETONE_BEGIN_CHECKED(CSettingsManager)
-        PUML_INHERITANCE_CHECKED(QObject, extends)
+    PUML_CLASS_BEGIN_CHECKED(CSettingsManager)
+        PUML_INHERITANCE_CHECKED(ISettingsManager, implements)
         PUML_COMPOSITION_DEPENDENCY(TSettingItem<T>, 1, *, contains)
-    PUML_SINGLETONE_END()
+    PUML_CLASS_END()
 PUML_PACKAGE_END()

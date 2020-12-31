@@ -1,0 +1,49 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsComponent"
+{
+}
+
+class "CSettingsManagerClient"
+{
+}
+
+class "ISettingsManager"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+DMA::IComponent <|-- CSettingsComponent : implements
+QObject <|-- ISettingsManager : extends
+
+'====================Dependencies section====================
+CSettingsComponent "1" *-- "1" ISettingsManager : provides
+CSettingsManagerClient "1" o-- "1" ISettingsManager : uses
+
+@enduml

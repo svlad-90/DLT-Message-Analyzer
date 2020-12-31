@@ -15,13 +15,18 @@
 
 #include "../api/ISearchResultModel.hpp"
 
-class CSearchResultModel : public QAbstractTableModel, public ISearchResultModel
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CSearchResultModel : public QAbstractTableModel,
+                           public ISearchResultModel,
+                           public CSettingsManagerClient
 {
     Q_OBJECT
 
 public:
 
-    CSearchResultModel(QObject *parent=nullptr);
+    CSearchResultModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                       QObject *parent=nullptr);
 
     // implementation of the ISearchResultModel
     void setFile(const tFileWrapperPtr& pFile) override;

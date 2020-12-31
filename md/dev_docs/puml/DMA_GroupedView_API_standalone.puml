@@ -34,6 +34,15 @@ class "IGroupedViewModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -44,7 +53,9 @@ class "QTreeView"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CGroupedView : extends
 QTreeView <|-- CGroupedView : extends
+CSettingsManagerClient <|-- CGroupedViewComponent : extends
 DMA::IComponent <|-- CGroupedViewComponent : implements
 
 '====================Dependencies section====================

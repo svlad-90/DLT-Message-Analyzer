@@ -11,14 +11,16 @@
 
 #include "CGroupedViewModel.hpp"
 #include "components/log/api/CLog.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
 
 static const tQStringPtr sRootItemName = std::make_shared<QString>("Root");
 
-CGroupedViewModel::CGroupedViewModel(QObject *parent)
+CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                                     QObject *parent)
     : QAbstractItemModel(parent),
+      CSettingsManagerClient(pSettingsManagerPtr),
       mRegex(),
       mSortingColumn(eGroupedViewColumn::Messages),
       mSortOrder(Qt::SortOrder::DescendingOrder),
@@ -604,7 +606,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
 
     if(nullptr != mpRootItem)
     {
-        const auto& visibleColumns = CSettingsManager::getInstance()->getGroupedViewColumnsVisibilityMap();
+        const auto& visibleColumns = getSettingsManager()->getGroupedViewColumnsVisibilityMap();
 
         bool bIsAnythingToShow = false;
 
@@ -841,6 +843,7 @@ PUML_PACKAGE_BEGIN(DMA_GroupedView)
     PUML_CLASS_BEGIN_CHECKED(CGroupedViewModel)
         PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
         PUML_INHERITANCE_CHECKED(IGroupedViewModel, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

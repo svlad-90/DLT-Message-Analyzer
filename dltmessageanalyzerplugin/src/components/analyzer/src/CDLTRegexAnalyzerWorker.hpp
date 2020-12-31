@@ -14,13 +14,16 @@
 #include "common/Definitions.hpp"
 #include "../api/IDLTMessageAnalyzerController.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 typedef int tWorkerThreadCookie;
 
 /**
  * @brief The CDLTRegexAnalyzerWorker class - an object, which is actually performs a regex analysis.
  * Intention is to use one or more of these instances in context of worker-thread(s).
  */
-class CDLTRegexAnalyzerWorker : public QObject
+class CDLTRegexAnalyzerWorker : public QObject,
+                                public CSettingsManagerClient
 {
     Q_OBJECT
 public:
@@ -31,7 +34,7 @@ public:
         ePortionAnalysisState_ERROR
     };
 
-    CDLTRegexAnalyzerWorker();
+    CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManagerPtr);
     tWorkerId getWorkerId() const;
 
 public slots:

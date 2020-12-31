@@ -38,6 +38,15 @@ class "DMA::IComponent"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -48,6 +57,7 @@ class "QObject"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CAnalyzerComponent : extends
 DMA::IComponent <|-- CAnalyzerComponent : implements
 QObject <|-- IDLTMessageAnalyzerController : extends
 QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends

@@ -1,0 +1,221 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Analyzer" #DDDDDD
+{
+
+class "CDLTRegexAnalyzerWorker"
+{
+}
+
+class "CMTAnalyzer"
+{
+}
+
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+class "CAnalyzerComponent"
+{
+}
+
+}
+
+package "DMA_FiltersView" #DDDDDD
+{
+
+class "CFilterItemDelegate"
+{
+}
+
+class "CFiltersModel"
+{
+}
+
+}
+
+package "DMA_FiltersView_API" #DDDDDD
+{
+
+class "CFiltersView"
+{
+}
+
+class "CFiltersViewComponent"
+{
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_GroupedView" #DDDDDD
+{
+
+class "CGroupedViewModel"
+{
+}
+
+}
+
+package "DMA_GroupedView_API" #DDDDDD
+{
+
+class "CGroupedView"
+{
+}
+
+class "CGroupedViewComponent"
+{
+}
+
+}
+
+package "DMA_PatternsView" #DDDDDD
+{
+
+class "CPatternsModel"
+{
+}
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsView"
+{
+}
+
+class "CPatternsViewComponent"
+{
+}
+
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLView"
+{
+}
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
+package "DMA_Root" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Form"
+{
+}
+
+}
+
+package "DMA_SearchView" #DDDDDD
+{
+
+class "CSearchResultHighlightingDelegate"
+{
+}
+
+class "CSearchResultModel"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchViewComponent"
+{
+}
+
+}
+
+package "DMA_Settings" #DDDDDD
+{
+
+class "CSettingsManager"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsComponent"
+{
+}
+
+class "CSettingsManagerClient"
+{
+}
+
+class "ISettingsManager"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+CSettingsManagerClient <|-- CDLTRegexAnalyzerWorker : extends
+CSettingsManagerClient <|-- CMTAnalyzer : extends
+CSettingsManagerClient <|-- CAnalyzerComponent : extends
+CSettingsManagerClient <|-- CFilterItemDelegate : extends
+CSettingsManagerClient <|-- CFiltersModel : extends
+CSettingsManagerClient <|-- CFiltersView : extends
+CSettingsManagerClient <|-- CFiltersViewComponent : extends
+CSettingsManagerClient <|-- CGroupedViewModel : extends
+CSettingsManagerClient <|-- CGroupedView : extends
+CSettingsManagerClient <|-- CGroupedViewComponent : extends
+CSettingsManagerClient <|-- CPatternsModel : extends
+CSettingsManagerClient <|-- CPatternsView : extends
+CSettingsManagerClient <|-- CPatternsViewComponent : extends
+CSettingsManagerClient <|-- CUMLView : extends
+CSettingsManagerClient <|-- CUMLViewComponent : extends
+CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
+CSettingsManagerClient <|-- Form : extends
+CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
+CSettingsManagerClient <|-- CSearchResultModel : extends
+CSettingsManagerClient <|-- CSearchViewComponent : extends
+ISettingsManager <|-- CSettingsManager : implements
+DMA::IComponent <|-- CSettingsComponent : implements
+QObject <|-- ISettingsManager : extends
+
+'====================Dependencies section====================
+CDLTMessageAnalyzer "1" o-- "1" ISettingsManager : gets and uses
+CSettingsComponent "1" --> "1" CSettingsManager : creates
+CSettingsComponent "1" *-- "1" ISettingsManager : provides
+CSettingsManagerClient "1" o-- "1" ISettingsManager : uses
+
+@enduml

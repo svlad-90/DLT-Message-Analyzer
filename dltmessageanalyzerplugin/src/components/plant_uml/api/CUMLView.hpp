@@ -12,10 +12,13 @@
 #include "QScrollArea"
 #include "QProcess"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class QProcess;
 class CImageViewer;
 
-class CUMLView : public QScrollArea
+class CUMLView : public QScrollArea,
+                 public CSettingsManagerClient
 {
     Q_OBJECT
     typedef QScrollArea tParent;
@@ -38,6 +41,9 @@ public:
         e_SVG = 0,
         e_PNG
     };
+
+protected:
+    void handleSettingsManagerChange() override;
 
 private:
 

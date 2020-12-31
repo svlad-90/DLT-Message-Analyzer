@@ -7,16 +7,21 @@
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CTableMemoryJumper;
 class CSearchResultView;
 class ISearchResultModel;
 
-class CSearchViewComponent : public QObject, public DMA::IComponent
+class CSearchViewComponent : public QObject,
+                             public DMA::IComponent,
+                             public CSettingsManagerClient
 {
     Q_OBJECT
 public:
 
-    CSearchViewComponent( CSearchResultView* pSearchResultView );
+    CSearchViewComponent( CSearchResultView* pSearchResultView,
+                          const tSettingsManagerPtr& pSettingsManagerPtr );
 
     CSearchResultView* getSearchResultView() const;
     std::shared_ptr<CTableMemoryJumper> getTableMemoryJumper() const;

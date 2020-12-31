@@ -16,13 +16,18 @@
 
 #include "../api/IPatternsModel.hpp"
 
-class CPatternsModel : public QAbstractItemModel, public IPatternsModel
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CPatternsModel : public QAbstractItemModel,
+                       public IPatternsModel,
+                       public CSettingsManagerClient
 {
     Q_OBJECT
 
 public:
 
-    CPatternsModel(QObject *parent=nullptr);
+    CPatternsModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+                   QObject *parent=nullptr);
     ~CPatternsModel() override;
 
     // Implementation of the IPatternsModel

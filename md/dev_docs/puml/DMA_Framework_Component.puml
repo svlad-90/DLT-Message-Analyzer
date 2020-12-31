@@ -112,6 +112,15 @@ class "CSearchViewComponent"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsComponent"
+{
+}
+
+}
+
 '====================Inheritance section====================
 DMA::IComponent <|-- CAnalyzerComponent : implements
 DMA::IComponent <|-- CFiltersViewComponent : implements
@@ -124,5 +133,6 @@ DMA::IComponent <|-- CLogsWrapperComponent : implements
 DMA::IComponent <|-- CPatternsViewComponent : implements
 DMA::IComponent <|-- CUMLViewComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements
+DMA::IComponent <|-- CSettingsComponent : implements
 
 @enduml

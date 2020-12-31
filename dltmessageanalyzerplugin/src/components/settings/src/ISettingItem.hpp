@@ -1,5 +1,4 @@
-#ifndef ISETTINGITEM_HPP
-#define ISETTINGITEM_HPP
+#pragma once
 
 #include <functional>
 
@@ -59,5 +58,3 @@ public:
      */
     bool readDataFromArray( const QJsonArray& settingsArray );
 };
-
-#endif // ISETTINGITEM_HPP

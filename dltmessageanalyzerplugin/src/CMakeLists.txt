@@ -102,7 +102,6 @@ include_directories(../../thirdparty/DMA_Plantuml/src)
 
 DMA_add_subdirectory_with_clang_tidy(common)
 DMA_add_subdirectory_with_clang_tidy(components)
-DMA_add_subdirectory_with_clang_tidy(settings)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp

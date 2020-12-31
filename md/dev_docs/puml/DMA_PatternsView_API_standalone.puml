@@ -43,6 +43,15 @@ class "IPatternsModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -57,7 +66,9 @@ class "QTreeView"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CPatternsView : extends
 QTreeView <|-- CPatternsView : extends
+CSettingsManagerClient <|-- CPatternsViewComponent : extends
 DMA::IComponent <|-- CPatternsViewComponent : implements
 QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 

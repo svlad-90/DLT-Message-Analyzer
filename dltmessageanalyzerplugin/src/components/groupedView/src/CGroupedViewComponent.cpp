@@ -8,7 +8,9 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CGroupedViewComponent::CGroupedViewComponent( CGroupedView* pGroupedView ):
+CGroupedViewComponent::CGroupedViewComponent( CGroupedView* pGroupedView,
+                                              const tSettingsManagerPtr& pSettingsManagerPtr ):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpGroupedViewModel(nullptr),
 mpGroupedView(pGroupedView)
 {
@@ -33,10 +35,11 @@ DMA::tSyncInitOperationResult CGroupedViewComponent::init()
     {
         if(nullptr != mpGroupedView)
         {
-            auto pGroupedViewModel= std::make_shared<CGroupedViewModel>();
+            auto pGroupedViewModel= std::make_shared<CGroupedViewModel>(getSettingsManager());
 
             if( nullptr != pGroupedViewModel )
             {
+                mpGroupedView->setSettingsManager(getSettingsManager());
                 mpGroupedViewModel = pGroupedViewModel;
                 mpGroupedView->setModel(pGroupedViewModel.get());
             }
@@ -90,6 +93,7 @@ CGroupedView* CGroupedViewComponent::getGroupedView() const
 PUML_PACKAGE_BEGIN(DMA_GroupedView_API)
     PUML_CLASS_BEGIN(CGroupedViewComponent)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(IGroupedViewModel, 1, 1, contains)
         PUML_USE_DEPENDENCY_CHECKED(CGroupedViewModel, 1, 1, using to create IGroupedViewModel)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CGroupedView, 1, 1, uses)

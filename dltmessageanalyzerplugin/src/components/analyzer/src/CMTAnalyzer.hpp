@@ -14,6 +14,8 @@
 #include "../api/IDLTMessageAnalyzerController.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 //Forward declarations
 class QThread;
 class IDLTMessageAnalyzerControllerConsumer;
@@ -21,11 +23,12 @@ class CDLTRegexAnalyzerWorker;
 typedef int tWorkerId;
 
 // CMTAnalyzer
-class CMTAnalyzer: public IDLTMessageAnalyzerController
+class CMTAnalyzer: public IDLTMessageAnalyzerController,
+                   public CSettingsManagerClient
 {
     Q_OBJECT
     public:
-        CMTAnalyzer();
+        CMTAnalyzer(const tSettingsManagerPtr& pSettingsManagerPtr);
         ~CMTAnalyzer() override;
 
         //IDLTMessageAnalyzerController implementation

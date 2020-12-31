@@ -4,7 +4,9 @@
 
 #include "DMA_Plantuml.hpp"
 
-CUMLViewComponent::CUMLViewComponent( CUMLView* pUMLView ):
+CUMLViewComponent::CUMLViewComponent( CUMLView* pUMLView,
+                                      const tSettingsManagerPtr& pSettingsManagerPtr ):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpUMLView(pUMLView)
 {
 }
@@ -22,7 +24,7 @@ DMA::tSyncInitOperationResult CUMLViewComponent::init()
    {
        if(nullptr != mpUMLView)
        {
-           // add logic here, when it will be needed
+           mpUMLView->setSettingsManager(getSettingsManager());
            result.bIsOperationSuccessful = true;
            result.returnCode = 0;
        }
@@ -68,6 +70,7 @@ CUMLView* CUMLViewComponent::getUMLView() const
 PUML_PACKAGE_BEGIN(DMA_PlantumlView_API)
    PUML_CLASS_BEGIN(CUMLViewComponent)
        PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+       PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
        PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
    PUML_CLASS_END()
 PUML_PACKAGE_END()

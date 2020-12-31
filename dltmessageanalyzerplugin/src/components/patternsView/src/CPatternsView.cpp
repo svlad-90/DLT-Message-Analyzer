@@ -28,7 +28,7 @@
 #include <QDesktopServices>
 #include <QClipboard>
 
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "CPatternsModel.hpp"
 #include "components/log/api/CLog.hpp"
 
@@ -318,6 +318,434 @@ CPatternsView::CPatternsView(QWidget *parent):
     mpPatternsSearchInput(nullptr),
     mCopyPastePatternData()
 {
+}
+
+CPatternsView::~CPatternsView()
+{
+    if(nullptr != mpRepresentationDelegate)
+    {
+        delete mpRepresentationDelegate;
+        mpRepresentationDelegate = nullptr;
+    }
+}
+
+void CPatternsView::setModel(QAbstractItemModel *model)
+{
+    tParent::setModel(model);
+    updateColumnsVisibility();
+}
+
+void CPatternsView::setPatternsSearchInput( QLineEdit* pPatternsSearchInput )
+{
+    mpPatternsSearchInput = pPatternsSearchInput;
+
+    if(nullptr != mpPatternsSearchInput)
+    {
+        mpPatternsSearchInput->installEventFilter(this);
+    }
+}
+
+bool CPatternsView::eventFilter(QObject* pObj, QEvent* pEvent)
+{
+    if (pEvent->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
+
+        if(NShortcuts::isApplyCombinationShortcut(pKeyEvent) ||
+           NShortcuts::isClearSeletedPatternsShortcut(pKeyEvent) ||
+           NShortcuts::isResetSeletedPatternsShortcut(pKeyEvent) ||
+           NShortcuts::isCollapseAllShortcut(pKeyEvent) ||
+           NShortcuts::isExpadAllShortcut(pKeyEvent))
+        {
+            keyPressEvent(pKeyEvent);
+        }
+    }
+
+    return QObject::eventFilter(pObj, pEvent);
+}
+
+QString CPatternsView::createCombinedRegex()
+{
+    QString finalRegex;
+
+    bool firstInjection = true;
+
+    typedef std::function<bool(const QModelIndex& idx)> tComparator;
+
+    QSet<QString> usedPatterns;
+
+    auto fillInPatterns = [this, &firstInjection, &finalRegex, &usedPatterns](const tComparator comparator, bool animate, const QColor& initialColor)
+    {
+        QVector<QModelIndex> highlightedRows;
+
+        auto preVisitFunc = [this,
+                &firstInjection,
+                &finalRegex,
+                &usedPatterns,
+                &comparator,
+                &animate,
+                &highlightedRows](const QModelIndex& idx)
+        {
+            auto alias = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>();
+
+            if( comparator(idx) )
+            {
+                auto foundUsedPattern = usedPatterns.find( alias );
+
+                if(foundUsedPattern == usedPatterns.end())
+                {
+                    if( false == firstInjection )
+                    {
+                        finalRegex.append("|");
+                    }
+
+                    finalRegex.append( idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Regex)).data().value<QString>() );
+                    firstInjection = false;
+
+                    if(nullptr != mpRepresentationDelegate)
+                    {
+                        bool bHighlight = getSettingsManager()->getHighlightActivePatterns();
+
+                        if(true == bHighlight && true == animate)
+                        {
+                            highlightedRows.push_back(idx);
+                        }
+                    }
+
+                    usedPatterns.insert(alias);
+                }
+            }
+
+            return true;
+        };
+
+        mpModel->visit(preVisitFunc, CPatternsModel::tVisitFunction());
+
+        if(nullptr != mpRepresentationDelegate && false == highlightedRows.empty())
+        {
+            QColor highlightingColor = getSettingsManager()->getPatternsHighlightingColor();
+            mpRepresentationDelegate->animateRows(highlightedRows, initialColor, highlightingColor, initialColor, 250 );
+            viewport()->update();
+        }
+    };
+
+    QColor initialColor = palette().color(QPalette::ColorRole::Base);
+
+    fillInPatterns( [this](const QModelIndex& idx)
+    {
+        bool bResult = false;
+
+        auto rowTypeIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType));
+        auto rowType = rowTypeIdx.data().value<ePatternsRowType>();
+        bool bIsValid = idx.isValid();
+        auto combineIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Combine));
+        auto bIsCombine = V_2_CS( combineIdx.data() );
+        bool bIsRowSelected = selectionModel()->isRowSelected(idx.row(), idx.parent());
+        bResult = bIsValid && bIsCombine == Qt::Checked && !bIsRowSelected && rowType == ePatternsRowType::ePatternsRowType_Alias;
+
+        //SEND_MSG(QString("patternName - %1 "
+        //                 "bIsValid - %2, "
+        //                 "bIsCombine - %3, "
+        //                 "bIsRowSelected - %4, "
+        //                 "rowType - %5")
+        //               .arg(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>())
+        //               .arg(bIsValid)
+        //               .arg(bIsCombine)
+        //               .arg(bIsRowSelected)
+        //               .arg(static_cast<int>(rowType)));
+
+        return bResult;
+    }, true, initialColor);
+
+    fillInPatterns( [this](const QModelIndex& idx)
+    {
+        bool bResult = false;
+
+        auto rowTypeIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType));
+        auto rowType = rowTypeIdx.data().value<ePatternsRowType>();
+        bool bIsValid = idx.isValid();
+        auto combineIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Combine));
+        auto bIsCombine = V_2_CS( combineIdx.data() );
+        bool bIsRowSelected = selectionModel()->isRowSelected(idx.row(), idx.parent());
+        bResult = bIsValid && bIsCombine == Qt::Checked && bIsRowSelected && rowType == ePatternsRowType::ePatternsRowType_Alias;
+
+        //SEND_MSG(QString("patternName - %1 "
+        //                 "bIsValid - %2, "
+        //                 "bIsCombine - %3, "
+        //                 "bIsRowSelected - %4, "
+        //                 "rowType - %5")
+        //               .arg(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>())
+        //               .arg(bIsValid)
+        //               .arg(bIsCombine)
+        //               .arg(bIsRowSelected)
+        //               .arg(static_cast<int>(rowType)));
+
+        return bResult;
+    }, false, QColor());
+
+    return finalRegex;
+}
+
+void CPatternsView::applyPatternsCombination()
+{
+    if( true == mpModel->areAnyCombinedPatternsAvailable() )
+    {
+        QString finalRegex = createCombinedRegex();
+        patternSelected( finalRegex );
+    }
+}
+
+void CPatternsView::keyPressEvent ( QKeyEvent * pEvent )
+{
+    if(NShortcuts::isApplyCombinationShortcut(pEvent))
+    {
+        if( true == mpModel->areAnyCombinedPatternsAvailable() )
+        {
+            QString finalRegex = createCombinedRegex();
+            patternSelected( finalRegex );
+        }
+    }
+    else if(NShortcuts::isSetCombineShortcut(pEvent))
+    {
+        auto selectedRows = selectionModel()->selectedRows(static_cast<int>(ePatternsColumn::Combine));
+
+        for(const auto& selectedRow : selectedRows)
+        {
+            auto checkState = V_2_CS( selectedRow.data() );
+
+            if(nullptr != mpModel)
+            {
+                mpModel->setIsCombine( selectedRow, getOppositeCheckState( checkState ), true, true );
+            }
+        }
+    }
+    else if(NShortcuts::isClearSeletedPatternsShortcut(pEvent))
+    {
+        if(nullptr != mpModel)
+        {
+            mpModel->clearSelectedPatterns();
+        }
+    }
+    else if(NShortcuts::isResetSeletedPatternsShortcut(pEvent))
+    {
+        if(nullptr != mpModel)
+        {
+            mpModel->resetPatternsToDefault();
+        }
+    }
+    else if(NShortcuts::isDeletePatternShortcut(pEvent))
+    {
+        deletePatternTriggered();
+    }
+    else if(NShortcuts::isCollapseAllShortcut(pEvent))
+    {
+        collapseAll();
+    }
+    else if(NShortcuts::isCopyShortcut(pEvent))
+    {
+        copySelectedRow();
+    }
+    else if(NShortcuts::isPasteShortcut(pEvent))
+    {
+        pasteSelectedRow();
+    }
+    else if(NShortcuts::isExpadAllShortcut(pEvent))
+    {
+        expandAll();
+    }
+    else
+    {
+        tParent::keyPressEvent(pEvent);
+    }
+}
+
+void CPatternsView::scrollTo(const QModelIndex &index, ScrollHint hint)
+{
+    //if(hint == QAbstractItemView::EnsureVisible)
+    //    return;
+    QTreeView::scrollTo(index, hint);
+}
+
+void CPatternsView::setSpecificModel( CPatternsModel* pModel )
+{
+    if(nullptr != pModel)
+    {
+        mpModel = pModel;
+
+        connect( mpModel, &CPatternsModel::filteredEntriesChanged,
+                 [this](const CPatternsModel::tFilteredEntryVec& filteredEntries,
+                 bool expandVisible)
+        {
+            //QElapsedTimer timer;
+            //timer.start();
+
+            //SEND_MSG(QString("~0 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
+
+            if(false == expandVisible)
+            {
+                collapseAll();
+            }
+
+            for(const auto& filteredEntry : filteredEntries)
+            {
+                setRowHidden(filteredEntry.row, filteredEntry.parentIdx, filteredEntry.filtered);
+
+                // on empty filter we leave all tree levels collapsed
+                if(true == expandVisible && false == filteredEntry.filtered)
+                {
+                    setExpanded(filteredEntry.parentIdx, true);
+                    //SEND_MSG(QString("~1 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
+                }
+            }
+
+            //SEND_MSG(QString("~2 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
+        });
+    }
+
+    setModel(pModel);
+}
+
+void CPatternsView::updateColumnsVisibility()
+{
+    const tPatternsColumnsVisibilityMap& visibilityMap = getSettingsManager()->getPatternsColumnsVisibilityMap();
+
+    for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
+         i < static_cast<int>(ePatternsColumn::Last);
+         ++i)
+    {
+        if(i >= static_cast<int>(ePatternsColumn::AfterLastVisible))
+        {
+            hideColumn(i);
+        }
+        else
+        {
+            auto foundColumn = visibilityMap.find(static_cast<ePatternsColumn>(i));
+
+            if( foundColumn != visibilityMap.end() )
+            {
+                if(true == foundColumn.value()) // if column is visible
+                {
+                    showColumn(i);
+                }
+                else
+                {
+                    hideColumn(i);
+                }
+            }
+            else
+            {
+                 hideColumn(static_cast<int>(i));
+            }
+        }
+    }
+}
+
+void CPatternsView::copySelectedRow()
+{
+    auto selectedRows = selectionModel()->selectedRows();
+
+    const auto& selectedIdx = selectedRows.front();
+
+    if(false == selectedRows.isEmpty())
+    {
+        if(nullptr != mpModel)
+        {
+            mCopyPastePatternData = tCopyPastePatternData();
+
+            QString clipboardString;
+            unsigned int counter = 0u;
+
+            auto preVisitFunc = [this, &clipboardString, &counter](const QModelIndex& idx)
+            {
+                tCopyPastePatternItem copyPasteItem;
+
+                ePatternsRowType patternsRowType =
+                        idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType)).data().value<ePatternsRowType>();
+
+                if(ePatternsRowType::ePatternsRowType_Alias == patternsRowType)
+                {
+                    copyPasteItem.alias =
+                            idx.sibling(idx.row(),
+                                                static_cast<int>(ePatternsColumn::Alias)).data().value<QString>();
+
+                    copyPasteItem.regex =
+                            idx.sibling(idx.row(),
+                                                static_cast<int>(ePatternsColumn::Regex)).data().value<QString>();
+
+                    mCopyPastePatternData.items.push_back(copyPasteItem);
+
+                    QString rowStr(QString("[#%1]\n").arg(counter));
+
+                    const auto& copyPasteMap = getSettingsManager()->getPatternsColumnsCopyPasteMap();
+
+                    for( auto it = copyPasteMap.begin(); it != copyPasteMap.end(); ++it )
+                    {
+                        bool bCopyPasteColumn = it.value();
+
+                        if( true == bCopyPasteColumn )
+                        {
+                            ePatternsColumn column = it.key();
+                            rowStr.append(getName(column)).append(" - ");
+
+                            switch( column )
+                            {
+                                case ePatternsColumn::AliasTreeLevel:
+                                {
+                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>());
+                                }
+                                    break;
+                                case ePatternsColumn::Regex:
+                                {
+                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<QString>());
+                                }
+                                    break;
+                                case ePatternsColumn::Default:
+                                case ePatternsColumn::Combine:
+                                {
+                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<bool>() ? "TRUE" : "FALSE");
+                                }
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            rowStr.append("\n");
+                        }
+                    }
+
+                    rowStr.append("\n");
+                    clipboardString.append(rowStr);
+                    ++counter;
+                }
+
+                return true;
+            };
+
+            mpModel->visit(preVisitFunc, CPatternsModel::tVisitFunction(), true, selectedIdx);
+
+            QClipboard* pClipboard = QApplication::clipboard();
+
+            if(nullptr != pClipboard)
+            {
+                pClipboard->setText(clipboardString);
+            }
+        }
+
+        mCopyPastePatternData.file =
+                getSettingsManager()->getSelectedRegexFile();
+    }
+}
+
+void CPatternsView::pasteSelectedRow()
+{
+    if(false == mCopyPastePatternData.file.isEmpty())
+    {
+        pastePatternTriggered(mCopyPastePatternData);
+    }
+}
+
+void CPatternsView::handleSettingsManagerChange()
+{
     header()->setSectionsMovable(false);
 
     setExpandsOnDoubleClick(false); // we will have our own logic
@@ -562,7 +990,7 @@ CPatternsView::CPatternsView(QWidget *parent):
 
                 {
                     const auto& patternsColumnsVisibilityMap =
-                            CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
+                            getSettingsManager()->getPatternsColumnsVisibilityMap();
 
                     for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
                          i < static_cast<int>(ePatternsColumn::AfterLastVisible);
@@ -573,17 +1001,17 @@ CPatternsView::CPatternsView(QWidget *parent):
                         if(foundItem != patternsColumnsVisibilityMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
                             {
                                 auto patternsColumnsVisibilityMap_ =
-                                        CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
+                                        getSettingsManager()->getPatternsColumnsVisibilityMap();
 
                                 auto foundItem_ = patternsColumnsVisibilityMap_.find(static_cast<ePatternsColumn>(i));
 
                                 if(foundItem_ != patternsColumnsVisibilityMap_.end()) // if item is in the map
                                 {
                                     foundItem_.value() = checked; // let's update visibility value
-                                    CSettingsManager::getInstance()->setPatternsColumnsVisibilityMap(patternsColumnsVisibilityMap_);
+                                    getSettingsManager()->setPatternsColumnsVisibilityMap(patternsColumnsVisibilityMap_);
                                 }
                             });
                             pAction->setCheckable(true);
@@ -598,9 +1026,9 @@ CPatternsView::CPatternsView(QWidget *parent):
 
             {
                 QAction* pAction = new QAction("Reset visible columns", this);
-                connect(pAction, &QAction::triggered, []()
+                connect(pAction, &QAction::triggered, [this]()
                 {
-                    CSettingsManager::getInstance()->resetPatternsColumnsVisibilityMap();
+                    getSettingsManager()->resetPatternsColumnsVisibilityMap();
                 });
                 pSubMenu->addAction(pAction);
             }
@@ -612,7 +1040,7 @@ CPatternsView::CPatternsView(QWidget *parent):
 
                 {
                     const auto& patternsColumnsCopyPasteMap =
-                            CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+                            getSettingsManager()->getPatternsColumnsCopyPasteMap();
 
                     for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
                          i < static_cast<int>(ePatternsColumn::AfterLastVisible);
@@ -623,17 +1051,17 @@ CPatternsView::CPatternsView(QWidget *parent):
                         if(foundItem != patternsColumnsCopyPasteMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<ePatternsColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [i](bool checked)
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
                             {
                                 auto patternsColumnsCopyPasteMap_ =
-                                        CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
+                                        getSettingsManager()->getPatternsColumnsCopyPasteMap();
 
                                 auto foundItem_ = patternsColumnsCopyPasteMap_.find(static_cast<ePatternsColumn>(i));
 
                                 if(foundItem_ != patternsColumnsCopyPasteMap_.end()) // if item is in the map
                                 {
                                     foundItem_.value() = checked; // let's update copy paste value
-                                    CSettingsManager::getInstance()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
+                                    getSettingsManager()->setPatternsColumnsCopyPasteMap(patternsColumnsCopyPasteMap_);
                                 }
                             });
                             pAction->setCheckable(true);
@@ -648,9 +1076,9 @@ CPatternsView::CPatternsView(QWidget *parent):
 
             {
                 QAction* pAction = new QAction("Reset copy columns", this);
-                connect(pAction, &QAction::triggered, []()
+                connect(pAction, &QAction::triggered, [this]()
                 {
-                    CSettingsManager::getInstance()->resetPatternsColumnsCopyPasteMap();
+                    getSettingsManager()->resetPatternsColumnsCopyPasteMap();
                 });
                 pSubMenu->addAction(pAction);
             }
@@ -665,25 +1093,25 @@ CPatternsView::CPatternsView(QWidget *parent):
 
             {
                 QAction* pAction = new QAction("Highlight \"combined\" patterns", this);
-                connect(pAction, &QAction::triggered, [](bool checked)
+                connect(pAction, &QAction::triggered, [this](bool checked)
                 {
-                    CSettingsManager::getInstance()->setHighlightActivePatterns(checked);
+                    getSettingsManager()->setHighlightActivePatterns(checked);
                 });
                 pAction->setCheckable(true);
-                pAction->setChecked(CSettingsManager::getInstance()->getHighlightActivePatterns());
+                pAction->setChecked(getSettingsManager()->getHighlightActivePatterns());
                 pSubMenu->addAction(pAction);
             }
 
             {
-                if(true == CSettingsManager::getInstance()->getHighlightActivePatterns())
+                if(true == getSettingsManager()->getHighlightActivePatterns())
                 {
                     QAction* pAction = new QAction("Highlighting color ...", this);
                     connect(pAction, &QAction::triggered, [this]()
                     {
-                        QColor color = QColorDialog::getColor( CSettingsManager::getInstance()->getPatternsHighlightingColor(), this );
+                        QColor color = QColorDialog::getColor( getSettingsManager()->getPatternsHighlightingColor(), this );
                         if( color.isValid() )
                         {
-                            CSettingsManager::getInstance()->setPatternsHighlightingColor(color);
+                            getSettingsManager()->setPatternsHighlightingColor(color);
                         }
                     });
                     pSubMenu->addAction(pAction);
@@ -697,12 +1125,12 @@ CPatternsView::CPatternsView(QWidget *parent):
 
         {
             QAction* pAction = new QAction("Open regex patterns storage", this);
-            connect(pAction, &QAction::triggered, []()
+            connect(pAction, &QAction::triggered, [this]()
             {
                 SEND_MSG(QString("[CPatternsView]: Attempt to open path - \"%1\"")
-                         .arg(CSettingsManager::getInstance()->getRegexDirectoryFull()));
+                         .arg(getSettingsManager()->getRegexDirectoryFull()));
 
-                QDesktopServices::openUrl( QUrl::fromLocalFile( CSettingsManager::getInstance()->getRegexDirectoryFull() ) );
+                QDesktopServices::openUrl( QUrl::fromLocalFile( getSettingsManager()->getRegexDirectoryFull() ) );
             });
             contextMenu.addAction(pAction);
         }
@@ -711,12 +1139,12 @@ CPatternsView::CPatternsView(QWidget *parent):
 
         {
             QAction* pAction = new QAction("Minimize on selection", this);
-            connect(pAction, &QAction::triggered, [](bool checked)
+            connect(pAction, &QAction::triggered, [this](bool checked)
             {
-                CSettingsManager::getInstance()->setMinimizePatternsViewOnSelection(checked);
+                getSettingsManager()->setMinimizePatternsViewOnSelection(checked);
             });
             pAction->setCheckable(true);
-            pAction->setChecked(CSettingsManager::getInstance()->getMinimizePatternsViewOnSelection());
+            pAction->setChecked(getSettingsManager()->getMinimizePatternsViewOnSelection());
             contextMenu.addAction(pAction);
         }
 
@@ -725,8 +1153,8 @@ CPatternsView::CPatternsView(QWidget *parent):
 
     connect( this, &QWidget::customContextMenuRequested, showContextMenu );
 
-    connect( CSettingsManager::getInstance().get(),
-             &CSettingsManager::patternsColumnsVisibilityMapChanged,
+    connect( getSettingsManager().get(),
+             &ISettingsManager::patternsColumnsVisibilityMapChanged,
              [this](const tPatternsColumnsVisibilityMap&)
     {
         updateColumnsVisibility();
@@ -735,433 +1163,10 @@ CPatternsView::CPatternsView(QWidget *parent):
     setItemDelegate(mpRepresentationDelegate);
 }
 
-CPatternsView::~CPatternsView()
-{
-    if(nullptr != mpRepresentationDelegate)
-    {
-        delete mpRepresentationDelegate;
-        mpRepresentationDelegate = nullptr;
-    }
-}
-
-void CPatternsView::setModel(QAbstractItemModel *model)
-{
-    tParent::setModel(model);
-    updateColumnsVisibility();
-}
-
-void CPatternsView::setPatternsSearchInput( QLineEdit* pPatternsSearchInput )
-{
-    mpPatternsSearchInput = pPatternsSearchInput;
-
-    if(nullptr != mpPatternsSearchInput)
-    {
-        mpPatternsSearchInput->installEventFilter(this);
-    }
-}
-
-bool CPatternsView::eventFilter(QObject* pObj, QEvent* pEvent)
-{
-    if (pEvent->type() == QEvent::KeyPress)
-    {
-        QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
-
-        if(NShortcuts::isApplyCombinationShortcut(pKeyEvent) ||
-           NShortcuts::isClearSeletedPatternsShortcut(pKeyEvent) ||
-           NShortcuts::isResetSeletedPatternsShortcut(pKeyEvent) ||
-           NShortcuts::isCollapseAllShortcut(pKeyEvent) ||
-           NShortcuts::isExpadAllShortcut(pKeyEvent))
-        {
-            keyPressEvent(pKeyEvent);
-        }
-    }
-
-    return QObject::eventFilter(pObj, pEvent);
-}
-
-QString CPatternsView::createCombinedRegex()
-{
-    QString finalRegex;
-
-    bool firstInjection = true;
-
-    typedef std::function<bool(const QModelIndex& idx)> tComparator;
-
-    QSet<QString> usedPatterns;
-
-    auto fillInPatterns = [this, &firstInjection, &finalRegex, &usedPatterns](const tComparator comparator, bool animate, const QColor& initialColor)
-    {
-        QVector<QModelIndex> highlightedRows;
-
-        auto preVisitFunc = [this,
-                &firstInjection,
-                &finalRegex,
-                &usedPatterns,
-                &comparator,
-                &animate,
-                &highlightedRows](const QModelIndex& idx)
-        {
-            auto alias = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>();
-
-            if( comparator(idx) )
-            {
-                auto foundUsedPattern = usedPatterns.find( alias );
-
-                if(foundUsedPattern == usedPatterns.end())
-                {
-                    if( false == firstInjection )
-                    {
-                        finalRegex.append("|");
-                    }
-
-                    finalRegex.append( idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Regex)).data().value<QString>() );
-                    firstInjection = false;
-
-                    if(nullptr != mpRepresentationDelegate)
-                    {
-                        bool bHighlight = CSettingsManager::getInstance()->getHighlightActivePatterns();
-
-                        if(true == bHighlight && true == animate)
-                        {
-                            highlightedRows.push_back(idx);
-                        }
-                    }
-
-                    usedPatterns.insert(alias);
-                }
-            }
-
-            return true;
-        };
-
-        mpModel->visit(preVisitFunc, CPatternsModel::tVisitFunction());
-
-        if(nullptr != mpRepresentationDelegate && false == highlightedRows.empty())
-        {
-            QColor highlightingColor = CSettingsManager::getInstance()->getPatternsHighlightingColor();
-            mpRepresentationDelegate->animateRows(highlightedRows, initialColor, highlightingColor, initialColor, 250 );
-            viewport()->update();
-        }
-    };
-
-    QColor initialColor = palette().color(QPalette::ColorRole::Base);
-
-    fillInPatterns( [this](const QModelIndex& idx)
-    {
-        bool bResult = false;
-
-        auto rowTypeIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType));
-        auto rowType = rowTypeIdx.data().value<ePatternsRowType>();
-        bool bIsValid = idx.isValid();
-        auto combineIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Combine));
-        auto bIsCombine = V_2_CS( combineIdx.data() );
-        bool bIsRowSelected = selectionModel()->isRowSelected(idx.row(), idx.parent());
-        bResult = bIsValid && bIsCombine == Qt::Checked && !bIsRowSelected && rowType == ePatternsRowType::ePatternsRowType_Alias;
-
-        //SEND_MSG(QString("patternName - %1 "
-        //                 "bIsValid - %2, "
-        //                 "bIsCombine - %3, "
-        //                 "bIsRowSelected - %4, "
-        //                 "rowType - %5")
-        //               .arg(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>())
-        //               .arg(bIsValid)
-        //               .arg(bIsCombine)
-        //               .arg(bIsRowSelected)
-        //               .arg(static_cast<int>(rowType)));
-
-        return bResult;
-    }, true, initialColor);
-
-    fillInPatterns( [this](const QModelIndex& idx)
-    {
-        bool bResult = false;
-
-        auto rowTypeIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType));
-        auto rowType = rowTypeIdx.data().value<ePatternsRowType>();
-        bool bIsValid = idx.isValid();
-        auto combineIdx = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Combine));
-        auto bIsCombine = V_2_CS( combineIdx.data() );
-        bool bIsRowSelected = selectionModel()->isRowSelected(idx.row(), idx.parent());
-        bResult = bIsValid && bIsCombine == Qt::Checked && bIsRowSelected && rowType == ePatternsRowType::ePatternsRowType_Alias;
-
-        //SEND_MSG(QString("patternName - %1 "
-        //                 "bIsValid - %2, "
-        //                 "bIsCombine - %3, "
-        //                 "bIsRowSelected - %4, "
-        //                 "rowType - %5")
-        //               .arg(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>())
-        //               .arg(bIsValid)
-        //               .arg(bIsCombine)
-        //               .arg(bIsRowSelected)
-        //               .arg(static_cast<int>(rowType)));
-
-        return bResult;
-    }, false, QColor());
-
-    return finalRegex;
-}
-
-void CPatternsView::applyPatternsCombination()
-{
-    if( true == mpModel->areAnyCombinedPatternsAvailable() )
-    {
-        QString finalRegex = createCombinedRegex();
-        patternSelected( finalRegex );
-    }
-}
-
-void CPatternsView::keyPressEvent ( QKeyEvent * pEvent )
-{
-    if(NShortcuts::isApplyCombinationShortcut(pEvent))
-    {
-        if( true == mpModel->areAnyCombinedPatternsAvailable() )
-        {
-            QString finalRegex = createCombinedRegex();
-            patternSelected( finalRegex );
-        }
-    }
-    else if(NShortcuts::isSetCombineShortcut(pEvent))
-    {
-        auto selectedRows = selectionModel()->selectedRows(static_cast<int>(ePatternsColumn::Combine));
-
-        for(const auto& selectedRow : selectedRows)
-        {
-            auto checkState = V_2_CS( selectedRow.data() );
-
-            if(nullptr != mpModel)
-            {
-                mpModel->setIsCombine( selectedRow, getOppositeCheckState( checkState ), true, true );
-            }
-        }
-    }
-    else if(NShortcuts::isClearSeletedPatternsShortcut(pEvent))
-    {
-        if(nullptr != mpModel)
-        {
-            mpModel->clearSelectedPatterns();
-        }
-    }
-    else if(NShortcuts::isResetSeletedPatternsShortcut(pEvent))
-    {
-        if(nullptr != mpModel)
-        {
-            mpModel->resetPatternsToDefault();
-        }
-    }
-    else if(NShortcuts::isDeletePatternShortcut(pEvent))
-    {
-        deletePatternTriggered();
-    }
-    else if(NShortcuts::isCollapseAllShortcut(pEvent))
-    {
-        collapseAll();
-    }
-    else if(NShortcuts::isCopyShortcut(pEvent))
-    {
-        copySelectedRow();
-    }
-    else if(NShortcuts::isPasteShortcut(pEvent))
-    {
-        pasteSelectedRow();
-    }
-    else if(NShortcuts::isExpadAllShortcut(pEvent))
-    {
-        expandAll();
-    }
-    else
-    {
-        tParent::keyPressEvent(pEvent);
-    }
-}
-
-void CPatternsView::scrollTo(const QModelIndex &index, ScrollHint hint)
-{
-    //if(hint == QAbstractItemView::EnsureVisible)
-    //    return;
-    QTreeView::scrollTo(index, hint);
-}
-
-void CPatternsView::setSpecificModel( CPatternsModel* pModel )
-{
-    if(nullptr != pModel)
-    {
-        mpModel = pModel;
-
-        connect( mpModel, &CPatternsModel::filteredEntriesChanged,
-                 [this](const CPatternsModel::tFilteredEntryVec& filteredEntries,
-                 bool expandVisible)
-        {
-            //QElapsedTimer timer;
-            //timer.start();
-
-            //SEND_MSG(QString("~0 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
-
-            if(false == expandVisible)
-            {
-                collapseAll();
-            }
-
-            for(const auto& filteredEntry : filteredEntries)
-            {
-                setRowHidden(filteredEntry.row, filteredEntry.parentIdx, filteredEntry.filtered);
-
-                // on empty filter we leave all tree levels collapsed
-                if(true == expandVisible && false == filteredEntry.filtered)
-                {
-                    setExpanded(filteredEntry.parentIdx, true);
-                    //SEND_MSG(QString("~1 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
-                }
-            }
-
-            //SEND_MSG(QString("~2 [CPatternsView][%1] Processing took - %2 ms").arg(__FUNCTION__).arg(timer.elapsed()));
-        });
-    }
-
-    setModel(pModel);
-}
-
-void CPatternsView::updateColumnsVisibility()
-{
-    const tPatternsColumnsVisibilityMap& visibilityMap = CSettingsManager::getInstance()->getPatternsColumnsVisibilityMap();
-
-    for( int i = static_cast<int>(ePatternsColumn::AliasTreeLevel);
-         i < static_cast<int>(ePatternsColumn::Last);
-         ++i)
-    {
-        if(i >= static_cast<int>(ePatternsColumn::AfterLastVisible))
-        {
-            hideColumn(i);
-        }
-        else
-        {
-            auto foundColumn = visibilityMap.find(static_cast<ePatternsColumn>(i));
-
-            if( foundColumn != visibilityMap.end() )
-            {
-                if(true == foundColumn.value()) // if column is visible
-                {
-                    showColumn(i);
-                }
-                else
-                {
-                    hideColumn(i);
-                }
-            }
-            else
-            {
-                 hideColumn(static_cast<int>(i));
-            }
-        }
-    }
-}
-
-void CPatternsView::copySelectedRow()
-{
-    auto selectedRows = selectionModel()->selectedRows();
-
-    const auto& selectedIdx = selectedRows.front();
-
-    if(false == selectedRows.isEmpty())
-    {
-        if(nullptr != mpModel)
-        {
-            mCopyPastePatternData = tCopyPastePatternData();
-
-            QString clipboardString;
-            unsigned int counter = 0u;
-
-            auto preVisitFunc = [this, &clipboardString, &counter](const QModelIndex& idx)
-            {
-                tCopyPastePatternItem copyPasteItem;
-
-                ePatternsRowType patternsRowType =
-                        idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::RowType)).data().value<ePatternsRowType>();
-
-                if(ePatternsRowType::ePatternsRowType_Alias == patternsRowType)
-                {
-                    copyPasteItem.alias =
-                            idx.sibling(idx.row(),
-                                                static_cast<int>(ePatternsColumn::Alias)).data().value<QString>();
-
-                    copyPasteItem.regex =
-                            idx.sibling(idx.row(),
-                                                static_cast<int>(ePatternsColumn::Regex)).data().value<QString>();
-
-                    mCopyPastePatternData.items.push_back(copyPasteItem);
-
-                    QString rowStr(QString("[#%1]\n").arg(counter));
-
-                    const auto& copyPasteMap = CSettingsManager::getInstance()->getPatternsColumnsCopyPasteMap();
-
-                    for( auto it = copyPasteMap.begin(); it != copyPasteMap.end(); ++it )
-                    {
-                        bool bCopyPasteColumn = it.value();
-
-                        if( true == bCopyPasteColumn )
-                        {
-                            ePatternsColumn column = it.key();
-                            rowStr.append(getName(column)).append(" - ");
-
-                            switch( column )
-                            {
-                                case ePatternsColumn::AliasTreeLevel:
-                                {
-                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>());
-                                }
-                                    break;
-                                case ePatternsColumn::Regex:
-                                {
-                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<QString>());
-                                }
-                                    break;
-                                case ePatternsColumn::Default:
-                                case ePatternsColumn::Combine:
-                                {
-                                    rowStr.append(idx.sibling(idx.row(), static_cast<int>(column)).data().value<bool>() ? "TRUE" : "FALSE");
-                                }
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                            rowStr.append("\n");
-                        }
-                    }
-
-                    rowStr.append("\n");
-                    clipboardString.append(rowStr);
-                    ++counter;
-                }
-
-                return true;
-            };
-
-            mpModel->visit(preVisitFunc, CPatternsModel::tVisitFunction(), true, selectedIdx);
-
-            QClipboard* pClipboard = QApplication::clipboard();
-
-            if(nullptr != pClipboard)
-            {
-                pClipboard->setText(clipboardString);
-            }
-        }
-
-        mCopyPastePatternData.file =
-                CSettingsManager::getInstance()->getSelectedRegexFile();
-    }
-}
-
-void CPatternsView::pasteSelectedRow()
-{
-    if(false == mCopyPastePatternData.file.isEmpty())
-    {
-        pastePatternTriggered(mCopyPastePatternData);
-    }
-}
-
 PUML_PACKAGE_BEGIN(DMA_PatternsView_API)
     PUML_CLASS_BEGIN_CHECKED(CPatternsView)
         PUML_INHERITANCE_CHECKED(QTreeView, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeRepresentationDelegate, 1, 1, contains)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, patterns search input)

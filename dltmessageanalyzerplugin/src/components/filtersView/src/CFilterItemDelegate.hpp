@@ -9,11 +9,14 @@
 
 #include <QStyledItemDelegate>
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class QCompleter;
 class CFiltersModel;
 class CRegexLineEdit;
 
-class CFilterItemDelegate : public QStyledItemDelegate
+class CFilterItemDelegate : public QStyledItemDelegate,
+                            public CSettingsManagerClient
 {
 public:
     typedef QStyledItemDelegate tParent;

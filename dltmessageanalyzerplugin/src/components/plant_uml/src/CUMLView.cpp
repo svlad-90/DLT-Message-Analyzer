@@ -15,14 +15,14 @@
 
 #include "CImageViewer.hpp"
 #include "../api/CUMLView.hpp"
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
 
-static QString get_UML_Storage_Path()
+static QString get_UML_Storage_Path(const QString& settingsFilePath)
 {
-    static const QString result( CSettingsManager::getInstance()->getSettingsFilepath() + QString("/uml/") );
+    const QString result( settingsFilePath + QString("/uml/") );
     return result;
 }
 
@@ -125,176 +125,6 @@ mLastSelectedFolder(QString(".") + QDir::separator())
 {
     mpImageViewer = new CImageViewer(this);
     setWidget(mpImageViewer);
-
-    auto showContextMenu = [this](const QPoint &pos)
-    {
-        QMenu contextMenu("Context menu", this);
-
-        {
-            QAction* pAction = new QAction("Save as ...", this);
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                QString targetFilePath = QFileDialog::getSaveFileName(this, tr("Save as"),
-                                                                mLastSelectedFolder + get_UML_File_Name(),
-                                                                tr("Portable network graphics (*.png);;"
-                                                                   "Plantuml (*.puml);;"
-                                                                   "Scalable vector graphics (*.svg)"));
-
-                if(false == targetFilePath.isEmpty())
-                {
-                    QFileInfo fileInfo(targetFilePath);
-
-                    auto extension = fileInfo.suffix();
-
-                    // try to remove the file if it exists
-                    if(fileInfo.exists())
-                    {
-                        mLastSelectedFolder = fileInfo.dir().path() + QDir::separator();
-                        QFile::remove(targetFilePath);
-                    }
-
-                    if(extension == get_PNG_Extension())
-                    {
-                        auto sourceFilePath = get_UML_Storage_Path() + get_UML_PNG_File_Name();
-
-                        if(!QFile::copy(sourceFilePath, targetFilePath))
-                        {
-                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
-                        }
-                    }
-                    else if(extension == get_PUML_Extension())
-                    {
-                        auto sourceFilePath = get_UML_Storage_Path() + get_UML_PUML_File_Name();
-                        if(!QFile::copy(sourceFilePath, targetFilePath))
-                        {
-                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
-                        }
-                    }
-                    else if(extension == get_SVG_Extension())
-                    {
-                        auto callback = [this, targetFilePath](int exitCode, QProcess::ExitStatus exitStatus)
-                        {
-                            // copy resulting SVG
-                            if(0 == exitCode && exitStatus == QProcess::ExitStatus::NormalExit)
-                            {
-                                auto sourceFilePath = get_UML_Storage_Path() + get_UML_SVG_File_Name();
-                                if(!QFile::copy(sourceFilePath, targetFilePath))
-                                {
-                                    SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
-                                }
-                            }
-                            else
-                            {
-                                SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
-                                diagramGenerationFinished(false);
-                            }
-
-                            mpSaveSVGSubProcess.reset();
-                        };
-
-                        generateUMLDiagramInternal(mDiagramContent, eDiagramExtension::e_SVG, callback, mpSaveSVGSubProcess, true);
-                    }
-                }
-            });
-
-            pAction->setEnabled(mbDiagramShown);
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        if(true == mbDiagramShown)
-        {
-            QAction* pAction = new QAction("Clear diagram", this);
-            connect(pAction, &QAction::triggered, [this]()
-            {
-                if(true == mbDiagramShown)
-                {
-                    mbDiagramShown = false;
-                    mDiagramContent.clear();
-                    clearDiagram();
-                }
-            });
-
-            pAction->setEnabled(mbDiagramShown);
-            contextMenu.addAction(pAction);
-        }
-
-        contextMenu.addSeparator();
-
-        {
-            QMenu* pSubMenu = new QMenu("UML settings", this);
-
-            {
-                {
-                    QAction* pAction = new QAction("Show arguments", this);
-                    connect(pAction, &QAction::triggered, [](bool checked)
-                    {
-                        CSettingsManager::getInstance()->setUML_ShowArguments(checked);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(CSettingsManager::getInstance()->getUML_ShowArguments());
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Wrap output", this);
-                    connect(pAction, &QAction::triggered, [](bool checked)
-                    {
-                        CSettingsManager::getInstance()->setUML_WrapOutput(checked);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(CSettingsManager::getInstance()->getUML_WrapOutput());
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Autonumber", this);
-                    connect(pAction, &QAction::triggered, [](bool checked)
-                    {
-                        CSettingsManager::getInstance()->setUML_Autonumber(checked);
-                    });
-                    pAction->setCheckable(true);
-                    pAction->setChecked(CSettingsManager::getInstance()->getUML_Autonumber());
-
-                    pSubMenu->addAction(pAction);
-                }
-
-                {
-                    QAction* pAction = new QAction("Max rows number ...", this);
-                    connect(pAction, &QAction::triggered, []()
-                    {
-                        bool ok;
-
-                        QString maxRowsStr = QInputDialog::getText(  nullptr, "Max rows number",
-                                   "Set max rows number in diagram:",
-                                   QLineEdit::Normal,
-                                   QString::number(CSettingsManager::getInstance()->getUML_MaxNumberOfRowsInDiagram()), &ok );
-
-                        if(true == ok)
-                        {
-                            auto maxRows = maxRowsStr.toInt(&ok);
-
-                            if(true == ok)
-                            {
-                                CSettingsManager::getInstance()->setUML_MaxNumberOfRowsInDiagram(maxRows);
-                            }
-                        }
-                    });
-
-                    pSubMenu->addAction(pAction);
-                }
-            }
-
-            contextMenu.addMenu(pSubMenu);
-        }
-
-        contextMenu.exec(mapToGlobal(pos));
-    };
-
-    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
 }
 
 void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
@@ -309,14 +139,14 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
     }
 
     // check that target folder exists
-    if(false == QDir(get_UML_Storage_Path()).exists())
+    if(false == QDir(get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath())).exists())
     {
-        QDir().mkdir(get_UML_Storage_Path());
+        QDir().mkdir(get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()));
     }
 
     pSubProcess = std::make_shared<QProcess>(this);
 
-    QString PUML_file_path = get_UML_Storage_Path() + get_UML_PUML_File_Name();
+    QString PUML_file_path = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PUML_File_Name();
 
     QFile PUML_file(PUML_file_path);
 
@@ -340,7 +170,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
         PUML_file.close();
     }
 
-    QString result_file_path = get_UML_Storage_Path() + ( extension == eDiagramExtension::e_PNG ? get_UML_PNG_File_Name() : get_UML_SVG_File_Name() );
+    QString result_file_path = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + ( extension == eDiagramExtension::e_PNG ? get_UML_PNG_File_Name() : get_UML_SVG_File_Name() );
 
     QFile result_file(result_file_path);
 
@@ -369,7 +199,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
     });
 
     // call plantuml to generate PNG
-    auto resCommand = get_PlantUML_Command(PUML_file_path, extension, CSettingsManager::getInstance()->getUML_MaxNumberOfRowsInDiagram());
+    auto resCommand = get_PlantUML_Command(PUML_file_path, extension, getSettingsManager()->getUML_MaxNumberOfRowsInDiagram());
     pSubProcess->start(resCommand.first, resCommand.second);
 
     if(true == blocking)
@@ -380,7 +210,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
 
 void CUMLView::generateUMLDiagram(const QString& diagramContent)
 {
-    QString PNG_file_path = get_UML_Storage_Path() + get_UML_PNG_File_Name();
+    QString PNG_file_path = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PNG_File_Name();
 
     mbDiagramShown = false;
 
@@ -453,9 +283,183 @@ bool CUMLView::isDiagramShown() const
     return mbDiagramShown;
 }
 
+void CUMLView::handleSettingsManagerChange()
+{
+    auto showContextMenu = [this](const QPoint &pos)
+    {
+        QMenu contextMenu("Context menu", this);
+
+        {
+            QAction* pAction = new QAction("Save as ...", this);
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                QString targetFilePath = QFileDialog::getSaveFileName(this, tr("Save as"),
+                                                                mLastSelectedFolder + get_UML_File_Name(),
+                                                                tr("Portable network graphics (*.png);;"
+                                                                   "Plantuml (*.puml);;"
+                                                                   "Scalable vector graphics (*.svg)"));
+
+                if(false == targetFilePath.isEmpty())
+                {
+                    QFileInfo fileInfo(targetFilePath);
+
+                    auto extension = fileInfo.suffix();
+
+                    // try to remove the file if it exists
+                    if(fileInfo.exists())
+                    {
+                        mLastSelectedFolder = fileInfo.dir().path() + QDir::separator();
+                        QFile::remove(targetFilePath);
+                    }
+
+                    if(extension == get_PNG_Extension())
+                    {
+                        auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PNG_File_Name();
+
+                        if(!QFile::copy(sourceFilePath, targetFilePath))
+                        {
+                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                        }
+                    }
+                    else if(extension == get_PUML_Extension())
+                    {
+                        auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PUML_File_Name();
+                        if(!QFile::copy(sourceFilePath, targetFilePath))
+                        {
+                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                        }
+                    }
+                    else if(extension == get_SVG_Extension())
+                    {
+                        auto callback = [this, targetFilePath](int exitCode, QProcess::ExitStatus exitStatus)
+                        {
+                            // copy resulting SVG
+                            if(0 == exitCode && exitStatus == QProcess::ExitStatus::NormalExit)
+                            {
+                                auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_SVG_File_Name();
+                                if(!QFile::copy(sourceFilePath, targetFilePath))
+                                {
+                                    SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                                }
+                            }
+                            else
+                            {
+                                SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
+                                diagramGenerationFinished(false);
+                            }
+
+                            mpSaveSVGSubProcess.reset();
+                        };
+
+                        generateUMLDiagramInternal(mDiagramContent, eDiagramExtension::e_SVG, callback, mpSaveSVGSubProcess, true);
+                    }
+                }
+            });
+
+            pAction->setEnabled(mbDiagramShown);
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        if(true == mbDiagramShown)
+        {
+            QAction* pAction = new QAction("Clear diagram", this);
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                if(true == mbDiagramShown)
+                {
+                    mbDiagramShown = false;
+                    mDiagramContent.clear();
+                    clearDiagram();
+                }
+            });
+
+            pAction->setEnabled(mbDiagramShown);
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
+            QMenu* pSubMenu = new QMenu("UML settings", this);
+
+            {
+                {
+                    QAction* pAction = new QAction("Show arguments", this);
+                    connect(pAction, &QAction::triggered, [this](bool checked)
+                    {
+                        getSettingsManager()->setUML_ShowArguments(checked);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getUML_ShowArguments());
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Wrap output", this);
+                    connect(pAction, &QAction::triggered, [this](bool checked)
+                    {
+                        getSettingsManager()->setUML_WrapOutput(checked);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getUML_WrapOutput());
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Autonumber", this);
+                    connect(pAction, &QAction::triggered, [this](bool checked)
+                    {
+                        getSettingsManager()->setUML_Autonumber(checked);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getUML_Autonumber());
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Max rows number ...", this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        bool ok;
+
+                        QString maxRowsStr = QInputDialog::getText(  nullptr, "Max rows number",
+                                   "Set max rows number in diagram:",
+                                   QLineEdit::Normal,
+                                   QString::number(getSettingsManager()->getUML_MaxNumberOfRowsInDiagram()), &ok );
+
+                        if(true == ok)
+                        {
+                            auto maxRows = maxRowsStr.toInt(&ok);
+
+                            if(true == ok)
+                            {
+                                getSettingsManager()->setUML_MaxNumberOfRowsInDiagram(maxRows);
+                            }
+                        }
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        contextMenu.exec(mapToGlobal(pos));
+    };
+
+    connect( this, &QWidget::customContextMenuRequested, showContextMenu );
+}
+
 PUML_PACKAGE_BEGIN(DMA_PlantumlView_API)
     PUML_CLASS_BEGIN_CHECKED(CUMLView)
         PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CImageViewer, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QProcess, 1, 2, contains)
     PUML_CLASS_END()

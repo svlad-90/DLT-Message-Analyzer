@@ -9,19 +9,25 @@
 
 #include "QStyledItemDelegate"
 
-class CSearchResultHighlightingDelegate : public QStyledItemDelegate
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CSearchResultHighlightingDelegate : public QStyledItemDelegate,
+                                          public CSettingsManagerClient
 {
     Q_OBJECT
 
 public:
 
-    CSearchResultHighlightingDelegate();
+    CSearchResultHighlightingDelegate(QObject *parent = nullptr);
     ~CSearchResultHighlightingDelegate() override;
 
     void paint(QPainter *painter,
                const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const override;
+
+protected:
+    void handleSettingsManagerChange() override;
 
 private:
 

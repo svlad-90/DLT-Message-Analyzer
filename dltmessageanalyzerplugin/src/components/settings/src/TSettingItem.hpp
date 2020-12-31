@@ -1,11 +1,10 @@
-#ifndef TSETTINGITEM_HPP
-#define TSETTINGITEM_HPP
+#pragma once
 
 #include <QString>
 
-#include "../common/Definitions.hpp"
-#include "../common/cpp_extensions.hpp"
-#include "../common/TOptional.hpp"
+#include "common/Definitions.hpp"
+#include "common/cpp_extensions.hpp"
+#include "common/TOptional.hpp"
 #include "CSettingItem.hpp"
 
 template<typename T>
@@ -284,5 +283,3 @@ private:
 
     tOptionalAllowedRange mAllowedRange;
 };
-
-#endif // TSETTINGITEM_HPP

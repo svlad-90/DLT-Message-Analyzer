@@ -31,6 +31,15 @@ class "IPatternsModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -41,6 +50,7 @@ abstract class "QAbstractItemModel"
 }
 
 '====================Inheritance section====================
+CSettingsManagerClient <|-- CPatternsModel : extends
 IPatternsModel <|-- CPatternsModel : implements
 QAbstractItemModel <|-- CPatternsModel : implements
 

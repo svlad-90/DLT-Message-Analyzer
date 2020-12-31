@@ -35,6 +35,15 @@ class "ISearchResultModel"
 
 }
 
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
 package "Qt" #DDDDDD
 {
 
@@ -50,6 +59,7 @@ class "QTableView"
 
 '====================Inheritance section====================
 QTableView <|-- CSearchResultView : extends
+CSettingsManagerClient <|-- CSearchViewComponent : extends
 DMA::IComponent <|-- CSearchViewComponent : implements
 QObject <|-- CSearchViewComponent : extends
 

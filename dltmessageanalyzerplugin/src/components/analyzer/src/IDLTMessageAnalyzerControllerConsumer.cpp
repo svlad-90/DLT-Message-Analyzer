@@ -8,7 +8,7 @@
 #include "../api/IDLTMessageAnalyzerController.hpp"
 #include "qdlt.h"
 
-#include "settings/CSettingsManager.hpp"
+#include "components/settings/api/ISettingsManager.hpp"
 #include "components/log/api/CLog.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -30,15 +30,14 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tFileWra
                                                                   const int& numberOfMessages,
                                                                   const QRegularExpression& regex,
                                                                   const int& numberOfThreads,
-                                                                  bool isContinuous)
+                                                                  bool isContinuous,
+                                                                  bool bUMLFeatureActive )
 {
     tRequestId requestId = INVALID_REQUEST_ID;
 
     if(false == mpController.expired())
     {
         tRegexScriptingMetadata regexMetadata;
-
-        bool bUMLFeatureActive = CSettingsManager::getInstance()->getUML_FeatureActive();
 
         bool bParseResult = regexMetadata.parse(regex, bUMLFeatureActive);
 

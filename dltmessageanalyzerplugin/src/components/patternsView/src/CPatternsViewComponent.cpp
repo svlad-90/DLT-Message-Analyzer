@@ -8,7 +8,9 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CPatternsViewComponent::CPatternsViewComponent( CPatternsView* pPatternsView ):
+CPatternsViewComponent::CPatternsViewComponent( CPatternsView* pPatternsView,
+                                                const tSettingsManagerPtr& pSettingsManagerPtr ):
+CSettingsManagerClient(pSettingsManagerPtr),
 mpPatternsModel(nullptr),
 mpPatternsView(pPatternsView)
 {
@@ -33,10 +35,11 @@ DMA::tSyncInitOperationResult CPatternsViewComponent::init()
    {
        if(nullptr != mpPatternsView)
        {
-           auto pPatternsModel= std::make_shared<CPatternsModel>();
+           auto pPatternsModel= std::make_shared<CPatternsModel>(getSettingsManager());
 
            if( nullptr != pPatternsModel )
            {
+               mpPatternsView->setSettingsManager(getSettingsManager());
                mpPatternsModel = pPatternsModel;
                mpPatternsView->setSpecificModel(pPatternsModel.get());
            }
@@ -90,6 +93,7 @@ CPatternsView* CPatternsViewComponent::getPatternsView() const
 PUML_PACKAGE_BEGIN(DMA_PatternsView_API)
    PUML_CLASS_BEGIN(CPatternsViewComponent)
        PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+       PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
        PUML_COMPOSITION_DEPENDENCY_CHECKED(IPatternsModel, 1, 1, contains)
        PUML_USE_DEPENDENCY_CHECKED(CPatternsModel, 1, 1, using to create IPatternsModel)
        PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
