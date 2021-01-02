@@ -82,7 +82,6 @@ TARGET_LINK_LIBRARIES(antlr4_PCRE_static antlr4_static)
 ################### ANTLR ( END ) #########################
 
 ################### DLT_MESSAGE_ANALYZER ##################
-QT5_WRAP_UI( UI_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/form.ui )
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 ################### PROJECT ###############################
@@ -102,29 +101,14 @@ include_directories(../../thirdparty/DMA_Plantuml/src)
 
 DMA_add_subdirectory_with_clang_tidy(common)
 DMA_add_subdirectory_with_clang_tidy(components)
+DMA_add_subdirectory_with_clang_tidy(plugin)
 
 add_library(DLT-Message-Analyzer MODULE
     dltmessageanalyzerplugin.cpp
-    CDLTMessageAnalyzer.cpp
-    form.cpp
-    ${UI_HEADERS}
     resources/dltmessageanalyzer.qrc)
 
 target_link_libraries(DLT-Message-Analyzer
-    DMA_analyzer
-    DMA_common
-    DMA_searchView
-    DMA_plant_uml
-    DMA_log
-    DMA_settings
-    DMA_logo
-    DMA_logsWrapper
-    DMA_filtersView
-    DMA_filtersView_no_clang_tidy
-    DMA_groupedView
-    DMA_patternsView
-    DMA_PCRE
-    DMA_Plantuml
+    DMA_plugin
     )
 
 if(TURN_OFF_RCC)

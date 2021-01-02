@@ -91,14 +91,19 @@ class "IFileWrapper"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -141,7 +146,7 @@ CAnalyzerComponent "1" --> "1" CMTAnalyzer : creates and feeds into CContinuousA
 IDLTMessageAnalyzerController "1" --> "1" IFileWrapper : uses
 IDLTMessageAnalyzerControllerConsumer "1" o-- "1" IDLTMessageAnalyzerController : uses
 IDLTMessageAnalyzerControllerConsumer "1" --> "1" IFileWrapper : uses
-CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
+CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 
 @enduml

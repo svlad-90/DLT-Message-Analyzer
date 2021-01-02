@@ -52,14 +52,19 @@ class "IPatternsModel"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -110,9 +115,9 @@ CPatternsView "1" o-- "1" QLineEdit : patterns search input
 CPatternsViewComponent "1" --> "1" CPatternsModel : using to create IPatternsModel
 CPatternsViewComponent "1" o-- "1" CPatternsView : uses
 CPatternsViewComponent "1" *-- "1" IPatternsModel : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
-DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 Ui::Form "1" *-- "1" CPatternsView : contains
 
 @enduml

@@ -43,14 +43,19 @@ class "IGroupedViewModel"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -89,8 +94,8 @@ DMA::IComponent <|-- CGroupedViewComponent : implements
 CGroupedViewComponent "1" o-- "1" CGroupedView : uses
 CGroupedViewComponent "1" --> "1" CGroupedViewModel : using to create IGroupedViewModel
 CGroupedViewComponent "1" *-- "1" IGroupedViewModel : contains
-CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
+CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
 Ui::Form "1" *-- "1" CGroupedView : contains
 
 @enduml

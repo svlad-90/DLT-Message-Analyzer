@@ -1,10 +1,14 @@
 #include "QStyleFactory"
 #include "QApplication"
 #include "QTextStream"
+#include "QKeyEvent"
+#include "QStyle"
+#include "QDir"
+
+#include "dltmessageanalyzerplugin.hpp"
 
 #include "common/Definitions.hpp"
 
-#include "dltmessageanalyzerplugin.hpp"
 #include "CConsoleInputProcessor.hpp"
 #include "../api/CLog.hpp"
 

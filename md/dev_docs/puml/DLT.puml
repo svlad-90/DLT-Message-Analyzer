@@ -65,14 +65,19 @@ class "IDLTLogsWrapperCreator"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 

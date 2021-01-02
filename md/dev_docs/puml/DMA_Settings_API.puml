@@ -117,7 +117,7 @@ class "CUMLViewComponent"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin_API" #DDDDDD
 {
 
 class "CDLTMessageAnalyzer"

@@ -34,14 +34,19 @@ class "CUMLViewComponent"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -83,8 +88,8 @@ DMA::IComponent <|-- CUMLViewComponent : implements
 CUMLView "1" *-- "1" CImageViewer : contains
 CUMLView "1" *-- "2" QProcess : contains
 CUMLViewComponent "1" o-- "1" CUMLView : uses
-CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
+CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
 Ui::Form "1" *-- "1" CUMLView : contains
 
 @enduml

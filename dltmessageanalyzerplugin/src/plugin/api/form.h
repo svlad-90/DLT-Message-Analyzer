@@ -17,8 +17,7 @@
  * @licence end@
  */
 
-#ifndef FORM_H
-#define FORM_H
+#pragma once
 
 #include <QWidget>
 #include <QtWidgets/QProgressBar>
@@ -105,5 +104,3 @@ private:
     QList<int> mSavedSplitterSizes;
     bool mPatternsHidden;
 };
-
-#endif // FORM_H

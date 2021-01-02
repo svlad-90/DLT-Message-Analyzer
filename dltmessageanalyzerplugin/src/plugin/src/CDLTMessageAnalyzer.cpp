@@ -4,7 +4,7 @@
  * @brief   Implementation of the CDLTMessageAnalyzer class
  */
 
-#include "CDLTMessageAnalyzer.hpp"
+#include "plugin/api/CDLTMessageAnalyzer.hpp"
 
 #include <QtDebug>
 #include <QLineEdit>
@@ -1736,7 +1736,7 @@ void CDLTMessageAnalyzer::setMessageDecoder( QDltMessageDecoder* pMessageDecoder
 }
 #endif
 
-PUML_PACKAGE_BEGIN(DMA_Root)
+PUML_PACKAGE_BEGIN(DMA_Plugin_API)
     PUML_CLASS_BEGIN_CHECKED(CDLTMessageAnalyzer)
         PUML_INHERITANCE_CHECKED(IDLTMessageAnalyzerControllerConsumer, implements)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)

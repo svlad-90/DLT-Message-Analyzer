@@ -25,12 +25,17 @@ class "CLogoComponent"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
 class "DLTMessageAnalyzerPlugin"
 {
 }
+
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
 
 class "Ui::Form"
 {
