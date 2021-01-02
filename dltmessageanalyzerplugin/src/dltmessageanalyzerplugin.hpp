@@ -11,7 +11,6 @@
 #include <QObject>
 
 #include "plugininterface.h"
-#include "form.h"
 
 #include "common/Definitions.hpp"
 
@@ -32,6 +31,7 @@ class CUMLViewComponent;
 class CLogoComponent;
 class CLogsWrapperComponent;
 class CSettingsComponent;
+class Form;
 
 namespace DMA
 {

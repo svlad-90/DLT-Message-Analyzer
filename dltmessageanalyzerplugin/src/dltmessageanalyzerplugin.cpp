@@ -11,11 +11,13 @@
 #include "QApplication"
 
 #include "dltmessageanalyzerplugin.hpp"
-#include "CDLTMessageAnalyzer.hpp"
+#include "plugin/api/CDLTMessageAnalyzer.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
 
 #include "DMA_Plantuml.hpp"
 #include "components/log/api/CLog.hpp"
+
+#include "plugin/api/form.h"
 
 #include "components/analyzer/api/CAnalyzerComponent.hpp"
 #include "components/log/api/CLogComponent.hpp"
@@ -718,7 +720,7 @@ void DLTMessageAnalyzerPlugin::analysisTrigger()
 Q_EXPORT_PLUGIN2(dltmessageanalyzerplugin, DLTMessageAnalyzerPlugin);
 #endif
 
-PUML_PACKAGE_BEGIN(DMA_Root)
+PUML_PACKAGE_BEGIN(DMA_Plugin)
     PUML_CLASS_BEGIN_CHECKED(DLTMessageAnalyzerPlugin)
         PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_INHERITANCE_CHECKED(QDLTPluginInterface, implements)

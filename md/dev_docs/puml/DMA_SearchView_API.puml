@@ -57,14 +57,19 @@ class "IFileWrapper"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -136,9 +141,9 @@ DMA::IComponent <|-- CSearchViewComponent : implements
 QObject <|-- CSearchViewComponent : extends
 
 '====================Dependencies section====================
+DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
-DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 Ui::Form "1" *-- "1" CSearchResultView : contains
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
 CSearchResultView "1" o-- "1" IFileWrapper : uses

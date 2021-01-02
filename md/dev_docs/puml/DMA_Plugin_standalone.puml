@@ -1,0 +1,47 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+}
+
+package "DMA_Plugin" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
+QObject <|-- DLTMessageAnalyzerPlugin : extends
+
+@enduml

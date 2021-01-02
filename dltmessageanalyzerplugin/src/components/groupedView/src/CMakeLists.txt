@@ -8,4 +8,9 @@ add_library(DMA_groupedView STATIC
     IGroupedViewModel.cpp
     ${PROCESSED_MOCS})
 
-target_link_libraries(DMA_groupedView PUBLIC qdlt Qt5::Widgets DMA_framework_base DMA_framework_component )
+target_link_libraries( DMA_groupedView PUBLIC
+                       qdlt
+                       Qt5::Widgets
+                       DMA_framework_base
+                       DMA_framework_component
+                       DMA_Plantuml )

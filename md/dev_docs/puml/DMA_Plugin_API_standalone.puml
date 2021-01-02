@@ -3,23 +3,6 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DLT" #DDDDDD
-{
-
-interface "QDLTPluginInterface"
-{
-}
-
-interface "QDltPluginControlInterface"
-{
-}
-
-interface "QDltPluginViewerInterface"
-{
-}
-
-}
-
 package "DMA_Analyzer_API" #DDDDDD
 {
 
@@ -31,14 +14,10 @@ abstract class "IDLTMessageAnalyzerControllerConsumer"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin_API" #DDDDDD
 {
 
 class "CDLTMessageAnalyzer"
-{
-}
-
-class "DLTMessageAnalyzerPlugin"
 {
 }
 
@@ -64,10 +43,6 @@ class "CSettingsManagerClient"
 package "Qt" #DDDDDD
 {
 
-class "QObject"
-{
-}
-
 class "QWidget"
 {
 }
@@ -77,17 +52,10 @@ class "QWidget"
 '====================Inheritance section====================
 CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 IDLTMessageAnalyzerControllerConsumer <|-- CDLTMessageAnalyzer : implements
-QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
-QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
-QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
-QObject <|-- DLTMessageAnalyzerPlugin : extends
 CSettingsManagerClient <|-- Form : extends
 QWidget <|-- Form : extends
 
 '====================Dependencies section====================
-DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
-DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
-Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains
 
 @enduml

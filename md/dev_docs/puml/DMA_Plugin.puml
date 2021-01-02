@@ -1,0 +1,155 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DLT" #DDDDDD
+{
+
+interface "QDLTPluginInterface"
+{
+}
+
+interface "QDltPluginControlInterface"
+{
+}
+
+interface "QDltPluginViewerInterface"
+{
+}
+
+}
+
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+class "CAnalyzerComponent"
+{
+}
+
+}
+
+package "DMA_FiltersView_API" #DDDDDD
+{
+
+class "CFiltersViewComponent"
+{
+}
+
+}
+
+package "DMA_GroupedView_API" #DDDDDD
+{
+
+class "CGroupedViewComponent"
+{
+}
+
+}
+
+package "DMA_Log_API" #DDDDDD
+{
+
+class "CLogComponent"
+{
+}
+
+}
+
+package "DMA_Logo_API" #DDDDDD
+{
+
+class "CLogoComponent"
+{
+}
+
+}
+
+package "DMA_LogsWrapper_API" #DDDDDD
+{
+
+class "CLogsWrapperComponent"
+{
+}
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsViewComponent"
+{
+}
+
+}
+
+package "DMA_PlantumlView_API" #DDDDDD
+{
+
+class "CUMLViewComponent"
+{
+}
+
+}
+
+package "DMA_Plugin" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Form"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchViewComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
+QDltPluginViewerInterface <|-- DLTMessageAnalyzerPlugin : implements
+QObject <|-- DLTMessageAnalyzerPlugin : extends
+
+'====================Dependencies section====================
+DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
+Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
+
+@enduml

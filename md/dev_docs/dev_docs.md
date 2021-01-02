@@ -16,7 +16,7 @@ It's main purposes is to:
 ## Table of contents
 
 
-#### [DMA_Root](../../dltmessageanalyzerplugin/src/doc/doc.md)
+#### [DMA_Plugin](../../dltmessageanalyzerplugin/src/plugin/doc/doc.md)
 ----
 #### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/components/analyzer/doc/doc.md)
 #### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)

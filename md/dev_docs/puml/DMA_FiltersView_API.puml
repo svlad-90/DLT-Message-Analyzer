@@ -47,14 +47,19 @@ class "DMA::IComponent"
 
 }
 
-package "DMA_Root" #DDDDDD
+package "DMA_Plugin" #DDDDDD
 {
 
-class "CDLTMessageAnalyzer"
+class "DLTMessageAnalyzerPlugin"
 {
 }
 
-class "DLTMessageAnalyzerPlugin"
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
 {
 }
 
@@ -105,9 +110,9 @@ CFiltersView "1" o-- "1" QLineEdit : regex input field
 CFiltersViewComponent "1" --> "1" CFiltersModel : using to create IFiltersModel
 CFiltersViewComponent "1" o-- "1" CFiltersView : uses
 CFiltersViewComponent "1" *-- "1" IFiltersModel : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
 CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses
-DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 Ui::Form "1" *-- "1" CFiltersView : contains
 
 @enduml

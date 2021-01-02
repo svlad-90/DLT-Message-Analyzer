@@ -4,10 +4,10 @@
  * @brief   Implementation of the Form class
  */
 
-#include "form.h"
+#include "../api/form.h"
 #include "ui_form.h"
 #include "dltmessageanalyzerplugin.hpp"
-#include "CDLTMessageAnalyzer.hpp"
+#include "../api/CDLTMessageAnalyzer.hpp"
 #include "QKeyEvent"
 #include "QScrollBar"
 #include "QDebug"
@@ -791,7 +791,7 @@ void Form::on_createSequenceDiagram_clicked()
     }
 }
 
-PUML_PACKAGE_BEGIN(DMA_Root)
+PUML_PACKAGE_BEGIN(DMA_Plugin_API)
     PUML_CLASS_BEGIN_CHECKED(Form)
         PUML_INHERITANCE_CHECKED(QWidget, extends)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
