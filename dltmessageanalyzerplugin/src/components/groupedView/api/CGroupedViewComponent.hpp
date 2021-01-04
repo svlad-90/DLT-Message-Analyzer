@@ -16,7 +16,7 @@ class CGroupedViewComponent : public DMA::IComponent,
 public:
 
     CGroupedViewComponent( CGroupedView* pGroupedView,
-                           const tSettingsManagerPtr& pSettingsManagerPtr );
+                           const tSettingsManagerPtr& pSettingsManager );
 
     CGroupedView* getGroupedView() const;
 

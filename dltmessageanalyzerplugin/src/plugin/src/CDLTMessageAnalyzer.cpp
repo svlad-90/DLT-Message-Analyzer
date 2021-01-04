@@ -68,9 +68,9 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          CSearchResultView* pSearchResultView,
                                          const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                                          const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
-                                         const tSettingsManagerPtr& pSettingsManagerPtr):
+                                         const tSettingsManagerPtr& pSettingsManager):
     IDLTMessageAnalyzerControllerConsumer (pController),
-    CSettingsManagerClient(pSettingsManagerPtr),
+    CSettingsManagerClient(pSettingsManager),
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
     mpProgressBar(pProgressBar),
@@ -325,11 +325,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     }
 #endif
-
-    connect( qApp, &QApplication::aboutToQuit, [this]()
-    {
-        getSettingsManager()->storeConfigs();
-    });
 
     connect( getSettingsManager().get(), &ISettingsManager::cacheEnabledChanged, [this](bool val)
     {

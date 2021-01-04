@@ -8,7 +8,7 @@ CSettingItem::CSettingItem ( const QString& key,
     mUpdateFielFunc(updateFielFunc)
 {}
 
-const QString& CSettingItem::getKey()
+const QString& CSettingItem::getKey() const
 {
     return mKey;
 }

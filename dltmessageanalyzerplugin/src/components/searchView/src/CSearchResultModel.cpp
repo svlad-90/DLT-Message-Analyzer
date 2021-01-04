@@ -14,8 +14,8 @@
 
 #include "DMA_Plantuml.hpp"
 
-CSearchResultModel::CSearchResultModel(const tSettingsManagerPtr& pSettingsManagerPtr, QObject *):
-CSettingsManagerClient(pSettingsManagerPtr),
+CSearchResultModel::CSearchResultModel(const tSettingsManagerPtr& pSettingsManager, QObject *):
+CSettingsManagerClient(pSettingsManager),
 mFoundMatchesPack(),
 mpFile(nullptr)
 {

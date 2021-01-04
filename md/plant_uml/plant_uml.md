@@ -17,6 +17,11 @@ This plugin is using the PlantUML syntax to generate sequence diagrams out of th
 > It will be automatically copied to the build directory as part of the CMake or QTCreator build. 
 > 
 > In other words - this feature should work out of the box.
+
+> **Note!**
+>
+> Plugin allows the client to explicitly specify the path to the plantuml tool, in case if the default path is not suitable or, for any reason, it does not work.
+> Search the "Plantuml settings" paragraph below on this page. 
 ----
 
 ----
@@ -189,7 +194,7 @@ The resulting diagram looks like this:
 > With the above example result could be: "one_two".
 ----
 
-## Settings
+## Diagrams settings
 
 ----
 
@@ -220,6 +225,25 @@ By default, the call arguments are shown. Row description is wrapped every 200 s
 These parameters can be overwritten via the context menu:
 
 ![Screenshot of other UML parameters](./plant_uml_other_settings.png)
+
+----
+
+## Plantuml settings
+
+----
+
+There is a set of settings, which allows you to specify the location of the plantuml.jar on your machine.
+
+![Screenshot of the plantuml settings](./plant_uml_location_settings.png)
+
+You can:
+- Use default plantuml location - <dlt-viewer-folder>/plugins/plantuml.jar
+- Specify the custom path to plantuml.jar
+- Specify the name of the environment variable, which will contain the path to the plantuml tool
+
+In order to visualize the current plantuml settings you can use the "plantuml-settings" command in the debug console:
+
+![Screenshot of the plantuml settings dump](./plant_uml_settings_dump.png)
 
 ----
 

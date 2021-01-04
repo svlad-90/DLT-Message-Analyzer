@@ -33,7 +33,7 @@ public:
      * @brief getKey - gets the key, which was previously assigned to this setting item
      * @return - the key string
      */
-    virtual const QString& getKey() = 0;
+    virtual const QString& getKey() const = 0;
 
     typedef std::function<void(void)> tGeneralUpdateDataFunc;
 

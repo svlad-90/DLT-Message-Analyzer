@@ -17,10 +17,10 @@
 
 static const tQStringPtr sRootItemName = std::make_shared<QString>("Root");
 
-CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager,
                                      QObject *parent)
     : QAbstractItemModel(parent),
-      CSettingsManagerClient(pSettingsManagerPtr),
+      CSettingsManagerClient(pSettingsManager),
       mRegex(),
       mSortingColumn(eGroupedViewColumn::Messages),
       mSortOrder(Qt::SortOrder::DescendingOrder),

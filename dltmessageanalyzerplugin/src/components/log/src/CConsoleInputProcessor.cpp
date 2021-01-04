@@ -4,6 +4,7 @@
 #include "QKeyEvent"
 #include "QStyle"
 #include "QDir"
+#include "QProcessEnvironment"
 
 #include "dltmessageanalyzerplugin.hpp"
 
@@ -261,9 +262,7 @@ static void UML_sequence_identifiers()
     }
 }
 
-static CConsoleInputProcessor::tScenariosMap createScenariosMap();
-
-static void printHelp(const QString& command)
+void CConsoleInputProcessor::printHelp(const QString& command)
 {
     static const auto scenarioMap = createScenariosMap();
 
@@ -323,11 +322,11 @@ static bool strToBool( const QString& str, bool& val )
     return bResult;
 }
 
-static CConsoleInputProcessor::tScenariosMap createScenariosMap()
+CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap()
 {
     CConsoleInputProcessor::tScenariosMap result;
 
-    result[sHelpCommandName] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    result[sHelpCommandName] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap& params)
     {
         auto foundCommandParam = params.find("c");
 
@@ -504,10 +503,42 @@ static CConsoleInputProcessor::tScenariosMap createScenariosMap()
        "- exports class diagram of the whole application or of the dedicated package(s) to the file-system. "
        "In case if no optional parameters provided - the whole application's diagram will be exported.");
 
+    result["plantuml-settings"] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap&)
+    {
+        SEND_MSG( "Current plantuml settings:" );
+        SEND_MSG( QString("Plantuml path mode: \"%1\"")
+        .arg(getPlantumlPathModeAsString( static_cast<ePlantumlPathMode>(getSettingsManager()->getPlantumlPathMode()) ) ) );
+        SEND_MSG( QString("Plantuml default path: \"%1\"")
+        .arg(getSettingsManager()->getDefaultPlantumlPath()));
+        SEND_MSG( QString("Plantuml custom path: \"%1\"")
+        .arg(getSettingsManager()->getPlantumlCustomPath()));
+        SEND_MSG( QString("Plantuml path environment variable: \"%1\"")
+        .arg(getSettingsManager()->getPlantumlPathEnvVar()));
+
+        const auto systemEnv = QProcessEnvironment::systemEnvironment();
+
+        const auto& plantumlPathEnvVar = getSettingsManager()->getPlantumlPathEnvVar();
+
+        if(true == systemEnv.contains(plantumlPathEnvVar))
+        {
+            auto plantUMLPath = systemEnv.value(plantumlPathEnvVar);
+
+            SEND_MSG( QString("Plantuml path environment variable value: \"%1\"")
+            .arg( plantUMLPath ));
+        }
+        else
+        {
+            SEND_MSG( QString("Plantuml path environment variable value: \"No such variable exist\""));
+        }
+    },
+    "- prints information about the currently used plantuml settings");
+
     return result;
 }
 
-CConsoleInputProcessor::CConsoleInputProcessor( QLineEdit* pTargetLineEdit ):
+CConsoleInputProcessor::CConsoleInputProcessor( QLineEdit* pTargetLineEdit,
+                                                const tSettingsManagerPtr& pSettingsManager ):
+    CSettingsManagerClient(pSettingsManager),
     mpTargetLineEdit(pTargetLineEdit),
     mScenariosMap(createScenariosMap()),
     mHistory(),

@@ -13,7 +13,7 @@ class CAnalyzerComponent : public DMA::IComponent,
 {
 public:
 
-    CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManagerPtr);
+    CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManager);
     std::shared_ptr<IDLTMessageAnalyzerController> getAnalyzerController() const;
 
     virtual const char* getName() const override;

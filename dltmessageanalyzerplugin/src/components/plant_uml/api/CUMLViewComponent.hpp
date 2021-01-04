@@ -16,7 +16,7 @@ class CUMLViewComponent : public DMA::IComponent,
 public:
 
     CUMLViewComponent( CUMLView* pUMLView,
-                       const tSettingsManagerPtr& pSettingsManagerPtr);
+                       const tSettingsManagerPtr& pSettingsManager);
 
     CUMLView* getUMLView() const;
 

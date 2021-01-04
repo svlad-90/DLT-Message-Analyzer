@@ -202,10 +202,10 @@ static QVector<tTreeItemPtr> sortingFunction (const QVector<tTreeItemPtr>& child
     return result;
 }
 
-CPatternsModel::CPatternsModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+CPatternsModel::CPatternsModel(const tSettingsManagerPtr& pSettingsManager,
                                QObject *parent):
     QAbstractItemModel(parent),
-    CSettingsManagerClient(pSettingsManagerPtr),
+    CSettingsManagerClient(pSettingsManager),
     mpRootItem(nullptr),
     mSortingColumn(ePatternsColumn::AliasTreeLevel),
     mSortOrder(Qt::SortOrder::DescendingOrder),

@@ -74,6 +74,9 @@ static const QString sFiltersCompletion_CompletionPopUpWidthKey = "FiltersComple
 static const QString sFiltersCompletion_SearchPolicyKey = "FiltersCompletion_SearchPolicy";
 
 static const QString sSearchViewLastColumnWidthStrategyKey = "SearchViewLastColumnWidthStrategy";
+static const QString sPlantumlPathMode = "PlantumlPathMode";
+static const QString sPlantumlPathEnvVar = "PlantumlPathEnvVar";
+static const QString sPlantumlCustomPath = "PlantumlCustomPath";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -383,6 +386,20 @@ CSettingsManager::CSettingsManager():
         TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(eSearchViewLastColumnWidthStrategy::eReset),
                                                                                               static_cast<int>(eSearchViewLastColumnWidthStrategy::eFitToContent))),
         static_cast<int>(eSearchViewLastColumnWidthStrategy::eFitToContent))),
+    mSetting_PlantumlPathMode(createRangedArithmeticSettingsItem<int>(sPlantumlPathMode,
+        [this](const int& data){plantumlPathModeChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(ePlantumlPathMode::eUseDefaultPath),
+                                                                                              static_cast<int>(ePlantumlPathMode::eLast) - 1)),
+        static_cast<int>(ePlantumlPathMode::eUseDefaultPath))),
+    mSetting_PlantumlPathEnvVar(createStringSettingsItem(sPlantumlPathEnvVar,
+        [this](const QString& data){plantumlPathEnvVarChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        "")),
+    mSetting_PlantumlCustomPath(createStringSettingsItem(sPlantumlCustomPath,
+        [this](const QString& data){plantumlCustomPathChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        "")),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -429,6 +446,9 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CompletionPopUpWidth);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_SearchPolicy);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchViewLastColumnWidthStrategy);
+    mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathMode);
+    mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathEnvVar);
+    mUserSettingItemPtrVec.push_back(&mSetting_PlantumlCustomPath);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1548,6 +1568,21 @@ void CSettingsManager::setSearchViewLastColumnWidthStrategy(const int& val)
     mSetting_SearchViewLastColumnWidthStrategy.setData(val);
 }
 
+void CSettingsManager::setPlantumlPathMode(const int& val)
+{
+    mSetting_PlantumlPathMode.setData(val);
+}
+
+void CSettingsManager::setPlantumlPathEnvVar(const QString& val)
+{
+    mSetting_PlantumlPathEnvVar.setData(val);
+}
+
+void CSettingsManager::setPlantumlCustomPath(const QString& val)
+{
+    mSetting_PlantumlCustomPath.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1750,6 +1785,21 @@ const int& CSettingsManager::getSearchViewLastColumnWidthStrategy() const
     return mSetting_SearchViewLastColumnWidthStrategy.getData();
 }
 
+const int& CSettingsManager::getPlantumlPathMode() const
+{
+    return mSetting_PlantumlPathMode.getData();
+}
+
+const QString& CSettingsManager::getPlantumlPathEnvVar() const
+{
+    return mSetting_PlantumlPathEnvVar.getData();
+}
+
+const QString& CSettingsManager::getPlantumlCustomPath() const
+{
+    return mSetting_PlantumlCustomPath.getData();
+}
+
 QString CSettingsManager::getRegexDirectory() const
 {
     return sSettingsManager_Directory + QDir::separator() +
@@ -1777,6 +1827,11 @@ QString CSettingsManager::getRootSettingsFilepath() const
 {
     return sSettingsManager_Directory + QDir::separator() +
            sSettingsManager_Root_SettingsFile;
+}
+
+QString CSettingsManager::getDefaultPlantumlPath() const
+{
+    return QCoreApplication::applicationDirPath() + QDir::separator() + "plugins/plantuml.jar";
 }
 
 void CSettingsManager::clearRegexConfig()
@@ -1881,6 +1936,8 @@ CSettingsManager::tOperationResult CSettingsManager::storeSettingsConfigCustomPa
         }
 
         QJsonDocument jsonDoc( settingsArray );
+        // Uncomment this to see the content of the generated file
+        //qDebug() << "doc - " << jsonDoc.toJson();
         jsonFile.write( jsonDoc.toJson() );
 
         result.bResult = true;

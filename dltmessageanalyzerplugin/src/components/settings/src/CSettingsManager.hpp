@@ -23,23 +23,24 @@ public:
      */
     CSettingsManager();
 
-    tOperationResult storeConfigs();
-    tOperationResult loadConfigs();
+    tOperationResult storeConfigs() override;
+    tOperationResult loadConfigs() override;
 
     //helpers
-    bool areAnyDefaultAliasesAvailable() const;
-    void resetSearchResultColumnsVisibilityMap();
-    void resetSearchResultColumnsCopyPasteMap();
-    void resetPatternsColumnsVisibilityMap();
-    void resetPatternsColumnsCopyPasteMap();
-    void resetRegexFiltersColumnsVisibilityMap();
-    void resetGroupedViewColumnsVisibilityMap();
-    void resetGroupedViewColumnsCopyPasteMap();
-    QString getRegexDirectory() const;
-    QString getRegexDirectoryFull() const;
-    QString getSettingsFilepath() const;
-    QString getUserSettingsFilepath() const;
-    QString getRootSettingsFilepath() const;
+    bool areAnyDefaultAliasesAvailable() const override;
+    void resetSearchResultColumnsVisibilityMap() override;
+    void resetSearchResultColumnsCopyPasteMap() override;
+    void resetPatternsColumnsVisibilityMap() override;
+    void resetPatternsColumnsCopyPasteMap() override;
+    void resetRegexFiltersColumnsVisibilityMap() override;
+    void resetGroupedViewColumnsVisibilityMap() override;
+    void resetGroupedViewColumnsCopyPasteMap() override;
+    QString getRegexDirectory() const override;
+    QString getRegexDirectoryFull() const override;
+    QString getSettingsFilepath() const override;
+    QString getUserSettingsFilepath() const override;
+    QString getRootSettingsFilepath() const override;
+    QString getDefaultPlantumlPath() const override;
 
 ////////////////////////SETTERS/////////////////////////////
 
@@ -89,6 +90,9 @@ public:
     void setFiltersCompletion_CompletionPopUpWidth(const int& val) override;
     void setFiltersCompletion_SearchPolicy(const bool& val) override;
     void setSearchViewLastColumnWidthStrategy(const int& val) override;
+    void setPlantumlPathMode(const int& val) override;
+    void setPlantumlPathEnvVar(const QString& val) override;
+    void setPlantumlCustomPath(const QString& val) override;
 
     void setSelectedRegexFile(const QString& val) override;
 
@@ -140,6 +144,9 @@ public:
     const int& getFiltersCompletion_CompletionPopUpWidth() const override;
     const bool& getFiltersCompletion_SearchPolicy() const override;
     const int& getSearchViewLastColumnWidthStrategy() const override;
+    const int& getPlantumlPathMode() const override;
+    const QString& getPlantumlPathEnvVar() const override;
+    const QString& getPlantumlCustomPath() const override;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
@@ -418,6 +425,10 @@ private: // fields
     TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
 
     TRangedSettingItem<int> mSetting_SearchViewLastColumnWidthStrategy;
+
+    TRangedSettingItem<int> mSetting_PlantumlPathMode;
+    TSettingItem<QString> mSetting_PlantumlPathEnvVar;
+    TSettingItem<QString> mSetting_PlantumlCustomPath;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

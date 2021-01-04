@@ -25,8 +25,8 @@ Q_DECLARE_METATYPE(CDLTRegexAnalyzerWorker::ePortionAnalysisState)
 static std::atomic<tWorkerId> sWorkerIdCounter(0);
 
 //CDLTRegexAnalyzerWorker
-CDLTRegexAnalyzerWorker::CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManagerPtr):
-CSettingsManagerClient(pSettingsManagerPtr),
+CDLTRegexAnalyzerWorker::CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManager):
+CSettingsManagerClient(pSettingsManager),
 mWorkerId(++sWorkerIdCounter),
 mColors()
 {

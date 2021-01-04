@@ -28,7 +28,7 @@ class CMTAnalyzer: public IDLTMessageAnalyzerController,
 {
     Q_OBJECT
     public:
-        CMTAnalyzer(const tSettingsManagerPtr& pSettingsManagerPtr);
+        CMTAnalyzer(const tSettingsManagerPtr& pSettingsManager);
         ~CMTAnalyzer() override;
 
         //IDLTMessageAnalyzerController implementation
