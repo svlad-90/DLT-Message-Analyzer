@@ -70,6 +70,7 @@ public:
     virtual QString getSettingsFilepath() const = 0;
     virtual QString getUserSettingsFilepath() const = 0;
     virtual QString getRootSettingsFilepath() const = 0;
+    virtual QString getDefaultPlantumlPath() const = 0;
 
 ////////////////////////SETTERS/////////////////////////////
 
@@ -119,6 +120,9 @@ public:
     virtual void setFiltersCompletion_CompletionPopUpWidth(const int& val) = 0;
     virtual void setFiltersCompletion_SearchPolicy(const bool& val) = 0;
     virtual void setSearchViewLastColumnWidthStrategy(const int& val) = 0;
+    virtual void setPlantumlPathMode(const int& val) = 0;
+    virtual void setPlantumlPathEnvVar(const QString& val) = 0;
+    virtual void setPlantumlCustomPath(const QString& val) = 0;
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -168,13 +172,16 @@ public:
     virtual const int& getUML_MaxNumberOfRowsInDiagram() const = 0;
     virtual const bool& getUML_ShowArguments() const = 0;
     virtual const bool& getUML_WrapOutput() const = 0;
-    virtual const bool& getUML_Autonumber() const = 0;
+    virtual const bool& getUML_Autonumber() const = 0;    
     virtual const bool& getFiltersCompletion_CaseSensitive() const = 0;
     virtual const int& getFiltersCompletion_MaxNumberOfSuggestions() const = 0;
     virtual const int& getFiltersCompletion_MaxCharactersInSuggestion() const = 0;
     virtual const int& getFiltersCompletion_CompletionPopUpWidth() const = 0;
     virtual const bool& getFiltersCompletion_SearchPolicy() const = 0;
     virtual const int& getSearchViewLastColumnWidthStrategy() const = 0;
+    virtual const int& getPlantumlPathMode() const = 0;
+    virtual const QString& getPlantumlPathEnvVar() const = 0;
+    virtual const QString& getPlantumlCustomPath() const = 0;
 
     // allowed ranges
     virtual const TOptional<tRange<int>>& getSetting_NumberOfThreads_AllowedRange() const = 0;
@@ -231,4 +238,7 @@ signals:
     void filtersCompletion_CompletionPopUpWidthChanged(const int& filtersCompletion_CompletionPopUpWidth);
     void filtersCompletion_SearchPolicyChanged(const bool& filtersCompletion_SearchPolicy);
     void searchViewLastColumnWidthStrategyChanged(const int& payloadWidthChanged);
+    void plantumlPathModeChanged(const int& plantumlPathMode);
+    void plantumlPathEnvVarChanged(const QString& plantumlPathEnvVar);
+    void plantumlCustomPathChanged(const QString& plantumlPathEnvVar);
 };

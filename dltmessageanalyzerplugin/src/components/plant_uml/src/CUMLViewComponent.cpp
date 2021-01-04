@@ -5,8 +5,8 @@
 #include "DMA_Plantuml.hpp"
 
 CUMLViewComponent::CUMLViewComponent( CUMLView* pUMLView,
-                                      const tSettingsManagerPtr& pSettingsManagerPtr ):
-CSettingsManagerClient(pSettingsManagerPtr),
+                                      const tSettingsManagerPtr& pSettingsManager ):
+CSettingsManagerClient(pSettingsManager),
 mpUMLView(pUMLView)
 {
 }

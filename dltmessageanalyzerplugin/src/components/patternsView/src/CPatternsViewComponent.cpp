@@ -9,8 +9,8 @@
 #include "dma/base/ForceLink.hpp"
 
 CPatternsViewComponent::CPatternsViewComponent( CPatternsView* pPatternsView,
-                                                const tSettingsManagerPtr& pSettingsManagerPtr ):
-CSettingsManagerClient(pSettingsManagerPtr),
+                                                const tSettingsManagerPtr& pSettingsManager ):
+CSettingsManagerClient(pSettingsManager),
 mpPatternsModel(nullptr),
 mpPatternsView(pPatternsView)
 {

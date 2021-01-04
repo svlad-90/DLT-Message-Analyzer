@@ -70,7 +70,7 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
                             CSearchResultView* pSearchResultView,
                             const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                             const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
-                            const tSettingsManagerPtr& pSettingsManagerPtr);
+                            const tSettingsManagerPtr& pSettingsManager);
 
         /**
          * @brief setFile - set's the file to be used for analysis

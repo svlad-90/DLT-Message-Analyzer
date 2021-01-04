@@ -7,7 +7,10 @@
 
 #include <QLineEdit>
 
-class CConsoleInputProcessor : public QObject
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
+class CConsoleInputProcessor : public QObject,
+                               public CSettingsManagerClient
 {
     Q_OBJECT
 
@@ -32,11 +35,16 @@ public:
 
     typedef std::map<tScenarioTag, tScenarioData> tScenariosMap;
 
-    CConsoleInputProcessor( QLineEdit* pTargetLineEdit );
+    CConsoleInputProcessor( QLineEdit* pTargetLineEdit,
+                            const tSettingsManagerPtr& pSettingsManager );
     virtual ~CConsoleInputProcessor();
 
 protected:
     bool eventFilter(QObject* pObj, QEvent* pEvent) override;
+
+private:
+    CConsoleInputProcessor::tScenariosMap createScenariosMap();
+    void printHelp(const QString& command);
 
 private:
 

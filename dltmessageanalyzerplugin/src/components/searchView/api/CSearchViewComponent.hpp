@@ -21,7 +21,7 @@ class CSearchViewComponent : public QObject,
 public:
 
     CSearchViewComponent( CSearchResultView* pSearchResultView,
-                          const tSettingsManagerPtr& pSettingsManagerPtr );
+                          const tSettingsManagerPtr& pSettingsManager );
 
     CSearchResultView* getSearchResultView() const;
     std::shared_ptr<CTableMemoryJumper> getTableMemoryJumper() const;

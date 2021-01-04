@@ -14,7 +14,7 @@ class CFiltersModel : public IFiltersModel,
     Q_OBJECT
 
 public:
-    explicit CFiltersModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+    explicit CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
                            QObject *parent = nullptr);
 
     // Implementation of the IFiltersModel

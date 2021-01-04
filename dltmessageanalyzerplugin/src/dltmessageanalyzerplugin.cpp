@@ -157,7 +157,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         auto pLogComponent = std::make_shared<CLogComponent>(mpForm->getConsoleViewInput(),
                                                              mpForm->getMainTabWidget(),
                                                              mpForm->getConsoleViewTab(),
-                                                             mpForm->getConsoleView());
+                                                             mpForm->getConsoleView(),
+                                                             mpSettingsComponent->getSettingsManager());
 
         auto initResult = pLogComponent->startInit();
 
@@ -274,6 +275,11 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
+        if(nullptr != mpSettingsComponent->getSettingsManager())
+        {
+            mpSettingsComponent->getSettingsManager()->storeConfigs();
+        }
+
         for(auto& pComponent : mComponents)
         {
             if(nullptr != pComponent)

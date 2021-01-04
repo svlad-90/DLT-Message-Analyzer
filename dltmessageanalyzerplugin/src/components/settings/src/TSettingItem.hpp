@@ -7,6 +7,9 @@
 #include "common/TOptional.hpp"
 #include "CSettingItem.hpp"
 
+#include "QDebug"
+#include "QJsonDocument"
+
 template<typename T>
 class TSettingItem : public CSettingItem
 {
@@ -52,6 +55,11 @@ class TSettingItem : public CSettingItem
         if(mWriteDataFunc)
         {
             result = mWriteDataFunc(mData);
+
+            // Uncomment to see content of all written flags in the console
+            //QJsonDocument doc(result);
+            //QString strJson(doc.toJson(QJsonDocument::Compact));
+            //qDebug() << QString("Write key - %1, data - %2").arg(getKey()).arg(strJson);
         }
 
         return result;

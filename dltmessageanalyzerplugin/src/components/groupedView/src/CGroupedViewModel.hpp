@@ -21,7 +21,7 @@ class CGroupedViewModel : public QAbstractItemModel,
                           public CSettingsManagerClient
 {
 public:
-    explicit CGroupedViewModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+    explicit CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager,
                                QObject *parent = nullptr);
     ~CGroupedViewModel() override;
 

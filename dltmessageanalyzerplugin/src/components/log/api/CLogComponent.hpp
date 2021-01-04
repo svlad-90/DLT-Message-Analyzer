@@ -7,16 +7,20 @@
 #include "memory"
 #include "dma/component/IComponent.hpp"
 
+#include "components/settings/api/CSettingsManagerClient.hpp"
+
 class CConsoleInputProcessor;
 
-class CLogComponent : public DMA::IComponent
+class CLogComponent : public DMA::IComponent,
+                      public CSettingsManagerClient
 {
 public:
 
     CLogComponent(QLineEdit* pConsoleViewInput,
                   QTabWidget* pMainTabWidget,
                   QWidget* pConsoleViewTab,
-                  QPlainTextEdit* pConsoleView
+                  QPlainTextEdit* pConsoleView,
+                  const tSettingsManagerPtr& pSettingsManager
                   );
     ~CLogComponent();
 

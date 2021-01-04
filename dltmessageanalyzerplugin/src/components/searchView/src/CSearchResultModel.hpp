@@ -25,7 +25,7 @@ class CSearchResultModel : public QAbstractTableModel,
 
 public:
 
-    CSearchResultModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+    CSearchResultModel(const tSettingsManagerPtr& pSettingsManager,
                        QObject *parent=nullptr);
 
     // implementation of the ISearchResultModel

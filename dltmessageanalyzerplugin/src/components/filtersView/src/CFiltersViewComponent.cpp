@@ -9,8 +9,8 @@
 #include "dma/base/ForceLink.hpp"
 
 CFiltersViewComponent::CFiltersViewComponent( CFiltersView* pFiltersView,
-                                              const tSettingsManagerPtr& pSettingsManagerPtr ):
-CSettingsManagerClient(pSettingsManagerPtr),
+                                              const tSettingsManagerPtr& pSettingsManager ):
+CSettingsManagerClient(pSettingsManager),
 mpFiltersModel(nullptr),
 mpFiltersView(pFiltersView)
 {

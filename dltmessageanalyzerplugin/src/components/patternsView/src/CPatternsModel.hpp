@@ -26,7 +26,7 @@ class CPatternsModel : public QAbstractItemModel,
 
 public:
 
-    CPatternsModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+    CPatternsModel(const tSettingsManagerPtr& pSettingsManager,
                    QObject *parent=nullptr);
     ~CPatternsModel() override;
 

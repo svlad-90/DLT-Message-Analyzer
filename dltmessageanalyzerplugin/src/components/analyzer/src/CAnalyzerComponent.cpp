@@ -7,8 +7,8 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CAnalyzerComponent::CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManagerPtr):
-CSettingsManagerClient(pSettingsManagerPtr),
+CAnalyzerComponent::CAnalyzerComponent(const tSettingsManagerPtr& pSettingsManager):
+CSettingsManagerClient(pSettingsManager),
 mpMessageAnalyzerController(nullptr)
 {
     // force linkage references in order to have consistent diagrams

@@ -34,7 +34,7 @@ public:
         ePortionAnalysisState_ERROR
     };
 
-    CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManagerPtr);
+    CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManager);
     tWorkerId getWorkerId() const;
 
 public slots:

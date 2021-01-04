@@ -658,4 +658,14 @@ int getRegexOptionsCharSize();
 QString getFormattedRegexError(const QRegularExpression& regex);
 int getRegexErrorColumn(const QRegularExpression& regex);
 
+enum class ePlantumlPathMode
+{
+    eUseDefaultPath = 0,
+    eUseCustomPath,
+    eUseEnvVar,
+    eLast
+};
+
+QString getPlantumlPathModeAsString(const ePlantumlPathMode& val);
+
 #endif // DEFINITIONS_HPP

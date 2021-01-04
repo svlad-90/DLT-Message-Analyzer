@@ -16,7 +16,7 @@ public:
     * @brief getKey - ( implementation of ISettingItem ) - gets the key, which was previously assigned to this setting item
     * @return - the key string
     */
-    const QString& getKey() override;
+    const QString& getKey() const override;
 
     /**
     * @brief getUpdateFileFunc - ( implementation of ISettingItem ) - reference to the update file function,

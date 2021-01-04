@@ -10,8 +10,8 @@
 #include "dma/base/ForceLink.hpp"
 
 CSearchViewComponent::CSearchViewComponent( CSearchResultView* pSearchResultView,
-                                            const tSettingsManagerPtr& pSettingsManagerPtr ):
-CSettingsManagerClient(pSettingsManagerPtr),
+                                            const tSettingsManagerPtr& pSettingsManager ):
+CSettingsManagerClient(pSettingsManager),
 mpSearchResultModel(nullptr),
 mpSearchResultView(pSearchResultView),
 mpSearchViewTableJumper(nullptr)

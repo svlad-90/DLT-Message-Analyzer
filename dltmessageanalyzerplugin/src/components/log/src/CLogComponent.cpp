@@ -7,7 +7,9 @@
 CLogComponent::CLogComponent(QLineEdit* pConsoleViewInput,
                              QTabWidget* pMainTabWidget,
                              QWidget* pConsoleViewTab,
-                             QPlainTextEdit* pConsoleView):
+                             QPlainTextEdit* pConsoleView,
+                             const tSettingsManagerPtr& pSettingsManager):
+CSettingsManagerClient(pSettingsManager),
 mpConsoleViewInput(pConsoleViewInput),
 mpConsoleInputProcessor(nullptr)
 {
@@ -38,7 +40,8 @@ DMA::tSyncInitOperationResult CLogComponent::init()
     {
         if(nullptr != mpConsoleViewInput)
         {
-            mpConsoleInputProcessor = std::make_shared<CConsoleInputProcessor>(mpConsoleViewInput);
+            mpConsoleInputProcessor = std::make_shared<CConsoleInputProcessor>(mpConsoleViewInput,
+                                                                               getSettingsManager());
             result.bIsOperationSuccessful = true;
             result.returnCode = 0;
         }

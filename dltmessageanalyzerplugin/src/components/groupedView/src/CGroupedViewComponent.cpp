@@ -9,8 +9,8 @@
 #include "dma/base/ForceLink.hpp"
 
 CGroupedViewComponent::CGroupedViewComponent( CGroupedView* pGroupedView,
-                                              const tSettingsManagerPtr& pSettingsManagerPtr ):
-CSettingsManagerClient(pSettingsManagerPtr),
+                                              const tSettingsManagerPtr& pSettingsManager ):
+CSettingsManagerClient(pSettingsManager),
 mpGroupedViewModel(nullptr),
 mpGroupedView(pGroupedView)
 {

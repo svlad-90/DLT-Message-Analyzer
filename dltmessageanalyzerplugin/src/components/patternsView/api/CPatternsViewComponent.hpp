@@ -16,7 +16,7 @@ class CPatternsViewComponent : public DMA::IComponent,
 public:
 
     CPatternsViewComponent( CPatternsView* pPatternsView,
-                            const tSettingsManagerPtr& pSettingsManagerPtr );
+                            const tSettingsManagerPtr& pSettingsManager );
 
     CPatternsView* getPatternsView() const;
 

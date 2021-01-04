@@ -15,7 +15,7 @@ class CFiltersViewComponent : public DMA::IComponent, CSettingsManagerClient
 public:
 
     CFiltersViewComponent( CFiltersView* pFiltersView,
-                           const tSettingsManagerPtr& pSettingsManagerPtr );
+                           const tSettingsManagerPtr& pSettingsManager );
 
     CFiltersView* getFiltersView() const;
 

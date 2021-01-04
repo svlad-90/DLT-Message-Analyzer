@@ -29,8 +29,8 @@ Q_DECLARE_METATYPE(tWorkerId)
 static const int CHUNK_SIZE = 4000;
 
 //CMTAnalyzer
-CMTAnalyzer::CMTAnalyzer(const tSettingsManagerPtr& pSettingsManagerPtr):
-CSettingsManagerClient(pSettingsManagerPtr),
+CMTAnalyzer::CMTAnalyzer(const tSettingsManagerPtr& pSettingsManager):
+CSettingsManagerClient(pSettingsManager),
 mWorkerItemMap(),
 mRequestIdCounter( static_cast<uint64_t>(-1) )
 {

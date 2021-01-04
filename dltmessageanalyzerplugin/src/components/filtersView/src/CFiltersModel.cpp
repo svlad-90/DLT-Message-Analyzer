@@ -19,10 +19,10 @@
 
 #include "DMA_Plantuml.hpp"
 
-CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManagerPtr,
+CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
                              QObject *parent)
     : IFiltersModel(parent),
-      CSettingsManagerClient(pSettingsManagerPtr),
+      CSettingsManagerClient(pSettingsManager),
       mRegex(),
       mSortingColumn(eRegexFiltersColumn::Index),
       mSortOrder(Qt::SortOrder::AscendingOrder),
