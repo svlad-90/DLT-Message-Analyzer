@@ -39,8 +39,8 @@ The current set of the supported commands contains:
 
 | Command name | Command parameters | Command desription |
 | --- | --- | --- |
-| clear | clear debug view |
-| color-aliases | prints all supported color aliases |
+| clear | No params | clear debug view |
+| color-aliases | No params | prints all supported color aliases |
 | help | [-c=&lt;command-name&gt;] | show this help. If no "c" parameter is provided - help regarding all available commands will be dumped. Be aware, that [&lt;command-name&gt; &lt;help&gt;] syntax can also be used to get the help output regarding a single command. Such syntax is easier to use, considering the limited auto-complete functionality of this console. E.g. "help -help" (ha-ha). |
 | plantuml-settings | No params | prints information about the currently used plantuml settings |
 | styles | No params | prints information about QT styles supported on target OS |
