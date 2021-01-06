@@ -286,6 +286,7 @@ void CFiltersView::handleSettingsManagerChange()
     if(nullptr == mpFilterItemDelegate)
     {
         mpFilterItemDelegate = new CFilterItemDelegate(this);
+        mpFilterItemDelegate->setSettingsManager(getSettingsManager());
         setItemDelegate(mpFilterItemDelegate);
     }
 

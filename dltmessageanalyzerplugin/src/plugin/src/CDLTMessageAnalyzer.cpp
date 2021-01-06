@@ -28,6 +28,7 @@
 #include "QMenu"
 #include "QApplication"
 #include "QColorDialog"
+#include "QKeyEvent"
 
 #include "common/CTreeItem.hpp"
 #include "components/patternsView/api/IPatternsModel.hpp"
@@ -51,6 +52,14 @@
 #include "components/logsWrapper/api/IDLTLogsWrapperCreator.hpp"
 
 #include "DMA_Plantuml.hpp"
+
+namespace NShortcuts
+{
+    static bool isSaveRegexPatternShortcut( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->modifiers() & Qt::ControlModifier && pEvent->key() == Qt::Key_S;
+    }
+}
 
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
@@ -258,6 +267,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
             {
                 QAction* pAction = new QAction("Save ...", mpRegexLineEdit);
+                pAction->setShortcut(Qt::CTRL + Qt::Key_S);
                 connect(pAction, &QAction::triggered, [this]()
                 {
                     addPattern( mpRegexLineEdit->text() );
@@ -491,6 +501,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         createSequenceDiagram();
     });
 
+    if(nullptr != mpRegexLineEdit)
+    {
+        mpRegexLineEdit->installEventFilter(this);
+    }
+
     handleLoadedConfig();
     handleLoadedRegexConfig();
 
@@ -500,6 +515,37 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                                       0,
                                                       getSettingsManager()->getCacheEnabled(),
                                                       false));
+}
+
+bool CDLTMessageAnalyzer::eventFilter(QObject* pObj, QEvent* pEvent)
+{
+    bool bResult = false;
+
+    if (pEvent->type() == QEvent::ShortcutOverride )
+    {
+        QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
+        if(nullptr != mpRegexLineEdit
+           && pObj == mpRegexLineEdit
+           && true == mpRegexLineEdit->hasFocus() )
+        {
+            if( true == NShortcuts::isSaveRegexPatternShortcut( pKeyEvent ) )
+            {
+                addPattern( mpRegexLineEdit->text() );
+                pEvent->accept();
+                bResult = true;
+            }
+        }
+        else
+        {
+            bResult = QObject::eventFilter(pObj, pEvent);
+        }
+    }
+    else
+    {
+        bResult = QObject::eventFilter(pObj, pEvent);
+    }
+
+    return bResult;
 }
 
 void CDLTMessageAnalyzer::decodeMsg(QDltMsg& msg) const
