@@ -215,6 +215,9 @@ signals:
          */
         void analysisStatusChanged( bool analysisRunning );
 
+    protected:
+        bool eventFilter(QObject* pObj, QEvent* pEvent) override;
+
     private:
 
         void setReuqestId( const tRequestId& val );
