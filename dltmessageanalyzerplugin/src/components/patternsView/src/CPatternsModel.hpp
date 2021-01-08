@@ -18,8 +18,7 @@
 
 #include "components/settings/api/CSettingsManagerClient.hpp"
 
-class CPatternsModel : public QAbstractItemModel,
-                       public IPatternsModel,
+class CPatternsModel : public IPatternsModel,
                        public CSettingsManagerClient
 {
     Q_OBJECT
@@ -50,6 +49,7 @@ public:
     void removeData(const QModelIndex& idx) override;
     QString getAliasEditName( const QModelIndex& idx ) override;
     void filterPatterns( const QString& filter ) override;
+    void refreshRegexPatterns() override;
     // Implementation of the IPatternsModel ( END )
 
     bool areAnyCombinedPatternsAvailable() const;

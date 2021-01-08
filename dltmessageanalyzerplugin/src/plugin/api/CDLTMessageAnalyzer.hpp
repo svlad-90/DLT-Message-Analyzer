@@ -248,7 +248,6 @@ signals:
 #endif
 
         void handleLoadedConfig();
-        void handleLoadedRegexConfig();
         void resetSearchRange();
         bool isContinuousAnalysis() const;
         void hidePatternLogic(bool userTriggered);

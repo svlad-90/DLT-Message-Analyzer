@@ -478,7 +478,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     connect(getSettingsManager().get(), &ISettingsManager::selectedRegexFileChanged,
     [this](const QString& /*regexDirectory*/)
     {
-        handleLoadedRegexConfig();
+        if(nullptr != mpPatternsModel)
+        {
+            mpPatternsModel->refreshRegexPatterns();
+        }
     });
 
     connect(getSettingsManager().get(), &ISettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
@@ -507,7 +510,16 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     }
 
     handleLoadedConfig();
-    handleLoadedRegexConfig();
+
+    if(nullptr != mpPatternsModel)
+    {
+        connect(mpPatternsModel.get(), &IPatternsModel::patternsRefreshed, [this]()
+        {
+            updateStatusLabel("Patterns refreshed ...");
+        });
+
+        mpPatternsModel->refreshRegexPatterns();
+    }
 
     // set initial cache status
     mpCacheStatusLabel->setText(formCacheStatusString(0,
@@ -576,20 +588,6 @@ void CDLTMessageAnalyzer::createSequenceDiagram() const
         else
         {
             SEND_WRN( "Can't form empty UML diagram. 0 rows from the \"Search view\" were selected for diagram's creation." );
-        }
-    }
-}
-
-void CDLTMessageAnalyzer::handleLoadedRegexConfig()
-{
-    if(nullptr != mpPatternsModel)
-    {
-        mpPatternsModel->resetData();
-
-        const auto& aliases = getSettingsManager()->getAliases();
-        for(const auto& alias : aliases)
-        {
-            mpPatternsModel->addData(alias.alias, alias.regex, alias.isDefault ? Qt::Checked : Qt::Unchecked );
         }
     }
 }

@@ -4,7 +4,8 @@
 
 #include "DMA_Plantuml.hpp"
 
-IPatternsModel::IPatternsModel()
+IPatternsModel::IPatternsModel(QObject *parent):
+QAbstractItemModel(parent)
 {
 
 }
@@ -18,6 +19,7 @@ DMA_FORCE_LINK_ANCHOR_CPP(IPatternsModel)
 
 PUML_PACKAGE_BEGIN(DMA_PatternsView_API)
     PUML_CLASS_BEGIN(IPatternsModel)
+        PUML_INHERITANCE(QAbstractItemModel, implements)
         PUML_PURE_VIRTUAL_METHOD( +,  void updateView() )
         PUML_PURE_VIRTUAL_METHOD( +, void resetData() )
         PUML_PURE_VIRTUAL_METHOD( +, QModelIndex addData(const QString& alias,
@@ -36,5 +38,7 @@ PUML_PACKAGE_BEGIN(DMA_PatternsView_API)
         PUML_PURE_VIRTUAL_METHOD( +, removeData(const QModelIndex& idx) )
         PUML_PURE_VIRTUAL_METHOD( +, QString getAliasEditName( const QModelIndex& idx ) )
         PUML_PURE_VIRTUAL_METHOD( +, void filterPatterns( const QString& filter ) )
+        PUML_PURE_VIRTUAL_METHOD( +, void refreshRegexPatterns() )
+        PUML_PURE_VIRTUAL_METHOD( +, signal void patternsRefreshed() )
     PUML_CLASS_END()
 PUML_PACKAGE_END()

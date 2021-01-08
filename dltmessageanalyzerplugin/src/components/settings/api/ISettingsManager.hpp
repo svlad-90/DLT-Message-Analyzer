@@ -71,6 +71,7 @@ public:
     virtual QString getUserSettingsFilepath() const = 0;
     virtual QString getRootSettingsFilepath() const = 0;
     virtual QString getDefaultPlantumlPath() const = 0;
+    virtual void refreshRegexConfiguration() = 0;
 
 ////////////////////////SETTERS/////////////////////////////
 

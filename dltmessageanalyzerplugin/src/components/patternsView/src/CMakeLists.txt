@@ -1,4 +1,5 @@
 qt5_wrap_cpp(PROCESSED_MOCS
+             ../api/IPatternsModel.hpp
              ../api/CPatternsView.hpp)
 
 add_library(DMA_patternsView STATIC

@@ -204,7 +204,7 @@ static QVector<tTreeItemPtr> sortingFunction (const QVector<tTreeItemPtr>& child
 
 CPatternsModel::CPatternsModel(const tSettingsManagerPtr& pSettingsManager,
                                QObject *parent):
-    QAbstractItemModel(parent),
+    IPatternsModel(parent),
     CSettingsManagerClient(pSettingsManager),
     mpRootItem(nullptr),
     mSortingColumn(ePatternsColumn::AliasTreeLevel),
@@ -1469,9 +1469,21 @@ void CPatternsModel::filterPatterns( const QString& filter )
     filterPatternsInternal(true);
 }
 
+void CPatternsModel::refreshRegexPatterns()
+{
+    resetData();
+
+    const auto& aliases = getSettingsManager()->getAliases();
+    for(const auto& alias : aliases)
+    {
+        addData(alias.alias, alias.regex, alias.isDefault ? Qt::Checked : Qt::Unchecked );
+    }
+
+    patternsRefreshed();
+}
+
 PUML_PACKAGE_BEGIN(DMA_PatternsView)
     PUML_CLASS_BEGIN_CHECKED(CPatternsModel)
-        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
         PUML_INHERITANCE_CHECKED(IPatternsModel, implements)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)
