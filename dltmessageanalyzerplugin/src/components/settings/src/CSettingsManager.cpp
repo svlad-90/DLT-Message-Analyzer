@@ -1834,6 +1834,11 @@ QString CSettingsManager::getDefaultPlantumlPath() const
     return QCoreApplication::applicationDirPath() + QDir::separator() + "plugins/plantuml.jar";
 }
 
+void CSettingsManager::refreshRegexConfiguration()
+{
+    mSetting_SelectedRegexFile.setData(mSetting_SelectedRegexFile.getData(), true);
+}
+
 void CSettingsManager::clearRegexConfig()
 {
     mSetting_Aliases.setDataSilent(tAliasItemVec());

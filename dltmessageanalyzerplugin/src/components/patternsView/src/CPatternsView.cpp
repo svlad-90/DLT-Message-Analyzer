@@ -80,6 +80,11 @@ namespace NShortcuts
     {
         return pEvent && pEvent->modifiers() & Qt::ControlModifier && pEvent->key() == Qt::Key_V;
     }
+
+    static bool isRefreshShortcut( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->modifiers() & Qt::AltModifier && pEvent->key() == Qt::Key_R;
+    }
 }
 
 static Qt::CheckState getOppositeCheckState(Qt::CheckState val)
@@ -347,6 +352,8 @@ void CPatternsView::setPatternsSearchInput( QLineEdit* pPatternsSearchInput )
 
 bool CPatternsView::eventFilter(QObject* pObj, QEvent* pEvent)
 {
+    bool bResult = true;
+
     if (pEvent->type() == QEvent::KeyPress)
     {
         QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
@@ -355,13 +362,23 @@ bool CPatternsView::eventFilter(QObject* pObj, QEvent* pEvent)
            NShortcuts::isClearSeletedPatternsShortcut(pKeyEvent) ||
            NShortcuts::isResetSeletedPatternsShortcut(pKeyEvent) ||
            NShortcuts::isCollapseAllShortcut(pKeyEvent) ||
-           NShortcuts::isExpadAllShortcut(pKeyEvent))
+           NShortcuts::isExpadAllShortcut(pKeyEvent) ||
+           NShortcuts::isRefreshShortcut(pKeyEvent) )
         {
             keyPressEvent(pKeyEvent);
+            bResult = true;
+        }
+        else
+        {
+            bResult = QObject::eventFilter(pObj, pEvent);
         }
     }
+    else
+    {
+        bResult = QObject::eventFilter(pObj, pEvent);
+    }
 
-    return QObject::eventFilter(pObj, pEvent);
+    return bResult;
 }
 
 QString CPatternsView::createCombinedRegex()
@@ -552,6 +569,15 @@ void CPatternsView::keyPressEvent ( QKeyEvent * pEvent )
     else if(NShortcuts::isExpadAllShortcut(pEvent))
     {
         expandAll();
+    }
+    else if(NShortcuts::isRefreshShortcut(pEvent))
+    {
+        if(nullptr != getSettingsManager()
+        && nullptr != mpModel )
+        {
+            getSettingsManager()->refreshRegexConfiguration();
+            mpModel->refreshRegexPatterns();
+        }
     }
     else
     {
@@ -920,6 +946,25 @@ void CPatternsView::handleSettingsManagerChange()
 
             contextMenu.addSeparator();
         }
+
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Refresh", this);
+            pAction->setShortcut(QKeySequence(tr("Alt+R")));
+            connect(pAction, &QAction::triggered, [this]()
+            {
+                if(nullptr != getSettingsManager()
+                && nullptr != mpModel )
+                {
+                    getSettingsManager()->refreshRegexConfiguration();
+                    mpModel->refreshRegexPatterns();
+                }
+            });
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
 
         {
             QMenu* pSubMenu = new QMenu("Combination settings", this);

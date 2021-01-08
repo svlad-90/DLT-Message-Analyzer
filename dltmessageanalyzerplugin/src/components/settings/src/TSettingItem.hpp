@@ -101,10 +101,11 @@ class TSettingItem : public CSettingItem
      * @brief setData - sets the data to memory.
      * Calls the update data func & update file func.
      * @param data - data to be remembered.
+     * @param bForce - whether we should update data if new value is equal to an old one
      */
-    virtual void setData( const tData& data )
+    virtual void setData( const tData& data, bool bForce = false )
     {
-        bool bUpdate = mData != data;
+        bool bUpdate = true == bForce || mData != data;
 
         if(true == bUpdate)
         {
@@ -128,10 +129,11 @@ class TSettingItem : public CSettingItem
      * @brief setDataSilent - sets the data to memory without emitting any signals.
      * Does not neither the update data func nor the update file func.
      * @param data - data to be remembered.
+     * @param bForce - whether we should update data if new value is equal to an old one
      */
-    virtual void setDataSilent( const tData& data )
+    virtual void setDataSilent( const tData& data, bool bForce = false )
     {
-        bool bUpdate = mData != data;
+        bool bUpdate = true == bForce || mData != data;
 
         if(true == bUpdate)
         {
@@ -220,10 +222,11 @@ public:
      * @brief setData - sets the data to memory.
      * Calls the update data func & update file func.
      * @param data - data to be remembered.
+     * @param bForce - whether we should update data if new value is equal to an old one
      */
-    void setData( const typename tParent::tData& data ) override
+    void setData( const typename tParent::tData& data, bool bForce = false ) override
     {
-        bool bUpdate = tParent::mData != data;
+        bool bUpdate = true == bForce || tParent::mData != data;
 
         if(true == bUpdate)
         {
@@ -249,10 +252,11 @@ public:
      * @brief setDataSilent - sets the data to memory without emitting any signals.
      * Does not neither the update data func nor the update file func.
      * @param data - data to be remembered.
+     * @param bForce - whether we should update data if new value is equal to an old one
      */
-    void setDataSilent( const typename tParent::tData& data ) override
+    void setDataSilent( const typename tParent::tData& data, bool bForce = false ) override
     {
-        bool bUpdate = tParent::mData != data;
+        bool bUpdate = true == bForce || tParent::mData != data;
 
         if(true == bUpdate)
         {

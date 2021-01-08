@@ -41,6 +41,7 @@ public:
     QString getUserSettingsFilepath() const override;
     QString getRootSettingsFilepath() const override;
     QString getDefaultPlantumlPath() const override;
+    void refreshRegexConfiguration() override;
 
 ////////////////////////SETTERS/////////////////////////////
 

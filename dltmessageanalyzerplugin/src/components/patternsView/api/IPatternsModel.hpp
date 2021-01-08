@@ -1,14 +1,16 @@
 #pragma once
 
+#include "QAbstractItemModel"
 #include "QModelIndex"
 
 #include "common/Definitions.hpp"
 
-class IPatternsModel
+class IPatternsModel : public QAbstractItemModel
 {
+    Q_OBJECT
 public:
 
-    IPatternsModel();
+    IPatternsModel(QObject *parent);
     virtual ~IPatternsModel();
 
     virtual void updateView() = 0;
@@ -16,6 +18,7 @@ public:
     virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isDefault = Qt::Unchecked) = 0;
     virtual QModelIndex addData(const QString& alias, const QString& regex, Qt::CheckState isCombine, Qt::CheckState isDefault) = 0;
     virtual void updatePatternsInPersistency() = 0;
+    virtual void refreshRegexPatterns() = 0;
 
     struct tSearchResult
     {
@@ -53,4 +56,7 @@ public:
     virtual QString getAliasEditName( const QModelIndex& idx ) = 0;
 
     virtual void filterPatterns( const QString& filter ) = 0;
+
+signals:
+    void patternsRefreshed();
 };

@@ -235,6 +235,8 @@ As soon as you will select the alternative regex configuration, the view will be
 >
 > Plugin supports copy-paste of patterns between the files via the Ctrl+C and Ctrl+V shortcuts ( or via the corresponding context-menu items ). 
 > It might become quite useful, in case if you'll decide to use some of the colleague's regexes in combination with your ones.
+> 
+> Currently, it works ONLY within an instance of the dlt-viewer. Sharing between the multiple instances is not supported.
 
 ----
 
