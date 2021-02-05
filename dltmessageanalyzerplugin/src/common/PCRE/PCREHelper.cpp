@@ -2,10 +2,6 @@
 
 #include "QString"
 
-#ifdef DEBUG_BUILD
-#include "QElapsedTimer"
-#endif
-
 #include "QLocale"
 
 #include "PCRELexer.h"
@@ -15,6 +11,10 @@
 #include "../CTreeItem.hpp"
 #include "components/log/api/CLog.hpp"
 #include "PCREHelper.hpp"
+
+#ifdef DEBUG_BUILD
+#include "QElapsedTimer"
+#endif
 
 using namespace std;
 using namespace antlr4;

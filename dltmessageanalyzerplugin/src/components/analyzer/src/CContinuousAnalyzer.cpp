@@ -28,14 +28,11 @@ void CSubConsumer::setCallback(const tCallback& callback)
     mCallback = callback;
 }
 
-void CSubConsumer::progressNotification( const tRequestId& requestId,
-                                         const eRequestState& requestState,
-                                         const int8_t& progress,
-                                         const tFoundMatchesPack& processedMatches)
+void CSubConsumer::progressNotification( const tProgressNotificationData& progressNotificationData )
 {
     if( mCallback )
     {
-        mCallback( requestId, requestState, progress, processedMatches );
+        mCallback( progressNotificationData );
     }
 }
 
@@ -50,15 +47,9 @@ mRequestIdCounter(static_cast<uint64_t>(-1))
 {
     auto pConsumer = IDLTMessageAnalyzerControllerConsumer::createInstance<CSubConsumer>(pSubAnalyzer);
 
-    auto callback = [this](const tRequestId& requestId,
-            const eRequestState& requestState,
-            const int8_t& progress,
-            const tFoundMatchesPack& processedMatches)
+    auto callback = [this](const tProgressNotificationData& progressNotificationData)
     {
-        progressNotification( requestId,
-                              requestState,
-                              progress,
-                              processedMatches );
+        progressNotification( progressNotificationData );
     };
 
     pConsumer->setCallback( callback );
@@ -66,12 +57,9 @@ mRequestIdCounter(static_cast<uint64_t>(-1))
     mpSubConsumer = pConsumer;
 }
 
-void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
-                                               const eRequestState& requestState,
-                                               const int8_t& progress,
-                                               const tFoundMatchesPack& processedMatches)
+void CContinuousAnalyzer::progressNotification( const tProgressNotificationData& progressNotificationData )
 {
-    auto foundSubRequest = mSubRequestDataMap.find(requestId);
+    auto foundSubRequest = mSubRequestDataMap.find(progressNotificationData.requestId);
 
     if(mSubRequestDataMap.end() != foundSubRequest)
     {
@@ -84,14 +72,11 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
                 if(false == foundRequest.value().pClient.expired())
                 {
                     QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
-                                              Q_ARG(tRequestId, foundSubRequest.value()),
-                                              Q_ARG(eRequestState, requestState),
-                                              Q_ARG(int8_t, progress),
-                                              Q_ARG(tFoundMatchesPack, processedMatches));
+                                              Q_ARG(tProgressNotificationData, progressNotificationData));
                 }
 
-                if(eRequestState::ERROR_STATE == requestState ||
-                        eRequestState::SUCCESSFUL == requestState)
+                if(eRequestState::ERROR_STATE == progressNotificationData.requestState ||
+                        eRequestState::SUCCESSFUL == progressNotificationData.requestState)
                 {
                     mRequestDataMap.erase(foundRequest);
                     mSubRequestDataMap.erase(foundSubRequest);
@@ -99,19 +84,23 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
             }
             else
             {
-                switch(requestState)
+                switch(progressNotificationData.requestState)
                 {
                     case eRequestState::PROGRESS:
                     {
                         if(false == foundRequest.value().pClient.expired())
                         {
-                            int8_t injectedProgress = foundRequest.value().bContinuousModeActive ? 100u : progress;
+                            int8_t injectedProgress = foundRequest.value().bContinuousModeActive ? 100u : progressNotificationData.progress;
+
+                            tProgressNotificationData resultProgressNotificationData
+                            (foundSubRequest.value(),
+                            progressNotificationData.requestState,
+                            injectedProgress,
+                            progressNotificationData.processedMatches,
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
 
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
-                                                      Q_ARG(tRequestId, foundSubRequest.value()),
-                                                      Q_ARG(eRequestState, requestState),
-                                                      Q_ARG(int8_t, injectedProgress),
-                                                      Q_ARG(tFoundMatchesPack, processedMatches));
+                                                      Q_ARG(tProgressNotificationData, resultProgressNotificationData));
                         }
                     }
                         break;
@@ -119,11 +108,15 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
                     {
                         if(false == foundRequest.value().pClient.expired())
                         {
+                            tProgressNotificationData resultProgressNotificationData
+                            (foundSubRequest.value(),
+                            progressNotificationData.requestState,
+                            progressNotificationData.progress,
+                            progressNotificationData.processedMatches,
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
+
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
-                                                      Q_ARG(tRequestId, foundSubRequest.value()),
-                                                      Q_ARG(eRequestState, requestState),
-                                                      Q_ARG(int8_t, progress),
-                                                      Q_ARG(tFoundMatchesPack, processedMatches));
+                                                      Q_ARG(tProgressNotificationData, resultProgressNotificationData));
                         }
 
                         mSubRequestDataMap.erase(foundSubRequest);
@@ -136,11 +129,15 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
                     {
                         if(false == foundRequest.value().pClient.expired())
                         {
+                            tProgressNotificationData resultProgressNotificationData
+                            (foundSubRequest.value(),
+                            eRequestState::PROGRESS,
+                            100,
+                            progressNotificationData.processedMatches,
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
+
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
-                                                      Q_ARG(tRequestId, foundSubRequest.value()),
-                                                      Q_ARG(eRequestState, eRequestState::PROGRESS),
-                                                      Q_ARG(int8_t, 100),
-                                                      Q_ARG(tFoundMatchesPack, processedMatches));
+                                                      Q_ARG(tProgressNotificationData, resultProgressNotificationData));
                         }
 
                         mSubRequestDataMap.erase(foundSubRequest); // sub-request is not relevant anymore
@@ -156,31 +153,35 @@ void CContinuousAnalyzer::progressNotification(const tRequestId& requestId,
     }
     else
     {
-        qDebug() << "Warning. Progress notification for irrelevant request id - " << requestId;
+        qDebug() << "Warning. Progress notification for irrelevant request id - " << progressNotificationData.requestId;
     }
 }
 
 tRequestId CContinuousAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                           const tFileWrapperPtr& pFile,
-                           const int& fromMessage,
-                           const int& numberOfMessages,
-                           const QRegularExpression& regex,
-                           const int& numberOfThreads,
-                           const tRegexScriptingMetadata& regexScriptingMetadata,
-                           bool isContinuous )
+                                                const tRequestParameters& requestParameters,
+                                                const tRegexScriptingMetadata& regexScriptingMetadata )
 {
     tRequestId resultRequestId = INVALID_REQUEST_ID;
 
     if(nullptr != mpSubAnalyzer)
     {
-        tRequestId subRequestId = mpSubAnalyzer->requestAnalyze(mpSubConsumer, pFile,fromMessage,numberOfMessages,regex,numberOfThreads,regexScriptingMetadata,isContinuous);
+        tRequestId subRequestId = mpSubAnalyzer->requestAnalyze(mpSubConsumer,
+                                                                requestParameters,
+                                                                regexScriptingMetadata);
 
         if(INVALID_REQUEST_ID != subRequestId)
         {
             resultRequestId = ++mRequestIdCounter;
-            tRequestData requestData( resultRequestId, pClient, subRequestId, isContinuous, pFile, regex, numberOfThreads, regexScriptingMetadata );
-            requestData.fromMessage = fromMessage;
-            requestData.toMessage = fromMessage + numberOfMessages;
+            tRequestData requestData( resultRequestId,
+                                      pClient,
+                                      subRequestId,
+                                      requestParameters.isContinuous,
+                                      requestParameters.pFile,
+                                      requestParameters.regex,
+                                      requestParameters.numberOfThreads,
+                                      regexScriptingMetadata );
+            requestData.fromMessage = requestParameters.fromMessage;
+            requestData.toMessage = requestParameters.fromMessage + requestParameters.numberOfMessages;
 
             mRequestDataMap.insert(resultRequestId, requestData);
             mSubRequestDataMap.insert( subRequestId, resultRequestId );
@@ -241,14 +242,19 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
 
             if(nullptr != mpSubAnalyzer)
             {
+                tRequestParameters requestParameters
+                (
+                    inputIt->mpFile,
+                    inputIt->fromMessage,
+                    inputIt->toMessage - inputIt->fromMessage,
+                    inputIt->regex,
+                    inputIt->numberOfThreads,
+                    inputIt->bIsContinuousAnalysis
+                );
+
                 tRequestId subRequestId = mpSubAnalyzer->requestAnalyze(mpSubConsumer,
-                                                                        inputIt->mpFile,
-                                                                        inputIt->fromMessage,
-                                                                        inputIt->toMessage - inputIt->fromMessage,
-                                                                        inputIt->regex,
-                                                                        inputIt->numberOfThreads,
-                                                                        inputIt->regexScriptingMetadata,
-                                                                        inputIt->bIsContinuousAnalysis);
+                                                                        requestParameters,
+                                                                        inputIt->regexScriptingMetadata);
 
                 if(INVALID_REQUEST_ID != subRequestId)
                 {
@@ -259,10 +265,16 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
                 {
                     if(false == inputIt.value().pClient.expired())
                     {
-                        inputIt.value().pClient.lock()->progressNotification(inputIt.value().requestId,
-                                                                             eRequestState::ERROR_STATE,
-                                                                             0,
-                                                                             tFoundMatchesPack());
+                        tProgressNotificationData progressNotificationData
+                        (
+                            inputIt.value().requestId,
+                            eRequestState::ERROR_STATE,
+                            0,
+                            tFoundMatchesPack(),
+                            false
+                        );
+
+                        inputIt.value().pClient.lock()->progressNotification(progressNotificationData);
                     }
 
                     mRequestDataMap.erase( inputIt );
@@ -288,10 +300,16 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
             // error
             if(false == inputIt.value().pClient.expired())
             {
-                inputIt.value().pClient.lock()->progressNotification(inputIt.value().requestId,
-                                                                     eRequestState::ERROR_STATE,
-                                                                     0,
-                                                                     tFoundMatchesPack());
+                tProgressNotificationData progressNotificationData
+                (
+                    inputIt.value().requestId,
+                    eRequestState::ERROR_STATE,
+                    0,
+                    tFoundMatchesPack(),
+                    false
+                );
+
+                inputIt.value().pClient.lock()->progressNotification(progressNotificationData);
             }
 
             mRequestDataMap.erase( inputIt );

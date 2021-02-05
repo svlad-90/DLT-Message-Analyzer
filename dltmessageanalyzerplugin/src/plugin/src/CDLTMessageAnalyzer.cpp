@@ -884,13 +884,18 @@ bool CDLTMessageAnalyzer::analyze()
             requestedMessages.to = mpFile->size() - 1;
         }
 
-        auto requestId = requestAnalyze( mpFile,
-                                     requestedMessages.from,
-                                     requestedMessages.to - requestedMessages.from + 1,
-                                     *pRegex,
-                                     mpNumberOfThreadsCombobBox->currentData().value<int>(),
-                                     isContinuousAnalysis(),
-                                     getSettingsManager()->getUML_FeatureActive());
+        tRequestParameters requestParameters
+        (
+            mpFile,
+            requestedMessages.from,
+            requestedMessages.to - requestedMessages.from + 1,
+            *pRegex,
+            mpNumberOfThreadsCombobBox->currentData().value<int>(),
+            isContinuousAnalysis()
+        );
+
+        auto requestId = requestAnalyze( requestParameters,
+                                         getSettingsManager()->getUML_FeatureActive() );
 
         setReuqestId(requestId);
 
@@ -1057,10 +1062,7 @@ void CDLTMessageAnalyzer::updateProgress(int progress, eRequestState requestStat
     mpProgressBar->repaint();
 }
 
-void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
-                                               const eRequestState &requestState,
-                                               const int8_t &progress,
-                                               const tFoundMatchesPack &processedMatches)
+void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& progressNotificationData)
 {
     //qDebug() << "CDLTMessageAnalyzer::" << __FUNCTION__;
 
@@ -1071,7 +1073,7 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
     //        mMeasurementNotificationTimer.restart();
     //#endif
 
-    if(mRequestId == requestId)
+    if(mRequestId == progressNotificationData.requestId)
     {
         if( nullptr == mpGroupedViewModel ||
             nullptr == mpSearchResultModel ||
@@ -1082,18 +1084,21 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
 
         //qDebug() << "CDLTMessageAnalyzer::" << __FUNCTION__ << ": progress - " << progress << "; requestStats - " << static_cast<int>(requestState);
 
-        switch(requestState)
+        switch(progressNotificationData.requestState)
         {
             case eRequestState::SUCCESSFUL:
             {
-                for(auto foundMatchesIt = processedMatches.matchedItemVec.begin(); foundMatchesIt != processedMatches.matchedItemVec.end(); ++foundMatchesIt)
+                for(auto foundMatchesIt = progressNotificationData.processedMatches.matchedItemVec.begin(); foundMatchesIt !=
+                    progressNotificationData.processedMatches.matchedItemVec.end(); ++foundMatchesIt)
                 {
-                    auto endIt = processedMatches.matchedItemVec.end();
+                    auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
                     mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
                     mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 
-                updateProgress(progress, requestState, false);
+                updateProgress(progressNotificationData.progress,
+                               progressNotificationData.requestState,
+                               false);
 
                 if( false == isContinuousAnalysis() )
                 {
@@ -1103,7 +1108,7 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
 
                 {
                     SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
-                             .arg(requestId)
+                             .arg(progressNotificationData.requestId)
                              .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
 
                     mMeasurementRequestTimer.restart();
@@ -1124,25 +1129,26 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
                 break;
             case eRequestState::PROGRESS:
             {
-                for(auto foundMatchesIt = processedMatches.matchedItemVec.begin();
-                    foundMatchesIt != processedMatches.matchedItemVec.end();
+                for(auto foundMatchesIt = progressNotificationData.processedMatches.matchedItemVec.begin();
+                    foundMatchesIt != progressNotificationData.processedMatches.matchedItemVec.end();
                     ++foundMatchesIt)
                 {
-                    auto endIt = processedMatches.matchedItemVec.end();
+                    auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
                     mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
                     mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 
-                updateProgress(progress, requestState, false);
+                updateProgress(progressNotificationData.progress,
+                               progressNotificationData.requestState, false);
 
-                if(progress == 100 && false == mbIsConnected)
+                if(progressNotificationData.progress == 100 && false == mbIsConnected)
                 {
-                    cancelRequest(requestId);
-                    updateProgress(progress, eRequestState::SUCCESSFUL, false);
+                    cancelRequest(progressNotificationData.requestId);
+                    updateProgress(progressNotificationData.progress, eRequestState::SUCCESSFUL, false);
                     analysisStatusChanged(false);
 
                     SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
-                             .arg(requestId)
+                             .arg(progressNotificationData.requestId)
                              .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
                 }
 
@@ -1150,19 +1156,20 @@ void CDLTMessageAnalyzer::progressNotification(const tRequestId &requestId,
             }
         }
 
-        auto additionResult = mpSearchResultModel->addNextMessageIdxVec( processedMatches );
+        auto additionResult = mpSearchResultModel->addNextMessageIdxVec( progressNotificationData.processedMatches );
 
         if(nullptr != mpSearchViewTableJumper &&
            nullptr != mpSearchResultModel &&
            additionResult.first &&
-           false == processedMatches.matchedItemVec.empty())
+           false == progressNotificationData.processedMatches.matchedItemVec.empty())
         {
-            if( (additionResult.second.to - additionResult.second.from + 1) == static_cast<int>(processedMatches.matchedItemVec.size()))
+            if( (additionResult.second.to - additionResult.second.from + 1) ==
+                 static_cast<int>(progressNotificationData.processedMatches.matchedItemVec.size()))
             {
                 int counter = 0;
                 CTableMemoryJumper::tCheckSet checkSet;
 
-                for(const auto& match : processedMatches.matchedItemVec)
+                for(const auto& match : progressNotificationData.processedMatches.matchedItemVec)
                 {
                     CTableMemoryJumper::tCheckItem checkItem;
                     checkItem.first = static_cast<CTableMemoryJumper::tRowID>( match.getItemMetadata().msgId );

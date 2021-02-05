@@ -25,12 +25,7 @@ IDLTMessageAnalyzerControllerConsumer::IDLTMessageAnalyzerControllerConsumer( co
 
 }
 
-tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tFileWrapperPtr& pFile,
-                                                                  const int& fromMessage,
-                                                                  const int& numberOfMessages,
-                                                                  const QRegularExpression& regex,
-                                                                  const int& numberOfThreads,
-                                                                  bool isContinuous,
+tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequestParameters& requestParameters,
                                                                   bool bUMLFeatureActive )
 {
     tRequestId requestId = INVALID_REQUEST_ID;
@@ -39,7 +34,7 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tFileWra
     {
         tRegexScriptingMetadata regexMetadata;
 
-        bool bParseResult = regexMetadata.parse(regex, bUMLFeatureActive);
+        bool bParseResult = regexMetadata.parse(requestParameters.regex, bUMLFeatureActive);
 
         if(false == bParseResult)
         {
@@ -61,7 +56,7 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tFileWra
             }
         }
 
-        requestId = mpController.lock()->requestAnalyze(shared_from_this(), pFile, fromMessage, numberOfMessages, regex, numberOfThreads, regexMetadata, isContinuous);
+        requestId = mpController.lock()->requestAnalyze(shared_from_this(), requestParameters, regexMetadata);
     }
 
     return requestId;
@@ -82,16 +77,8 @@ PUML_PACKAGE_BEGIN(DMA_Analyzer_API)
     PUML_ABSTRACT_CLASS_BEGIN_CHECKED(IDLTMessageAnalyzerControllerConsumer)
         PUML_INHERITANCE_CHECKED(QObject, extends)
         PUML_INHERITANCE_CHECKED(std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>, extends)
-        PUML_PURE_VIRTUAL_METHOD( +, void progressNotification( const tRequestId& requestId,
-                                                                const eRequestState& requestState,
-                                                                const int8_t& progress,
-                                                                const tFoundMatchesPack& processedMatches) )
-        PUML_METHOD( +, tRequestId requestAnalyze( const tFileWrapperPtr& pFile,
-                                                   const int& fromMessage,
-                                                   const int& numberOfMessages,
-                                                   const QRegularExpression& regex,
-                                                   const int& numberOfThreads,
-                                                   bool isContinuous ) )
+        PUML_PURE_VIRTUAL_METHOD( +, slot void progressNotification( const tProgressNotificationData& progressNotificationData ) )
+        PUML_METHOD( +, tRequestId requestAnalyze( const tRequestParameters& requestParameters ) )
         PUML_AGGREGATION_DEPENDENCY(IDLTMessageAnalyzerController, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
     PUML_ABSTRACT_CLASS_END()

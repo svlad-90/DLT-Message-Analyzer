@@ -21,16 +21,10 @@ class CSubConsumer : public IDLTMessageAnalyzerControllerConsumer
 {
    Q_OBJECT
 public:
-   typedef std::function<void(const tRequestId&,
-                              const eRequestState&,
-                              const int8_t&,
-                              const tFoundMatchesPack&)> tCallback;
+   typedef std::function<void(const tProgressNotificationData&)> tCallback;
    CSubConsumer(const tDLTMessageAnalyzerControllerPtr& pController);
    void setCallback(const tCallback& callback);
-   void progressNotification( const tRequestId& requestId,
-                              const eRequestState& requestState,
-                              const int8_t& progress,
-                              const tFoundMatchesPack& processedMatches) override;
+   void progressNotification( const tProgressNotificationData& progressNotificationData ) override;
 private:
    tCallback mCallback;
 };
@@ -53,13 +47,8 @@ public:
      * @brief requestAnalyze - check IDLTMessageAnalyzerController for details
      */
     tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                               const tFileWrapperPtr& pFile,
-                               const int& fromMessage,
-                               const int& numberOfMessages,
-                               const QRegularExpression& regex,
-                               const int& numberOfThreads,
-                               const tRegexScriptingMetadata& regexScriptingMetadata,
-                               bool isContinuous ) override;
+                               const tRequestParameters& requestParameters,
+                               const tRegexScriptingMetadata& regexScriptingMetadata ) override;
 
     /**
      * @brief requestAnalyze - check IDLTMessageAnalyzerController for details
@@ -76,10 +65,7 @@ private:// methods
     typedef QMap<tRequestId, tRequestData> tRequestDataMap;
 
     void triggerContinuousAnalysisIteration(const tRequestDataMap::iterator& inputIt);
-    void progressNotification(const tRequestId& requestId,
-                              const eRequestState& requestState,
-                              const int8_t& progress,
-                              const tFoundMatchesPack& processedMatches);
+    void progressNotification(const tProgressNotificationData& progressNotificationData);
 
 private:// fields
     std::shared_ptr<IDLTMessageAnalyzerControllerConsumer> mpSubConsumer;
