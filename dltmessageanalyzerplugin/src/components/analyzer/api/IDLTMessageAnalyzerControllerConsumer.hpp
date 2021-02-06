@@ -7,7 +7,7 @@
 
 #include <QObject>
 
-#include "common/Definitions.hpp"
+#include "Definitions.hpp"
 
 //Forward declarations
 
@@ -29,19 +29,11 @@ public:
     virtual ~IDLTMessageAnalyzerControllerConsumer();
 
 public slots:
-    virtual void progressNotification( const tRequestId& requestId,
-                                       const eRequestState& requestState,
-                                       const int8_t& progress,
-                                       const tFoundMatchesPack& processedMatches)=0;
+    virtual void progressNotification( const tProgressNotificationData& progressNotificationData )=0;
 
 protected:
     IDLTMessageAnalyzerControllerConsumer( const std::weak_ptr<IDLTMessageAnalyzerController>& pController );
-    tRequestId requestAnalyze( const tFileWrapperPtr& pFile,
-                               const int& fromMessage,
-                               const int& numberOfMessages,
-                               const QRegularExpression& regex,
-                               const int& numberOfThreads,
-                               bool isContinuous,
+    tRequestId requestAnalyze( const tRequestParameters& requestParameters,
                                bool bUMLFeatureActive );
     void cancelRequest( const tRequestId& requestId );
 

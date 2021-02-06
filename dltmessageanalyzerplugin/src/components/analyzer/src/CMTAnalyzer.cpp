@@ -74,39 +74,34 @@ CMTAnalyzer::~CMTAnalyzer()
 }
 
 tRequestId CMTAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                        const tFileWrapperPtr& pFile,
-                                        const int& fromMessage,
-                                        const int& numberOfMessages,
-                                        const QRegularExpression& regex,
-                                        const int& numberOfThreads,
-                                        const tRegexScriptingMetadata& regexScriptingMetadata,
-                                        bool)
+                                        const tRequestParameters& requestParameters,
+                                        const tRegexScriptingMetadata& regexScriptingMetadata )
 {
     tRequestId requestId = INVALID_REQUEST_ID;
 
-    if(nullptr != pFile &&
+    if(nullptr != requestParameters.pFile &&
        false == pClient.expired() &&
        nullptr != pClient.lock() )
     {
         connect(this,
                 &IDLTMessageAnalyzerController::progressNotification,
-                [pClient](const tRequestId& requestId_,
-                const eRequestState& requestState,
-                const int8_t& progress,
-                const tFoundMatchesPack& processedMatches)
+                [pClient](const tProgressNotificationData& progressNotificationData)
         {
             if(false == pClient.expired())
             {
-                pClient.lock()->progressNotification(requestId_,
-                                                     requestState,
-                                                     progress,
-                                                     processedMatches);
+                pClient.lock()->progressNotification( progressNotificationData );
             }
         });
 
-        if(true == regex.isValid())
+        if(true == requestParameters.regex.isValid())
         {
-            tRequestData requestData( pClient, pFile, fromMessage, numberOfMessages, regex, regexScriptingMetadata, numberOfThreads );
+            tRequestData requestData( pClient,
+                                      requestParameters.pFile,
+                                      requestParameters.fromMessage,
+                                      requestParameters.numberOfMessages,
+                                      requestParameters.regex,
+                                      regexScriptingMetadata,
+                                      requestParameters.numberOfThreads );
 
             if(0 != requestData.numberOfMessagesToBeAnalyzed)
             {
@@ -245,12 +240,17 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
                              .arg(workerThreadCookie));
 #endif
 
+            tAnalyzePortionData analyzePortionData
+            (
+                requestId_,
+                processingStrings,
+                inputIt_->regex,
+                inputIt_->regexScriptingMetadata,
+                workerThreadCookie
+            );
+
             QMetaObject::invokeMethod(workerItem.pDLTRegexAnalyzer, "analyzePortion", Qt::QueuedConnection,
-                                      Q_ARG(tRequestId, requestId_),
-                                      Q_ARG(tProcessingStrings, processingStrings),
-                                      Q_ARG(QRegularExpression, inputIt_->regex),
-                                      Q_ARG(tRegexScriptingMetadata, inputIt_->regexScriptingMetadata),
-                                      Q_ARG(tWorkerThreadCookie, workerThreadCookie));
+                                      Q_ARG(tAnalyzePortionData, analyzePortionData));
         }
     };
 
@@ -294,17 +294,21 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
     return bResult;
 }
 
-void CMTAnalyzer::portionRegexAnalysisFinished( const tRequestId& requestId,
-                                                int numberOfProcessedString,
-                                                CDLTRegexAnalyzerWorker::ePortionAnalysisState portionAnalysisState,
-                                                const tFoundMatchesPack& processedMatches,
-                                                const tWorkerId&,
-                                                const tWorkerThreadCookie& workerThreadCookie )
+void CMTAnalyzer::portionRegexAnalysisFinished( const tPortionRegexAnalysisFinishedData& portionRegexAnalysisFinishedData )
 {
-    auto requestIt = mRequestMap.find(requestId);
+    auto requestIt = mRequestMap.find(portionRegexAnalysisFinishedData.requestId);
 
     if(requestIt != mRequestMap.end())
     {
+        if(true == portionRegexAnalysisFinishedData.bUML_Req_Res_Ev_DuplicateFound &&
+           false == requestIt->bUML_Req_Res_Ev_DuplicateFound)
+        {
+            requestIt->bUML_Req_Res_Ev_DuplicateFound = true;
+            SEND_WRN(QString("[CMTAnalyzer][%1] Warning! Duplicated (UEV|URT|URS) UML items detected in the result string."
+                             "\"First win\" strategy will be applied. Check the input regex. "
+                             "The result diagram might be not what you expect to get.").arg(__FUNCTION__));
+        }
+
         auto pClient = requestIt.value().pClient;
 
 #ifdef DEBUG_MESSAGES
@@ -314,23 +318,23 @@ void CMTAnalyzer::portionRegexAnalysisFinished( const tRequestId& requestId,
                          "worker thread id - %4; "
                          "workerThreadCookie - %5; ")
                  .arg(__FUNCTION__)
-                 .arg(requestId)
-                 .arg(processedMatches.matchedItemVec.size())
-                 .arg(workerId)
-                 .arg(workerThreadCookie));
+                 .arg(portionRegexAnalysisFinishedData.requestId)
+                 .arg(portionRegexAnalysisFinishedData.processedMatches.matchedItemVec.size())
+                 .arg(portionRegexAnalysisFinishedData.workerId)
+                 .arg(portionRegexAnalysisFinishedData.workerThreadCookie));
 #endif
 
-        switch(portionAnalysisState)
+        switch(portionRegexAnalysisFinishedData.portionAnalysisState)
         {
-            case CDLTRegexAnalyzerWorker::ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL:
+            case ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL:
             {
-                auto foundPendingItem = requestIt.value().pendingResults.find( workerThreadCookie );
+                auto foundPendingItem = requestIt.value().pendingResults.find( portionRegexAnalysisFinishedData.workerThreadCookie );
 
                 if( foundPendingItem != requestIt.value().pendingResults.end() )
                 {
                     foundPendingItem->isResultAvailable = true;
-                    foundPendingItem->foundMatchesPack = processedMatches;
-                    foundPendingItem->numberOfProcessedString = numberOfProcessedString;
+                    foundPendingItem->foundMatchesPack = portionRegexAnalysisFinishedData.processedMatches;
+                    foundPendingItem->numberOfProcessedString = portionRegexAnalysisFinishedData.numberOfProcessedString;
 
                     for(auto it = requestIt.value().pendingResults.begin(); it != requestIt.value().pendingResults.end(); )
                     {
@@ -348,11 +352,15 @@ void CMTAnalyzer::portionRegexAnalysisFinished( const tRequestId& requestId,
                                 auto requestStatus = analysisFinished ? eRequestState::SUCCESSFUL : eRequestState::PROGRESS;
                                 auto pClient_ = requestIt.value().pClient.lock().get();
 
+                                tProgressNotificationData progressNotificationData
+                                ( portionRegexAnalysisFinishedData.requestId,
+                                  requestStatus,
+                                  progress,
+                                  it->foundMatchesPack,
+                                  portionRegexAnalysisFinishedData.bUML_Req_Res_Ev_DuplicateFound );
+
                                 QMetaObject::invokeMethod(pClient_, "progressNotification", Qt::QueuedConnection,
-                                                          Q_ARG(tRequestId, requestId),
-                                                          Q_ARG(eRequestState, requestStatus),
-                                                          Q_ARG(int8_t, progress),
-                                                          Q_ARG(tFoundMatchesPack, it->foundMatchesPack));
+                                                          Q_ARG(tProgressNotificationData, progressNotificationData));
 
                                 auto specificWorkerId = it->workerId;
 
@@ -393,7 +401,7 @@ void CMTAnalyzer::portionRegexAnalysisFinished( const tRequestId& requestId,
                 }
             }
                 break;
-            case CDLTRegexAnalyzerWorker::ePortionAnalysisState::ePortionAnalysisState_ERROR:
+            case ePortionAnalysisState::ePortionAnalysisState_ERROR:
             {
                 if( false == requestIt.value().pClient.expired() )
                 {
@@ -454,6 +462,7 @@ CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzer
     numberOfThreads(numberOfThreads_),
     fromMessage(fromMessage_),
     workerThreadCookieCounter(0),
+    bUML_Req_Res_Ev_DuplicateFound(false),
     pendingResults()
 {
     if( numberOfMessagesToBeAnalyzed >= pFile->size() )

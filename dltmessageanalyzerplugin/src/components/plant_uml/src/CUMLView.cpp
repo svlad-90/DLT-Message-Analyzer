@@ -285,8 +285,7 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
 
     auto callback = [this, PNG_file_path, diagramContent](int exitCode, QProcess::ExitStatus exitStatus)
     {
-        // view PNG
-        if(0 == exitCode && exitStatus == QProcess::ExitStatus::NormalExit)
+        auto viewPng = [this, &PNG_file_path, &diagramContent]()
         {
             if(nullptr != mpImageViewer)
             {
@@ -303,12 +302,19 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
             }
 
             diagramGenerationFinished(mbDiagramShown);
+        };
+
+        // view PNG
+        if(0 == exitCode && exitStatus == QProcess::ExitStatus::NormalExit)
+        {
+            viewPng();
         }
         else
         {
             SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
-            SEND_ERR(mDiagramContent);
-            diagramGenerationFinished(false);
+            SEND_ERR(diagramContent);
+
+            viewPng();
         }
 
         mbDiagramGenerationInProgress = false;
@@ -400,21 +406,13 @@ void CUMLView::handleSettingsManagerChange()
                     }
                     else if(extension == get_SVG_Extension())
                     {
-                        auto callback = [this, targetFilePath](int exitCode, QProcess::ExitStatus exitStatus)
+                        auto callback = [this, targetFilePath](int, QProcess::ExitStatus)
                         {
                             // copy resulting SVG
-                            if(0 == exitCode && exitStatus == QProcess::ExitStatus::NormalExit)
+                            auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_SVG_File_Name();
+                            if(!QFile::copy(sourceFilePath, targetFilePath))
                             {
-                                auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_SVG_File_Name();
-                                if(!QFile::copy(sourceFilePath, targetFilePath))
-                                {
-                                    SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
-                                }
-                            }
-                            else
-                            {
-                                SEND_ERR(QString("Diagram creation error. Exit code - %1. Exit status %2").arg(exitCode).arg(exitStatus));
-                                diagramGenerationFinished(false);
+                                SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
                             }
 
                             mpSaveSVGSubProcess.reset();

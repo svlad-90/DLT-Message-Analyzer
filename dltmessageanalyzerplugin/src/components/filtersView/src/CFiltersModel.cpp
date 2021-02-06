@@ -8,16 +8,16 @@
 #include "QDateTime"
 #include "QRegularExpression"
 
-#ifdef DEBUG_BUILD
-#include "QElapsedTimer"
-#endif
-
 #include "components/settings/api/ISettingsManager.hpp"
 #include "CFiltersModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "common/PCRE/PCREHelper.hpp"
 
 #include "DMA_Plantuml.hpp"
+
+#ifdef DEBUG_BUILD
+#include "QElapsedTimer"
+#endif
 
 CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
                              QObject *parent)

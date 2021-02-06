@@ -225,10 +225,7 @@ signals:
         void tryStop();
 
         // IDLTMessageAnalyzerControllerConsumer interface
-        void progressNotification(const tRequestId &requestId,
-                                  const eRequestState &requestState,
-                                  const int8_t &progress,
-                                  const tFoundMatchesPack &processedMatches);
+        void progressNotification(const tProgressNotificationData& progressNotificationData);
         void animateError( QWidget* pAnimationWidget );
 
         void updateProgress(int progress, eRequestState requestState, bool silent);

@@ -453,9 +453,30 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                         }
                         else // otherwise
                         {
-                            // let's directly use client-defined value, ignoring value from the group
-                            UMLRepresentationResult.first = true;
-                            UMLRepresentationResult.second.append(item.UML_Custom_Value);
+                            switch(UML_ID)
+                            {
+                                case eUML_ID::UML_CLIENT:
+                                case eUML_ID::UML_SERVICE:
+                                {
+                                    QString str;
+                                    str.reserve(item.UML_Custom_Value.size() + 2);
+                                    str.append("\"");
+                                    str.append(item.UML_Custom_Value);
+                                    str.append("\"");
+
+                                    // let's directly use client-defined value, ignoring value from the group
+                                    UMLRepresentationResult.first = true;
+                                    UMLRepresentationResult.second.append(str);
+                                }
+                                    break;
+                                default:
+                                {
+                                    // let's directly use client-defined value, ignoring value from the group
+                                    UMLRepresentationResult.first = true;
+                                    UMLRepresentationResult.second.append(item.UML_Custom_Value);
+                                }
+                                    break;
+                            }
                         }
                     }
                 }

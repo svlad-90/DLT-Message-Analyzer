@@ -979,10 +979,12 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
     return pMatchesTree;
 }
 
-tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatches,
+tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatches,
                                                 const tRegexScriptingMetadata& regexScriptingMetadata,
                                                 tTreeItemSharedPtr pTree)
 {
+    tUpdateUMLInfoResult result;
+
     tRegexScriptingMetadata::tCheckIDs checkIDs;
 
     for(const auto& match : foundMatches)
@@ -1017,7 +1019,7 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
     {
         if(nullptr != pMatchesTree)
         {
-            auto preVisitFunction = [&regexScriptingMetadata, this](tTreeItem* pItem)
+            auto preVisitFunction = [&regexScriptingMetadata, &result, this](tTreeItem* pItem)
             {
                 const auto& match = *(pItem->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
 
@@ -1027,8 +1029,8 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                 // lambda, which checks whether specific match is representing a UML data
                 auto isUMLData = [&match, &regexScriptingMetadata]()->std::pair<bool, tOptional_UML_IDMap*>
                 {
-                    std::pair<bool, tOptional_UML_IDMap*> result;
-                    result.first = false;
+                    std::pair<bool, tOptional_UML_IDMap*> res;
+                    res.first = false;
 
                     auto groupIdx = match.idx;
                     auto groups = regexScriptingMetadata.getItemsVec();
@@ -1040,12 +1042,12 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
                         if(nullptr != pGroupMetadata &&
                            ( false == pGroupMetadata->optionalUML_ID.optional_UML_IDMap.empty() ) )
                         {
-                            result.first = true; // we got the UML data
-                            result.second = &pGroupMetadata->optionalUML_ID.optional_UML_IDMap;
+                            res.first = true; // we got the UML data
+                            res.second = &pGroupMetadata->optionalUML_ID.optional_UML_IDMap;
                         }
                     }
 
-                    return result;
+                    return res;
                 };
 
                 auto UMLDataRes = isUMLData();
@@ -1056,36 +1058,55 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
 
                     for(const auto& UML_IDItem : *(UMLDataRes.second))
                     {
-                        if(true == UML_IDItem.second.UML_Custom_Value.isEmpty()) // if there is no client's custom value
+                        auto isReqResEv = [&UML_IDItem]()
                         {
-                            //let's grab groups content
-                            tUMLDataItem UMLDataItem;
+                            return UML_IDItem.first == eUML_ID::UML_REQUEST ||
+                               UML_IDItem.first == eUML_ID::UML_RESPONSE ||
+                               UML_IDItem.first == eUML_ID::UML_EVENT;
+                        };
 
-                            for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
+                        if(false == isReqResEv() || false == UMLInfo.bContains_Req_Resp_Ev)
+                        {
+                            if(true == UML_IDItem.second.UML_Custom_Value.isEmpty()) // if there is no client's custom value
                             {
-                                const auto& fieldRange = *it;
+                                //let's grab groups content
+                                tUMLDataItem UMLDataItem;
 
-                                bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
-                                        (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
-
-                                if(true == insideRange) // if group is even partially inside the range
+                                for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
                                 {
-                                    tStringCoverageItem stringCoverageItem;
-                                    stringCoverageItem.range = tIntRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
-                                                                       std::min( fieldRange.to, match.range.to ) - fieldRange.from );
-                                    stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
-                                    UMLDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
+                                    const auto& fieldRange = *it;
+
+                                    bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
+                                            (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
+
+                                    if(true == insideRange) // if group is even partially inside the range
+                                    {
+                                        tStringCoverageItem stringCoverageItem;
+                                        stringCoverageItem.range = tIntRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
+                                                                           std::min( fieldRange.to, match.range.to ) - fieldRange.from );
+                                        stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
+                                        UMLDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
+                                    }
                                 }
+
+                                UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                            }
+                            else // otherwise
+                            {
+                                // let's directly assign custom client's value
+                                tUMLDataItem UMLDataItem;
+                                UMLDataItem.UML_Custom_Value = UML_IDItem.second.UML_Custom_Value;
+                                UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
                             }
 
-                            UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                            if(true == isReqResEv())
+                            {
+                                UMLInfo.bContains_Req_Resp_Ev = true;
+                            }
                         }
-                        else // otherwise
+                        else
                         {
-                            // let's directly assign custom client's value
-                            tUMLDataItem UMLDataItem;
-                            UMLDataItem.UML_Custom_Value = UML_IDItem.second.UML_Custom_Value;
-                            UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                            result.bUML_Req_Res_Ev_DuplicateFound = true;
                         }
                     }
                 }
@@ -1097,7 +1118,9 @@ tTreeItemSharedPtr tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatche
         }
     }
 
-    return pMatchesTree;
+    result.pTreeItem = pMatchesTree;
+
+    return result;
 }
 
 //tFoundMatch

@@ -9,7 +9,7 @@
 
 #include <QRegularExpression>
 
-#include "common/Definitions.hpp"
+#include "../api/Definitions.hpp"
 
 #include "../api/IDLTMessageAnalyzerController.hpp"
 #include "CDLTRegexAnalyzerWorker.hpp"
@@ -33,23 +33,13 @@ class CMTAnalyzer: public IDLTMessageAnalyzerController,
 
         //IDLTMessageAnalyzerController implementation
         tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                   const tFileWrapperPtr& pFile,
-                                   const int& fromMessage,
-                                   const int& numberOfMessages,
-                                   const QRegularExpression& regex,
-                                   const int& numberOfThreads,
-                                   const tRegexScriptingMetadata& regexScriptingMetadata,
-                                   bool isContinuous ) override;
+                                   const tRequestParameters& requestParameters,
+                                   const tRegexScriptingMetadata& regexScriptingMetadata ) override;
         void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) override;
         int getMaximumNumberOfThreads() const override;
 
 private slots:
-    void portionRegexAnalysisFinished( const tRequestId& requestId,
-                                       int numberOfProcessedString,
-                                       CDLTRegexAnalyzerWorker::ePortionAnalysisState portionAnalysisState,
-                                       const tFoundMatchesPack& processedMatches,
-                                       const tWorkerId& workerId,
-                                       const tWorkerThreadCookie& workerThreadCookie );
+    void portionRegexAnalysisFinished( const tPortionRegexAnalysisFinishedData& portionRegexAnalysisFinishedData );
 
 private: // methods
 
@@ -72,6 +62,7 @@ private: // methods
         int numberOfThreads; // number of threads, to be used for analysis
         int fromMessage; // from which message to start analysis
         tWorkerThreadCookie workerThreadCookieCounter;
+        bool bUML_Req_Res_Ev_DuplicateFound = false;
 
         struct tPendingResultsItem
         {

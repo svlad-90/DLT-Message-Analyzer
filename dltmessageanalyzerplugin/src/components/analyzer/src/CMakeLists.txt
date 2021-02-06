@@ -9,6 +9,8 @@ add_library(DMA_analyzer STATIC
     CContinuousAnalyzer.cpp
     CDLTRegexAnalyzerWorker.cpp
     CAnalyzerComponent.cpp
+    Definitions.cpp
+    DefinitionsInternal.cpp
     ${PROCESSED_MOCS}
     )
 

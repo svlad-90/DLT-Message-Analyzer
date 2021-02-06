@@ -20,7 +20,7 @@
 
 #include "DMA_Plantuml.hpp"
 
-Q_DECLARE_METATYPE(CDLTRegexAnalyzerWorker::ePortionAnalysisState)
+Q_DECLARE_METATYPE(ePortionAnalysisState)
 
 static std::atomic<tWorkerId> sWorkerIdCounter(0);
 
@@ -36,6 +36,10 @@ mColors()
     qRegisterMetaType<int8_t>("int8_t");
     qRegisterMetaType<tWorkerThreadCookie>("tWorkerThreadCookie");
     qRegisterMetaType<tRegexScriptingMetadata>("tRegexScriptingMetadata");
+    qRegisterMetaType<tRequestParameters>("tRequestParameters");
+    qRegisterMetaType<tProgressNotificationData>("tProgressNotificationData");
+    qRegisterMetaType<tPortionRegexAnalysisFinishedData>("tPortionRegexAnalysisFinishedData");
+    qRegisterMetaType<tAnalyzePortionData>("tAnalyzePortionData");
 
     connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged,
              [this]( const tHighlightingGradient& gradient )
@@ -51,32 +55,30 @@ tWorkerId CDLTRegexAnalyzerWorker::getWorkerId() const
     return mWorkerId;
 }
 
-void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
-                                              const tProcessingStrings& processingStrings,
-                                              const QRegularExpression& regex,
-                                              const tRegexScriptingMetadata& regexMetadata,
-                                              const tWorkerThreadCookie& workerThreadCookie)
+void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyzePortionData )
 {
 #ifdef DEBUG_BUILD
     SEND_MSG( QString( "[CDLTRegexAnalyzerWorker][%1] reqID - %2; procString.size() - %3; regex - %4 mWorkerId - %5" )
               .arg(__FUNCTION__)
-              .arg(requestId)
-              .arg(processingStrings.size())
-              .arg(regex.pattern())
+              .arg(analyzePortionData.requestId)
+              .arg(analyzePortionData.processingStrings.size())
+              .arg(analyzePortionData.regex.pattern())
               .arg(mWorkerId));
 #endif
 
     bool bAnalyzeUML = false;
 
     if(true == getSettingsManager()->getUML_FeatureActive() &&
-       true == regexMetadata.doesContainAnyUMLGroup() &&
-       true == regexMetadata.doesContainConsistentUMLData(false).first)
+       true == analyzePortionData.regexMetadata.doesContainAnyUMLGroup() &&
+       true == analyzePortionData.regexMetadata.doesContainConsistentUMLData(false).first)
     {
         bAnalyzeUML = true;
     }
 
-    CDLTRegexAnalyzerWorker::ePortionAnalysisState portionAnalysisState = CDLTRegexAnalyzerWorker::ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL;
+    ePortionAnalysisState portionAnalysisState = ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL;
     tFoundMatchesPack foundMatchesPack;
+
+    bool bUML_Req_Res_Ev_DuplicateFound = false;
 
     try
     {
@@ -85,9 +87,9 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
         timer.start();
 #endif
 
-        for(const auto& processingString : processingStrings)
+        for(const auto& processingString : analyzePortionData.processingStrings)
         {
-            QRegularExpressionMatch match = regex.match(*(processingString.second));
+            QRegularExpressionMatch match = analyzePortionData.regex.match(*(processingString.second));
 
             if (true == match.hasMatch())
             {
@@ -112,11 +114,20 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
                 }
 
                 tItemMetadata itemMetadata = processingString.first;
-                auto pTree = itemMetadata.updateHighlightingInfo(foundMatches, mColors, regexMetadata);
+                auto pTree = itemMetadata.updateHighlightingInfo(foundMatches,
+                                                                 mColors,
+                                                                 analyzePortionData.regexMetadata);
 
                 if(true == bAnalyzeUML)
                 {
-                    itemMetadata.updateUMLInfo(foundMatches, regexMetadata, pTree);
+                    auto updateUMLInfoResult = itemMetadata.updateUMLInfo(foundMatches,
+                                               analyzePortionData.regexMetadata,
+                                               pTree);
+
+                    if(false == bUML_Req_Res_Ev_DuplicateFound)
+                    {
+                        bUML_Req_Res_Ev_DuplicateFound = updateUMLInfoResult.bUML_Req_Res_Ev_DuplicateFound;
+                    }
                 }
 
                 foundMatchesPack.matchedItemVec.push_back( tFoundMatchesPackItem( std::move(itemMetadata), std::move(foundMatches) ) );
@@ -126,17 +137,26 @@ void CDLTRegexAnalyzerWorker::analyzePortion( const tRequestId& requestId,
 #ifdef DEBUG_BUILD
         SEND_MSG( QString("[CDLTRegexAnalyzerWorker][%1] Portion number - %2; found matches - %3; portion analysis took - %4 ms")
                   .arg(__FUNCTION__)
-                  .arg(workerThreadCookie)
+                  .arg(analyzePortionData.workerThreadCookie)
                   .arg(foundMatchesPack.matchedItemVec.size())
                   .arg(QLocale().toString(timer.elapsed()), 4) );
 #endif
     }
     catch (const std::exception&)
     {
-        portionAnalysisState = CDLTRegexAnalyzerWorker::ePortionAnalysisState::ePortionAnalysisState_ERROR;
+        portionAnalysisState = ePortionAnalysisState::ePortionAnalysisState_ERROR;
     }
 
-    emit portionAnalysisFinished( requestId, static_cast<int>(processingStrings.size()), portionAnalysisState, foundMatchesPack, mWorkerId, workerThreadCookie );
+    tPortionRegexAnalysisFinishedData portionRegexAnalysisFinishedData(
+    analyzePortionData.requestId,
+    static_cast<int>(analyzePortionData.processingStrings.size()),
+    portionAnalysisState,
+    foundMatchesPack,
+    mWorkerId,
+    analyzePortionData.workerThreadCookie,
+    bUML_Req_Res_Ev_DuplicateFound);
+
+    emit portionAnalysisFinished( portionRegexAnalysisFinishedData );
 }
 
 PUML_PACKAGE_BEGIN(DMA_Analyzer)

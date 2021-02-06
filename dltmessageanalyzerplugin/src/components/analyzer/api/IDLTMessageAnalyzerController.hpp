@@ -7,7 +7,7 @@
 
 #include <QObject>
 
-#include "common/Definitions.hpp"
+#include "Definitions.hpp"
 
 //Forward declarations
 class IDLTMessageAnalyzerControllerConsumer;
@@ -30,23 +30,13 @@ public:
     /**
      * @brief requestAnalyze - used to triger analysis
      * @param pClient - client, which should be notified about the progress
-     * @param pFile - file, which is used for analysis
-     * @param fromMessage - from which message to analyze
-     * @param numberOfMessages - until which message to analyze
-     * @param regex - regex, to be used for analysis
-     * @param numberOfThreads - number of threads to be used for analysis
-     * @param regexScriptingMetadata - scripting metadata
-     * @param isContinuous - whether search is continuous. This parameter can be ignored by one-shot implementations
+     * @param requestParameters - inout request parameters
+     * @param regexScriptingMetadata - regex scripting metadata
      * @return - request id, if search was successfully started. Or INVALID_REQUEST_ID otherwise
      */
     virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient,
-                                       const tFileWrapperPtr& pFile,
-                                       const int& fromMessage,
-                                       const int& numberOfMessages,
-                                       const QRegularExpression& regex,
-                                       const int& numberOfThreads,
-                                       const tRegexScriptingMetadata& regexScriptingMetadata,
-                                       bool isContinuous)=0;
+                                       const tRequestParameters& requestParameters,
+                                       const tRegexScriptingMetadata& regexScriptingMetadata )=0;
 
     /**
      * @brief cancelRequest - used to stop previously started analysis iteration
@@ -72,18 +62,10 @@ public:
 signals:
     /**
      * @brief progressNotification - signal, which notifies client about the analysis progress.
-     * @param requestId - id of the request, about which we notify the client
-     * @param requestState - the state of the request
-     * @param progress - progress in percents
-     * @param processedMatches - found matches
-     * @param isContinuous - whether analysis is continuous.
+     * @param progressNotificationData - progress notification data
      * Client might not remember about this fact, so we provide this information back to the client, to simplify the client's logic.
      */
-    void progressNotification( const tRequestId& requestId,
-                                       const eRequestState& requestState,
-                                       const int8_t& progress,
-                                       const tFoundMatchesPack& processedMatches,
-                                       bool isContinuous );
+    void progressNotification( const tProgressNotificationData& progressNotificationData );
 };
 
 typedef std::shared_ptr<IDLTMessageAnalyzerController> tDLTMessageAnalyzerControllerPtr;

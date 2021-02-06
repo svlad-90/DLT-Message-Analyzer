@@ -12,6 +12,7 @@
 #include <QRegularExpression>
 
 #include "common/Definitions.hpp"
+#include "DefinitionsInternal.hpp"
 #include "../api/IDLTMessageAnalyzerController.hpp"
 
 #include "components/settings/api/CSettingsManagerClient.hpp"
@@ -28,24 +29,14 @@ class CDLTRegexAnalyzerWorker : public QObject,
     Q_OBJECT
 public:
 
-    enum class ePortionAnalysisState
-    {
-        ePortionAnalysisState_SUCCESSFUL,
-        ePortionAnalysisState_ERROR
-    };
-
     CDLTRegexAnalyzerWorker(const tSettingsManagerPtr& pSettingsManager);
     tWorkerId getWorkerId() const;
 
 public slots:
-    void analyzePortion( const tRequestId& requestId,
-                         const tProcessingStrings& processingStrings,
-                         const QRegularExpression& regex,
-                         const tRegexScriptingMetadata& regexMetadata,
-                         const tWorkerThreadCookie& workerThreadCookie );
+    void analyzePortion( const tAnalyzePortionData& analyzePortionData );
 
 signals:
-    void portionAnalysisFinished( const tRequestId& requestId, int numberOfProcessedString, ePortionAnalysisState portionAnalysisState, const tFoundMatchesPack& processedMatches, const tWorkerId& workerId, const tWorkerThreadCookie& workerThreadCookie);
+    void portionAnalysisFinished( const tPortionRegexAnalysisFinishedData& portionRegexAnalysisFinishedData );
 
 private: // members
     tWorkerId mWorkerId;

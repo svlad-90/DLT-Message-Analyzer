@@ -536,6 +536,7 @@ struct tUMLInfo
     bool bUMLConstraintsFulfilled = false;
     bool bApplyForUMLCreation = false;
     tUMLDataMap UMLDataMap;
+    bool bContains_Req_Resp_Ev = false;
 };
 
 struct tItemMetadata
@@ -551,7 +552,14 @@ struct tItemMetadata
                                  const QVector<QColor>& gradientColors,
                                  const tRegexScriptingMetadata& regexScriptingMetadata,
                                  tTreeItemSharedPtr pTree = nullptr);
-    tTreeItemSharedPtr updateUMLInfo(const tFoundMatches& foundMatches,
+
+    struct tUpdateUMLInfoResult
+    {
+        tTreeItemSharedPtr pTreeItem;
+        bool bUML_Req_Res_Ev_DuplicateFound = false;
+    };
+
+    tUpdateUMLInfoResult updateUMLInfo(const tFoundMatches& foundMatches,
                        const tRegexScriptingMetadata& regexScriptingMetadata,
                        tTreeItemSharedPtr pTree = nullptr);
     tMsgId msgId;
