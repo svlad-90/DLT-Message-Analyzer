@@ -2324,22 +2324,22 @@ QString getPayloadWidthAsString(const eSearchViewLastColumnWidthStrategy& val)
     return result;
 }
 
-QString getPlantumlPathModeAsString(const ePlantumlPathMode& val)
+QString getPathModeAsString(const ePathMode& val)
 {
     QString result;
 
     switch(val)
     {
-        case ePlantumlPathMode::eUseDefaultPath:
+        case ePathMode::eUseDefaultPath:
             result = "Use default path";
         break;
-        case ePlantumlPathMode::eUseCustomPath:
+        case ePathMode::eUseCustomPath:
             result = "Use custom path";
         break;
-        case ePlantumlPathMode::eUseEnvVar:
+        case ePathMode::eUseEnvVar:
             result = "Use environment variable";
         break;
-        case ePlantumlPathMode::eLast:
+        case ePathMode::eLast:
             result = "Last";
         break;
     }

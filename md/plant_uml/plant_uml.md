@@ -232,7 +232,7 @@ These parameters can be overwritten via the context menu:
 
 ----
 
-There is a set of settings, which allows you to specify the location of the plantuml.jar on your machine.
+There is a set of settings, which allows you to specify the location of the plantuml.jar on your machine:
 
 ![Screenshot of the plantuml settings](./plant_uml_location_settings.png)
 
@@ -244,6 +244,21 @@ You can:
 In order to visualize the current plantuml settings you can use the "plantuml-settings" command in the debug console:
 
 ![Screenshot of the plantuml settings dump](./plant_uml_settings_dump.png)
+
+----
+
+The same set of settings exists, which allows you to specify the location of the java on your machine:
+
+![Screenshot of the java settings](./java_location_settings.png)
+
+You can:
+- Use default java location. In this case we will assume, that the compatible java version is speified on your path.
+- Specify the custom path to java
+- Specify the name of the environment variable, which will contain the path to the java
+
+In order to visualize the current plantuml settings you can use the "java-settings" command in the debug console:
+
+![Screenshot of the java settings dump](./java_settings_dump.png)
 
 ----
 

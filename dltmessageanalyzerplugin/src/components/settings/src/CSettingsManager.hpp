@@ -41,6 +41,7 @@ public:
     QString getUserSettingsFilepath() const override;
     QString getRootSettingsFilepath() const override;
     QString getDefaultPlantumlPath() const override;
+    QString getDefaultJavaPath() const override;
     void refreshRegexConfiguration() override;
 
 ////////////////////////SETTERS/////////////////////////////
@@ -94,6 +95,9 @@ public:
     void setPlantumlPathMode(const int& val) override;
     void setPlantumlPathEnvVar(const QString& val) override;
     void setPlantumlCustomPath(const QString& val) override;
+    void setJavaPathMode(const int& val) override;
+    void setJavaPathEnvVar(const QString& val) override;
+    void setJavaCustomPath(const QString& val) override;
 
     void setSelectedRegexFile(const QString& val) override;
 
@@ -148,6 +152,9 @@ public:
     const int& getPlantumlPathMode() const override;
     const QString& getPlantumlPathEnvVar() const override;
     const QString& getPlantumlCustomPath() const override;
+    const int& getJavaPathMode() const override;
+    const QString& getJavaPathEnvVar() const override;
+    const QString& getJavaCustomPath() const override;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
@@ -427,9 +434,15 @@ private: // fields
 
     TRangedSettingItem<int> mSetting_SearchViewLastColumnWidthStrategy;
 
+    // Plantuml path settings
     TRangedSettingItem<int> mSetting_PlantumlPathMode;
     TSettingItem<QString> mSetting_PlantumlPathEnvVar;
     TSettingItem<QString> mSetting_PlantumlCustomPath;
+
+    // Java path settings
+    TRangedSettingItem<int> mSetting_JavaPathMode;
+    TSettingItem<QString> mSetting_JavaPathEnvVar;
+    TSettingItem<QString> mSetting_JavaCustomPath;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;
