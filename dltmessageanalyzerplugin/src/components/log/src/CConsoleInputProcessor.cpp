@@ -507,7 +507,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
     {
         SEND_MSG( "Current plantuml settings:" );
         SEND_MSG( QString("Plantuml path mode: \"%1\"")
-        .arg(getPlantumlPathModeAsString( static_cast<ePlantumlPathMode>(getSettingsManager()->getPlantumlPathMode()) ) ) );
+        .arg(getPathModeAsString( static_cast<ePathMode>(getSettingsManager()->getPlantumlPathMode()) ) ) );
         SEND_MSG( QString("Plantuml default path: \"%1\"")
         .arg(getSettingsManager()->getDefaultPlantumlPath()));
         SEND_MSG( QString("Plantuml custom path: \"%1\"")
@@ -532,6 +532,36 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         }
     },
     "- prints information about the currently used plantuml settings");
+
+    result["java-settings"] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap&)
+    {
+        SEND_MSG( "Current java settings:" );
+        SEND_MSG( QString("Java path mode: \"%1\"")
+        .arg(getPathModeAsString( static_cast<ePathMode>(getSettingsManager()->getJavaPathMode()) ) ) );
+        SEND_MSG( QString("Java default path: \"%1\"")
+        .arg(getSettingsManager()->getDefaultJavaPath()));
+        SEND_MSG( QString("Java custom path: \"%1\"")
+        .arg(getSettingsManager()->getJavaCustomPath()));
+        SEND_MSG( QString("Java path environment variable: \"%1\"")
+        .arg(getSettingsManager()->getJavaPathEnvVar()));
+
+        const auto systemEnv = QProcessEnvironment::systemEnvironment();
+
+        const auto& javaPathEnvVar = getSettingsManager()->getJavaPathEnvVar();
+
+        if(true == systemEnv.contains(javaPathEnvVar))
+        {
+            auto javaUMLPath = systemEnv.value(javaPathEnvVar);
+
+            SEND_MSG( QString("Java path environment variable value: \"%1\"")
+            .arg( javaUMLPath ));
+        }
+        else
+        {
+            SEND_MSG( QString("Java path environment variable value: \"No such variable exist\""));
+        }
+    },
+    "- prints information about the currently used java settings");
 
     return result;
 }

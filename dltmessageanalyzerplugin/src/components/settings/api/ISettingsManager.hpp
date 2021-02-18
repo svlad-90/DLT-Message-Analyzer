@@ -71,6 +71,7 @@ public:
     virtual QString getUserSettingsFilepath() const = 0;
     virtual QString getRootSettingsFilepath() const = 0;
     virtual QString getDefaultPlantumlPath() const = 0;
+    virtual QString getDefaultJavaPath() const = 0;
     virtual void refreshRegexConfiguration() = 0;
 
 ////////////////////////SETTERS/////////////////////////////
@@ -124,6 +125,9 @@ public:
     virtual void setPlantumlPathMode(const int& val) = 0;
     virtual void setPlantumlPathEnvVar(const QString& val) = 0;
     virtual void setPlantumlCustomPath(const QString& val) = 0;
+    virtual void setJavaPathMode(const int& val) = 0;
+    virtual void setJavaPathEnvVar(const QString& val) = 0;
+    virtual void setJavaCustomPath(const QString& val) = 0;
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -183,6 +187,9 @@ public:
     virtual const int& getPlantumlPathMode() const = 0;
     virtual const QString& getPlantumlPathEnvVar() const = 0;
     virtual const QString& getPlantumlCustomPath() const = 0;
+    virtual const int& getJavaPathMode() const = 0;
+    virtual const QString& getJavaPathEnvVar() const = 0;
+    virtual const QString& getJavaCustomPath() const = 0;
 
     // allowed ranges
     virtual const TOptional<tRange<int>>& getSetting_NumberOfThreads_AllowedRange() const = 0;
@@ -242,4 +249,7 @@ signals:
     void plantumlPathModeChanged(const int& plantumlPathMode);
     void plantumlPathEnvVarChanged(const QString& plantumlPathEnvVar);
     void plantumlCustomPathChanged(const QString& plantumlPathEnvVar);
+    void javaPathModeChanged(const int& plantumlPathMode);
+    void javaPathEnvVarChanged(const QString& plantumlPathEnvVar);
+    void javaCustomPathChanged(const QString& plantumlPathEnvVar);
 };

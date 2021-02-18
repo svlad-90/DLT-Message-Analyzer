@@ -12,6 +12,7 @@
 #include "QFile"
 #include "QInputDialog"
 #include "QCoreApplication"
+#include "QMetaEnum"
 
 #include "CImageViewer.hpp"
 #include "../api/CUMLView.hpp"
@@ -69,13 +70,14 @@ static QString get_UML_SVG_File_Name()
 }
 
 static std::pair<QString /*command*/, QStringList /*arguments*/> get_PlantUML_Command(const QString& plantUMLPath,
+                                                                                      const QString& javaPath,
                                                                                       const QString& PUMLFilePath,
                                                                                       CUMLView::eDiagramExtension extension,
                                                                                       const int& maxRows)
 {
     std::pair<QString /*command*/, QStringList /*arguments*/> result;
 
-    result.first = "java";
+    result.first = javaPath;
 
     auto usedPixelsInt = maxRows * 3500 /*pixels*/; // we give here some really big value to ensure that the whole diagram will be rendered.
 
@@ -137,68 +139,87 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
         pSubProcess.reset();
     }
 
-    const QString& defaultPlantumlPath = getSettingsManager()->getDefaultPlantumlPath();
-    QString plantUMLPath = defaultPlantumlPath;
-
-    switch(static_cast<ePlantumlPathMode>(getSettingsManager()->getPlantumlPathMode()))
+    auto getDependencyPath = []( const QString& msgPrefix,
+            const ePathMode& pathMode,
+            const QString& defaultPath,
+            const QString& customPath,
+            const QString& envVar )
     {
-        case ePlantumlPathMode::eUseDefaultPath:
-        {
-            plantUMLPath = defaultPlantumlPath;
-        }
-            break;
-        case ePlantumlPathMode::eUseCustomPath:
-        {
-            const auto& customPath = getSettingsManager()->getPlantumlCustomPath();
+        QString targetPath = defaultPath;
 
-            if(false == customPath.isEmpty())
+        switch(pathMode)
+        {
+            case ePathMode::eUseDefaultPath:
             {
-                plantUMLPath = customPath;
+                targetPath = defaultPath;
             }
-            else
+                break;
+            case ePathMode::eUseCustomPath:
             {
-                SEND_WRN(QString("[CUMLView] Custom path is empty. Fallback to the default path - \"%1\".")
-                         .arg(defaultPlantumlPath));
-                plantUMLPath = defaultPlantumlPath;
-            }
-        }
-            break;
-        case ePlantumlPathMode::eUseEnvVar:
-        {
-            const auto systemEnv = QProcessEnvironment::systemEnvironment();
-
-            const auto& plantumlPathEnvVar = getSettingsManager()->getPlantumlPathEnvVar();
-
-            if(true == systemEnv.contains(plantumlPathEnvVar))
-            {
-                plantUMLPath = systemEnv.value(plantumlPathEnvVar);
-
-                if(true == plantUMLPath.isEmpty())
+                if(false == customPath.isEmpty())
                 {
-                    SEND_WRN(QString("[CUMLView] Selected env. var. - \"%1\" - has an empty value. Fallback to the default path - \"%2\".")
-                             .arg(plantumlPathEnvVar)
-                             .arg(defaultPlantumlPath));
-                    plantUMLPath = defaultPlantumlPath;
+                    targetPath = customPath;
+                }
+                else
+                {
+                    SEND_WRN(QString("[CUMLView][%1] Custom path is empty. Fallback to the default path - \"%2\".")
+                             .arg(msgPrefix).arg(defaultPath));
+                    targetPath = defaultPath;
                 }
             }
-            else
+                break;
+            case ePathMode::eUseEnvVar:
             {
-                SEND_WRN(QString("[CUMLView] Selected env. var - \"%1\" - does not exist. Fallback to the default path - \"%2\".")
-                         .arg(plantumlPathEnvVar)
-                         .arg(defaultPlantumlPath));
-                plantUMLPath = defaultPlantumlPath;
-            }
-        }
-            break;
-        case ePlantumlPathMode::eLast:
-        {
-            SEND_WRN(QString("[CUMLView] saved ePlantumlPathMode equal to eLast. Something went wrong! Fallback to the default path - \"%1\".")
-                     .arg(defaultPlantumlPath));
+                const auto systemEnv = QProcessEnvironment::systemEnvironment();
 
-            plantUMLPath = defaultPlantumlPath;
+                if(true == systemEnv.contains(envVar))
+                {
+                    targetPath = systemEnv.value(envVar);
+
+                    if(true == targetPath.isEmpty())
+                    {
+                        SEND_WRN(QString("[CUMLView][%1] Selected env. var. - \"%2\" - has an empty value. Fallback to the default path - \"%3\".")
+                                 .arg(msgPrefix)
+                                 .arg(envVar)
+                                 .arg(defaultPath));
+                        targetPath = defaultPath;
+                    }
+                }
+                else
+                {
+                    SEND_WRN(QString("[CUMLView][%1] Selected env. var - \"%2\" - does not exist. Fallback to the default path - \"%3\".")
+                             .arg(msgPrefix)
+                             .arg(envVar)
+                             .arg(defaultPath));
+                    targetPath = defaultPath;
+                }
+            }
+                break;
+            case ePathMode::eLast:
+            {
+                SEND_WRN(QString("[CUMLView][%1] saved ePathMode equal to eLast. Something went wrong! Fallback to the default path - \"%2\".")
+                         .arg(msgPrefix)
+                         .arg(defaultPath));
+
+                targetPath = defaultPath;
+            }
+                break;
         }
-            break;
-    }
+
+        return targetPath;
+    };
+
+    QString plantUMLPath = getDependencyPath( "plantuml_path",
+                                              static_cast<ePathMode>(getSettingsManager()->getPlantumlPathMode()),
+                                              getSettingsManager()->getDefaultPlantumlPath(),
+                                              getSettingsManager()->getPlantumlCustomPath(),
+                                              getSettingsManager()->getPlantumlPathEnvVar());
+
+    QString javaPath = getDependencyPath( "java_path",
+                                           static_cast<ePathMode>(getSettingsManager()->getJavaPathMode()),
+                                           getSettingsManager()->getDefaultJavaPath(),
+                                           getSettingsManager()->getJavaCustomPath(),
+                                           getSettingsManager()->getJavaPathEnvVar());
 
     if(true == QFile::exists(plantUMLPath))
     {
@@ -222,7 +243,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
 
             if(false == bRemoveResult)
             {
-                SEND_WRN(QString("Was not able to remove file - \"%1\"").arg(PUML_file_path));
+                SEND_WRN(QString("[CUMLView] Was not able to remove file - \"%1\"").arg(PUML_file_path));
             }
         }
 
@@ -246,11 +267,18 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
 
             if(false == bRemoveResult)
             {
-                SEND_WRN(QString("Was not able to remove file - \"%1\"").arg(result_file_path));
+                SEND_WRN(QString("[CUMLView] Was not able to remove file - \"%1\"").arg(result_file_path));
             }
         }
 
         auto pSubProcessWeak = std::weak_ptr<QProcess>(pSubProcess);
+
+        // call plantuml to generate PNG
+        auto resCommand = get_PlantUML_Command(plantUMLPath,
+                                               javaPath,
+                                               PUML_file_path,
+                                               extension,
+                                               getSettingsManager()->getUML_MaxNumberOfRowsInDiagram());
 
         connect(pSubProcess.get(),
                 static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
@@ -262,8 +290,24 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
             }
         });
 
-        // call plantuml to generate PNG
-        auto resCommand = get_PlantUML_Command(plantUMLPath, PUML_file_path, extension, getSettingsManager()->getUML_MaxNumberOfRowsInDiagram());
+        QString commandToTrace = resCommand.first;
+
+        for(const auto& param : resCommand.second)
+        {
+            commandToTrace.append(" ").append(param);
+        }
+
+        connect(pSubProcess.get(),
+                static_cast<void(QProcess::*)(QProcess::ProcessError)>(&QProcess::errorOccurred),
+                [commandToTrace, callback, pSubProcessWeak](const QProcess::ProcessError& error)
+        {
+            QMetaEnum metaEnum = QMetaEnum::fromType<QProcess::ProcessError>();
+            SEND_ERR(QString("[CUMLView] Error during execution of the sub-process - %1. Used command - \"%2\"")
+                     .arg(metaEnum.valueToKey(error))
+                     .arg(commandToTrace));
+            callback(0, QProcess::NormalExit);
+        });
+
         pSubProcess->start(resCommand.first, resCommand.second);
 
         if(true == blocking)
@@ -273,7 +317,8 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
     }
     else
     {
-        SEND_ERR(QString("Specified plantuml path \"%1\" does not exist. Diagram creation interrupted.").arg(plantUMLPath));
+        SEND_ERR(QString("[CUMLView] Specified plantuml path \"%1\" does not exist. Diagram creation interrupted.").arg(plantUMLPath));
+        callback(-1, QProcess::NormalExit);
     }
 }
 
@@ -320,13 +365,13 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
         mbDiagramGenerationInProgress = false;
     };
 
-    generateUMLDiagramInternal(diagramContent, eDiagramExtension::e_PNG, callback, mpDiagramCreationSubProcess, false);
-
     // clear the view
     clearDiagram();
 
     diagramGenerationStarted();
     mbDiagramGenerationInProgress = true;
+
+    generateUMLDiagramInternal(diagramContent, eDiagramExtension::e_PNG, callback, mpDiagramCreationSubProcess, false);
 }
 
 bool CUMLView::isDiagramGenerationInProgress() const
@@ -529,11 +574,11 @@ void CUMLView::handleSettingsManagerChange()
                     QActionGroup* pActionGroup = new QActionGroup(this);
                     pActionGroup->setExclusive(true);
 
-                    for(int i = static_cast<int>(ePlantumlPathMode::eUseDefaultPath);
-                        i < static_cast<int>(ePlantumlPathMode::eLast);
+                    for(int i = static_cast<int>(ePathMode::eUseDefaultPath);
+                        i < static_cast<int>(ePathMode::eLast);
                         i++)
                     {
-                        QAction* pAction = new QAction(getPlantumlPathModeAsString(static_cast<ePlantumlPathMode>(i)), this);
+                        QAction* pAction = new QAction(getPathModeAsString(static_cast<ePathMode>(i)), this);
                         connect(pAction, &QAction::triggered, [this, i]()
                         {
                             getSettingsManager()->setPlantumlPathMode(i);
@@ -596,6 +641,93 @@ void CUMLView::handleSettingsManagerChange()
                         && false == text.isEmpty())
                         {
                             getSettingsManager()->setPlantumlPathEnvVar(text);
+                        }
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+            }
+
+            contextMenu.addMenu(pSubMenu);
+        }
+
+        {
+            QMenu* pSubMenu = new QMenu("Java settings", this);
+
+            {
+                {
+                    QMenu* pSubSubMenu = new QMenu("Java path mode", this);
+
+                    QActionGroup* pActionGroup = new QActionGroup(this);
+                    pActionGroup->setExclusive(true);
+
+                    for(int i = static_cast<int>(ePathMode::eUseDefaultPath);
+                        i < static_cast<int>(ePathMode::eLast);
+                        i++)
+                    {
+                        QAction* pAction = new QAction(getPathModeAsString(static_cast<ePathMode>(i)), this);
+                        connect(pAction, &QAction::triggered, [this, i]()
+                        {
+                            getSettingsManager()->setJavaPathMode(i);
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(getSettingsManager()->getJavaPathMode() == i);
+
+                        pSubSubMenu->addAction(pAction);
+                        pActionGroup->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QString itemName = "Set custom path ...";
+
+                    QAction* pAction = new QAction(itemName, this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        QString filters("All files (*.*)");
+                        QString defaultFilter("All files (*.*)");
+
+                        auto filePath = QFileDialog::getOpenFileName(nullptr,
+                                                                    "Select path to java",
+                                                                    getSettingsManager()->getJavaCustomPath().size() > 0 ?
+                                                                    getSettingsManager()->getJavaCustomPath() :
+                                                                    QCoreApplication::applicationDirPath(),
+                                                                    filters,
+                                                                    &defaultFilter);
+
+                        if(0 != filePath.size())
+                        {
+                            if(true == QFile::exists(filePath))
+                            {
+                                QString absolutePath = QFileInfo(filePath).absoluteFilePath();
+                                getSettingsManager()->setJavaCustomPath(absolutePath);
+                            }
+                            else
+                            {
+                                SEND_ERR(QString("[CUMLView] Selected file does not exist - \"%1\"").arg(filePath));
+                            }
+                        }
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QString itemName = "Set environment variable ...";
+
+                    QAction* pAction = new QAction(itemName, this);
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        bool ok;
+                        QString text = QInputDialog::getText(this, tr("Set java environment variable:"),
+                                                             tr("Env. var.:"), QLineEdit::Normal,
+                                                             getSettingsManager()->getJavaPathEnvVar(), &ok);
+                        if (true == ok
+                        && false == text.isEmpty())
+                        {
+                            getSettingsManager()->setJavaPathEnvVar(text);
                         }
                     });
 

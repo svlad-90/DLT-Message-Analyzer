@@ -77,6 +77,9 @@ static const QString sSearchViewLastColumnWidthStrategyKey = "SearchViewLastColu
 static const QString sPlantumlPathMode = "PlantumlPathMode";
 static const QString sPlantumlPathEnvVar = "PlantumlPathEnvVar";
 static const QString sPlantumlCustomPath = "PlantumlCustomPath";
+static const QString sJavaPathMode = "JavaPathMode";
+static const QString sJavaPathEnvVar = "JavaPathEnvVar";
+static const QString sJavaCustomPath = "JavaCustomPath";
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
@@ -389,15 +392,29 @@ CSettingsManager::CSettingsManager():
     mSetting_PlantumlPathMode(createRangedArithmeticSettingsItem<int>(sPlantumlPathMode,
         [this](const int& data){plantumlPathModeChanged(data);},
         [this](){tryStoreSettingsConfig();},
-        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(ePlantumlPathMode::eUseDefaultPath),
-                                                                                              static_cast<int>(ePlantumlPathMode::eLast) - 1)),
-        static_cast<int>(ePlantumlPathMode::eUseDefaultPath))),
+        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(ePathMode::eUseDefaultPath),
+                                                                                              static_cast<int>(ePathMode::eLast) - 1)),
+        static_cast<int>(ePathMode::eUseDefaultPath))),
     mSetting_PlantumlPathEnvVar(createStringSettingsItem(sPlantumlPathEnvVar,
         [this](const QString& data){plantumlPathEnvVarChanged(data);},
         [this](){tryStoreSettingsConfig();},
         "")),
     mSetting_PlantumlCustomPath(createStringSettingsItem(sPlantumlCustomPath,
         [this](const QString& data){plantumlCustomPathChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        "")),
+    mSetting_JavaPathMode(createRangedArithmeticSettingsItem<int>(sJavaPathMode,
+        [this](const int& data){javaPathModeChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        TRangedSettingItem<int>::tOptionalAllowedRange(TRangedSettingItem<int>::tAllowedRange(static_cast<int>(ePathMode::eUseDefaultPath),
+                                                                                              static_cast<int>(ePathMode::eLast) - 1)),
+        static_cast<int>(ePathMode::eUseDefaultPath))),
+    mSetting_JavaPathEnvVar(createStringSettingsItem(sJavaPathEnvVar,
+        [this](const QString& data){javaPathEnvVarChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        "")),
+    mSetting_JavaCustomPath(createStringSettingsItem(sJavaCustomPath,
+        [this](const QString& data){javaCustomPathChanged(data);},
         [this](){tryStoreSettingsConfig();},
         "")),
     mRootSettingItemPtrVec(),
@@ -449,6 +466,9 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathMode);
     mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathEnvVar);
     mUserSettingItemPtrVec.push_back(&mSetting_PlantumlCustomPath);
+    mUserSettingItemPtrVec.push_back(&mSetting_JavaPathMode);
+    mUserSettingItemPtrVec.push_back(&mSetting_JavaPathEnvVar);
+    mUserSettingItemPtrVec.push_back(&mSetting_JavaCustomPath);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1583,6 +1603,21 @@ void CSettingsManager::setPlantumlCustomPath(const QString& val)
     mSetting_PlantumlCustomPath.setData(val);
 }
 
+void CSettingsManager::setJavaPathMode(const int& val)
+{
+    mSetting_JavaPathMode.setData(val);
+}
+
+void CSettingsManager::setJavaPathEnvVar(const QString& val)
+{
+    mSetting_JavaPathEnvVar.setData(val);
+}
+
+void CSettingsManager::setJavaCustomPath(const QString& val)
+{
+    mSetting_JavaCustomPath.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1800,6 +1835,21 @@ const QString& CSettingsManager::getPlantumlCustomPath() const
     return mSetting_PlantumlCustomPath.getData();
 }
 
+const int& CSettingsManager::getJavaPathMode() const
+{
+    return mSetting_JavaPathMode.getData();
+}
+
+const QString& CSettingsManager::getJavaPathEnvVar() const
+{
+    return mSetting_JavaPathEnvVar.getData();
+}
+
+const QString& CSettingsManager::getJavaCustomPath() const
+{
+    return mSetting_JavaCustomPath.getData();
+}
+
 QString CSettingsManager::getRegexDirectory() const
 {
     return sSettingsManager_Directory + QDir::separator() +
@@ -1832,6 +1882,11 @@ QString CSettingsManager::getRootSettingsFilepath() const
 QString CSettingsManager::getDefaultPlantumlPath() const
 {
     return QCoreApplication::applicationDirPath() + QDir::separator() + "plugins/plantuml.jar";
+}
+
+QString CSettingsManager::getDefaultJavaPath() const
+{
+    return "java"; // we expect that it should be inside the path
 }
 
 void CSettingsManager::refreshRegexConfiguration()

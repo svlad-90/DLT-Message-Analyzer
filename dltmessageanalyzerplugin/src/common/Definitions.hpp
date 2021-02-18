@@ -666,7 +666,7 @@ int getRegexOptionsCharSize();
 QString getFormattedRegexError(const QRegularExpression& regex);
 int getRegexErrorColumn(const QRegularExpression& regex);
 
-enum class ePlantumlPathMode
+enum class ePathMode
 {
     eUseDefaultPath = 0,
     eUseCustomPath,
@@ -674,6 +674,6 @@ enum class ePlantumlPathMode
     eLast
 };
 
-QString getPlantumlPathModeAsString(const ePlantumlPathMode& val);
+QString getPathModeAsString(const ePathMode& val);
 
 #endif // DEFINITIONS_HPP
