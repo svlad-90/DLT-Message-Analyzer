@@ -81,6 +81,8 @@ public:
     CUMLView* getUMLView();
     QPushButton* getCreateSequenceDiagramButton();
     CLogo* getLogo();
+    QPushButton* getUMLCreateDiagramFromTextButton();
+    QPlainTextEdit* getUMLTextEditor();
 
 private slots:
     void on_analyze_clicked();

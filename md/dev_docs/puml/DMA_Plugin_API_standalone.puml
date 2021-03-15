@@ -8,8 +8,8 @@ package "DMA_Analyzer_API" #DDDDDD
 
 abstract class "IDLTMessageAnalyzerControllerConsumer"
 {
-    + tRequestId requestAnalyze( const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
-    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+    + {abstract} virtual slot void progressNotification( const tProgressNotificationData& progressNotificationData ) = 0
+    + tRequestId requestAnalyze( const tRequestParameters& requestParameters )
 }
 
 }

@@ -232,7 +232,9 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     {
         auto pUMLViewComponent = std::make_shared<CUMLViewComponent>(mpForm->getUMLView(),
-                                                                     mpSettingsComponent->getSettingsManager());
+                                                                     mpSettingsComponent->getSettingsManager(),
+                                                                     mpForm->getUMLCreateDiagramFromTextButton(),
+                                                                     mpForm->getUMLTextEditor());
         mpUMLViewComponent = pUMLViewComponent;
 
         auto initResult = pUMLViewComponent->startInit();
@@ -479,45 +481,68 @@ void DLTMessageAnalyzerPlugin::initFileFinish()
 bool DLTMessageAnalyzerPlugin::stateChanged(int, QDltConnection::QDltConnectionState connectionState,QString hostname)
 {
 
-    mConnecitonsMap[hostname] = connectionState;
+    auto foundElement = mConnecitonsMap.find(hostname);
 
-    mConnectionState = QDltConnection::QDltConnectionOffline;
+    bool bCheck = false;
 
-    for(const auto& connectionStateItem : mConnecitonsMap)
+    if(foundElement != mConnecitonsMap.end()) // if element is already known
     {
-        switch(connectionStateItem)
+        // and it's status has changed from or to Online
+        if(foundElement.value() != connectionState &&
+           (foundElement.value() == QDltConnection::QDltConnectionOnline
+         || connectionState == QDltConnection::QDltConnectionOnline) )
         {
-            case QDltConnection::QDltConnectionOnline:
+            bCheck = true; // we should not further check anything
+        }
+    }
+    else // if element is not known
+    {
+        // then we should check
+        bCheck = true;
+    }
+
+    if(true == bCheck) // if something has changed
+    {
+        mConnecitonsMap[hostname] = connectionState;
+
+        mConnectionState = QDltConnection::QDltConnectionOffline;
+
+        for(const auto& connectionStateItem : mConnecitonsMap)
+        {
+            switch(connectionStateItem)
             {
-                mConnectionState = connectionState;
+                case QDltConnection::QDltConnectionOnline:
+                {
+                    mConnectionState = connectionStateItem;
+                }
+                    break;
+                default:
+                {
+                    // do nothing
+                }
+                    break;
             }
-                break;
-            default:
+
+            if( QDltConnection::QDltConnectionOnline == mConnectionState )
             {
-                // do nothing
-            }
                 break;
+            }
         }
 
         if( QDltConnection::QDltConnectionOnline == mConnectionState )
         {
-            break;
+            if( mpDLTMessageAnalyzer )
+            {
+               mpDLTMessageAnalyzer->connectionChanged(true);
+            }
         }
-    }
-
-    if( QDltConnection::QDltConnectionOnline == mConnectionState )
-    {
-        if( mpDLTMessageAnalyzer )
+        else
         {
-           mpDLTMessageAnalyzer->connectionChanged(true);
-        }
-    }
-    else
-    {
-        if( mpDLTMessageAnalyzer )
-        {
-           mpDLTMessageAnalyzer->connectionChanged(false);
-           mpDLTMessageAnalyzer->stop(CDLTMessageAnalyzer::eStopAction::eStopIfNotFinished);
+            if( mpDLTMessageAnalyzer )
+            {
+               mpDLTMessageAnalyzer->connectionChanged(false);
+               mpDLTMessageAnalyzer->stop(CDLTMessageAnalyzer::eStopAction::eStopIfNotFinished);
+            }
         }
     }
 

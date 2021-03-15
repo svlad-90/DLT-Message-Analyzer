@@ -145,7 +145,7 @@ void CMTAnalyzer::sendError( tRequestMap::iterator& requestIt )
 }
 
 bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const tWorkerId& workerId)
-{
+{    
     bool bResult = true;
 
     const tRequestId requestId = inputIt.key();

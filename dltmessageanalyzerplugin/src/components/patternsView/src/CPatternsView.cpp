@@ -913,7 +913,8 @@ void CPatternsView::handleSettingsManagerChange()
                 pasteSelectedRow();
             });
 
-            if(true == selectionModel()->selectedRows().isEmpty())
+            // if there is something to paste
+            if(true == mCopyPastePatternData.items.empty())
             {
                 pAction->setEnabled(false);
             }

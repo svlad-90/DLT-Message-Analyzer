@@ -9,6 +9,8 @@
 
 class CUMLView;
 class IUMLModel;
+class QPushButton;
+class QPlainTextEdit;
 
 class CUMLViewComponent : public DMA::IComponent,
                           public CSettingsManagerClient
@@ -16,7 +18,9 @@ class CUMLViewComponent : public DMA::IComponent,
 public:
 
     CUMLViewComponent( CUMLView* pUMLView,
-                       const tSettingsManagerPtr& pSettingsManager);
+                       const tSettingsManagerPtr& pSettingsManager,
+                       QPushButton* pUMLCreateDiagramFromTextButton,
+                       QPlainTextEdit* pUMLTextEditor );
 
     CUMLView* getUMLView() const;
 
@@ -28,4 +32,6 @@ protected:
 
 private:
     CUMLView* mpUMLView;
+    QPushButton* mpUMLCreateDiagramFromTextButton;
+    QPlainTextEdit* mpUMLTextEditor;
 };

@@ -34,14 +34,15 @@ class "CAnalyzerComponent"
 abstract class "IDLTMessageAnalyzerController"
 {
     + {abstract} virtual int getMaximumNumberOfThreads() const = 0
-    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, const tRegexScriptingMetadata& regexScriptingMetadata, bool isContinuous) = 0
+    + signal void progressNotification( const tProgressNotificationData& progressNotificationData )
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestParameters& requestParameters ) = 0
     + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
 }
 
 abstract class "IDLTMessageAnalyzerControllerConsumer"
 {
-    + tRequestId requestAnalyze( const tFileWrapperPtr& pFile, const int& fromMessage, const int& numberOfMessages, const QRegularExpression& regex, const int& numberOfThreads, bool isContinuous )
-    + {abstract} virtual void progressNotification( const tRequestId& requestId, const eRequestState& requestState, const int8_t& progress, const tFoundMatchesPack& processedMatches) = 0
+    + {abstract} virtual slot void progressNotification( const tProgressNotificationData& progressNotificationData ) = 0
+    + tRequestId requestAnalyze( const tRequestParameters& requestParameters )
 }
 
 }
