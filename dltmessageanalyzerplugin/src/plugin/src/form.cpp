@@ -317,7 +317,9 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
     QList<int> newSplitterSizes;
     newSplitterSizes.push_back(1000);
     newSplitterSizes.push_back(0);
+
     mpUI->splitter_tabWidget_filters->setSizes(newSplitterSizes);
+    mpUI->UMLViewSplitter->setSizes(newSplitterSizes);
 }
 
 Form::~Form()
@@ -641,6 +643,30 @@ CLogo* Form::getLogo()
     if(mpUI)
     {
         pResult = mpUI->iconButton;
+    }
+
+    return pResult;
+}
+
+QPushButton* Form::getUMLCreateDiagramFromTextButton()
+{
+    QPushButton* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->UMLCreateDiagramFromTextButton;
+    }
+
+    return pResult;
+}
+
+QPlainTextEdit* Form::getUMLTextEditor()
+{
+    QPlainTextEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->UMLTextEditor;
     }
 
     return pResult;

@@ -5,9 +5,13 @@
 #include "DMA_Plantuml.hpp"
 
 CUMLViewComponent::CUMLViewComponent( CUMLView* pUMLView,
-                                      const tSettingsManagerPtr& pSettingsManager ):
+                                      const tSettingsManagerPtr& pSettingsManager,
+                                      QPushButton* pUMLCreateDiagramFromTextButton,
+                                      QPlainTextEdit* pUMLTextEditor ):
 CSettingsManagerClient(pSettingsManager),
-mpUMLView(pUMLView)
+mpUMLView(pUMLView),
+mpUMLCreateDiagramFromTextButton(pUMLCreateDiagramFromTextButton),
+mpUMLTextEditor(pUMLTextEditor)
 {
 }
 
@@ -25,6 +29,17 @@ DMA::tSyncInitOperationResult CUMLViewComponent::init()
        if(nullptr != mpUMLView)
        {
            mpUMLView->setSettingsManager(getSettingsManager());
+
+           if(nullptr != mpUMLCreateDiagramFromTextButton)
+           {
+               mpUMLView->setUMLCreateDiagramFromTextButton(mpUMLCreateDiagramFromTextButton);
+           }
+
+           if(nullptr != mpUMLTextEditor)
+           {
+               mpUMLView->setUMLTextEditor(mpUMLTextEditor);
+           }
+
            result.bIsOperationSuccessful = true;
            result.returnCode = 0;
        }

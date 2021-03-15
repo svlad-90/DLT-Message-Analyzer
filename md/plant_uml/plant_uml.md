@@ -194,6 +194,29 @@ The resulting diagram looks like this:
 > With the above example result could be: "one_two".
 ----
 
+----
+
+## Plantuml text editor
+
+----
+
+Sometimes it is needed to slightly modify the resulting diagram, which you've obtained from the logs. E.g. to point out to the neighbor domain, which step of the sequence is wrong.
+
+Or it might be needed to create your own diagram and instantly check it without sharing it with some external services. E.g. without the usage of google chrome's extensions, which do load your project-specific content to the external servers to convert *.puml to *.svg, *.png, etc. 
+
+Plugin's implementation allows you to reach both approaches:
+
+- You can either type in the text input field the custom diagram's content
+- Or you can build a diagram out of the logs and then manually modify it. Content of "diagram from logs" will be placed inside the text editor on each creation. Then you can adjust its content as to your needs.
+
+![Animation of how to use the plantuml editor](./plant_uml_editor.gif)
+
+The additional bonus: in case if you have Graphviz installed, other types of diagrams are also supported, e.g. class diagrams:
+
+![Screenshot of the class diagram](./plantuml_class_diagram.png)
+
+----
+
 ## Diagrams settings
 
 ----

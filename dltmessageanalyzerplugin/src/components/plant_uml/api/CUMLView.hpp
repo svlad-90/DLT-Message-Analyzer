@@ -16,6 +16,8 @@
 
 class QProcess;
 class CImageViewer;
+class QPushButton;
+class QPlainTextEdit;
 
 class CUMLView : public QScrollArea,
                  public CSettingsManagerClient
@@ -30,6 +32,9 @@ public:
     void cancelDiagramGeneration();
     void clearDiagram();
     bool isDiagramShown() const;
+
+    void setUMLCreateDiagramFromTextButton(QPushButton* pUMLCreateDiagramFromTextButton);
+    void setUMLTextEditor(QPlainTextEdit* pUMLTextEditor);
 
 signals:
     void diagramGenerationStarted();
@@ -46,6 +51,8 @@ protected:
     void handleSettingsManagerChange() override;
 
 private:
+
+    void startGenerateUMLDiagram(const QString& diagramContent, bool isInternalCall);
 
     typedef std::shared_ptr<QProcess> tProcessPtr;
 
@@ -64,4 +71,6 @@ private:
     QString mDiagramContent;
     bool mbDiagramGenerationInProgress;
     QString mLastSelectedFolder;
+    QPushButton* mpUMLCreateDiagramFromTextButton;
+    QPlainTextEdit* mpUMLTextEditor;
 };

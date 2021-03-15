@@ -394,7 +394,7 @@
            <enum>QTabWidget::South</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="iconSize">
            <size>
@@ -579,18 +579,43 @@ QPushButton:hover:!pressed{
            <attribute name="title">
             <string>UML view</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="CUMLView" name="PNG_UML_View">
-              <property name="contextMenuPolicy">
-               <enum>Qt::CustomContextMenu</enum>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="2" column="0">
+             <widget class="QSplitter" name="UMLViewSplitter">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="createSequenceDiagram">
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <widget class="QWidget" name="verticalLayoutWidget_2">
+               <layout class="QVBoxLayout" name="UMLViewLayout">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="CUMLView" name="PNG_UML_View">
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::CustomContextMenu</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="createSequenceDiagram">
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
     border: 2px solid #8f8f91;
     border-radius: 2px;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
@@ -609,10 +634,61 @@ QPushButton:hover:!pressed{
     background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
 	color: rgb(255, 255, 255);
 }</string>
-              </property>
-              <property name="text">
-               <string>Create sequence diagram</string>
-              </property>
+                  </property>
+                  <property name="text">
+                   <string>Create sequence diagram</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="verticalLayoutWidget_3">
+               <layout class="QVBoxLayout" name="UMLViewTELayout">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPlainTextEdit" name="UMLTextEditor"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="UMLCreateDiagramFromTextButton">
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    border: 2px solid #8f8f91;
+    border-radius: 2px;
+    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+    min-width: 80px;
+	color: rgb(255, 255, 255);
+}
+
+QPushButton:pressed {
+    border: 2px solid #8f8f91;
+    background-color: qlineargradient(spread:pad, x1:0.169461, y1:0.181, x2:0, y2:0.954182, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+	color: rgb(255, 255, 255);
+}
+
+QPushButton:hover:!pressed{
+    border: 2px solid #9ccfdd;
+    background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
+	color: rgb(255, 255, 255);
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Create diagram from text</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
            </layout>
@@ -683,7 +759,7 @@ QPushButton:hover:!pressed{
           </widget>
          </widget>
          <widget class="QWidget" name="verticalLayoutWidget">
-          <layout class="QVBoxLayout" name="filtersLayout" stretch="0,0,0">
+          <layout class="QVBoxLayout" name="filtersLayout" stretch="0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetMinimumSize</enum>
            </property>
@@ -699,19 +775,6 @@ QPushButton:hover:!pressed{
            <property name="bottomMargin">
             <number>10</number>
            </property>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="CFiltersView" name="filtersTreeView">
              <property name="sizePolicy">

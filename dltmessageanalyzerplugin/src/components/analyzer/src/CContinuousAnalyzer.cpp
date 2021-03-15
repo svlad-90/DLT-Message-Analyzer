@@ -71,15 +71,27 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
             {
                 if(false == foundRequest.value().pClient.expired())
                 {
-                    QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
-                                              Q_ARG(tProgressNotificationData, progressNotificationData));
-                }
+                    auto progressNotificationDataCopy = progressNotificationData;
+                    progressNotificationDataCopy.requestId = foundRequest.key();
 
-                if(eRequestState::ERROR_STATE == progressNotificationData.requestState ||
-                        eRequestState::SUCCESSFUL == progressNotificationData.requestState)
+                    QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
+                                              Q_ARG(tProgressNotificationData, progressNotificationDataCopy));
+
+                    if(eRequestState::ERROR_STATE == progressNotificationDataCopy.requestState ||
+                            eRequestState::SUCCESSFUL == progressNotificationDataCopy.requestState)
+                    {
+                        mRequestDataMap.erase(foundRequest);
+                        mSubRequestDataMap.erase(foundSubRequest);
+                    }
+                }
+                else
                 {
-                    mRequestDataMap.erase(foundRequest);
-                    mSubRequestDataMap.erase(foundSubRequest);
+                    if(eRequestState::ERROR_STATE == progressNotificationData.requestState ||
+                            eRequestState::SUCCESSFUL == progressNotificationData.requestState)
+                    {
+                        mRequestDataMap.erase(foundRequest);
+                        mSubRequestDataMap.erase(foundSubRequest);
+                    }
                 }
             }
             else

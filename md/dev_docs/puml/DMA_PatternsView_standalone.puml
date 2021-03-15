@@ -22,8 +22,10 @@ class "IPatternsModel"
     + {abstract} virtual QModelIndex editData(const QModelIndex& idx, const QString& alias, const QString& regex, Qt::CheckState isDefault, Qt::CheckState isCombine) = 0
     + {abstract} virtual QString getAliasEditName( const QModelIndex& idx ) = 0
     + {abstract} virtual removeData(const QModelIndex& idx) = 0
+    + {abstract} virtual signal void patternsRefreshed() = 0
     + {abstract} virtual tSearchResult search( const QString& alias ) = 0
     + {abstract} virtual void filterPatterns( const QString& filter ) = 0
+    + {abstract} virtual void refreshRegexPatterns() = 0
     + {abstract} virtual void resetData() = 0
     + {abstract} virtual void updatePatternsInPersistency() = 0
     + {abstract} virtual void updateView() = 0
@@ -40,18 +42,8 @@ class "CSettingsManagerClient"
 
 }
 
-package "Qt" #DDDDDD
-{
-
-abstract class "QAbstractItemModel"
-{
-}
-
-}
-
 '====================Inheritance section====================
 CSettingsManagerClient <|-- CPatternsModel : extends
 IPatternsModel <|-- CPatternsModel : implements
-QAbstractItemModel <|-- CPatternsModel : implements
 
 @enduml

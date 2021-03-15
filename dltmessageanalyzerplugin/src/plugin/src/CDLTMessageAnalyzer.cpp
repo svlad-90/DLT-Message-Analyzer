@@ -691,6 +691,8 @@ void CDLTMessageAnalyzer::resetSearchRange()
 
 void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
 {
+    mpFile = pFile;
+
     if(nullptr != mpFile)
     {
         mpFile->setSubFilesHandlingStatus(getSettingsManager()->getSubFilesHandlingStatus());
@@ -711,8 +713,6 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
     }
 
     resetSearchRange();
-
-    mpFile = pFile;
 
     if(nullptr != mpSearchResultView)
     {

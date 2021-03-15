@@ -13,6 +13,8 @@
 #include "QInputDialog"
 #include "QCoreApplication"
 #include "QMetaEnum"
+#include "QPushButton"
+#include "QPlainTextEdit"
 
 #include "CImageViewer.hpp"
 #include "../api/CUMLView.hpp"
@@ -299,12 +301,16 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
 
         connect(pSubProcess.get(),
                 static_cast<void(QProcess::*)(QProcess::ProcessError)>(&QProcess::errorOccurred),
-                [commandToTrace, callback, pSubProcessWeak](const QProcess::ProcessError& error)
+                [commandToTrace, callback, pSubProcessWeak, this](const QProcess::ProcessError& error)
         {
-            QMetaEnum metaEnum = QMetaEnum::fromType<QProcess::ProcessError>();
-            SEND_ERR(QString("[CUMLView] Error during execution of the sub-process - %1. Used command - \"%2\"")
-                     .arg(metaEnum.valueToKey(error))
-                     .arg(commandToTrace));
+            if(true == mbDiagramGenerationInProgress)
+            {
+                QMetaEnum metaEnum = QMetaEnum::fromType<QProcess::ProcessError>();
+                SEND_ERR(QString("[CUMLView] Error during execution of the sub-process - %1. Used command - \"%2\"")
+                         .arg(metaEnum.valueToKey(error))
+                         .arg(commandToTrace));
+            }
+
             callback(0, QProcess::NormalExit);
         });
 
@@ -322,8 +328,17 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
     }
 }
 
-void CUMLView::generateUMLDiagram(const QString& diagramContent)
+void CUMLView::startGenerateUMLDiagram(const QString& diagramContent, bool isInternalCall)
 {
+    if(false == isInternalCall)
+    {
+        if(nullptr != mpUMLTextEditor)
+        {
+            mpUMLTextEditor->clear();
+            mpUMLTextEditor->appendPlainText(diagramContent);
+        }
+    }
+
     QString PNG_file_path = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PNG_File_Name();
 
     mbDiagramShown = false;
@@ -332,18 +347,25 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
     {
         auto viewPng = [this, &PNG_file_path, &diagramContent]()
         {
-            if(nullptr != mpImageViewer)
+            if(true == mbDiagramGenerationInProgress)
             {
-                if(mpImageViewer->loadFile(PNG_file_path))
+                if(nullptr != mpImageViewer)
                 {
-                    mbDiagramShown = true;
-                    mDiagramContent = diagramContent;
+                    if(mpImageViewer->loadFile(PNG_file_path))
+                    {
+                        mbDiagramShown = true;
+                        mDiagramContent = diagramContent;
+                    }
+                    else
+                    {
+                        mbDiagramShown = false;
+                        SEND_ERR(QString("PNG viewer was not able to open file - \"%1\"").arg(PNG_file_path));
+                    }
                 }
-                else
-                {
-                    mbDiagramShown = false;
-                    SEND_ERR(QString("PNG viewer was not able to open file - \"%1\"").arg(PNG_file_path));
-                }
+            }
+            else
+            {
+                mbDiagramShown = false;
             }
 
             diagramGenerationFinished(mbDiagramShown);
@@ -374,6 +396,11 @@ void CUMLView::generateUMLDiagram(const QString& diagramContent)
     generateUMLDiagramInternal(diagramContent, eDiagramExtension::e_PNG, callback, mpDiagramCreationSubProcess, false);
 }
 
+void CUMLView::generateUMLDiagram(const QString& diagramContent)
+{
+    startGenerateUMLDiagram(diagramContent, false);
+}
+
 bool CUMLView::isDiagramGenerationInProgress() const
 {
     return mbDiagramGenerationInProgress;
@@ -383,8 +410,8 @@ void CUMLView::cancelDiagramGeneration()
 {
     if(true == mbDiagramGenerationInProgress)
     {
-        mpDiagramCreationSubProcess.reset();
         mbDiagramGenerationInProgress = false;
+        mpDiagramCreationSubProcess.reset();
         diagramGenerationFinished(false);
     }
 }
@@ -401,6 +428,39 @@ void CUMLView::clearDiagram()
 bool CUMLView::isDiagramShown() const
 {
     return mbDiagramShown;
+}
+
+void CUMLView::setUMLCreateDiagramFromTextButton(QPushButton* pUMLCreateDiagramFromTextButton)
+{
+    mpUMLCreateDiagramFromTextButton = pUMLCreateDiagramFromTextButton;
+
+    if(nullptr != mpUMLCreateDiagramFromTextButton)
+    {
+        connect(mpUMLCreateDiagramFromTextButton, &QPushButton::clicked, [this]()
+        {
+            if(nullptr != mpUMLTextEditor)
+            {
+                cancelDiagramGeneration();
+
+                QString diagramContent = mpUMLTextEditor->toPlainText();
+
+                if(false == diagramContent.isEmpty())
+                {
+                    startGenerateUMLDiagram(diagramContent, true);
+                }
+            }
+        });
+    }
+}
+
+void CUMLView::setUMLTextEditor(QPlainTextEdit* pUMLTextEditor)
+{
+    mpUMLTextEditor = pUMLTextEditor;
+
+    if(nullptr != mpUMLTextEditor)
+    {
+
+    }
 }
 
 void CUMLView::handleSettingsManagerChange()
