@@ -868,8 +868,8 @@ void CPatternsModel::updatePatternsInPersistency()
 
         mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false);
 
-        // if size of patterns has changed
-        if(aliasVec.size() != getSettingsManager()->getAliases().size())
+        // if something has changed
+        if(aliasVec != getSettingsManager()->getAliases())
         {
             // let's update them in the persistency
             getSettingsManager()->setAliases( aliasVec );
