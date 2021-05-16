@@ -11,11 +11,14 @@
 #include <atomic>
 
 #include <QElapsedTimer>
+#include <QFile>
 
 #include "Definitions.hpp"
 
 #include "QRegularExpression"
 #include "QTextStream"
+
+#include "dlt_common.h"
 
 #include "components/log/api/CLog.hpp"
 #include "CTreeItem.hpp"
@@ -2345,6 +2348,265 @@ QString getPathModeAsString(const ePathMode& val)
     }
 
     return result;
+}
+
+bool convertLogFileToDLT( const QString& sourceFilePath, const QString& targetFilePath )
+{
+    bool bResult = true;
+
+    QElapsedTimer timer;
+
+    timer.start();
+
+    QFile sourceFile(sourceFilePath);
+    QFile targetFile(targetFilePath);
+
+    if(sourceFile.open(QFile::OpenModeFlag::ReadOnly)) // open source file
+    {
+        if(targetFile.open(QFile::OpenModeFlag::ReadWrite | QFile::OpenModeFlag::Truncate)) // open target file
+        {
+            uint8_t messageCounter = 0u;
+            uint32_t messageIndex = 0u;
+
+            auto writeDltMsg = [&targetFile,
+                                &messageCounter,
+                                &messageIndex,
+                                &timer](const QString& str)
+            {
+                QByteArray data;
+
+                {
+                    // storage header
+                    data.push_back(0x44); // D
+                    data.push_back(0x4c); // L
+                    data.push_back(0x54); // T
+                    data.push_back(0x01);
+
+                    auto elapsedMs = timer.elapsed();
+
+                    auto elapsedSeconds = static_cast<uint32_t>(elapsedMs / 1000);
+                    uint8_t elapsedSeconds_1_byte = elapsedSeconds & 0xff;
+                    uint8_t elapsedSeconds_2_byte = (elapsedSeconds >> 8);
+                    uint8_t elapsedSeconds_3_byte = (elapsedSeconds >> 16);
+                    uint8_t elapsedSeconds_4_byte = (elapsedSeconds >> 24);
+                    data.push_back( elapsedSeconds_4_byte );
+                    data.push_back( elapsedSeconds_3_byte );
+                    data.push_back( elapsedSeconds_2_byte );
+                    data.push_back( elapsedSeconds_1_byte );
+
+                    auto elapsedMicroSeconds = static_cast<uint32_t>(elapsedMs % 1000 * 1000);
+                    uint8_t elapsedMicroSeconds_1_byte = elapsedMicroSeconds & 0xff;
+                    uint8_t elapsedMicroSeconds_2_byte = (elapsedMicroSeconds >> 8);
+                    uint8_t elapsedMicroSeconds_3_byte = (elapsedMicroSeconds >> 16);
+                    uint8_t elapsedMicroSeconds_4_byte = (elapsedMicroSeconds >> 24);
+                    data.push_back( elapsedMicroSeconds_4_byte );
+                    data.push_back( elapsedMicroSeconds_3_byte );
+                    data.push_back( elapsedMicroSeconds_2_byte );
+                    data.push_back( elapsedMicroSeconds_1_byte );
+
+                    data.push_back('E');
+                    data.push_back('C');
+                    data.push_back('U');
+                    data.push_back('1');
+                }
+
+                {
+                    // HEADER
+
+                    // 0 byte: HTYP
+                    char HTYP = 0u;
+                    HTYP |= 1UL;         // use extended header
+                    HTYP &= ~(1UL << 1); // Most Significant Byte First
+                    HTYP |= 1UL << 2;    // With ECU ID
+                    HTYP |= 1UL << 3;    // With Session ID
+                    HTYP |= 1UL << 4;    // With Timestamp
+                    HTYP &= ~(1UL << 5); // Version
+                    HTYP |= ~(1UL << 6); // Version
+                    HTYP |= ~(1UL << 7); // Version
+                    data.push_back(HTYP);
+
+                    // 1 byte: MCNT
+                    data.push_back(messageCounter);
+                    ++messageCounter;
+
+                    // 2-3 bytes: LEN - set last, when we can calculate this value.
+                    data.push_back('0');
+                    data.push_back('0');
+
+                    // 4-7 bytes: ECU
+                    data.push_back('E');
+                    data.push_back('C');
+                    data.push_back('U');
+                    data.push_back('1');
+
+                    // 8-11 bytes: SEID
+                    uint32_t sessionId = 9999;
+                    uint8_t sessionId_1_byte = sessionId & 0xff;
+                    uint8_t sessionId_2_byte = (sessionId >> 8);
+                    uint8_t sessionId_3_byte = (sessionId >> 16);
+                    uint8_t sessionId_4_byte = (sessionId >> 24);
+                    data.push_back( sessionId_4_byte );
+                    data.push_back( sessionId_3_byte );
+                    data.push_back( sessionId_2_byte );
+                    data.push_back( sessionId_1_byte );
+
+                    // 12-15 bytes: TMSP
+                    uint32_t timestamp = messageIndex;
+                    uint8_t timestamp_1_byte = timestamp & 0xff;
+                    uint8_t timestamp_2_byte = (timestamp >> 8);
+                    uint8_t timestamp_3_byte = (timestamp >> 16);
+                    uint8_t timestamp_4_byte = (timestamp >> 24);
+                    data.push_back( timestamp_4_byte );
+                    data.push_back( timestamp_3_byte );
+                    data.push_back( timestamp_2_byte );
+                    data.push_back( timestamp_1_byte );
+                }
+
+                {
+                    // EXTENDED HEADER
+
+                    // 0 byte: Message info
+                    char messageInfo = 0u;
+                    messageInfo |= 1UL;         // Verbose
+                    messageInfo &= ~(1UL << 1); // Message Type Info
+                    messageInfo &= ~(1UL << 2); // Message Type Info
+                    messageInfo &= ~(1UL << 3); // Message Type Info
+                    messageInfo &= ~(1UL << 4); // Message Type Info
+                    messageInfo |= 1UL << 5;    // Message Type Info
+                    messageInfo |= 1UL << 6;    // Message Type Info
+                    messageInfo &= ~(1UL << 7); // Message Type Info
+                    data.push_back(messageInfo);
+
+                    // 1 byte: Number of arguments
+                    data.push_back(1);
+
+                    // 2-5 byte: APID
+                    data.push_back('C');
+                    data.push_back('O');
+                    data.push_back('N');
+                    data.push_back('V');
+
+                    // 6-9 byte: CTID
+                    data.push_back('I');
+                    data.push_back('M');
+                    data.push_back('P');
+                    data.push_back('1');
+                }
+
+                {
+                    // PAYLOAD
+
+                    // 0-4 bytes: ARG1 Type Info
+                    uint8_t typeInfo = 0u;
+
+                    typeInfo &= ~(1UL);       // Reserved
+                    typeInfo &= ~(1UL << 1);  // Reserved
+                    typeInfo &= ~(1UL << 2);  // Reserved
+                    typeInfo &= ~(1UL << 3);  // Reserved
+                    typeInfo &= ~(1UL << 4);  // Reserved
+                    typeInfo &= ~(1UL << 5);  // Reserved
+                    typeInfo &= ~(1UL << 6);  // Reserved
+                    typeInfo &= ~(1UL << 7);  // Reserved
+
+                    data.push_back(typeInfo);
+
+                    typeInfo = 0u;
+
+                    typeInfo &= ~(1UL);       // SCOD
+                    typeInfo &= ~(1UL << 1);  // SCOD
+                    typeInfo &= ~(1UL << 2);  // Reserved
+                    typeInfo &= ~(1UL << 3);  // Reserved
+                    typeInfo &= ~(1UL << 4);  // Reserved
+                    typeInfo &= ~(1UL << 5);  // Reserved
+                    typeInfo &= ~(1UL << 6);  // Reserved
+                    typeInfo &= ~(1UL << 7);  // Reserved
+
+                    data.push_back(typeInfo);
+
+                    typeInfo = 0u;
+
+                    typeInfo &= ~(1UL);       // ARAY
+                    typeInfo |= (1UL << 1);   // STRG
+                    typeInfo &= ~(1UL << 2);  // RAWD
+                    typeInfo &= ~(1UL << 3);  // VARI
+                    typeInfo &= ~(1UL << 4);  // FIXP
+                    typeInfo &= ~(1UL << 5);  // TRAI
+                    typeInfo &= ~(1UL << 6);  // STRU
+                    typeInfo |= (1UL << 7);   // SCOD
+
+                    data.push_back(typeInfo);
+
+                    typeInfo = 0u;
+
+                    typeInfo &= ~(1UL);       // Type length
+                    typeInfo &= ~(1UL << 1);  // Type length
+                    typeInfo &= ~(1UL << 2);  // Type length
+                    typeInfo &= ~(1UL << 2);  // Type length
+                    typeInfo &= ~(1UL << 3);  // Bool
+                    typeInfo &= ~(1UL << 4);  // SINT
+                    typeInfo &= ~(1UL << 5);  // UINT
+                    typeInfo &= ~(1UL << 6);  // FLOAT
+
+                    data.push_back(typeInfo);
+
+                    // ARG1 Payload
+                    QString strCopy = str;
+                    auto maxLength = 8192;
+                    if(strCopy.length() >= maxLength )
+                    {
+                        strCopy = strCopy.mid(0, maxLength - 1);
+                    }
+
+                    uint16_t strLength = strCopy.size();
+                    uint8_t strLength_low = strLength & 0xff;
+                    uint8_t strLength_high = (strLength >> 8);
+                    data.push_back(strLength_high);
+                    data.push_back(strLength_low);
+
+                    data.append(strCopy);
+
+                    // 2-3 bytes: LEN - at last, set the data length.
+                    uint16_t storageHeaderSize = 16;
+
+                    uint16_t dataSize = data.size() - storageHeaderSize;
+                    dataSize = DLT_SWAP_16(dataSize);
+                    uint8_t dataSize_low = dataSize & 0xff;
+                    uint8_t dataSize_high = (dataSize >> 8);
+                    data[storageHeaderSize + 2] = dataSize_low;
+                    data[storageHeaderSize + 3] = dataSize_high;
+                }
+
+                targetFile.write(data);
+
+                ++ messageIndex;
+            };
+
+            QString line = sourceFile.readLine();
+            while (!line.isNull())
+            {
+                writeDltMsg(line);
+                line = sourceFile.readLine();
+            }
+
+            targetFile.close();
+        }
+        else
+        {
+            SEND_ERR(QString("Failed to open file \"%1\". Error: \"%2\"")
+                     .arg(targetFilePath)
+                     .arg(targetFile.errorString()));
+            bResult = false;
+        }
+    }
+    else
+    {
+        SEND_ERR(QString("Failed to open file \"%1\". Error: \"%2\"")
+                 .arg(sourceFilePath)
+                 .arg(sourceFile.errorString()));
+        bResult = false;
+    }
+
+    return bResult;
 }
 
 PUML_PACKAGE_BEGIN(Qt)

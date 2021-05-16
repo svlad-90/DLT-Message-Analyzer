@@ -676,4 +676,16 @@ enum class ePathMode
 
 QString getPathModeAsString(const ePathMode& val);
 
+/**
+ * @brief convertLogFileToDLT - converts the content of the sourceFilePath file
+ * to the DLT format and saved it to the targetFilePath.
+ * Note! Each "\n" separation treated as a new message.
+ * @param sourceFilePath - input file path. Should exist
+ * @param targetFilePath - output file, which will be created and filled in with content.
+ * Note! In case if file under the specified path already exists - it will be truncated!
+ * @return - true in case of success. False otherwise.
+ */
+bool convertLogFileToDLT( const QString& sourceFilePath,
+                          const QString& targetFilePath );
+
 #endif // DEFINITIONS_HPP

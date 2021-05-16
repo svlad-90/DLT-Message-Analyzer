@@ -5,6 +5,9 @@
 #include "QStyle"
 #include "QDir"
 #include "QProcessEnvironment"
+#include "QElapsedTimer"
+
+#include "dlt_common.h"
 
 #include "dltmessageanalyzerplugin.hpp"
 
@@ -562,6 +565,49 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         }
     },
     "- prints information about the currently used java settings");
+
+    result["convert-txt-to-dlt-file"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
+    {
+        if(false == params.empty())
+        {
+            auto foundSourceFileParam = params.find("sf");
+
+            if(foundSourceFileParam != params.end())
+            {
+                auto foundTargetFileParam = params.find("tf");
+
+                if(foundTargetFileParam != params.end())
+                {
+                    bool bConvertionResult = convertLogFileToDLT(foundSourceFileParam->second, foundTargetFileParam->second);
+
+                    if(false == bConvertionResult)
+                    {
+                       SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Failed to convert the \"%1\" file to dlt format!")
+                                .arg(foundSourceFileParam->second));
+                    }
+                    else
+                    {
+                        SEND_MSG("Command [convert-txt-to-dlt-file]: Conversion successfully performed!");
+                    }
+                }
+                else
+                {
+                    SEND_ERR("Command [convert-txt-to-dlt-file]: required parameter \"tf\" not found!");
+                }
+            }
+            else
+            {
+                SEND_ERR("Command [convert-txt-to-dlt-file]: required parameter \"sf\" not found!");
+            }
+        }
+        else
+        {
+            printAppClassDiagram();
+        }
+    },
+    "- converts specified file with '\n' separated set of strings to the dlt format"
+    "[-sf=<source_file> // mandatory! Source file which we should convert to the dlt format]"
+    "[-tf=<target file> // mandatory! Target file, into which we should save the content]");
 
     return result;
 }

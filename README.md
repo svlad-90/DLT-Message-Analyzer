@@ -76,6 +76,7 @@ It is developed to increase the analytical capabilities of the dlt-viewer.
 ### [Debug console](./md/debug_console/debug_console.md)
 
 - Debug "console view", which shows debug messages of the plugin and allows you to perform a set of predefined scenarios.
+- In addition, console view allows you to convert custom txt files into the dlt format. Thus, you can use dlt-viewer for the projects, which do not use full Genivi DLT infrastructure. E.g. no dlt-daemon or dlt API lib being used.
 
 and many other features
 
