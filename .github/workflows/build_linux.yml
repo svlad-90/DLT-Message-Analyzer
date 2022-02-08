@@ -5,6 +5,12 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch'     
+        required: true
+        default: 'master'
 
 jobs:
   build_linux:

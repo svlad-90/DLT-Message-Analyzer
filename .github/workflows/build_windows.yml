@@ -5,6 +5,12 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target branch'     
+        required: true
+        default: 'master'
 
 jobs:
   build_windows:
@@ -12,6 +18,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
+
+    - uses: ilammy/msvc-dev-cmd@v1
  
     # Caching the Qt
     - name: Cache Qt
@@ -86,7 +94,6 @@ jobs:
     #CMake for dlt-viewer, including the DLT-Message_analyzer plugin
     - name: CMake
       run: |
-        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
         cmake ..\${{ github.event.repository.name }}\ "-GCodeBlocks - NMake Makefiles JOM" "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_PREFIX_PATH:STRING=../Qt/Qt/5.15.0/msvc2019_64" "-DQT_QMAKE_EXECUTABLE:STRING=../Qt/Qt/5.15.0/msvc2019_64/bin/qmake.exe"
       shell: cmd
       working-directory: ..\build
@@ -101,7 +108,6 @@ jobs:
     # Build of the project
     - name: Jom
       run: |
-        call "%programfiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsx86_amd64.bat"
         jom.exe -j8
       shell: cmd
       working-directory: ..\build
