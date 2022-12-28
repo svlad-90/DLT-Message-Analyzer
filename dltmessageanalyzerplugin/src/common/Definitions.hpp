@@ -688,4 +688,9 @@ QString getPathModeAsString(const ePathMode& val);
 bool convertLogFileToDLT( const QString& sourceFilePath,
                           const QString& targetFilePath );
 
+/**
+ * @brief isDarkMode - tells whether dark mode is enabled
+ */
+bool isDarkMode();
+
 #endif // DEFINITIONS_HPP

@@ -1009,7 +1009,7 @@ void CDLTMessageAnalyzer::animateError( QWidget* pAnimationWidget )
 
         QPropertyAnimation *pColor = new QPropertyAnimation(pAnimationProxy, "color");
         pColor->setDuration(250);
-        pColor->setStartValue(QColor(255, 255, 255));
+        pColor->setStartValue(qApp->palette().window());
         pColor->setEndValue(QColor(255, 0, 0));
 
         pAnimSeq->addAnimation(pColor);
@@ -1017,7 +1017,7 @@ void CDLTMessageAnalyzer::animateError( QWidget* pAnimationWidget )
         QPropertyAnimation *pUncolor = new QPropertyAnimation(pAnimationProxy, "color");
         pUncolor->setDuration(250);
         pUncolor->setStartValue(QColor(255, 0, 0));
-        pUncolor->setEndValue(QColor(255, 255, 255));
+        pUncolor->setEndValue(qApp->palette().window());
 
         pAnimSeq->addAnimation(pUncolor);
 
