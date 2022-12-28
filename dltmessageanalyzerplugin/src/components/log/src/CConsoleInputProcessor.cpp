@@ -602,7 +602,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         }
         else
         {
-            printAppClassDiagram();
+            SEND_ERR("Command [convert-txt-to-dlt-file]: required parameters \"sf\" and \"tf\" not found!");
         }
     },
     "- converts specified file with '\n' separated set of strings to the dlt format"

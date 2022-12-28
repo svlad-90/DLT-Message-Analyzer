@@ -12,6 +12,8 @@
 
 #include <QElapsedTimer>
 #include <QFile>
+#include <QApplication>
+#include <QPalette>
 
 #include "Definitions.hpp"
 
@@ -2607,6 +2609,12 @@ bool convertLogFileToDLT( const QString& sourceFilePath, const QString& targetFi
     }
 
     return bResult;
+}
+
+bool isDarkMode()
+{
+    const QColor textColor = qApp->palette().text().color();
+    return textColor.red() > 150 && textColor.green() > 150 && textColor.blue() > 150;
 }
 
 PUML_PACKAGE_BEGIN(Qt)

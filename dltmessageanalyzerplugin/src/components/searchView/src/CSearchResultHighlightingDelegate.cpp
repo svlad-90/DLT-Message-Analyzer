@@ -57,6 +57,15 @@ void drawText(const QString& inputStr,
     }
     else
     {
+        if(isDarkMode())
+        {
+            painter->fillRect(option.rect, option.palette.window());
+        }
+        else
+        {
+           painter->fillRect(option.rect, QColor(255,255,255));
+        }
+
         QPalette::ColorGroup cg = QPalette::Normal;
         painter->setPen(option.palette.color(cg, QPalette::Text));
 
@@ -161,7 +170,7 @@ static void collectDrawData(const QString& inputStr,
         }
         else
         {
-            drawData.color = QColor(0,0,0);
+            drawData.color = option.palette.text().color();
             drawData.isBold = false;
         }
     }
@@ -221,6 +230,17 @@ static void drawText( const tDrawDataPack& drawDataPack,
     if(true == drawDataPack.isSelected)
     {
         painter->fillRect(option.rect, option.palette.highlight());
+    }
+    else
+    {
+        if(isDarkMode())
+        {
+            painter->fillRect(option.rect, option.palette.window());
+        }
+        else
+        {
+           painter->fillRect(option.rect, QColor(255,255,255));
+        }
     }
 
     for(const auto& drawDataItem : drawDataPack.drawDataList)
@@ -392,7 +412,7 @@ static void drawHighlightedText(eSearchResultColumn field,
     }
 
     {
-        painter->setPen(QColor(0,0,0));
+        painter->setPen(option.palette.text().color());
         auto font = painter->font();
         font.setBold(false);
         painter->setFont(font);
@@ -432,6 +452,17 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
         if(Qt::Checked == UML_Applicability)
         {
             painter->fillRect(opt.rect, QBrush(QColor(200,200,200)));
+        }
+        else
+        {
+            if(isDarkMode())
+            {
+                painter->fillRect(option.rect, option.palette.window());
+            }
+            else
+            {
+               painter->fillRect(option.rect, QColor(255,255,255));
+            }
         }
 
         switch(static_cast<eSearchResultColumn>(index.column()))
