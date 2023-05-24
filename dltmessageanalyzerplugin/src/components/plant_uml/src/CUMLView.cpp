@@ -15,6 +15,7 @@
 #include "QMetaEnum"
 #include "QPushButton"
 #include "QPlainTextEdit"
+#include "QActionGroup"
 
 #include "CImageViewer.hpp"
 #include "../api/CUMLView.hpp"

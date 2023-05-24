@@ -99,6 +99,11 @@ endif()
 
 include_directories(../../thirdparty/DMA_Plantuml/src)
 
+# to force variant lite to use nonstd::variant
+# otherwise the implementation will throw compile-time errors
+# with C++17
+add_compile_definitions(variant_CONFIG_SELECT_VARIANT=variant_VARIANT_NONSTD)
+
 DMA_add_subdirectory_with_clang_tidy(common)
 DMA_add_subdirectory_with_clang_tidy(components)
 DMA_add_subdirectory_with_clang_tidy(plugin)
@@ -130,7 +135,7 @@ add_custom_command(TARGET DLT-Message-Analyzer POST_BUILD
 ################### PLANTUML ( END ) ######################
 
 ################### QT ####################################
-target_link_libraries(DLT-Message-Analyzer qdlt Qt5::Widgets )
+target_link_libraries(DLT-Message-Analyzer qdlt ${QT_PREFIX}::Widgets )
 ################### QT ( END ) ############################
 
 add_plugin(DLT-Message-Analyzer)

@@ -1,4 +1,4 @@
-qt5_wrap_cpp(PROCESSED_MOCS
+qt_wrap_cpp(PROCESSED_MOCS
              ../api/CConsoleView.hpp)
 
 add_library(DMA_log STATIC
@@ -11,7 +11,7 @@ add_library(DMA_log STATIC
 
 target_link_libraries( DMA_log PUBLIC
                        qdlt
-                       Qt5::Widgets
+                       ${QT_PREFIX}::Widgets
                        DMA_framework_base
                        DMA_framework_component
                        DMA_Plantuml )

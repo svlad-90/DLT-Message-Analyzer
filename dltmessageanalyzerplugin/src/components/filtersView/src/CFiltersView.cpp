@@ -10,6 +10,7 @@
 #include "QClipboard"
 #include "QLineEdit"
 #include "QKeyEvent"
+#include "QActionGroup"
 
 #include "CFiltersModel.hpp"
 #include "components/settings/api/ISettingsManager.hpp"

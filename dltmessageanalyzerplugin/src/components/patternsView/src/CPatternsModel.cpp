@@ -400,7 +400,7 @@ QVariant CPatternsModel::data(const QModelIndex &index, int role) const
             result = Qt::AlignLeft;
         }
     }
-    else if (role == Qt::BackgroundColorRole)
+    else if (role == Qt::BackgroundRole)
     {
         result = QColor(0,0,0,0);
     }
@@ -417,7 +417,7 @@ Qt::ItemFlags CPatternsModel::flags(const QModelIndex &index) const
         if ( index.column() == static_cast<int>(ePatternsColumn::Default) ||
              index.column() == static_cast<int>(ePatternsColumn::Combine))
         {
-            result = QAbstractItemModel::flags(index) | Qt::ItemIsTristate;
+            result = QAbstractItemModel::flags(index) | Qt::ItemIsAutoTristate;
         }
         else
         {

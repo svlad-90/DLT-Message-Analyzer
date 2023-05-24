@@ -193,7 +193,7 @@ As of now, they are Linux and Windows.
 > sudo apt-get install libqt5serialport5
 > sudo apt-get install libqt5serialport5-dev
 >```
->
+> for Qt6 [__qtserialport__](https://doc.qt.io/qt-6/qtserialport-index.html) module needs to be installed.
 
 ----
 

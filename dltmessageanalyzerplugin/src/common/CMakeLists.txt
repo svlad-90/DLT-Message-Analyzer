@@ -9,5 +9,5 @@ add_library(DMA_common STATIC
 add_subdirectory(PCRE)
 
 ################### QT ####################################
-target_link_libraries(DMA_common qdlt Qt5::Widgets )
+target_link_libraries(DMA_common qdlt ${QT_PREFIX}::Widgets )
 ################### QT ( END ) ############################
