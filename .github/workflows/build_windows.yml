@@ -64,12 +64,12 @@ jobs:
            echo "D:/a/${{ github.event.repository.name }}/tools/jom/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: powershell
 
-    # Checkout dlt-viewer's revision v2.21.0
+    # Checkout dlt-viewer's revision v2.24.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v2
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.21.0
+        ref: ebb3c355bc0edf2b6c3be84452b8afa4d1a82641
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
