@@ -2565,7 +2565,7 @@ bool convertLogFileToDLT( const QString& sourceFilePath, const QString& targetFi
                     data.push_back(strLength_high);
                     data.push_back(strLength_low);
 
-                    data.append(strCopy);
+                    data.append(strCopy.toUtf8());
 
                     // 2-3 bytes: LEN - at last, set the data length.
                     uint16_t storageHeaderSize = 16;

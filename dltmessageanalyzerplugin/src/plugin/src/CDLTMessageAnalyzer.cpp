@@ -10,7 +10,6 @@
 #include <QLineEdit>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
-#include <QRegExp>
 #include <QInputDialog>
 #include <QHeaderView>
 #include "QFileDialog"

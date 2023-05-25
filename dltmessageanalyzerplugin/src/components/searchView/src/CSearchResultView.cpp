@@ -23,6 +23,7 @@
 #include <QDialogButtonBox>
 #include <QFontDialog>
 #include <QTableWidget>
+#include <QActionGroup>
 
 #include "common/Definitions.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"

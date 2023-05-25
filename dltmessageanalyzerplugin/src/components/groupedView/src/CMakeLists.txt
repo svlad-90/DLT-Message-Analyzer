@@ -1,4 +1,4 @@
-qt5_wrap_cpp(PROCESSED_MOCS
+qt_wrap_cpp(PROCESSED_MOCS
              ../api/CGroupedView.hpp)
 
 add_library(DMA_groupedView STATIC
@@ -10,7 +10,7 @@ add_library(DMA_groupedView STATIC
 
 target_link_libraries( DMA_groupedView PUBLIC
                        qdlt
-                       Qt5::Widgets
+                       ${QT_PREFIX}::Widgets
                        DMA_framework_base
                        DMA_framework_component
                        DMA_Plantuml )

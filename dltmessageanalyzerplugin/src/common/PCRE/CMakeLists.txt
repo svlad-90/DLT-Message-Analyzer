@@ -6,7 +6,7 @@ add_library(DMA_PCRE STATIC
 DMA_SuppressClangTidy_END()
 
 ################### QT ####################################
-target_link_libraries(DMA_PCRE Qt5::Widgets )
+target_link_libraries(DMA_PCRE ${QT_PREFIX}::Widgets )
 ################### QT ( END ) ############################
 
 ################### ANTLR_LINKAGE #########################
