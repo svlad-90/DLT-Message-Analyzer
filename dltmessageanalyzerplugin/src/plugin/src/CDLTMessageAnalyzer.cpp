@@ -266,7 +266,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
             {
                 QAction* pAction = new QAction("Save ...", mpRegexLineEdit);
+                #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 pAction->setShortcut(Qt::CTRL + Qt::Key_S);
+                #else
+                pAction->setShortcut(Qt::CTRL | Qt::Key_S);
+                #endif
                 connect(pAction, &QAction::triggered, [this]()
                 {
                     addPattern( mpRegexLineEdit->text() );

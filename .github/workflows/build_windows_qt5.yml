@@ -1,4 +1,4 @@
-name: Build windows
+name: Build windows Qt5
 
 on:
   push:
@@ -20,24 +20,6 @@ jobs:
     steps:
 
     - uses: ilammy/msvc-dev-cmd@v1
- 
-    # Caching the Qt
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v1
-      with:
-        path: ..\Qt
-        key: ${{ runner.os }}-QtCache
-
-    # Installation of the Qt
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-         version: 5.15.0
-         target: desktop
-         host: windows
-         dir: ..\Qt 
-         cached: ${{ steps.cache-qt.outputs.cache-hit }}
          
     # Creation of the ..\downloads directory
     - name: Creation of the "..\downloads" directory
@@ -66,14 +48,14 @@ jobs:
 
     # Checkout dlt-viewer's revision v2.24.0
     - name: Checkout of the dlt-viewer
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: GENIVI/dlt-viewer
         ref: ebb3c355bc0edf2b6c3be84452b8afa4d1a82641
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: svlad-90/${{ github.event.repository.name }}
         path: .\plugin\${{ github.event.repository.name }}
@@ -85,6 +67,16 @@ jobs:
       shell: powershell
       working-directory: .\plugin
 
+    # Install Qt5
+    - name: Install Qt5
+      uses: jurplel/install-qt-action@v3
+      with:
+         version: 5.15.0
+         target: desktop
+         host: windows
+         dir: ${{ github.workspace }}\Qt5
+         cache: true
+
     # Create build directory
     - name: Creation of the ".\build" directory
       run: mkdir ..\build
@@ -94,7 +86,7 @@ jobs:
     #CMake for dlt-viewer, including the DLT-Message_analyzer plugin
     - name: CMake
       run: |
-        cmake ..\${{ github.event.repository.name }}\ "-GCodeBlocks - NMake Makefiles JOM" "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_PREFIX_PATH:STRING=../Qt/Qt/5.15.0/msvc2019_64" "-DQT_QMAKE_EXECUTABLE:STRING=../Qt/Qt/5.15.0/msvc2019_64/bin/qmake.exe"
+        cmake ..\${{ github.event.repository.name }}\ "-GCodeBlocks - NMake Makefiles JOM" "-DCMAKE_BUILD_TYPE:STRING=Release" "-DCMAKE_PREFIX_PATH:STRING=${{ github.workspace }}/Qt5/Qt/5.15.0/msvc2019_64" "-DQT_QMAKE_EXECUTABLE:STRING=${{ github.workspace }}/Qt5/Qt/5.15.0/msvc2019_64/bin/qmake.exe"
       shell: cmd
       working-directory: ..\build
     

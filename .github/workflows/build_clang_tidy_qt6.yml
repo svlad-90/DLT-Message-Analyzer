@@ -1,4 +1,4 @@
-name: Build linux
+name: Build clang-tidy Qt6
 
 on:
   push:
@@ -13,11 +13,16 @@ on:
         default: 'master'
 
 jobs:
-  build_linux:
+  build_clang_tidy:
     
     runs-on: ubuntu-latest
 
     steps:
+
+    # Install clang-tidy
+    - name: Install clang-tidy
+      run: sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install clang-tidy
+      shell: bash
 
     # Install uuid-dev
     - name: Install uuid-dev
@@ -26,34 +31,16 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
       shell: bash
 
-    # Cache Qt
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v1
-      with:
-        path: ../Qt
-        key: ${{ runner.os }}-QtCache
-
-    # Install Qt
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-         version: 5.15.0
-         target: desktop
-         host: linux
-         dir: ../Qt 
-         cached: ${{ steps.cache-qt.outputs.cache-hit }}
-
     # Checkout dlt-viewer's revision v2.24.0
     - name: Checkout of the dlt-viewer
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: GENIVI/dlt-viewer
         ref: ebb3c355bc0edf2b6c3be84452b8afa4d1a82641
 
     # Checkout project's revision, which is pushed
-    - name: Checkout of the ${{ github.event.repository.name }}
-      uses: actions/checkout@v2
+    - name: Checkout of the project
+      uses: actions/checkout@v3
       with:
         repository: svlad-90/${{ github.event.repository.name }}
         path: ./plugin/${{ github.event.repository.name }}
@@ -65,6 +52,17 @@ jobs:
       shell: bash
       working-directory: ./plugin
 
+    # Install Qt6
+    - name: Install Qt6
+      uses: jurplel/install-qt-action@v3
+      with:
+         version: 6.5.0
+         target: desktop
+         host: linux
+         dir: ${{ github.workspace }}/Qt6
+         cache: true
+         modules: 'qtserialport'
+
     # Create build directory
     - name: Creation of the "../build" directory
       run: mkdir ../build
@@ -72,13 +70,13 @@ jobs:
       working-directory: ./
 
     # CMake execution
-    - name: CMake
-      run: cmake ../${{ github.event.repository.name }}
+    - name: CMake with clang-tidy
+      run: cmake ../${{ github.event.repository.name }} -DDMA_CLANG_TIDY_BUILD=true
       shell: bash
       working-directory: ../build
     
-    # Build of the project
+    # Build of the project with proceed on error
     - name: Make
-      run: make -j8
+      run: make -k -j8
       shell: bash
       working-directory: ../build

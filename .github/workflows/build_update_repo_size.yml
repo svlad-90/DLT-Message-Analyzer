@@ -26,7 +26,7 @@ jobs:
       
     # Checkout project's revision, which was pushed
     - name: Checkout of the project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: svlad-90/${{ github.event.repository.name }}
         path: ./

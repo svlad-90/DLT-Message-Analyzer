@@ -31,7 +31,12 @@ class CDoubleDelegate: public QStyledItemDelegate
 
     virtual QString displayText(const QVariant &value, const QLocale &locale) const
     {
-        if (value.type() == QVariant::Double) {
+        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        if (value.type() == QVariant::Double)
+        #else
+        if (value.userType() == QMetaType::Double)
+        #endif
+        {
             return locale.toString( value.toDouble(), 'f', 3 );
         }
         return QStyledItemDelegate::displayText(value, locale);

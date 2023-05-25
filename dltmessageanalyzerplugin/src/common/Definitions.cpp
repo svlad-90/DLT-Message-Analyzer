@@ -781,12 +781,12 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
             // wee need to process "between children" cases in a loop ( in case if there are 2 children or more )
             if(children.size() >= 2)
             {
-                for(auto it = children.begin(); it != children.end() - 1; ++it)
+                for(auto it = children.begin(); it != std::prev(children.end()); ++it)
                 {
                     const auto& firstChildMatch = *((*it)->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
                     tAnalysisRange firstChildAnalysisRange( firstChildMatch.range, inputRange );
 
-                    const auto& secondChildMatch = *((*(it+1))->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
+                    const auto& secondChildMatch = *((*(std::next(it)))->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
                     tAnalysisRange secondChildAnalysisRange( secondChildMatch.range, inputRange );
 
                     if((secondChildAnalysisRange.from - firstChildAnalysisRange.to) > 1)
@@ -802,7 +802,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
             // we need to process "from last child to end" case manually
             {
-                const auto& lastChild = *(children.end() - 1);
+                const auto& lastChild = *(std::prev(children.end()));
                 const auto& lastChildMatch = *(lastChild->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
                 tAnalysisRange lastChildAnalysisRange(lastChildMatch.range, inputRange);
 

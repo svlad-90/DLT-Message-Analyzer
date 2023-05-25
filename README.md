@@ -1,5 +1,3 @@
-----
-
 ## Please, support!
 
 <span style="color:red">If you are an active user of the DLT-Message-Analyzer plugin - please, spend a few moments to star this GitHub repository. Our team will very much appreciate it!</span>
@@ -8,9 +6,12 @@
 
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
 
-![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux/badge.svg)
-![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows/badge.svg)
-![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy/badge.svg)
+![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux_qt5/badge.svg)
+![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows_qt5/badge.svg)
+![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy-qt5/badge.svg)
+![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux_qt6/badge.svg)
+![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows_qt6/badge.svg)
+![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy-qt6/badge.svg)
 
 ----
 
