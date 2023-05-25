@@ -2,7 +2,26 @@
 
 ----
 
+Table of contents
+
+- [Installation guide](#installation-guide)
+  - [Clone repositories](#clone-repositories)
+  - [Linux console build](#linux-console-build)
+  - [Qt Creator build](#qt-creator-build)
+    - [Qt Creator IDE set up](#qt-creator-ide-set-up)
+    - [qmake *.pro based build](#qmake-pro-based-build)
+    - [Linux and Windows QT creator build](#linux-and-windows-qt-creator-build)
+  - [Run dlt-viewer and enable the plugin](#run-dlt-viewer-and-enable-the-plugin)
+  - [Build dependencies and settings](#build-dependencies-and-settings)
+    - [Build dependencies](#build-dependencies)
+    - [Build settings](#build-settings)
+  - [dlt-viewer-docker](#dlt-viewer-docker)
+
+----
+
 # Installation guide
+
+## Clone repositories
 
 - Clone the dlt-viewer project from the **[following location]( https://github.com/GENIVI/dlt-viewer )**.
 
@@ -56,7 +75,11 @@ make -j4
 
 ----
 
-### Qt Creator IDE set up
+## Qt Creator build
+
+----
+
+#### Qt Creator IDE set up
 
 - Specify the location of CMake in QT Creator:
 
@@ -67,34 +90,6 @@ Afterward, open the dlt-viewer's CMake project, which is located in the root of 
 ![Screenshot of "Open project" context menu in the Qt Creator](./installation_guide_open_project_menu.png)
 
 ![Screenshot of project file selection in the Qt Creator](./installation_guide_select_project.png)
-
-> **Important note for Windows compilation!**
->
-> In addition to the already mentioned steps, for Windows you will need to modify the dlt-viewer's root CMakeLists.txt.
-> Open the same file, which is mentioned in previous screenshot in the text editor, and add the following 2 lines:
-> 
-> if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC") # new line
->
-> SET(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=gnu99")
->
-> add_definitions( "-Wall" )
->
-> add_definitions( "-Wextra" )
->
-> add_definitions( "-Wno-variadic-macros" )
->
-> add_definitions( "-pedantic" )
->
-> add_definitions( "-Wno-strict-aliasing" )
->
-> endif()                                      # new line
->
-> That will allow you to build plugin with CMake + MSVC + jom, avoiding compilation errors related to misusage of the GCC compiler flags.
->
-> This issue is already raised in dlt-viewer's repo:
-> https://github.com/GENIVI/dlt-viewer/issues/113
->
-> Hopefully it will be fixed soon. Afterward, this step will become obsolete and will be removed from this guide.
 
 ----
 
@@ -108,7 +103,7 @@ Afterward, open the dlt-viewer's CMake project, which is located in the root of 
 
 ----
 
-## qmake *.pro based build
+### qmake *.pro based build
 
 Such a build option was dropped.
 DLT-Message-Analyzer has started to use antlr generator, which has only CMake support.
@@ -137,7 +132,7 @@ As of now, they are Linux and Windows.
 
 ----
 
-### Run dlt-viewer and enable the plugin
+## Run dlt-viewer and enable the plugin
 
 - Proceed to the build's artifacts folder and run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
 - Enable and show the DLT-Message-Analyzer plugin:
@@ -146,9 +141,9 @@ As of now, they are Linux and Windows.
 
 ----
 
-### Build dependencies and settings
+## Build dependencies and settings
 
-#### Build dependencies
+### Build dependencies
 
 > **Note!** 
 > 
@@ -184,7 +179,7 @@ As of now, they are Linux and Windows.
 
 ----
 
-#### Build settings
+### Build settings
 
 > **Note!** 
 > 
@@ -193,7 +188,20 @@ As of now, they are Linux and Windows.
 > sudo apt-get install libqt5serialport5
 > sudo apt-get install libqt5serialport5-dev
 >```
-> for Qt6 [__qtserialport__](https://doc.qt.io/qt-6/qtserialport-index.html) module needs to be installed.
+> For Qt6 [__qtserialport__](https://doc.qt.io/qt-6/qtserialport-index.html) module needs to be installed.
+
+----
+
+## dlt-viewer-docker
+
+[sevketcaba](https://github.com/sevketcaba) has developed a useful tool, which allows to build and run dlt-viewer + DMA inside the Docker container. The approach is based on *.sh scripts, so it can be used only for Linux.
+
+The usage is quite simple:
+
+- Clone [this repository](https://github.com/sevketcaba/dlt-viewer-docker)
+- cd to qt5, or qt6, depending on which version of QT you want to use
+- Run ./build.sh in order to build the Docker image
+- Run ./run.sh in order to start the corresponding Docker container and start the dlt-viewer with preinstalled DMA
 
 ----
 
