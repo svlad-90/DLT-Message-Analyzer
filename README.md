@@ -6,12 +6,12 @@
 
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
 
-![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux_qt5/badge.svg)
-![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows_qt5/badge.svg)
-![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy-qt5/badge.svg)
-![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux_qt6/badge.svg)
-![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows_qt6/badge.svg)
-![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy-qt6/badge.svg)
+![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux%20Qt5/badge.svg)
+![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows%20Qt5/badge.svg)
+![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy%20Qt5/badge.svg)
+![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux%20Qt6/badge.svg)
+![Build windows](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20windows%20Qt6/badge.svg)
+![Build clang-tidy](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20clang-tidy%20Qt6/badge.svg)
 
 ----
 

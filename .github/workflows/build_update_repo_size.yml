@@ -31,6 +31,7 @@ jobs:
         repository: svlad-90/${{ github.event.repository.name }}
         path: ./
         ref: ${{ github.ref }}
+        token: ${{ secrets.update_repo_size }}
         
     # Build repository size_md report
     - name: Build repository size report
