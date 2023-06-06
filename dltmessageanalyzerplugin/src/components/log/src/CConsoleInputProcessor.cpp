@@ -578,12 +578,36 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
 
                 if(foundTargetFileParam != params.end())
                 {
-                    bool bConvertionResult = convertLogFileToDLT(foundSourceFileParam->second, foundTargetFileParam->second);
+                    bool bConvertionResult = false;
+
+                    auto foundVersionParam = params.find("version");
+
+                    if(foundVersionParam != params.end())
+                    {
+                        if(foundVersionParam->second.toLower() == "v2")
+                        {
+                            bConvertionResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                        }
+                        else if(foundVersionParam->second.toLower() == "v1")
+                        {
+                            bConvertionResult = convertLogFileToDLTV1(foundSourceFileParam->second, foundTargetFileParam->second);
+                        }
+                        else
+                        {
+                            SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Wrong value '%1' was passed for the parameter 'version'! "
+                                             "Supported values are 'v1' and 'v2'.")
+                                         .arg(foundVersionParam->second));
+                        }
+                    }
+                    else
+                    {
+                        bConvertionResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                    }
 
                     if(false == bConvertionResult)
                     {
-                       SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Failed to convert the \"%1\" file to dlt format!")
-                                .arg(foundSourceFileParam->second));
+                        SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Failed to convert the \"%1\" file to dlt format!")
+                                     .arg(foundSourceFileParam->second));
                     }
                     else
                     {
@@ -605,9 +629,10 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
             SEND_ERR("Command [convert-txt-to-dlt-file]: required parameters \"sf\" and \"tf\" not found!");
         }
     },
-    "- converts specified file with '\n' separated set of strings to the dlt format"
+    "- converts specified file with '\\n' separated set of strings to the dlt format"
     "[-sf=<source_file> // mandatory! Source file which we should convert to the dlt format]"
-    "[-tf=<target file> // mandatory! Target file, into which we should save the content]");
+    "[-tf=<target file> // mandatory! Target file, into which we should save the content]"
+    "[-v=<version> // optional! Version of the dlt protocol. Supported values are 'v1' and 'v2'. Default value is 'v2']");
 
     return result;
 }

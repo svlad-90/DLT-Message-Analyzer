@@ -677,16 +677,30 @@ enum class ePathMode
 QString getPathModeAsString(const ePathMode& val);
 
 /**
- * @brief convertLogFileToDLT - converts the content of the sourceFilePath file
- * to the DLT format and saved it to the targetFilePath.
+ * @brief convertLogFileToDLTV1 - converts the content of the sourceFilePath file
+ * to the DLT format and saves it to the targetFilePath.
+ * Uses v1 dlt protocol.
  * Note! Each "\n" separation treated as a new message.
  * @param sourceFilePath - input file path. Should exist
  * @param targetFilePath - output file, which will be created and filled in with content.
  * Note! In case if file under the specified path already exists - it will be truncated!
  * @return - true in case of success. False otherwise.
  */
-bool convertLogFileToDLT( const QString& sourceFilePath,
-                          const QString& targetFilePath );
+bool convertLogFileToDLTV1( const QString& sourceFilePath,
+                           const QString& targetFilePath );
+
+/**
+ * @brief convertLogFileToDLTV2 - converts the content of the sourceFilePath file
+ * to the DLT format and saves it to the targetFilePath.
+ * Uses v2 dlt protocol.
+ * Note! Each "\n" separation treated as a new message.
+ * @param sourceFilePath - input file path. Should exist
+ * @param targetFilePath - output file, which will be created and filled in with content.
+ * Note! In case if file under the specified path already exists - it will be truncated!
+ * @return - true in case of success. False otherwise.
+ */
+bool convertLogFileToDLTV2( const QString& sourceFilePath,
+                           const QString& targetFilePath );
 
 /**
  * @brief isDarkMode - tells whether dark mode is enabled
