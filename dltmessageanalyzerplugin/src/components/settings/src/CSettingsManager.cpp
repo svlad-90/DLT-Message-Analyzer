@@ -49,6 +49,7 @@ static const QString sSearchResultHighlightingGradientKey = "searchResultHighlig
 static const QString sNumberOfColorsKey = "numberOfColors";
 static const QString sSearchResultColumnsVisibilityMapKey = "searchResultColumnsVisibilityMap";
 static const QString sSearchResultColumnsCopyPasteMapKey = "searchResultColumnsCopyPasteMap";
+static const QString sSearchResultColumnsSearchMapKey = "searchResultColumnsSearchMap";
 static const QString sMarkTimeStampWithBold = "markTimeStampWithBold";
 static const QString sPatternsColumnsVisibilityMapKey = "patternsColumnsVisibilityMap";
 static const QString sPatternsColumnsCopyPasteMapKey = "patternsColumnsCopyPasteMap";
@@ -139,6 +140,34 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultCopyPasteMap()
 
 static const tSearchResultColumnsVisibilityMap sDefaultSearchResultColumnsCopyPasteMap
 = fillInDefaultSearchResultCopyPasteMap();
+
+static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultSearchMap()
+{
+    tSearchResultColumnsVisibilityMap result;
+
+    // fields, which are searched by default
+    result.insert(eSearchResultColumn::Apid, true);
+    result.insert(eSearchResultColumn::Ctid, true);
+    result.insert(eSearchResultColumn::Payload, true);
+
+    // fields, which are not searched by default
+    result.insert(eSearchResultColumn::Index, false);
+    result.insert(eSearchResultColumn::Timestamp, false);
+    result.insert(eSearchResultColumn::Ecuid, false);
+    result.insert(eSearchResultColumn::UML_Applicability, false);
+    result.insert(eSearchResultColumn::Time, false);
+    result.insert(eSearchResultColumn::Count, false);
+    result.insert(eSearchResultColumn::SessionId, false);
+    result.insert(eSearchResultColumn::Type, false);
+    result.insert(eSearchResultColumn::Subtype, false);
+    result.insert(eSearchResultColumn::Mode, false);
+    result.insert(eSearchResultColumn::Args, false);
+
+    return result;
+}
+
+static const tSearchResultColumnsVisibilityMap sDefaultSearchResultColumnsSearchMap
+    = fillInDefaultSearchResultSearchMap();
 
 static tPatternsColumnsVisibilityMap fillInDefaultPatternsColumnsVisibilityMap()
 {
@@ -287,6 +316,10 @@ CSettingsManager::CSettingsManager():
         [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsCopyPasteMapChanged(data);},
         [this](){tryStoreSettingsConfig();},
         sDefaultSearchResultColumnsCopyPasteMap)),
+    mSetting_SearchResultColumnsSearchMap(createSearchResultColumnsVisibilityMapSettingsItem(sSearchResultColumnsSearchMapKey,
+          [this](const tSearchResultColumnsVisibilityMap& data){searchResultColumnsSearchMapChanged(data);},
+          [this](){tryStoreSettingsConfig();},
+          sDefaultSearchResultColumnsSearchMap)),
     mSetting_MarkTimeStampWithBold(createBooleanSettingsItem(sMarkTimeStampWithBold,
         [this](const bool& data){markTimeStampWithBoldChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -441,6 +474,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultHighlightingGradient);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsCopyPasteMap);
+     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsSearchMap);
     mUserSettingItemPtrVec.push_back(&mSetting_MarkTimeStampWithBold);
     mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsCopyPasteMap);
@@ -1482,6 +1516,11 @@ void CSettingsManager::setSearchResultColumnsCopyPasteMap(const tSearchResultCol
     mSetting_SearchResultColumnsCopyPasteMap.setData(val);
 }
 
+void CSettingsManager::setSearchResultColumnsSearchMap(const tSearchResultColumnsVisibilityMap& val)
+{
+    mSetting_SearchResultColumnsSearchMap.setData(val);
+}
+
 void CSettingsManager::setMarkTimeStampWithBold(bool val)
 {
     mSetting_MarkTimeStampWithBold.setData(val);
@@ -1707,6 +1746,11 @@ const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumn
 const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsCopyPasteMap() const
 {
     return mSetting_SearchResultColumnsCopyPasteMap.getData();
+}
+
+const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsSearchMap() const
+{
+    return mSetting_SearchResultColumnsSearchMap.getData();
 }
 
 bool CSettingsManager::getMarkTimeStampWithBold() const
@@ -2097,6 +2141,11 @@ void CSettingsManager::resetSearchResultColumnsVisibilityMap()
 void CSettingsManager::resetSearchResultColumnsCopyPasteMap()
 {
     setSearchResultColumnsCopyPasteMap(sDefaultSearchResultColumnsCopyPasteMap);
+}
+
+void CSettingsManager::resetSearchResultColumnsSearchMap()
+{
+    setSearchResultColumnsSearchMap(sDefaultSearchResultColumnsSearchMap);
 }
 
 void CSettingsManager::resetPatternsColumnsVisibilityMap()

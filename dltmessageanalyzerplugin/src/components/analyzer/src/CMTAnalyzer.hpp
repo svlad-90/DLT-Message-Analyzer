@@ -51,7 +51,8 @@ private: // methods
                       const int& numberOfMessages,
                       const QRegularExpression& regex_,
                       const tRegexScriptingMetadata& regexScriptingMetadata_,
-                      const int& numberOfThreads_);
+                      const int& numberOfThreads_,
+                      const tSearchResultColumnsVisibilityMap& searchColumns_);
         std::weak_ptr<IDLTMessageAnalyzerControllerConsumer> pClient;
         tFileWrapperPtr pFile; // file, which should be analyzed
         int requestedRegexMatches;  // number of strings, which were requested to be analyzed from the regex analyzer thread
@@ -60,6 +61,7 @@ private: // methods
         QRegularExpression regex; // the regular expression, with which we are working
         tRegexScriptingMetadata regexScriptingMetadata;
         int numberOfThreads; // number of threads, to be used for analysis
+        tSearchResultColumnsVisibilityMap searchColumns; // columns in which we search for the match.
         int fromMessage; // from which message to start analysis
         tWorkerThreadCookie workerThreadCookieCounter;
         bool bUML_Req_Res_Ev_DuplicateFound = false;

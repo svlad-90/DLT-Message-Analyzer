@@ -51,10 +51,6 @@ public:
 
 private:
 
-    tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field) const;
-
-private:
-
     tFoundMatchesPack mFoundMatchesPack;
     tFileWrapperPtr mpFile;
 };

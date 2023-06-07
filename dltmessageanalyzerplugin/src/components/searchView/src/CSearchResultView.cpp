@@ -1238,6 +1238,66 @@ void CSearchResultView::handleSettingsManagerChange()
             QMenu* pSubMenu = new QMenu("Columns settings", this);
 
             {
+                QMenu* pSubSubMenu = new QMenu("Search columns", this);
+
+                {
+                    const auto& searchResultColumnsSearchMap =
+                        getSettingsManager()->getSearchResultColumnsSearchMap();
+
+                    for( int i = static_cast<int>(eSearchResultColumn::UML_Applicability);
+                         i < static_cast<int>(eSearchResultColumn::Last);
+                         ++i)
+                    {
+                        auto foundItem = searchResultColumnsSearchMap.find(static_cast<eSearchResultColumn>(i));
+
+                        if(foundItem != searchResultColumnsSearchMap.end())
+                        {
+                            QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
+                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                                    {
+                                        auto searchResultColumnsSearchMapInner =
+                                            getSettingsManager()->getSearchResultColumnsSearchMap();
+
+                                        auto foundItemInner = searchResultColumnsSearchMapInner.find(static_cast<eSearchResultColumn>(i));
+
+                                        if(foundItemInner != searchResultColumnsSearchMapInner.end()) // if item is in the map
+                                        {
+                                            foundItemInner.value() = checked; // let's update copy paste value
+                                            getSettingsManager()->setSearchResultColumnsSearchMap(searchResultColumnsSearchMapInner);
+                                        }
+
+                                        restartSearch();
+                                    });
+                            pAction->setCheckable(true);
+                            pAction->setChecked(foundItem.value());
+
+                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                                && false == getSettingsManager()->getUML_FeatureActive())
+                            {
+                                pAction->setEnabled(false);
+                            }
+
+                            pSubSubMenu->addAction(pAction);
+                        }
+                    }
+                }
+
+                pSubMenu->addMenu(pSubSubMenu);
+            }
+
+            {
+                QAction* pAction = new QAction("Reset search columns", this);
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    getSettingsManager()->resetSearchResultColumnsSearchMap();
+                    restartSearch();
+                });
+                pSubMenu->addAction(pAction);
+            }
+
+            pSubMenu->addSeparator();
+
+            {
                 QMenu* pSubSubMenu = new QMenu("Visible columns", this);
 
                 {

@@ -26,7 +26,8 @@ struct tRequestParameters
     const int& numberOfMessages_,
     const QRegularExpression& regex_,
     const int& numberOfThreads_,
-    bool isContinuous_);
+    bool isContinuous_,
+    const tSearchResultColumnsVisibilityMap& searchColumns_);
 
     tFileWrapperPtr pFile;
     int fromMessage;
@@ -34,6 +35,7 @@ struct tRequestParameters
     QRegularExpression regex;
     int numberOfThreads;
     bool isContinuous;
+    tSearchResultColumnsVisibilityMap searchColumns;
 };
 
 Q_DECLARE_METATYPE(tRequestParameters)

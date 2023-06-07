@@ -6,7 +6,8 @@ fromMessage(0),
 numberOfMessages(0),
 regex(),
 numberOfThreads(0),
-isContinuous(false)
+isContinuous(false),
+searchColumns()
 {
 }
 
@@ -16,13 +17,15 @@ const int& fromMessage_,
 const int& numberOfMessages_,
 const QRegularExpression& regex_,
 const int& numberOfThreads_,
-bool isContinuous_):
+bool isContinuous_,
+const tSearchResultColumnsVisibilityMap& searchColumns_):
 pFile(pFile_),
 fromMessage(fromMessage_),
 numberOfMessages(numberOfMessages_),
 regex(regex_),
 numberOfThreads(numberOfThreads_),
-isContinuous(isContinuous_)
+isContinuous(isContinuous_),
+searchColumns(searchColumns_)
 {
 }
 

@@ -707,4 +707,13 @@ bool convertLogFileToDLTV2( const QString& sourceFilePath,
  */
 bool isDarkMode();
 
+/**
+ * @brief getDataStrFromMsg - this function is used to get string data from the message in a unified way
+ * @param msgId - id of the message
+ * @param pMsg - pointer to a message wrapper
+ * @param field - search result column type. Used to detect in which way to format the data
+ * @return - shared pointer to a string with a gathered information
+ */
+tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field);
+
 #endif // DEFINITIONS_HPP
