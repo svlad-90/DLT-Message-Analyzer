@@ -15,6 +15,32 @@ Still, there are additional things that it does on top of what the standard func
 
 ----
 
+## Search columns
+
+Search view allows you to select the search columns, which will be traversed during the search:
+
+![Screenshot of the "Search columns" context menu](./search_view_search_columns.png)
+
+All selected columns would be concatenated in the following way:
+
+> **SELECTED_COLUMN_1 + " " + SELECTED_COLUMN_2 + " " ... + SELECTED_COLUMN_N**
+
+The default combination is the following one:
+
+> **Apid + " " + Ctid + " " + Payload**
+
+This feature allows you to search by any combination of the available columns.
+
+Useful use-cases:
+
+- Filter out messages from a certain ECU
+- Filter out messages of ceratin type, subtype, mode
+- Filter out messages by time and date
+
+Some of this functionality you can achieve with the usual dlt-viewer's filter mechanism. But having it also in the DLT-Message-Analyzer provides more flexibility on how you work with the traces inside the plugin.
+
+----
+
 ## Visible columns
 
 Search view allows you to select the visible columns, which might increase the readability of the messages:

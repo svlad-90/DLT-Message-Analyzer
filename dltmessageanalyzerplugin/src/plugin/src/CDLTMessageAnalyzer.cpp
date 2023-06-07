@@ -894,7 +894,8 @@ bool CDLTMessageAnalyzer::analyze()
             requestedMessages.to - requestedMessages.from + 1,
             *pRegex,
             mpNumberOfThreadsCombobBox->currentData().value<int>(),
-            isContinuousAnalysis()
+            isContinuousAnalysis(),
+            getSettingsManager()->getSearchResultColumnsSearchMap()
         );
 
         auto requestId = requestAnalyze( requestParameters,

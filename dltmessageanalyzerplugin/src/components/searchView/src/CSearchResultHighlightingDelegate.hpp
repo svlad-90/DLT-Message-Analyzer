@@ -32,4 +32,5 @@ protected:
 private:
 
     bool mbMarkTimestampWithBold;
+    tSearchResultColumnsVisibilityMap mSearchResultColumnsSearchMap;
 };

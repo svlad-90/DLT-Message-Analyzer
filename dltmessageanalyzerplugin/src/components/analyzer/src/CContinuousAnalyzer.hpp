@@ -80,7 +80,8 @@ private:// fields
                      const tFileWrapperPtr& pFile,
                      const QRegularExpression& regex_,
                      const int& numberOfThreads_,
-                     const tRegexScriptingMetadata& regexScriptingMetadata_);
+                     const tRegexScriptingMetadata& regexScriptingMetadata_,
+                     const tSearchResultColumnsVisibilityMap& searchColumns_);
         tRequestId requestId;
         std::weak_ptr<IDLTMessageAnalyzerControllerConsumer> pClient;
         tRequestId subRequestId;
@@ -92,6 +93,7 @@ private:// fields
         tRegexScriptingMetadata regexScriptingMetadata;
         int numberOfThreads;
         bool bContinuousModeActive;
+        tSearchResultColumnsVisibilityMap searchColumns;
     };
 
     tRequestDataMap mRequestDataMap;

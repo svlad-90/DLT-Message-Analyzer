@@ -191,7 +191,8 @@ tRequestId CContinuousAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageA
                                       requestParameters.pFile,
                                       requestParameters.regex,
                                       requestParameters.numberOfThreads,
-                                      regexScriptingMetadata );
+                                      regexScriptingMetadata,
+                                      requestParameters.searchColumns );
             requestData.fromMessage = requestParameters.fromMessage;
             requestData.toMessage = requestParameters.fromMessage + requestParameters.numberOfMessages;
 
@@ -261,7 +262,8 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
                     inputIt->toMessage - inputIt->fromMessage,
                     inputIt->regex,
                     inputIt->numberOfThreads,
-                    inputIt->bIsContinuousAnalysis
+                    inputIt->bIsContinuousAnalysis,
+                    inputIt->searchColumns
                 );
 
                 tRequestId subRequestId = mpSubAnalyzer->requestAnalyze(mpSubConsumer,
@@ -337,7 +339,8 @@ CContinuousAnalyzer::tRequestData::tRequestData(const tRequestId& requestId_,
             const tFileWrapperPtr& pFile,
             const QRegularExpression& regex_,
             const int& numberOfThreads_,
-            const tRegexScriptingMetadata& regexScriptingMetadata_): requestId(requestId_),
+            const tRegexScriptingMetadata& regexScriptingMetadata_,
+            const tSearchResultColumnsVisibilityMap& searchColumns_): requestId(requestId_),
             pClient(pClient_),
             subRequestId(subRequestId_),
             bIsContinuousAnalysis(bIsContinuousAnalysis_),
@@ -347,7 +350,8 @@ CContinuousAnalyzer::tRequestData::tRequestData(const tRequestId& requestId_,
             regex(regex_),
             regexScriptingMetadata(regexScriptingMetadata_),
             numberOfThreads(numberOfThreads_),
-            bContinuousModeActive(false)
+            bContinuousModeActive(false),
+            searchColumns(searchColumns_)
 {}
 
 PUML_PACKAGE_BEGIN(DMA_Analyzer)

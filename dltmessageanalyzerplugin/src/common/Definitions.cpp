@@ -24,6 +24,8 @@
 
 #include "dlt_common.h"
 
+#include "components/logsWrapper/api/IMsgWrapper.hpp"
+
 #include "components/log/api/CLog.hpp"
 #include "CTreeItem.hpp"
 
@@ -2927,6 +2929,99 @@ bool isDarkMode()
 {
     const QColor textColor = qApp->palette().text().color();
     return textColor.red() > 150 && textColor.green() > 150 && textColor.blue() > 150;
+}
+
+tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field)
+{
+    if(nullptr == pMsg)
+    {
+        return tQStringPtr();
+    }
+
+    tQStringPtr pStrRes = std::make_shared<QString>();
+
+    switch(field)
+    {
+    case eSearchResultColumn::Index:
+    {
+        *pStrRes = QString("%1").arg(msgId);
+    }
+    break;
+    case eSearchResultColumn::Time:
+    {
+        *pStrRes = QString("%1.%2").arg(pMsg->getTimeString()).arg(pMsg->getMicroseconds(),6,10,QLatin1Char('0'));
+    }
+    break;
+    case eSearchResultColumn::Timestamp:
+    {
+        *pStrRes = QString("%1.%2").arg(pMsg->getTimestamp()/10000).arg(pMsg->getTimestamp()%10000,4,10,QLatin1Char('0'));
+    }
+    break;
+    case eSearchResultColumn::Count:
+    {
+        *pStrRes = QString("%1").arg(pMsg->getMessageCounter());
+    }
+    break;
+    case eSearchResultColumn::Ecuid:
+    {
+        *pStrRes = pMsg->getEcuid();
+    }
+    break;
+    case eSearchResultColumn::Apid:
+    {
+        *pStrRes = pMsg->getApid();
+    }
+    break;
+    case eSearchResultColumn::Ctid:
+    {
+        *pStrRes = pMsg->getCtid();
+    }
+    break;
+    case eSearchResultColumn::SessionId:
+    {
+        *pStrRes = QString("%1").arg(pMsg->getSessionid());
+    }
+    break;
+    case eSearchResultColumn::Type:
+    {
+        *pStrRes = pMsg->getTypeString();
+    }
+    break;
+    case eSearchResultColumn::Subtype:
+    {
+        *pStrRes = pMsg->getSubtypeString();
+    }
+    break;
+    case eSearchResultColumn::Mode:
+    {
+        *pStrRes = pMsg->getModeString();
+    }
+    break;
+    case eSearchResultColumn::Args:
+    {
+        *pStrRes = QString("%1").arg(pMsg->getNumberOfArguments());
+    }
+    break;
+    case eSearchResultColumn::Payload:
+    {
+        *pStrRes = pMsg->getPayload();
+    }
+    break;
+    case eSearchResultColumn::UML_Applicability:
+    {
+        *pStrRes = ""; // no string value provided for this column
+    }
+    break;
+    case eSearchResultColumn::Last:
+    {
+        *pStrRes = "Unhandled field type!";
+    }
+    break;
+    default:
+        break;
+    }
+
+    return pStrRes;
 }
 
 PUML_PACKAGE_BEGIN(Qt)

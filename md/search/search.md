@@ -10,11 +10,11 @@ This chapter describes the general aspects of the plugin's search functionality.
 
 ## How the search string is formed?
 
-Currently plugin's implementation forms the search string in the following way:
+The default search string is formed in the following way:
 
 > **Apid + " " + Ctid + " " + Payload**
 
-As of now, there is no way exist to change this rule. Still, the implementation might be extended in future releases to allow the runtime change of the search string.
+But it is possible to adjust it. More information on this topic is located [here](../search_view/search_view.md#search-columns).
 
 ----
 

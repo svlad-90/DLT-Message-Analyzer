@@ -24,7 +24,8 @@
 
 CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate(QObject *parent):
 QStyledItemDelegate(parent),
-mbMarkTimestampWithBold(false)
+mbMarkTimestampWithBold(false),
+mSearchResultColumnsSearchMap()
 {
 }
 
@@ -465,72 +466,58 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             }
         }
 
-        switch(static_cast<eSearchResultColumn>(index.column()))
+        if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::UML_Applicability)
         {
-            case eSearchResultColumn::Apid:
-            case eSearchResultColumn::Ctid:
-            case eSearchResultColumn::Payload:
-            {
-#ifdef DEBUG_CSearchResultHighlightingDelegate
-                SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(start:<index:row-%1:col-%2>)")
-                         .arg(index.row())
-                         .arg(index.column()));
-#endif
-                const auto& matchData = pModel->getFoundMatchesItemPack(index);
+            QStyleOptionViewItem viewItemOption = option;
 
-                bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
-                const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
+            const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+            QRect newRect = QStyle::alignedRect(viewItemOption.direction, Qt::AlignCenter,
+                                                QSize(viewItemOption.decorationSize.width() + 5, option.decorationSize.height()),
+                                                QRect(viewItemOption.rect.x() + textMargin, option.rect.y(),
+                                                      viewItemOption.rect.width() - (2 * textMargin), viewItemOption.rect.height()));
+            viewItemOption.rect = newRect;
 
-                drawHighlightedText(field,
-                                    matchData,
-                                    stringData,
-                                    painter, opt,
-                                    isMonoColorHighlighting,
-                                    regexMonoHighlightingColor);
-#ifdef DEBUG_CSearchResultHighlightingDelegate
-                SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(end:<index:row-%2:col-%3>): took %1 ms")
-                         .arg(elapsedTimer.elapsed())
-                         .arg(index.row())
-                         .arg(index.column()));
-#endif
-            }
-                break;
-            case eSearchResultColumn::Args:
-            case eSearchResultColumn::Last:
-            case eSearchResultColumn::Mode:
-            case eSearchResultColumn::Time:
-            case eSearchResultColumn::Type:
-            case eSearchResultColumn::Count:
-            case eSearchResultColumn::Ecuid:
-            case eSearchResultColumn::Index:
-            case eSearchResultColumn::Subtype:
-            case eSearchResultColumn::SessionId:
-            {
-                drawText( stringData, painter, opt, false );
-            }
-            break;
-            case eSearchResultColumn::Timestamp:
-            {
-                drawText( stringData, painter, opt, mbMarkTimestampWithBold );
-            }
-            break;
-            case eSearchResultColumn::UML_Applicability:
-            {
-                QStyleOptionViewItem viewItemOption = option;
-
-                const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-                QRect newRect = QStyle::alignedRect(viewItemOption.direction, Qt::AlignCenter,
-                                                    QSize(viewItemOption.decorationSize.width() + 5, option.decorationSize.height()),
-                                                    QRect(viewItemOption.rect.x() + textMargin, option.rect.y(),
-                                                          viewItemOption.rect.width() - (2 * textMargin), viewItemOption.rect.height()));
-                viewItemOption.rect = newRect;
-
-                QStyledItemDelegate::paint(painter, viewItemOption, index);
-            }
-            break;
+            QStyledItemDelegate::paint(painter, viewItemOption, index);
         }
+        else if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::Timestamp &&
+                true == mbMarkTimestampWithBold)
+        {
+            drawText( stringData, painter, opt, mbMarkTimestampWithBold );
+        }
+        else
+        {
+            auto foundSearchColumn = mSearchResultColumnsSearchMap.find(static_cast<eSearchResultColumn>(index.column()));
 
-        painter->restore();
+            if(foundSearchColumn != mSearchResultColumnsSearchMap.end() && true == foundSearchColumn.value())
+            {
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+               SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(start:<index:row-%1:col-%2>)")
+                            .arg(index.row())
+                            .arg(index.column()));
+#endif
+               const auto& matchData = pModel->getFoundMatchesItemPack(index);
+
+               bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
+               const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
+
+               drawHighlightedText(field,
+                                   matchData,
+                                   stringData,
+                                   painter, opt,
+                                   isMonoColorHighlighting,
+                                   regexMonoHighlightingColor);
+#ifdef DEBUG_CSearchResultHighlightingDelegate
+               SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(end:<index:row-%2:col-%3>): took %1 ms")
+                            .arg(elapsedTimer.elapsed())
+                            .arg(index.row())
+                            .arg(index.column()));
+#endif
+            }
+            else
+            {
+               drawText( stringData, painter, opt, false );
+            }
+        }
     }
 
 #ifdef DEBUG_CSearchResultHighlightingDelegate
@@ -549,76 +536,60 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
 
     auto column = static_cast<eSearchResultColumn>(index.column());
 
-    switch(column)
+    auto foundSearchColumn = mSearchResultColumnsSearchMap.find(static_cast<eSearchResultColumn>(column));
+
+    if(foundSearchColumn != mSearchResultColumnsSearchMap.end() && true == foundSearchColumn.value())
     {
-        case eSearchResultColumn::Apid:
-        case eSearchResultColumn::Ctid:
-        case eSearchResultColumn::Payload:
+        const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
+
+        if(nullptr != pModel)
         {
-            const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
+            const auto& matchData = pModel->getFoundMatchesItemPack(index);
 
-            if(nullptr != pModel)
+            tDrawDataPack drawDataPack;
+
+            drawDataPack.alignment = option.displayAlignment;
+
+            const auto& highlightingInfo = matchData.getItemMetadata().highlightingInfoMultiColor;
+            auto foundHighlightingInfoItem = highlightingInfo.find(column);
+
+            if(highlightingInfo.end() != foundHighlightingInfoItem)
             {
-                const auto& matchData = pModel->getFoundMatchesItemPack(index);
+               const auto& highlightingData = foundHighlightingInfoItem.value();
 
-                tDrawDataPack drawDataPack;
+               if(false == highlightingData.empty())
+               {
+                    auto inputStr = pModel->data(index, Qt::DisplayRole).value<QString>();
 
-                drawDataPack.alignment = option.displayAlignment;
+                    bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
+                    const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
 
-                const auto& highlightingInfo = matchData.getItemMetadata().highlightingInfoMultiColor;
-                auto foundHighlightingInfoItem = highlightingInfo.find(column);
+                    collectDrawDataPack(inputStr,
+                                        highlightingData,
+                                        drawDataPack,
+                                        option,
+                                        isMonoColorHighlighting,
+                                        regexMonoHighlightingColor);
 
-                if(highlightingInfo.end() != foundHighlightingInfoItem)
-                {
-                    const auto& highlightingData = foundHighlightingInfoItem.value();
+                    int shift = calculateShifts(drawDataPack, option);
 
-                    if(false == highlightingData.empty())
-                    {
-                        auto inputStr = pModel->data(index, Qt::DisplayRole).value<QString>();
-
-                        bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
-                        const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
-
-                        collectDrawDataPack(inputStr,
-                                            highlightingData,
-                                            drawDataPack,
-                                            option,
-                                            isMonoColorHighlighting,
-                                            regexMonoHighlightingColor);
-
-                        int shift = calculateShifts(drawDataPack, option);
-
-                        result = QStyledItemDelegate::sizeHint(option, index);
-                        result.setWidth(shift);
-                    }
-                    else
-                    {
-                        result = QStyledItemDelegate::sizeHint(option, index);
-                    }
-                }
-                else
-                {
                     result = QStyledItemDelegate::sizeHint(option, index);
-                }
+                    result.setWidth(shift);
+               }
+               else
+               {
+                    result = QStyledItemDelegate::sizeHint(option, index);
+               }
+            }
+            else
+            {
+               result = QStyledItemDelegate::sizeHint(option, index);
             }
         }
-            break;
-        case eSearchResultColumn::Args:
-        case eSearchResultColumn::Last:
-        case eSearchResultColumn::Mode:
-        case eSearchResultColumn::Time:
-        case eSearchResultColumn::Type:
-        case eSearchResultColumn::Count:
-        case eSearchResultColumn::Ecuid:
-        case eSearchResultColumn::Index:
-        case eSearchResultColumn::Subtype:
-        case eSearchResultColumn::SessionId:
-        case eSearchResultColumn::Timestamp:
-        case eSearchResultColumn::UML_Applicability:
-        {
-            result = QStyledItemDelegate::sizeHint(option, index);
-        }
-        break;
+    }
+    else
+    {
+        result = QStyledItemDelegate::sizeHint(option, index);
     }
 
     return result;
@@ -634,6 +605,15 @@ void CSearchResultHighlightingDelegate::handleSettingsManagerChange()
     {
         mbMarkTimestampWithBold = val;
     });
+
+    mSearchResultColumnsSearchMap = getSettingsManager()->getSearchResultColumnsSearchMap();
+
+    connect( getSettingsManager().get(),
+            &ISettingsManager::searchResultColumnsSearchMapChanged,
+            [this](tSearchResultColumnsVisibilityMap val)
+            {
+                mSearchResultColumnsSearchMap = val;
+            });
 }
 
 PUML_PACKAGE_BEGIN(DMA_SearchView)

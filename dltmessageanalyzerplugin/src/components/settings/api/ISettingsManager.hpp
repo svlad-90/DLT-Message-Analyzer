@@ -60,6 +60,7 @@ public:
     virtual bool areAnyDefaultAliasesAvailable() const = 0;
     virtual void resetSearchResultColumnsVisibilityMap() = 0;
     virtual void resetSearchResultColumnsCopyPasteMap() = 0;
+    virtual void resetSearchResultColumnsSearchMap() = 0;
     virtual void resetPatternsColumnsVisibilityMap() = 0;
     virtual void resetPatternsColumnsCopyPasteMap() = 0;
     virtual void resetRegexFiltersColumnsVisibilityMap() = 0;
@@ -100,6 +101,7 @@ public:
     virtual void setSearchResultHighlightingGradient(const tHighlightingGradient& val) = 0;
     virtual void setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val) = 0;
     virtual void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val) = 0;
+    virtual void setSearchResultColumnsSearchMap(const tSearchResultColumnsVisibilityMap& val) = 0;
     virtual void setMarkTimeStampWithBold(bool val) = 0;
     virtual void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val) = 0;
     virtual void setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val) = 0;
@@ -161,6 +163,7 @@ public:
     virtual tHighlightingGradient getSearchResultHighlightingGradient() const = 0;
     virtual const tSearchResultColumnsVisibilityMap& getSearchResultColumnsVisibilityMap() const = 0;
     virtual const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const = 0;
+    virtual const tSearchResultColumnsVisibilityMap& getSearchResultColumnsSearchMap() const = 0;
     virtual bool getMarkTimeStampWithBold() const = 0;
     virtual const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const = 0;
     virtual const tPatternsColumnsVisibilityMap& getPatternsColumnsCopyPasteMap() const = 0;
@@ -224,6 +227,7 @@ signals:
     void searchResultHighlightingGradientChanged(const tHighlightingGradient& searchResultHighlightingGradient);
     void searchResultColumnsVisibilityMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsVisibilityMap);
     void searchResultColumnsCopyPasteMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsCopyPasteMap);
+    void searchResultColumnsSearchMapChanged(const tSearchResultColumnsVisibilityMap& searchResultColumnsCopyPasteMap);
     void markTimeStampWithBoldChanged(bool markTimeStampWithBold);
     void patternsColumnsVisibilityMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsVisibilityMap);
     void patternsColumnsCopyPasteMapChanged(const tPatternsColumnsVisibilityMap& patternsColumnsCopyPasteMap);

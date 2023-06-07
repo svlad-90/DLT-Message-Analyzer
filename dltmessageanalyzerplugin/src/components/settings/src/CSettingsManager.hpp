@@ -30,6 +30,7 @@ public:
     bool areAnyDefaultAliasesAvailable() const override;
     void resetSearchResultColumnsVisibilityMap() override;
     void resetSearchResultColumnsCopyPasteMap() override;
+    void resetSearchResultColumnsSearchMap() override;
     void resetPatternsColumnsVisibilityMap() override;
     void resetPatternsColumnsCopyPasteMap() override;
     void resetRegexFiltersColumnsVisibilityMap() override;
@@ -70,6 +71,7 @@ public:
     void setSearchResultHighlightingGradient(const tHighlightingGradient& val) override;
     void setSearchResultColumnsVisibilityMap(const tSearchResultColumnsVisibilityMap& val) override;
     void setSearchResultColumnsCopyPasteMap(const tSearchResultColumnsVisibilityMap& val) override;
+    void setSearchResultColumnsSearchMap(const tSearchResultColumnsVisibilityMap& val) override;
     void setMarkTimeStampWithBold(bool val) override;
     void setPatternsColumnsVisibilityMap(const tPatternsColumnsVisibilityMap& val) override;
     void setPatternsColumnsCopyPasteMap(const tPatternsColumnsVisibilityMap& val) override;
@@ -126,6 +128,7 @@ public:
     tHighlightingGradient getSearchResultHighlightingGradient() const override;
     const tSearchResultColumnsVisibilityMap& getSearchResultColumnsVisibilityMap() const override;
     const tSearchResultColumnsVisibilityMap& getSearchResultColumnsCopyPasteMap() const override;
+    const tSearchResultColumnsVisibilityMap& getSearchResultColumnsSearchMap() const override;
     bool getMarkTimeStampWithBold() const override;
     const tPatternsColumnsVisibilityMap& getPatternsColumnsVisibilityMap() const override;
     const tPatternsColumnsVisibilityMap& getPatternsColumnsCopyPasteMap() const override;
@@ -403,6 +406,7 @@ private: // fields
 
     TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsVisibilityMap;
     TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsCopyPasteMap;
+    TSettingItem<tSearchResultColumnsVisibilityMap> mSetting_SearchResultColumnsSearchMap;
     TSettingItem<bool> mSetting_MarkTimeStampWithBold;
     TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsVisibilityMap;
     TSettingItem<tPatternsColumnsVisibilityMap> mSetting_PatternsColumnsCopyPasteMap;
