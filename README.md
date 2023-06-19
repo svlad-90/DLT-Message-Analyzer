@@ -17,9 +17,19 @@
 
 ## What is DLT Message Analyzer?
 
-DLT Message Analyzer is a plugin for dlt-viewer SW. It works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.
+The DLT Message Analyzer plugin is the perfect tool for anyone looking to increase their analytical capabilities when using the dlt-viewer SW. With this plugin, users can quickly and easily analyze logs, allowing them to gain valuable insights into their data. The plugin is easy to use and provides users with a comprehensive set of features to help them make the most of their data.
 
-It is developed to increase the analytical capabilities of the dlt-viewer.
+The DLT Message Analyzer works in combination with the **[following source code](https://github.com/GENIVI/dlt-viewer)**.
+
+There are the following schemas of deployment:
+
+|#|Approach|Diagram|Comment|Used components|Active connection to the target|
+|---|---|-----|---|---|---|
+|1|Deploy dlt-daemon on the target device. Forward applications output to the dlt-daemon. Use dlt-viewer on the host machine, to fetch data from the dlt-daemon. Use DLT Message Analyzer for logs analysis inside the dlt-viewer.|[DLT Message Analyzer plugin - deployment approach 1](./md/dlt_message_analyzer_approach_1.png)|The classical approach. dlt-daemon is running on the target side, e.g. on the multi-media board inside the vehicle.|dlt-daemon, dlt-viewer, DLT Message Analyzer|+|
+|2|Deploy dlt-daemon on the host machine. Connect to the target over the ssh and forward data to the dlt-daemon, using bash or Python "glue-scripting". Use dlt-viewer on the host machine, to fetch data from the dlt-daemon. Use DLT Message Analyzer for logs analysis inside the dlt-viewer.|[DLT Message Analyzer plugin - deployment approach 2](./md/dlt_message_analyzer_approach_2.png)|Alternative approach, which allows to connect to the localhost inside the dlt-viewer and get the data without deploying dlt-daemon on the target device.|dlt-daemon, dlt-viewer, DLT Message Analyzer, glue-code|+|
+|3|Collect the logs from the target to a text document. Use the DLT Message Analyzer debug console command 'convert-txt-to-dlt-file' to convert any textual data to dlt format. Open the resulting dlt file in the dlt-viewer. Use DLT Message Analyzer for logs analysis inside the dlt-viewer.|[DLT Message Analyzer plugin - deployment approach 3](./md/dlt_message_analyzer_approach_3.png)|A simplistic approach for those, who is not interested in fetching data into the dlt-viewer directly from the target. More details on the console commands **[here](./md/debug_console/debug_console.md)**.|dlt-viewer, DLT Message Analyzer|-|
+
+**Note** If you are new to the dlt-viewer and, espacially, to the dlt-daemon, we propose you to use the **deployment approach #3**.
 
 ----
 
