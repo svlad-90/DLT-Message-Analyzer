@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/IFileWrapper.hpp)
+set(WRAP_SRC ../api/IFileWrapper.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_logsWrapper STATIC
     CDLTFileWrapper.cpp

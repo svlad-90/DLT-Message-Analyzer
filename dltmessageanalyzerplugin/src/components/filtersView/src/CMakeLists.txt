@@ -1,6 +1,7 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CFiltersView.hpp
+set(WRAP_SRC ../api/CFiltersView.hpp
              ../api/IFiltersModel.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_filtersView STATIC
     CFiltersModel.cpp

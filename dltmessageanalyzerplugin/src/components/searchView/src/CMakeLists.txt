@@ -1,6 +1,7 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CSearchResultView.hpp
+set(WRAP_SRC ../api/CSearchResultView.hpp
              ../api/CSearchViewComponent.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_searchView STATIC
     CSearchResultHighlightingDelegate.cpp

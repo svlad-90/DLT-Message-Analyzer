@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CUMLView.hpp)
+set(WRAP_SRC ../api/CUMLView.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_plant_uml STATIC
 #   CSVGView.cpp

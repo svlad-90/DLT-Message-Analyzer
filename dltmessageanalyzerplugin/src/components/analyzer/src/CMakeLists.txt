@@ -1,6 +1,7 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/IDLTMessageAnalyzerControllerConsumer.hpp
+set(WRAP_SRC ../api/IDLTMessageAnalyzerControllerConsumer.hpp
              ../api/IDLTMessageAnalyzerController.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_analyzer STATIC
     IDLTMessageAnalyzerController.cpp

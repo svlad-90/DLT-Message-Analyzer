@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CGroupedView.hpp)
+set(WRAP_SRC ../api/CGroupedView.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_groupedView STATIC
     CGroupedView.cpp

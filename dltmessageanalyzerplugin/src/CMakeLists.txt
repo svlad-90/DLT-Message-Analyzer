@@ -3,6 +3,35 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ################### CPP ( END ) ###########################
 
+################### QT_SPECIFIC ###########################
+if(${QT_PREFIX}Core_VERSION VERSION_LESS "5.15.0")
+    message("DMA_QT5_COMPATIBILITY_MODE is set")
+    set(DMA_QT5_COMPATIBILITY_MODE TRUE)
+else()
+    set(DMA_QT5_COMPATIBILITY_MODE FALSE)
+endif()
+
+function (DMA_qt_wrap_cpp processed_mocs_var_name wrap_src_var_name)
+    set(local_processed_mocs)
+    if(DMA_QT5_COMPATIBILITY_MODE)
+      qt5_wrap_cpp(local_processed_mocs ${${wrap_src_var_name}})
+    else()
+      qt_wrap_cpp(local_processed_mocs ${${wrap_src_var_name}})
+    endif()
+    set(${processed_mocs_var_name} ${local_processed_mocs} PARENT_SCOPE)
+endfunction()
+
+function (DMA_QT_WRAP_UI ui_headers_var_name wrap_ui_var_name)
+    set(local_ui_headers)
+    if(DMA_QT5_COMPATIBILITY_MODE)
+      QT5_WRAP_UI(local_ui_headers ${${wrap_ui_var_name}})
+    else()
+      QT_WRAP_UI(local_ui_headers ${${wrap_ui_var_name}})
+    endif()
+    set(${ui_headers_var_name} ${local_ui_headers} PARENT_SCOPE)
+endfunction()
+################### QT_SPECIFIC ( END ) ###################
+
 ################### COMMON_DEPS ###########################
 include(FetchContent)
 FetchContent_Declare(
