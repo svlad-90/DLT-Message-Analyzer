@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/ISettingsManager.hpp)
+set(WRAP_SRC ../api/ISettingsManager.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_settings STATIC
     CSettingsManager.cpp

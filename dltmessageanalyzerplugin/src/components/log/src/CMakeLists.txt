@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CConsoleView.hpp)
+set(WRAP_SRC ../api/CConsoleView.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_log STATIC
     CConsoleCtrl.cpp

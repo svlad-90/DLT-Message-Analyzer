@@ -1,5 +1,6 @@
-qt_wrap_cpp(PROCESSED_MOCS
-             ../api/CLogo.hpp)
+set(WRAP_SRC ../api/CLogo.hpp)
+
+DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_logo STATIC
     CLogo.cpp
