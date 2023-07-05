@@ -44,18 +44,27 @@ const QString sVARPrefix = "VAR_";
 //////// UML_IDENTIFIERS ////////
 const QString s_UML_SEQUENCE_ID = "USID"; // - optional
 const QString s_UML_CLIENT = "UCL"; // - mandatory
-const QString s_UML_REQUEST = "URT"; // - mandatory
-const QString s_UML_RESPONSE = "URS"; // - mandatory
-const QString s_UML_EVENT = "UEV"; // - mandatory
+const QString s_UML_REQUEST = "URT"; // - request type
+const QString s_UML_RESPONSE = "URS"; // - request type
+const QString s_UML_EVENT = "UEV"; // - request type
 const QString s_UML_SERVICE = "US"; // - mandatory
 const QString s_UML_METHOD = "UM"; // - mandatory
 const QString s_UML_ARGUMENTS = "UA"; // - optional
+const QString s_UML_TIMESTAMP = "UTS"; // - optional
 const QString s_UML_ALIAS_DELIMITER = "_";
 const QString s_Regex_options = "(?J)";
 
 static tUML_IDs_Map createUMLIDsMap()
 {
     tUML_IDs_Map result;
+
+    {
+        tUML_ID_Item item;
+        item.id_type = eUML_ID_Type::e_Optional;
+        item.id_str = s_UML_TIMESTAMP;
+        item.description = "Call timestamp";
+        result.insert(std::make_pair(eUML_ID::UML_TIMESTAMP, item));
+    }
 
     {
         tUML_ID_Item item;
@@ -1010,7 +1019,7 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
      * E.g. for the following string:
      * UI
      * IF1
-     * [daimler.if1verbose] 10886 MainMultiSeat#2:RP : setIsClientConnected() [unknown:0]]
+     * [comp.if1verbose] 10886 Service#2:RP : setIsClientConnected() [unknown:0]]
      * With the following regex:
      * ^(?<UCL>[\w]+) IF1 .*\] (?<USID>[\d]+) (?<US>[A-Za-z]+#[\d]+):(?<URS>RP) : (?<UM>[\w])\((?<UA>.*)\) \[unknown
      * We will need to fill in the following information:

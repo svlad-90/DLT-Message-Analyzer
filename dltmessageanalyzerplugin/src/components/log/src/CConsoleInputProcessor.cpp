@@ -253,6 +253,11 @@ static void UML_sequence_identifiers()
     {
         QString id_type_msg = QString("Type - ").append(getUMLIDTypeAsString(item.second.id_type));
 
+        if(item.first == eUML_ID::UML_TIMESTAMP)
+        {
+            id_type_msg.append(" - if not specified, the dlt message timestamp is used");
+        }
+
         if(item.second.id_type == eUML_ID_Type::e_RequestType)
         {
             id_type_msg.append(" - at least one of the request types should be filled in");

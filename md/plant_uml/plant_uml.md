@@ -56,13 +56,14 @@ UML regex group identifiers, which are supported by the plugin:
 
 | Group name | Meaning | Type |
 | ------------- | ------------- | ------------- |
-| USID | Sequence id of the communication | optional |
 | UCL | Name of the client | mandatory |
+| US | Service name | mandatory |
+| UM | Method name | mandatory |
 | URT | Request identifier | request_type - at least one of the request types should be filled in |
 | URS | Response identifier | request_type - at least one of the request types should be filled in |
 | UEV | Event identifier | request_type - at least one of the request types should be filled in |
-| US | Service name | mandatory |
-| UM | Method name | mandatory |
+| UTS | Call timestamp | optional - if not specified, the dlt message timestamp is used |
+| USID | Sequence id of the communication | optional |
 | UA | Call arguments | optional |
 
 ----

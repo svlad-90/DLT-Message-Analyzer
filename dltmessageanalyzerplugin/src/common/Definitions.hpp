@@ -29,7 +29,8 @@ extern const QString sRegexScriptingDelimiter;
 
 enum class eUML_ID
 {
-    UML_SEQUENCE_ID = 0,
+    UML_TIMESTAMP = 0,
+    UML_SEQUENCE_ID,
     UML_CLIENT ,
     UML_REQUEST,
     UML_RESPONSE,

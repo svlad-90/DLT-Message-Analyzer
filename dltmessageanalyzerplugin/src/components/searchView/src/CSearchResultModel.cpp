@@ -4,8 +4,6 @@
  * @brief   Implementation of the CSearchResultModel class
  */
 
-#include "qdlt.h"
-
 #include "CSearchResultModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
@@ -342,6 +340,16 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                             UMLRepresentationResult.second.append(str);
                                         }
                                             break;
+                                        case eUML_ID::UML_TIMESTAMP:
+                                        {
+                                            QString str;
+                                            str.append("[");
+                                            str.append( message.mid(range.from, range.to - range.from + 1) );
+                                            str.append("] ");
+
+                                            UMLRepresentationResult.second.append(str);
+                                        }
+                                        break;
                                         default:
                                         {
                                             UMLRepresentationResult.second.append(message.mid(range.from, range.to - range.from + 1));
@@ -372,19 +380,50 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                     str.append("\"");
 
                                     // let's directly use client-defined value, ignoring value from the group
-                                    UMLRepresentationResult.first = true;
+                                    UMLRepresentationResult.second.append(str);
+                                }
+                                    break;
+                                case eUML_ID::UML_TIMESTAMP:
+                                {
+                                    const auto column = eSearchResultColumn::Timestamp;
+                                    QString timestampVal = getStrValue(row, column);
+                                    QString str;
+                                    str.reserve(timestampVal.size() + 3);
+                                    str.append("[");
+                                    str.append( timestampVal );
+                                    str.append("] ");
+
+                                    // let's use dlt's native timestamp
                                     UMLRepresentationResult.second.append(str);
                                 }
                                     break;
                                 default:
                                 {
                                     // let's directly use client-defined value, ignoring value from the group
-                                    UMLRepresentationResult.first = true;
                                     UMLRepresentationResult.second.append(item.UML_Custom_Value);
                                 }
                                     break;
                             }
+
+                            UMLRepresentationResult.first = true;
                         }
+                    }
+                }
+                else
+                {
+                    if(UML_ID == eUML_ID::UML_TIMESTAMP)
+                    {
+                        const auto column = eSearchResultColumn::Timestamp;
+                        QString timestampVal = getStrValue(row, column);
+                        QString str;
+                        str.reserve(timestampVal.size() + 3);
+                        str.append("[");
+                        str.append( timestampVal );
+                        str.append("] ");
+
+                        // let's use dlt's native timestamp
+                        UMLRepresentationResult.second.append(str);
+                        UMLRepresentationResult.first = true;
                     }
                 }
 
@@ -414,10 +453,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
             appendUMLData(eUML_ID::UML_SERVICE);
             subStr.append(" : ");
             int wrappingStartingPoint = subStr.size();
-            subStr.append("[");
-            const auto column = eSearchResultColumn::Timestamp;
-            subStr.append( getStrValue(row, column) );
-            subStr.append("] ");
+            appendUMLData(eUML_ID::UML_TIMESTAMP);
             appendUMLData(eUML_ID::UML_SEQUENCE_ID);
             subStr.append(" ");
             insertMethodFormattingRange.from = subStr.size();
