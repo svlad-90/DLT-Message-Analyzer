@@ -26,6 +26,7 @@
 #include <QActionGroup>
 
 #include "common/Definitions.hpp"
+#include "common/TOptional.hpp"
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "CSearchResultModel.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
@@ -57,6 +58,14 @@ CSearchResultView::CSearchResultView(QWidget *parent):
             {
                 auto siblingIdx = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
                 mpSpecificModel->setUML_Applicability(index, !siblingIdx.data(Qt::CheckStateRole).value<bool>());
+            }
+        }
+        else if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::PlotView_Applicability)
+        {
+            if(nullptr != mpSpecificModel)
+            {
+                auto siblingIdx = index.sibling(index.row(), static_cast<int>(eSearchResultColumn::PlotView_Applicability));
+                mpSpecificModel->setPlotView_Applicability(index, !siblingIdx.data(Qt::CheckStateRole).value<bool>());
             }
         }
     });
@@ -315,11 +324,11 @@ void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelInde
     {
         if(false == indexAt(rect().bottomLeft()).isValid())
         {
-            updateWidthLogic(topLeft.row(), bottomRight.row());
             continueCheck = false;
         }
         else
         {
+            updateWidthLogic(topLeft.row(), bottomRight.row());
             mbIsViewFull = true;
         }
     }
@@ -414,8 +423,9 @@ void CSearchResultView::updateColumnsVisibility()
         {
             if(true == foundColumn.value()) // if column is visible
             {
-                if(i != static_cast<int>(eSearchResultColumn::UML_Applicability) ||
-                  ((i == static_cast<int>(eSearchResultColumn::UML_Applicability) && (true == getSettingsManager()->getUML_FeatureActive() ) ) ) )
+                if( ( i != static_cast<int>(eSearchResultColumn::UML_Applicability) && i != static_cast<int>(eSearchResultColumn::PlotView_Applicability) ) ||
+                  ((i == static_cast<int>(eSearchResultColumn::UML_Applicability) && (true == getSettingsManager()->getUML_FeatureActive() ) ) ) ||
+                  ((i == static_cast<int>(eSearchResultColumn::PlotView_Applicability) && (true == getSettingsManager()->getPlotViewFeatureActive() ) ) ) )
                 {
                     showColumn(i);
 
@@ -471,7 +481,7 @@ void CSearchResultView::setModel(QAbstractItemModel *model)
 
     QHeaderView *horizontalHeader = tParent::horizontalHeader();
 
-    connect( horizontalHeader, &QHeaderView::sectionDoubleClicked, [this](int logicalIndex)
+    connect( horizontalHeader, &QHeaderView::sectionDoubleClicked, this, [this](int logicalIndex)
     {
         if(static_cast<eSearchResultColumn>(logicalIndex) == getLastVisibleColumn())
         {
@@ -779,24 +789,27 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     }
     else if(event->key() == Qt::Key::Key_Space)
     {
-        if(true == getSettingsManager()->getUML_FeatureActive())
+        if(nullptr != mpSpecificModel)
         {
-            if(nullptr != mpSpecificModel)
-            {
-                auto selectedRows = selectionModel()->selectedRows();
+            auto selectedRows = selectionModel()->selectedRows();
 
-                if(false == selectedRows.empty())
+            if(false == selectedRows.empty())
+            {
+                TOptional<bool> bSelectedValue;
+                auto tryApplyActionToColumn = [&selectedRows, &bSelectedValue, this](eSearchResultColumn targetColumn)
                 {
-                    auto targetIndex = selectedRows[0];
-                    bool bTargetIndexFound = targetIndex.flags() & Qt::ItemIsEditable;
+                    const auto targetColumnInt = static_cast<int>(targetColumn);
+                    auto targetColumnIdx = selectedRows[0].sibling(selectedRows[0].row(), targetColumnInt);
+                    bool bTargetIndexFound = targetColumnIdx.flags() & Qt::ItemIsEditable;
 
                     if(false == bTargetIndexFound)
                     {
                         for(const auto& selectedRow : selectedRows)
                         {
-                            if(selectedRow.flags() & Qt::ItemIsEditable)
+                            targetColumnIdx = selectedRow.sibling(selectedRow.row(), targetColumnInt);
+
+                            if(targetColumnIdx.flags() & Qt::ItemIsEditable)
                             {
-                                targetIndex = selectedRow;
                                 bTargetIndexFound = true;
                                 break;
                             }
@@ -805,18 +818,45 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
 
                     if(true == bTargetIndexFound)
                     {
-                        auto targetValue = !(targetIndex.sibling(targetIndex.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data(Qt::CheckStateRole).value<bool>());
+                        auto targetValue = false;
+
+                        if(false == bSelectedValue.isSet())
+                        {
+                            targetValue = !(targetColumnIdx.data(Qt::CheckStateRole).value<bool>());
+                            bSelectedValue.setValue(targetValue);
+                        }
+                        else
+                        {
+                            targetValue = bSelectedValue.getValue();
+                        }
 
                         for(const auto& selectedRow : selectedRows)
                         {
-                            auto siblingIdx = selectedRow.sibling(selectedRow.row(), static_cast<int>(eSearchResultColumn::UML_Applicability));
+                            auto siblingIdx = selectedRow.sibling(selectedRow.row(), targetColumnInt);
 
                             if(siblingIdx.data(Qt::CheckStateRole).value<bool>() != targetValue)
                             {
-                                mpSpecificModel->setUML_Applicability(selectedRow, targetValue);
+                                if(targetColumn == eSearchResultColumn::UML_Applicability)
+                                {
+                                    mpSpecificModel->setUML_Applicability(siblingIdx, targetValue);
+                                }
+                                else if(targetColumn == eSearchResultColumn::PlotView_Applicability)
+                                {
+                                    mpSpecificModel->setPlotView_Applicability(siblingIdx, targetValue);
+                                }
                             }
                         }
                     }
+                };
+
+                if(true == getSettingsManager()->getUML_FeatureActive())
+                {
+                    tryApplyActionToColumn(eSearchResultColumn::UML_Applicability);
+                }
+
+                if(true == getSettingsManager()->getPlotViewFeatureActive())
+                {
+                    tryApplyActionToColumn(eSearchResultColumn::PlotView_Applicability);
                 }
             }
         }
@@ -824,12 +864,12 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     else if((event->modifiers() & Qt::AltModifier) != 0
             && (event->key() == Qt::Key::Key_Down))
     {
-        switchToNextUMLItem(true);
+        switchToNextCheckboxItem(true, static_cast<int>(eSearchResultColumn::UML_Applicability));
     }
     else if((event->modifiers() & Qt::AltModifier) != 0
             && (event->key() == Qt::Key::Key_Up))
     {
-        switchToNextUMLItem(false);
+        switchToNextCheckboxItem(false, static_cast<int>(eSearchResultColumn::UML_Applicability));
     }
     else
     {
@@ -875,74 +915,71 @@ void CSearchResultView::copyMessageFiles()
     }
 }
 
-void CSearchResultView::switchToNextUMLItem(bool bNext)
+void CSearchResultView::switchToNextCheckboxItem(bool bNext, int column)
 {
-    if(true == getSettingsManager()->getUML_FeatureActive()) // if UML feature is active
-    {
-        auto selectedRows = selectionModel()->selectedRows();
+    auto selectedRows = selectionModel()->selectedRows();
 
-        if(false == selectedRows.isEmpty())
+    if(false == selectedRows.isEmpty())
+    {
+        QModelIndex targetIndex;
+
+        if(true == bNext)
         {
-            QModelIndex targetIndex;
+            targetIndex = *std::min_element( selectedRows.begin(), selectedRows.end(),
+                                            [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+        }
+        else
+        {
+            targetIndex = *std::max_element( selectedRows.begin(), selectedRows.end(),
+                                            [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
+        }
+
+        if(true == targetIndex.isValid())
+        {
+            auto iSize = model()->rowCount();
+
+            auto checkIndexFunc = [this, &column](const int& row)->bool
+            {
+                bool bResult = false;
+
+                auto checkIndex = model()->index(row, column);
+                if( true == checkIndex.isValid() )
+                {
+                    bool bUsedForUML = checkIndex.flags() & Qt::ItemIsEditable;
+
+                    if(true == bUsedForUML)
+                    {
+                        scrollTo( checkIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
+                        setCurrentIndex(checkIndex);
+                        bResult = true;
+                    }
+                }
+
+                return bResult;
+            };
 
             if(true == bNext)
             {
-                targetIndex = *std::min_element( selectedRows.begin(), selectedRows.end(),
-                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-            }
-            else
-            {
-                targetIndex = *std::max_element( selectedRows.begin(), selectedRows.end(),
-                                                [](const QModelIndex& lhs, const QModelIndex& rhs){ return lhs.row() < rhs.row(); });
-            }
-
-            if(true == targetIndex.isValid())
-            {                
-                auto iSize = model()->rowCount();
-
-                auto checkIndexFunc = [this](const int& row)->bool
+                if(targetIndex.row() < model()->rowCount())
                 {
-                    bool bResult = false;
-
-                    auto checkIndex = model()->index(row, static_cast<int>(eSearchResultColumn::UML_Applicability));
-                    if( true == checkIndex.isValid() )
+                    for(int i = targetIndex.row() + 1; i < iSize; ++i)
                     {
-                        bool bUsedForUML = checkIndex.flags() & Qt::ItemIsEditable;
-
-                        if(true == bUsedForUML)
+                        if(true == checkIndexFunc(i))
                         {
-                            scrollTo( checkIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
-                            setCurrentIndex(checkIndex);
-                            bResult = true;
-                        }
-                    }
-
-                    return bResult;
-                };
-
-                if(true == bNext)
-                {
-                    if(targetIndex.row() < model()->rowCount())
-                    {
-                        for(int i = targetIndex.row() + 1; i < iSize; ++i)
-                        {
-                            if(true == checkIndexFunc(i))
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                if(targetIndex.row() > 0)
                 {
-                    if(targetIndex.row() > 0)
+                    for(int i = targetIndex.row() - 1; i >= 0; --i)
                     {
-                        for(int i = targetIndex.row() - 1; i >= 0; --i)
+                        if(true == checkIndexFunc(i))
                         {
-                            if(true == checkIndexFunc(i))
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
@@ -951,21 +988,25 @@ void CSearchResultView::switchToNextUMLItem(bool bNext)
     }
 }
 
-void CSearchResultView::selectAllUMLItems(bool select)
+void CSearchResultView::selectAllCheckboxItems(bool select, int column)
 {
-    if(true == getSettingsManager()->getUML_FeatureActive()) // if UML feature is active
+    const auto iSize = model()->rowCount();
+    for( int i = 0; i < iSize; ++i )
     {
-        const auto iSize = model()->rowCount();
-        for( int i = 0; i < iSize; ++i )
-        {
-            auto checkIndex = model()->index(i, static_cast<int>(eSearchResultColumn::UML_Applicability));
-            bool bUsedForUML = checkIndex.flags() & Qt::ItemIsEditable;
+        auto checkIndex = model()->index(i, column);
+        bool bEditable = checkIndex.flags() & Qt::ItemIsEditable;
 
-            if(true == bUsedForUML)
+        if(true == bEditable)
+        {
+            if(checkIndex.data(Qt::CheckStateRole).value<bool>() != select)
             {
-                if(checkIndex.data(Qt::CheckStateRole).value<bool>() != select)
+                if(column == static_cast<int>(eSearchResultColumn::UML_Applicability))
                 {
                     mpSpecificModel->setUML_Applicability(checkIndex, select);
+                }
+                else if(column == static_cast<int>(eSearchResultColumn::PlotView_Applicability))
+                {
+                    mpSpecificModel->setPlotView_Applicability(checkIndex, select);
                 }
             }
         }
@@ -1003,7 +1044,7 @@ void CSearchResultView::handleSettingsManagerChange()
         {
             QAction* pAction = new QAction("Copy", this);
             pAction->setShortcut(QKeySequence(tr("Ctrl+C")));
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, this, [this]()
             {
                 copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), false );
             });
@@ -1019,7 +1060,7 @@ void CSearchResultView::handleSettingsManagerChange()
         {
             QAction* pAction = new QAction("Copy payload", this);
             pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+C")));
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, this, [this]()
             {
                 copySelectionToClipboard( getSettingsManager()->getCopySearchResultAsHTML(), true );
             });
@@ -1052,7 +1093,7 @@ void CSearchResultView::handleSettingsManagerChange()
         {
             QAction* pAction = new QAction("Clear search results", this);
             pAction->setShortcut(QKeySequence(tr("Ctrl+Shift+Space")));
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, this, [this]()
             {
                 clearSearchResultsRequested();
             });
@@ -1063,7 +1104,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
         {
             QAction* pAction = new QAction("Copy as HTML", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setCopySearchResultAsHTML(checked);
             });
@@ -1085,7 +1126,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
         {
             QAction* pAction = new QAction("Monitor sub-files", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setSubFilesHandlingStatus(checked);
             });
@@ -1103,7 +1144,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
                     QAction* pAction = new QAction(msg, this);
                     pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+C")));
-                    connect(pAction, &QAction::triggered, [this, selectedRows]()
+                    connect(pAction, &QAction::triggered, this, [this, selectedRows]()
                     {
                         copyMessageFiles();
                     });
@@ -1125,7 +1166,7 @@ void CSearchResultView::handleSettingsManagerChange()
                     QString msg = QString("Set search range ...");
 
                     QAction* pAction = new QAction(msg, this);
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
                        getUserSearchRange();
                     });
@@ -1146,7 +1187,7 @@ void CSearchResultView::handleSettingsManagerChange()
                     QString msg = QString("Lock search range from id %1 to id %2").arg(prop.from).arg(prop.to);
 
                     QAction* pAction = new QAction(msg, this);
-                    connect(pAction, &QAction::triggered, [this, prop]()
+                    connect(pAction, &QAction::triggered, this, [this, prop]()
                     {
                         mSearchRange = prop;
                         searchRangeChanged( mSearchRange, false );
@@ -1162,7 +1203,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         QString msg = QString("Search \"starting from\" id %1").arg(targetMsgId);
 
                         QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
+                        connect(pAction, &QAction::triggered, this, [this, targetMsgId]()
                         {
                             tIntRangeProperty prop;
                             prop.isSet = true;
@@ -1196,7 +1237,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         QString msg = QString("Search \"up to\" id %1").arg(targetMsgId);
 
                         QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this, targetMsgId]()
+                        connect(pAction, &QAction::triggered, this, [this, targetMsgId]()
                         {
                             tIntRangeProperty prop;
                             prop.isSet = true;
@@ -1219,7 +1260,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         QString msg = QString("(*) Remove lock on search range from id %1 to id %2").arg( mSearchRange.from ).arg( mSearchRange.to );
 
                         QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             mSearchRange = tIntRangeProperty();
                             searchRangeChanged( mSearchRange, true );
@@ -1253,7 +1294,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         if(foundItem != searchResultColumnsSearchMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            connect(pAction, &QAction::triggered, this, [this, i](bool checked)
                                     {
                                         auto searchResultColumnsSearchMapInner =
                                             getSettingsManager()->getSearchResultColumnsSearchMap();
@@ -1271,8 +1312,10 @@ void CSearchResultView::handleSettingsManagerChange()
                             pAction->setCheckable(true);
                             pAction->setChecked(foundItem.value());
 
-                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                                && false == getSettingsManager()->getUML_FeatureActive())
+                            if( (i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                                 && false == getSettingsManager()->getUML_FeatureActive() ) ||
+                                (i == static_cast<int>(eSearchResultColumn::PlotView_Applicability)
+                                 && false == getSettingsManager()->getPlotViewFeatureActive() ) )
                             {
                                 pAction->setEnabled(false);
                             }
@@ -1287,7 +1330,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
             {
                 QAction* pAction = new QAction("Reset search columns", this);
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     getSettingsManager()->resetSearchResultColumnsSearchMap();
                     restartSearch();
@@ -1313,7 +1356,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         if(foundItem != searchResultColumnsVisibilityMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            connect(pAction, &QAction::triggered, this, [this, i](bool checked)
                             {
                                 auto searchResultColumnsVisibilityMapInner =
                                         getSettingsManager()->getSearchResultColumnsVisibilityMap();
@@ -1329,8 +1372,10 @@ void CSearchResultView::handleSettingsManagerChange()
                             pAction->setCheckable(true);
                             pAction->setChecked(foundItem.value());
 
-                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                            && false == getSettingsManager()->getUML_FeatureActive())
+                            if( (i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                                 && false == getSettingsManager()->getUML_FeatureActive() ) ||
+                                (i == static_cast<int>(eSearchResultColumn::PlotView_Applicability)
+                                 && false == getSettingsManager()->getPlotViewFeatureActive() ) )
                             {
                                 pAction->setEnabled(false);
                             }
@@ -1345,7 +1390,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
             {
                 QAction* pAction = new QAction("Reset visible columns", this);
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     getSettingsManager()->resetSearchResultColumnsVisibilityMap();
                 });
@@ -1370,7 +1415,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         if(foundItem != searchResultColumnsCopyPasteMap.end())
                         {
                             QAction* pAction = new QAction(getName(static_cast<eSearchResultColumn>(i)), this);
-                            connect(pAction, &QAction::triggered, [this, i](bool checked)
+                            connect(pAction, &QAction::triggered, this, [this, i](bool checked)
                             {
                                 auto searchResultColumnsCopyPasteMapInner =
                                         getSettingsManager()->getSearchResultColumnsCopyPasteMap();
@@ -1386,8 +1431,10 @@ void CSearchResultView::handleSettingsManagerChange()
                             pAction->setCheckable(true);
                             pAction->setChecked(foundItem.value());
 
-                            if(i == static_cast<int>(eSearchResultColumn::UML_Applicability)
-                            && false == getSettingsManager()->getUML_FeatureActive())
+                            if( (i == static_cast<int>(eSearchResultColumn::UML_Applicability)
+                                 && false == getSettingsManager()->getUML_FeatureActive() ) ||
+                                (i == static_cast<int>(eSearchResultColumn::PlotView_Applicability)
+                                 && false == getSettingsManager()->getPlotViewFeatureActive() ) )
                             {
                                 pAction->setEnabled(false);
                             }
@@ -1402,7 +1449,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
             {
                 QAction* pAction = new QAction("Reset copy columns", this);
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     getSettingsManager()->resetSearchResultColumnsCopyPasteMap();
                 });
@@ -1422,7 +1469,7 @@ void CSearchResultView::handleSettingsManagerChange()
                     i++)
                 {
                     QAction* pAction = new QAction(getPayloadWidthAsString(static_cast<eSearchViewLastColumnWidthStrategy>(i)), this);
-                    connect(pAction, &QAction::triggered, [this, i]()
+                    connect(pAction, &QAction::triggered, this, [this, i]()
                     {
                         getSettingsManager()->setSearchViewLastColumnWidthStrategy(i);
                     });
@@ -1442,7 +1489,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
             {
                 QAction* pAction = new QAction("Mark timestamp with bold", this);
-                connect(pAction, &QAction::triggered, [this](bool checked)
+                connect(pAction, &QAction::triggered, this, [this](bool checked)
                 {
                     getSettingsManager()->setMarkTimeStampWithBold(checked);
                 });
@@ -1461,7 +1508,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
             {
                 QAction* pAction = new QAction("Highlight with single color", this);
-                connect(pAction, &QAction::triggered, [this](bool checked)
+                connect(pAction, &QAction::triggered, this, [this](bool checked)
                 {
                     getSettingsManager()->setSearchResultMonoColorHighlighting(checked);
                 });
@@ -1474,7 +1521,7 @@ void CSearchResultView::handleSettingsManagerChange()
             {
                 {
                     QAction* pAction = new QAction("Highlighting color ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
                         QColor color = QColorDialog::getColor( getSettingsManager()->getRegexMonoHighlightingColor(), this );
                         if( color.isValid() )
@@ -1494,7 +1541,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
                     {
                         QAction* pAction = new QAction("Set \"from\" color ...", this);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             const auto& currentGradientValue = getSettingsManager()->getSearchResultHighlightingGradient();
 
@@ -1510,7 +1557,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
                     {
                         QAction* pAction = new QAction("Set \"to\" color ...", this);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             const auto& currentGradientValue = getSettingsManager()->getSearchResultHighlightingGradient();
 
@@ -1529,7 +1576,7 @@ void CSearchResultView::handleSettingsManagerChange()
                         QString msg = QString("Set number of colors ( cur. val. - %1 ) ...").arg(currentGradientValue.numberOfColors);
 
                         QAction* pAction = new QAction(msg, this);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             bool ok;
 
@@ -1584,9 +1631,9 @@ void CSearchResultView::handleSettingsManagerChange()
                 {
                     QAction* pAction = new QAction("Select all UML items", this);
                     pAction->setToolTip(tr("Same as Ctrl+A, then Space"));
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
-                        selectAllUMLItems(true);
+                        selectAllCheckboxItems(true, static_cast<int>(eSearchResultColumn::UML_Applicability));
                     });
 
                     pSubMenu->addAction(pAction);
@@ -1595,9 +1642,9 @@ void CSearchResultView::handleSettingsManagerChange()
                 {
                     QAction* pAction = new QAction("Unselect all UML items", this);
                     pAction->setToolTip(tr("Same as Ctrl+A then Space"));
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
-                        selectAllUMLItems(false);
+                        selectAllCheckboxItems(false, static_cast<int>(eSearchResultColumn::UML_Applicability));
                     });
 
                     pSubMenu->addAction(pAction);
@@ -1608,9 +1655,9 @@ void CSearchResultView::handleSettingsManagerChange()
                 {
                     QAction* pAction = new QAction("Find previous UML item", this);
                     pAction->setShortcut(QKeySequence(tr("Alt+Up")));
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
-                        switchToNextUMLItem(false);
+                        switchToNextCheckboxItem(false, static_cast<int>(eSearchResultColumn::UML_Applicability));
                     });
 
                     pSubMenu->addAction(pAction);
@@ -1619,9 +1666,67 @@ void CSearchResultView::handleSettingsManagerChange()
                 {
                     QAction* pAction = new QAction("Find next UML item", this);
                     pAction->setShortcut(QKeySequence(tr("Alt+Down")));
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
-                        switchToNextUMLItem(true);
+                        switchToNextCheckboxItem(true, static_cast<int>(eSearchResultColumn::UML_Applicability));
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
+        }
+
+        contextMenu.addSeparator();
+
+        if(true == getSettingsManager()->getPlotViewFeatureActive())
+        {
+            {
+                QMenu* pSubMenu = new QMenu("Plot settings", this);
+                pSubMenu->setToolTipsVisible(true);
+
+                {
+                    QAction* pAction = new QAction("Select all plot items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A, then Space"));
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        selectAllCheckboxItems(true, static_cast<int>(eSearchResultColumn::PlotView_Applicability));
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Unselect all plot items", this);
+                    pAction->setToolTip(tr("Same as Ctrl+A then Space"));
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        selectAllCheckboxItems(false, static_cast<int>(eSearchResultColumn::PlotView_Applicability));
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                pSubMenu->addSeparator();
+
+                {
+                    QAction* pAction = new QAction("Find previous plot item", this);
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        switchToNextCheckboxItem(false, static_cast<int>(eSearchResultColumn::PlotView_Applicability));
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Find next plot item", this);
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        switchToNextCheckboxItem(true, static_cast<int>(eSearchResultColumn::PlotView_Applicability));
                     });
 
                     pSubMenu->addAction(pAction);
@@ -1643,7 +1748,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
                 {
                     QAction* pAction = new QAction("Select font ...", this);
-                    connect(pAction, &QAction::triggered, [this]()
+                    connect(pAction, &QAction::triggered, this, [this]()
                     {
                         bool ok;
                         QFont selectedFont = QFontDialog::getFont(&ok, font(), this);
@@ -1667,12 +1772,17 @@ void CSearchResultView::handleSettingsManagerChange()
 
     connect( this, &QWidget::customContextMenuRequested, showContextMenu );
 
-    connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, this, [this](bool)
     {
         updateColumnsVisibility();
     });
 
-    connect(getSettingsManager().get(), &ISettingsManager::font_SearchViewChanged, [this](const QFont& font)
+    connect(getSettingsManager().get(), &ISettingsManager::plotViewFeatureActiveChanged, this, [this](bool)
+    {
+        updateColumnsVisibility();
+    });
+
+    connect(getSettingsManager().get(), &ISettingsManager::font_SearchViewChanged, this, [this](const QFont& font)
     {
         setFont(font);
 
@@ -1681,13 +1791,19 @@ void CSearchResultView::handleSettingsManagerChange()
         forceUpdateWidthAndResetContentMap();
     });
 
-    connect( getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [this]()
+    connect( getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, this, [this]()
+    {
+        restartSearch();
+    });
+
+    connect( getSettingsManager().get(), &ISettingsManager::plotViewFeatureActiveChanged, this, [this]()
     {
         restartSearch();
     });
 
     connect( getSettingsManager().get(),
              &ISettingsManager::searchResultColumnsVisibilityMapChanged,
+             this,
              [this](const tSearchResultColumnsVisibilityMap&)
     {
         updateColumnsVisibility();
@@ -1695,6 +1811,7 @@ void CSearchResultView::handleSettingsManagerChange()
 
     connect( getSettingsManager().get(),
              &ISettingsManager::searchViewLastColumnWidthStrategyChanged,
+             this,
              [this](const int&)
     {
         forceUpdateWidthAndResetContentMap();

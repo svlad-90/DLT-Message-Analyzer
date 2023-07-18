@@ -75,6 +75,15 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
         bAnalyzeUML = true;
     }
 
+    bool bAnalyzePlotView = false;
+
+    if(true == getSettingsManager()->getPlotViewFeatureActive() &&
+        true == analyzePortionData.regexMetadata.doesContainAnyPlotViewGroup() &&
+        true == analyzePortionData.regexMetadata.doesContainConsistentPlotViewData(false, true).first)
+    {
+        bAnalyzePlotView = true;
+    }
+
     ePortionAnalysisState portionAnalysisState = ePortionAnalysisState::ePortionAnalysisState_SUCCESSFUL;
     tFoundMatchesPack foundMatchesPack;
 
@@ -128,6 +137,13 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
                     {
                         bUML_Req_Res_Ev_DuplicateFound = updateUMLInfoResult.bUML_Req_Res_Ev_DuplicateFound;
                     }
+                }
+
+                if(true == bAnalyzePlotView)
+                {
+                    auto updatePlotViewInfoResult = itemMetadata.updatePlotViewInfo(foundMatches,
+                                                                          analyzePortionData.regexMetadata,
+                                                                          pTree);
                 }
 
                 foundMatchesPack.matchedItemVec.push_back( tFoundMatchesPackItem( std::move(itemMetadata), std::move(foundMatches) ) );

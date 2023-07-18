@@ -15,7 +15,10 @@ class TOptional
 {
 
 public:
-    TOptional();
+    TOptional():
+        mData(),
+        mbIsSet(false)
+    {}
 
     explicit TOptional(const T& val):
     mData(val),
@@ -43,6 +46,12 @@ public:
     bool isSet() const
     {
         return mbIsSet;
+    }
+
+    void reset()
+    {
+        mData = T();
+        mbIsSet = false;
     }
 
 private:

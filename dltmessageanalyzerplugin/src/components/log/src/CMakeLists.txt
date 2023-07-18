@@ -11,6 +11,7 @@ add_library(DMA_log STATIC
     ${PROCESSED_MOCS})
 
 target_link_libraries( DMA_log PUBLIC
+                       DMA_common
                        qdlt
                        ${QT_PREFIX}::Widgets
                        DMA_framework_base

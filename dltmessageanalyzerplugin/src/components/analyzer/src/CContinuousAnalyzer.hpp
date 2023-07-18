@@ -19,14 +19,14 @@ class IDLTMessageAnalyzerControllerConsumer;
  */
 class CSubConsumer : public IDLTMessageAnalyzerControllerConsumer
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
-   typedef std::function<void(const tProgressNotificationData&)> tCallback;
-   CSubConsumer(const tDLTMessageAnalyzerControllerPtr& pController);
-   void setCallback(const tCallback& callback);
-   void progressNotification( const tProgressNotificationData& progressNotificationData ) override;
+    typedef std::function<void(const tProgressNotificationData&)> tCallback;
+    CSubConsumer(const tDLTMessageAnalyzerControllerPtr& pController);
+    void setCallback(const tCallback& callback);
+    void progressNotification( const tProgressNotificationData& progressNotificationData ) override;
 private:
-   tCallback mCallback;
+    tCallback mCallback;
 };
 
 /**

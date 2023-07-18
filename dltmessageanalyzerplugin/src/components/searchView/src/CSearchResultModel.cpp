@@ -4,6 +4,8 @@
  * @brief   Implementation of the CSearchResultModel class
  */
 
+#include <QDateTime>
+
 #include "CSearchResultModel.hpp"
 #include "components/log/api/CLog.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
@@ -78,6 +80,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
         switch( static_cast<eSearchResultColumn>(index.column()) )
         {
             case eSearchResultColumn::UML_Applicability: { alignment = Qt::AlignCenter; } break;
+            case eSearchResultColumn::PlotView_Applicability: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Index: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Time: { alignment = Qt::AlignCenter; } break;
             case eSearchResultColumn::Timestamp: { alignment = Qt::AlignCenter; } break;
@@ -96,7 +99,9 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
 
         result = alignment;
     }
-    else if ( role == Qt::DisplayRole && column != eSearchResultColumn::UML_Applicability )
+    else if ( role == Qt::DisplayRole &&
+              ( column != eSearchResultColumn::UML_Applicability &&
+                column != eSearchResultColumn::PlotView_Applicability ) )
     {
         auto msgId = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().msgId;
         const auto& pMsg = mpFile->getMsg(msgId);
@@ -107,7 +112,7 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
             result = std::move(*pStrValue);
         }
     }
-    else if( role == Qt::CheckStateRole && ( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
+    else if( role == Qt::CheckStateRole &&( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
     {
         const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
 
@@ -123,9 +128,26 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
             }
         }
     }
+    else if( role == Qt::CheckStateRole &&( index.column() == static_cast<int>(eSearchResultColumn::PlotView_Applicability) ) )
+    {
+        const auto& plotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().plotViewInfo;
+
+        if(true == plotViewInfo.bPlotViewConstraintsFulfilled)
+        {
+            if(true == plotViewInfo.bApplyForPlotCreation)
+            {
+                result = Qt::CheckState::Checked;
+            }
+            else
+            {
+                result = Qt::CheckState::Unchecked;
+            }
+        }
+    }
     else if (role == Qt::TextAlignmentRole)
     {
-        if(index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability))
+        if(index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ||
+           index.column() == static_cast<int>(eSearchResultColumn::PlotView_Applicability))
         {
             result = Qt::AlignLeft;
         }
@@ -169,6 +191,19 @@ Qt::ItemFlags CSearchResultModel::flags(const QModelIndex &index) const
                 result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
             }
         }
+        else if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::PlotView_Applicability)
+        {
+            const auto& plotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().plotViewInfo;
+
+            if(true == plotViewInfo.bPlotViewConstraintsFulfilled)
+            {
+                result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+            }
+            else
+            {
+                result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+            }
+        }
         else
         {
             result = QAbstractItemModel::flags(index);
@@ -204,23 +239,24 @@ std::pair<bool, tIntRange> CSearchResultModel::addNextMessageIdxVec(const tFound
 
 int CSearchResultModel::getFileIdx( const QModelIndex& idx ) const
 {
-   int result = -1;
+    int result = -1;
 
-   auto row = idx.row();
+    auto row = idx.row();
 
-   if(row >= 0 && static_cast<size_t>(row) < mFoundMatchesPack.matchedItemVec.size())
-   {
-       result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)].getItemMetadata().msgIdFiltered;
-   }
+    if(row >= 0 && static_cast<size_t>(row) < mFoundMatchesPack.matchedItemVec.size())
+    {
+        result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)].getItemMetadata().msgIdFiltered;
+    }
 
-   return result;
+    return result;
 }
 
 QString CSearchResultModel::getStrValue(const int& row, const eSearchResultColumn& column) const
 {
     QString result;
 
-    if(column != eSearchResultColumn::UML_Applicability)
+    if(column != eSearchResultColumn::UML_Applicability &&
+       column != eSearchResultColumn::PlotView_Applicability)
     {
         auto index = createIndex(row, static_cast<int>(column));
 
@@ -257,7 +293,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
     outputString.append("skinparam defaultFontName monospaced\n");
 #endif
 
-    //let's represent wheether UML data is properly filled in
+    //let's represent whether UML data is properly filled in
     int row = 0;
 
     for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
@@ -285,7 +321,8 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                 {
                     for(const auto& item : foundUMLDataItem->second)
                     {
-                        if(true == item.UML_Custom_Value.isEmpty()) // if there is no client-defined value
+                        if(item.pUML_Custom_Value == nullptr ||
+                           true == item.pUML_Custom_Value->isEmpty()) // if there is no client-defined value
                         {
                             // let's use value from the corresponding group
                             for(const auto& stringCoverageMapItem : item.stringCoverageMap)
@@ -374,9 +411,9 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                 case eUML_ID::UML_SERVICE:
                                 {
                                     QString str;
-                                    str.reserve(item.UML_Custom_Value.size() + 2);
+                                    str.reserve(item.pUML_Custom_Value->size() + 2);
                                     str.append("\"");
-                                    str.append(item.UML_Custom_Value);
+                                    str.append(*item.pUML_Custom_Value);
                                     str.append("\"");
 
                                     // let's directly use client-defined value, ignoring value from the group
@@ -400,7 +437,7 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
                                 default:
                                 {
                                     // let's directly use client-defined value, ignoring value from the group
-                                    UMLRepresentationResult.second.append(item.UML_Custom_Value);
+                                    UMLRepresentationResult.second.append(*item.pUML_Custom_Value);
                                 }
                                     break;
                             }
@@ -432,11 +469,11 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
             auto appendUMLData = [&getUMLItemRepresentation, &subStr](const eUML_ID& UML_ID)
             {
-                auto findUCLResult = getUMLItemRepresentation(UML_ID);
+                auto umlRepresentationResult = getUMLItemRepresentation(UML_ID);
 
-                if(true == findUCLResult.first)
+                if(true == umlRepresentationResult.first)
                 {
-                    subStr.append(findUCLResult.second);
+                    subStr.append(umlRepresentationResult.second);
                 }
                 else
                 {
@@ -535,6 +572,860 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
     return result;
 }
 
+namespace detail
+{
+    struct tGraphMetadataItem
+    {
+        TOptional<QString> graphName;
+    };
+
+    typedef std::map<tGraphId, tGraphMetadataItem> tGraphIdMetadataMap;
+    typedef std::map<QString, tGraphIdMetadataMap> tAxisNameMetadataMap;
+
+    struct tMetadataItem
+    {
+        TOptional<tTimestampParserBase::tParsedData> xTimestamp;
+        TOptional<tTimestampParserBase::tParsedData> yTimestamp;
+    };
+
+    static QString splitCamelCase(const QString val)
+    {
+        QString result;
+        result.reserve(val.size() + 5);
+
+        for (int i = 0; i < val.size(); ++i)
+        {
+            QChar ch = val[i];
+            bool bIsLastCharacter = i == val.size() - 1;
+
+            if(true == bIsLastCharacter)
+            {
+                result.append(ch);
+            }
+            else
+            {
+                QChar nextCh = val[i+1];
+
+                bool bIsFirstCharacter = i == 0;
+
+                if(true == ch.isUpper() &&
+                   true == nextCh.isLower() &&
+                   false == bIsFirstCharacter)
+                {
+                    result.append(" ");
+                    result.append(ch.toLower());
+                }
+                else
+                {
+                    result.append(ch);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    static bool processPlotViewDataItemVec(const CSearchResultModel& searchResultModel,
+                                           ePlotViewID plotViewID,
+                                           const tPlotViewDataItemVec& plotViewDataItemVec,
+                                           ISearchResultModel::tPlotContent& plotContent,
+                                           const tMsgId& msgId,
+                                           tAxisNameMetadataMap& axisNameMetadataMap,
+                                           const uint32_t& rowId,
+                                           bool bXDataPresented,
+                                           tMetadataItem& metadataItem)
+    {
+        bool bResult = true;
+
+        for(auto it = plotViewDataItemVec.begin();
+             it != plotViewDataItemVec.end() && true == bResult;
+             ++it)
+        {
+            const auto& plotViewDataItem = *it;
+            const auto& pGroupName = plotViewDataItem.pPlotViewGroupName;
+            const auto& splitParameters = plotViewDataItem.plotViewSplitParameters;
+            const auto& optColor = plotViewDataItem.optColor;
+            const auto& stringCoverageMap = plotViewDataItem.stringCoverageMap;
+
+            auto getValueFromStringCoverageMap = [&]()
+            {
+                QString result;
+
+                for(const auto& stringCoverageMapItem : stringCoverageMap)
+                {
+                    auto column = stringCoverageMapItem.first;
+
+                    QString message = searchResultModel.getStrValue(rowId, column);
+
+                    auto messageSize = message.size();
+                    const auto& range = stringCoverageMapItem.second.range;
+
+                    if(range.from >= 0 && range.from < messageSize &&
+                        range.to >= 0 && range.to < messageSize )
+                    {
+                        result.append(message.mid(range.from, range.to - range.from + 1));
+
+                        if(true == stringCoverageMapItem.second.bAddSeparator)
+                        {
+                            result.append(" ");
+                        }
+                    }
+                }
+
+                return result;
+            };
+
+            auto resolveTimestamp = [](const tMsgId& msgId,
+                                       const TOptional<tTimestampParserBase::tParsedData>& timestamp,
+                                       const QString& valueStr,
+                                       tPlotData& valueDouble
+                                       ) -> bool
+            {
+                bool bValueResolved = false;
+
+                if(true == timestamp.isSet())
+                {
+                    const auto& xTimestamp = timestamp.getValue();
+                    if(valueStr.size() >= xTimestamp.minValueLength)
+                    {
+                        typedef tTimestampParserBase::eTimestampItemType eTimestampItemType;
+
+                        QString fetchedValue;
+                        int32_t charCounter = 0;
+
+                        for(const auto& timestampDataPair : timestamp.getValue().timestampDataVec)
+                        {
+                            if(timestampDataPair.first == eTimestampItemType::separator)
+                            {
+                                fetchedValue.append(":");
+                            }
+                            else
+                            {
+                                fetchedValue.append(valueStr.mid(charCounter, timestampDataPair.second));
+                            }
+
+                            charCounter += timestampDataPair.second;
+                        }
+
+                        auto dateTime = QDateTime::fromString(fetchedValue, xTimestamp.dateTimeFormat);
+
+                        if(true == dateTime.isValid())
+                        {
+                            auto valueMsecDouble = static_cast<double>(dateTime.toMSecsSinceEpoch()) / 1000;
+                            valueDouble = valueMsecDouble;
+                            bValueResolved = true;
+                        }
+                        else
+                        {
+                            SEND_WRN(QString("Skip line #%1 due to the following error: <Was not able to get valid "
+                                             "data out of value '%2' and data format '%3'. Please, try to specify "
+                                             "the date and time format, which will work with QDateTime::fromString"
+                                             "(const QString &string, const QString &format) method.>")
+                                         .arg(msgId).arg(fetchedValue).arg(xTimestamp.dateTimeFormat));
+                            bValueResolved = false;
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: <According to the timestamp definition the "
+                                         "expected min data size is '%2', while captured data size of ;ine '%3' is '%4'.>")
+                                     .arg(msgId).arg(xTimestamp.minValueLength).arg(valueStr).arg(valueStr.size()));
+                        bValueResolved = false;
+                    }
+                }
+                else
+                {
+                    valueDouble = valueStr.toDouble(&bValueResolved);
+
+                    if(false == bValueResolved)
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '<Was not able to convert data '%2' to double>'")
+                                     .arg(msgId).arg(valueStr));
+                    }
+                }
+
+                return bValueResolved;
+            };
+
+            assert(nullptr != plotViewDataItem.pPlotViewGroupName);
+
+            switch(plotViewID)
+            {
+            case ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].axisType.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].axisType.setValue(parsingResult.axisRectType);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_MAX:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_MAX>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].xMax.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].xMax.setValue(parsingResult.value);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_MIN:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_MIN>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].xMin.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].xMin.setValue(parsingResult.value);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_MAX:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_MAX>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].yMax.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].yMax.setValue(parsingResult.value);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_MIN:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_MIN>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].yMin.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].yMin.setValue(parsingResult.value);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_NAME:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_NAME>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].xName.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].xName.setValue(splitCamelCase(parsingResult.value));
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                    .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_NAME:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_NAME>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].yName.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].yName.setValue(splitCamelCase(parsingResult.value));
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_UNIT:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_UNIT>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].xUnit.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].xUnit.setValue(splitCamelCase(parsingResult.value));
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_UNIT:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_UNIT>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == plotContent.plotAxisMap[parsingResult.axisRectName].yUnit.isSet())
+                        {
+                            plotContent.plotAxisMap[parsingResult.axisRectName].yUnit.setValue(splitCamelCase(parsingResult.value));
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_DATA:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_DATA>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        QString valueStr;
+                        bool bValueResolved = false;
+                        auto valueDouble = 0.0;
+
+                        if(true == parsingResult.value.isSet())
+                        {
+                            valueDouble = parsingResult.value.getValue();
+                            bValueResolved = true;
+                        }
+                        else
+                        {
+                            valueStr = getValueFromStringCoverageMap();
+                            bValueResolved = resolveTimestamp(msgId,
+                                                              metadataItem.xTimestamp,
+                                                              valueStr,
+                                                              valueDouble);
+                        }
+
+                        if(true == bValueResolved)
+                        {
+                            auto foundAxisNameMetadata = axisNameMetadataMap.find(parsingResult.axisRectName);
+
+                            if(foundAxisNameMetadata != axisNameMetadataMap.end())
+                            {
+                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+
+                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                                {
+                                    assert(true == foundGraphIdMetadata->second.graphName.isSet());
+                                    auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
+                                                               .plotGraphSubItemMap[foundGraphIdMetadata->second.graphName.getValue()];
+
+                                    if(true == graphSubItem.dataItems.empty() || msgId != graphSubItem.dataItems.back().getMsgId())
+                                    {
+                                        graphSubItem.dataItems.push_back(ISearchResultModel::tPlotGraphDataItem());
+                                    }
+
+                                    auto& dataItem = graphSubItem.dataItems.back();
+
+                                    dataItem.setX(msgId, valueDouble);
+
+                                    if(false == graphSubItem.xOptColor.isSet)
+                                    {
+                                        if(true == optColor.isSet)
+                                        {
+                                            graphSubItem.xOptColor = optColor;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            bResult = false;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_X_TIMESTAMP:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_X_TIMESTAMP>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == metadataItem.xTimestamp.isSet())
+                        {
+                            metadataItem.xTimestamp.setValue(parsingResult.parsedData);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_DATA:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_DATA>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        QString valueStr;
+                        bool bValueResolved = false;
+                        auto valueDouble = 0.0;
+
+                        if(true == parsingResult.value.isSet())
+                        {
+                            valueDouble = parsingResult.value.getValue();
+                            bValueResolved = true;
+                        }
+                        else
+                        {
+                            valueStr = getValueFromStringCoverageMap();
+                            bValueResolved = resolveTimestamp(msgId,
+                                                                   metadataItem.yTimestamp,
+                                                                   valueStr,
+                                                                   valueDouble);
+                        }
+
+                        if(true == bValueResolved)
+                        {
+                            auto foundAxisNameMetadata = axisNameMetadataMap.find(parsingResult.axisRectName);
+
+                            if(foundAxisNameMetadata != axisNameMetadataMap.end())
+                            {
+                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+
+                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                                {
+                                    assert(true == foundGraphIdMetadata->second.graphName.isSet());
+                                    auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
+                                                             .plotGraphSubItemMap[foundGraphIdMetadata->second.graphName.getValue()];
+
+                                    if(true == graphSubItem.dataItems.empty() || msgId != graphSubItem.dataItems.back().getMsgId())
+                                    {
+                                        graphSubItem.dataItems.push_back(ISearchResultModel::tPlotGraphDataItem());
+                                    }
+
+                                    auto& dataItem = graphSubItem.dataItems.back();
+
+                                    dataItem.setY(msgId, valueDouble);
+
+                                    if(false == bXDataPresented)
+                                    {
+                                        QString timestampStr = searchResultModel.getStrValue(rowId, eSearchResultColumn::Timestamp);
+                                        bool conversionOk = false;
+                                        auto timestampDouble = timestampStr.toDouble(&conversionOk);
+
+                                        if(true == conversionOk)
+                                        {
+                                            dataItem.setX(msgId, timestampDouble);
+                                        }
+                                        else
+                                        {
+                                            SEND_ERR(QString("Was not able to assign timestamp '%1' for string #%2")
+                                                         .arg(timestampStr, msgId));
+                                        }
+                                    }
+
+                                    if(false == graphSubItem.xOptColor.isSet)
+                                    {
+                                        if(true == optColor.isSet)
+                                        {
+                                            graphSubItem.xOptColor = optColor;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            bResult = false;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_Y_TIMESTAMP:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_Y_TIMESTAMP>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        if(false == metadataItem.yTimestamp.isSet())
+                        {
+                            metadataItem.yTimestamp.setValue(parsingResult.parsedData);
+                        }
+                        else
+                        {
+                            //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
+                            //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_GRAPH_NAME:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_GRAPH_NAME>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        auto& axisRectNameMap = axisNameMetadataMap[parsingResult.axisRectName];
+                        auto& metadataItem = axisRectNameMap[parsingResult.graphId];
+
+                        metadataItem.graphName.setValue("");
+
+                        if(true == parsingResult.graphName.isSet() &&
+                           false == parsingResult.graphName.getValue().isEmpty())
+                        {
+                            metadataItem.graphName.getWriteableValue().append(parsingResult.graphName.getValue());
+                        }
+                        else
+                        {
+                            auto value = getValueFromStringCoverageMap();
+                            metadataItem.graphName.getWriteableValue().append(value);
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_GRAPH_METADATA:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_GRAPH_METADATA>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        auto foundAxisNameMetadata = axisNameMetadataMap.find(parsingResult.axisRectName);
+
+                        if(foundAxisNameMetadata != axisNameMetadataMap.end())
+                        {
+                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+
+                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                            {
+                                assert(true == foundGraphIdMetadata->second.graphName.isSet());
+                                auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
+                                                         .plotGraphSubItemMap[foundGraphIdMetadata->second.graphName.getValue()];
+
+                                if(true == graphSubItem.dataItems.empty() || msgId != graphSubItem.dataItems.back().getMsgId())
+                                {
+                                    graphSubItem.dataItems.push_back(ISearchResultModel::tPlotGraphDataItem());
+                                }
+
+                                auto& dataItem = graphSubItem.dataItems.back();
+
+                                QString targetValue;
+
+                                if(true == parsingResult.value.isSet() &&
+                                   false == parsingResult.value.getValue().isEmpty())
+                                {
+                                    targetValue.append(parsingResult.value.getValue());
+                                }
+                                else
+                                {
+                                    auto value = getValueFromStringCoverageMap();
+                                    targetValue.append(value);
+                                }
+
+                                dataItem.appendMetadata(msgId, splitCamelCase(parsingResult.key), targetValue);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_GANTT_EVENT:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        auto foundAxisNameMetadata = axisNameMetadataMap.find(parsingResult.axisRectName);
+
+                        if(foundAxisNameMetadata != axisNameMetadataMap.end())
+                        {
+                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+
+                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                            {
+                                assert(true == foundGraphIdMetadata->second.graphName.isSet());
+                                auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
+                                                         .plotGraphSubItemMap[foundGraphIdMetadata->second.graphName.getValue()];
+
+                                if(true == graphSubItem.dataItems.empty() || msgId != graphSubItem.dataItems.back().getMsgId())
+                                {
+                                    graphSubItem.dataItems.push_back(ISearchResultModel::tPlotGraphDataItem());
+                                }
+
+                                auto& dataItem = graphSubItem.dataItems.back();
+
+                                ISearchResultModel::eGanttDataItemType eventType;
+
+                                switch(parsingResult.eventType)
+                                {
+                                    case tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT>::eGanttEventType::START:
+                                    {
+                                        eventType = ISearchResultModel::eGanttDataItemType::START;
+                                    }
+                                    break;
+                                    case tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT>::eGanttEventType::END:
+                                    {
+                                        eventType = ISearchResultModel::eGanttDataItemType::END;
+                                    }
+                                    break;
+                                }
+
+                                dataItem.setGanttDataItemType(msgId, eventType);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            }
+        }
+
+        return bResult;
+    }
+}
+
+ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
+{
+    tPlotContent result;
+
+    detail::tAxisNameMetadataMap axisNameMetadataMap;
+
+    uint32_t row = 0;
+
+    for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
+    {
+        const auto& itemMetadata = foundMatchPack.getItemMetadata();
+
+        if(true == itemMetadata.plotViewInfo.bPlotViewConstraintsFulfilled
+            && true == itemMetadata.plotViewInfo.bApplyForPlotCreation)
+        {
+            detail::tMetadataItem metadataItem;
+
+            bool bXDataPresented = itemMetadata.plotViewInfo.plotViewDataMap.find(ePlotViewID::PLOT_X_DATA) !=
+                    itemMetadata.plotViewInfo.plotViewDataMap.end();
+            bool skipRowFlag = false;
+
+            for(auto it = itemMetadata.plotViewInfo.plotViewDataMap.begin();
+                it != itemMetadata.plotViewInfo.plotViewDataMap.end() && false == skipRowFlag;
+                ++it)
+            {
+                const auto& plotViewDataMap = *it;
+                const auto& plotViewID = plotViewDataMap.first;
+                const auto& plotViewDataItemVec = plotViewDataMap.second;
+
+                skipRowFlag = !processPlotViewDataItemVec(*this,
+                                           plotViewID,
+                                           plotViewDataItemVec,
+                                           result,
+                                           itemMetadata.msgIdFiltered,
+                                           axisNameMetadataMap,
+                                           row,
+                                           bXDataPresented,
+                                           metadataItem);
+            }
+        }
+        ++row;
+    }
+
+    return result;
+}
+
 void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool checked )
 {
     if(true == index.isValid())
@@ -544,6 +1435,20 @@ void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool ch
         if(true == UML_Info.bUMLConstraintsFulfilled)
         {
             UML_Info.bApplyForUMLCreation = checked;
+            dataChanged(index, index);
+        }
+    }
+}
+
+void CSearchResultModel::setPlotView_Applicability( const QModelIndex& index, bool checked )
+{
+    if(true == index.isValid())
+    {
+        auto& plotView_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadataWriteable().plotViewInfo;
+
+        if(true == plotView_Info.bPlotViewConstraintsFulfilled)
+        {
+            plotView_Info.bApplyForPlotCreation = checked;
             dataChanged(index, index);
         }
     }

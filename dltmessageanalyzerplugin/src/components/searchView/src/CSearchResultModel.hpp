@@ -35,6 +35,7 @@ public:
     int getFileIdx( const QModelIndex& idx ) const override;
     std::pair<bool, tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) override;
     std::pair<int /*rowNumber*/, QString /*diagramContent*/> getUMLDiagramContent() const override;
+    virtual tPlotContent createPlotContent() const override;
     // implementation of the ISearchResultModel ( END )
 
     int rowCount(const QModelIndex &parent) const override;
@@ -46,6 +47,7 @@ public:
     const tFoundMatchesPackItem& getFoundMatchesItemPack( const QModelIndex& modelIndex ) const;
 
     void setUML_Applicability( const QModelIndex& index, bool checked );
+    void setPlotView_Applicability( const QModelIndex& index, bool checked );
 
     QString getStrValue(const int& row, const eSearchResultColumn& column) const;
 

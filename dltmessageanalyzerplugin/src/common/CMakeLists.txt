@@ -1,6 +1,8 @@
 add_library(DMA_common STATIC
+    BaseDefinitions.cpp
     CTreeItem.cpp
     Definitions.cpp
+    PlotDefinitions.cpp
     CBGColorAnimation.cpp
     CRegexDirectoryMonitor.cpp
     CTableMemoryJumper.cpp

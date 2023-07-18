@@ -11,6 +11,8 @@ add_library(DMA_plugin STATIC
     ${UI_HEADERS}
     ${PROCESSED_MOCS})
 
+target_compile_definitions(DMA_plugin PRIVATE QCUSTOMPLOT_USE_LIBRARY)
+
 target_link_libraries( DMA_plugin PUBLIC
                       DMA_common
                       DMA_analyzer
@@ -24,9 +26,11 @@ target_link_libraries( DMA_plugin PUBLIC
                       DMA_filtersView_no_clang_tidy
                       DMA_groupedView
                       DMA_patternsView
+                      qcustomplot
+                      DMA_plotView
                       DMA_PCRE
                       qdlt
                       ${QT_PREFIX}::Widgets 
                       DMA_framework_base 
                       DMA_framework_component
-                      DMA_Plantuml )
+                      DMA_Plantuml)

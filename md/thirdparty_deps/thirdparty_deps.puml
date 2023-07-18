@@ -20,6 +20,7 @@ package "DLT_Message_Analyzer Dependencies" {
     package "Qt" {
         [qt5]
         [qt6]
+        [qcustomplot]
     }
 
     package "DMA_Family" {
@@ -66,6 +67,7 @@ package "DLT_Message_Analyzer Dependencies" {
 
 [dlt_message_analyzer_source] --> [qt5] : https://github.com/qt/qt5
 [dlt_message_analyzer_source] --> [qt6] : https://github.com/qt/qtbase
+[dlt_message_analyzer_source] --> [qcustomplot] : https://gitlab.com/DerManu/QCustomPlot
 [dlt_message_analyzer_source] --> [qdlt] : https://github.com/GENIVI/dlt-viewer/tree/master/qdlt
 [dlt_message_analyzer_source] --> [plantuml] : https://github.com/plantuml/plantuml
 [dlt_message_analyzer_source] --> [antlr4] : https://github.com/antlr/antlr4

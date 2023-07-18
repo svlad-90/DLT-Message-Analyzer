@@ -238,8 +238,8 @@ CPatternsModel::~CPatternsModel()
 
 void CPatternsModel::updateView()
 {
-   emit dataChanged( index(0,0), index ( rowCount(), columnCount()) );
-   emit layoutChanged();
+    emit dataChanged( index(0,0), index ( rowCount(), columnCount()) );
+    emit layoutChanged();
 }
 
 QModelIndex CPatternsModel::index(int row, int column,

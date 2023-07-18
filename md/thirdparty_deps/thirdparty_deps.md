@@ -23,6 +23,7 @@
 | actions/checkout |[Repository](https://github.com/actions/checkout) | MIT | [License](https://github.com/actions/checkout/blob/main/LICENSE) |
 | jurplel/install_qt_action |[Repository](https://github.com/jurplel/install-qt-action) | MIT | [License](https://github.com/jurplel/install-qt-action/blob/master/LICENSE) |
 | stefanzweifel/git_auto_commit_action |[Repository](https://github.com/stefanzweifel/git-auto-commit-action) | MIT | [License](https://github.com/stefanzweifel/git-auto-commit-action/blob/master/LICENSE) |
+| qcustomplot |[Repository](https://gitlab.com/DerManu/QCustomPlot) | GPL-3.0 | [License](https://gitlab.com/DerManu/QCustomPlot/-/blob/master/GPL.txt?ref_type=heads) |
 
 ----
 

@@ -103,6 +103,15 @@ class "CUMLViewComponent"
 
 }
 
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
 package "DMA_SearchView_API" #DDDDDD
 {
 
@@ -132,6 +141,7 @@ DMA::IComponent <|-- CLogoComponent : implements
 DMA::IComponent <|-- CLogsWrapperComponent : implements
 DMA::IComponent <|-- CPatternsViewComponent : implements
 DMA::IComponent <|-- CUMLViewComponent : implements
+DMA::IComponent <|-- CPlotViewComponent : implements
 DMA::IComponent <|-- CSearchViewComponent : implements
 DMA::IComponent <|-- CSettingsComponent : implements
 

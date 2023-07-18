@@ -225,11 +225,11 @@ unsigned int CDLTMsgWrapper::getSize() const
 
 void CDLTMsgWrapper::dumpSize() const
 {
-   SEND_MSG( QString( "sizeof(CDLTMsgWrapper) - %1;").arg(sizeof(CDLTMsgWrapper)));
-   SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mEcuidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mEcuidUTF8.capacity())));
-   SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mApidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mApidUTF8.capacity())));
-   SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mCtidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mCtidUTF8.capacity())));
-   SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mPayloadUTF8.capacity() - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mPayloadUTF8.capacity())));
+    SEND_MSG( QString( "sizeof(CDLTMsgWrapper) - %1;").arg(sizeof(CDLTMsgWrapper)));
+    SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mEcuidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mEcuidUTF8.capacity())));
+    SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mApidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mApidUTF8.capacity())));
+    SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mCtidUTF8.capacity()) - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mCtidUTF8.capacity())));
+    SEND_MSG( QString( "sizeof( char ) * static_cast<unsigned int>(mPayloadUTF8.capacity() - %1;").arg(sizeof( char ) * static_cast<unsigned int>(mPayloadUTF8.capacity())));
 }
 
 void CDLTMsgWrapper::dumpPayload() const

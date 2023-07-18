@@ -103,6 +103,16 @@ Afterward, open the dlt-viewer's CMake project, which is located in the root of 
 
 ----
 
+> **Important note!**
+>
+> Compilation might fail, if you do not have installed libqt5svg5-dev ( for Qt5 ) or libqt6svg6-dev ( for Qt6 ).
+> Those are used by the QCustomPlot dependency, which is used by the DLT-Message-Analyzer.
+>
+> Thus, please, install it before making attempt to build the project:
+> sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libqt5svg5-dev ( or libqt6svg6-dev )
+
+----
+
 ### qmake *.pro based build
 
 Such a build option was dropped.

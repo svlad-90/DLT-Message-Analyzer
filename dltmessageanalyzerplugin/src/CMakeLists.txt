@@ -32,6 +32,28 @@ function (DMA_QT_WRAP_UI ui_headers_var_name wrap_ui_var_name)
 endfunction()
 ################### QT_SPECIFIC ( END ) ###################
 
+################### QCUSTOMPLOT ###########################
+# function - sync_qcustomplot
+# Syncs QCustomPlot, implementation, which is used for
+# the creation of plots
+function (DMA_sync_q_custom_plot)
+    include(FetchContent)
+    FetchContent_Declare(
+      qcustomplot
+      GIT_REPOSITORY https://github.com/svlad-90/QCustomPlot-library
+      GIT_TAG        2.1.1.1
+    ) 
+    
+    FetchContent_GetProperties(qcustomplot)
+    if(NOT qcustomplot_POPULATED)
+        FetchContent_Populate(qcustomplot)
+        add_subdirectory(${qcustomplot_SOURCE_DIR} ${qcustomplot_BINARY_DIR})
+    endif()
+
+#    include_directories(${qcustomplot_SOURCE_DIR}/DMA_Plantuml/include)
+endfunction(DMA_sync_q_custom_plot)
+################### QCUSTOMPLOT ( END ) ###################
+
 ################### COMMON_DEPS ###########################
 include(FetchContent)
 FetchContent_Declare(
@@ -60,6 +82,7 @@ add_definitions(-DDMA_FORCE_LINK_ON)
 DMA_sync_g_test_framework()
 DMA_sync_plantuml()
 DMA_sync_framework()
+DMA_sync_q_custom_plot()
 ################### DEPENDENCIES ( END )###################
 
 ################### COMPATIBILITY #########################

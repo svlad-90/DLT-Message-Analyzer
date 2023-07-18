@@ -39,6 +39,7 @@ class CPatternsView;
 class CFiltersView;
 class CUMLView;
 class CLogo;
+class CCustomPlotExtended;
 
 namespace Ui {
     class Form;
@@ -79,9 +80,11 @@ public:
     QLineEdit* getFiltersSearchInput();
     QLineEdit* getConsoleViewInput();
     CUMLView* getUMLView();
+    CCustomPlotExtended* getCustomPlot();
     QPushButton* getCreateSequenceDiagramButton();
     CLogo* getLogo();
     QPushButton* getUMLCreateDiagramFromTextButton();
+    QPushButton* getCreatePlotButton();
     QPlainTextEdit* getUMLTextEditor();
 
 private slots:

@@ -47,8 +47,8 @@ private:
     void updateColumnsVisibility();
     void getUserSearchRange();
     void copyMessageFiles();
-    void switchToNextUMLItem(bool bNext);
-    void selectAllUMLItems(bool select);
+    void switchToNextCheckboxItem(bool bNext, int column);
+    void selectAllCheckboxItems(bool select, int column);
     void updateWidthLogic(const int& rowFrom, const int& rowTo);
 
     typedef std::set<eSearchResultColumn> tUpdateWidthSet;

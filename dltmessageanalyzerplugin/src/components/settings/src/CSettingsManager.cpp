@@ -68,6 +68,8 @@ static const QString sUML_ShowArgumentsKey = "UML_ShowArguments";
 static const QString sUML_WrapOutputKey = "UML_WrapOutput";
 static const QString sUML_AutonumberKey = "UML_Autonumber";
 
+static const QString sPlotViewFeatureActiveKey = "PlotViewFeatureActive";
+
 static const QString sFiltersCompletion_CaseSensitiveKey = "FiltersCompletion_CaseSensitive";
 static const QString sFiltersCompletion_MaxNumberOfSuggestionsKey = "FiltersCompletion_MaxNumberOfSuggestions";
 static const QString sFiltersCompletion_MaxCharactersInSuggestionKey = "FiltersCompletion_MaxCharactersInSuggestion";
@@ -91,6 +93,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultColumnsVisibil
 
     // fields, which are visible by default
     result.insert(eSearchResultColumn::UML_Applicability, true);
+    result.insert(eSearchResultColumn::PlotView_Applicability, true);
     result.insert(eSearchResultColumn::Index, true);
     result.insert(eSearchResultColumn::Time, true);
     result.insert(eSearchResultColumn::Timestamp, true);
@@ -127,6 +130,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultCopyPasteMap()
 
     // fields, which are not copied by default
     result.insert(eSearchResultColumn::UML_Applicability, false);
+    result.insert(eSearchResultColumn::PlotView_Applicability, false);
     result.insert(eSearchResultColumn::Time, false);
     result.insert(eSearchResultColumn::Count, false);
     result.insert(eSearchResultColumn::SessionId, false);
@@ -155,6 +159,7 @@ static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultSearchMap()
     result.insert(eSearchResultColumn::Timestamp, false);
     result.insert(eSearchResultColumn::Ecuid, false);
     result.insert(eSearchResultColumn::UML_Applicability, false);
+    result.insert(eSearchResultColumn::PlotView_Applicability, false);
     result.insert(eSearchResultColumn::Time, false);
     result.insert(eSearchResultColumn::Count, false);
     result.insert(eSearchResultColumn::SessionId, false);
@@ -393,6 +398,11 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){UML_AutonumberChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mPlotViewFeatureActiveProtector(),
+    mSetting_PlotViewFeatureActive(createBooleanSettingsItem(sPlotViewFeatureActiveKey,
+        [this](const bool& data){plotViewFeatureActiveChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
     mSetting_FiltersCompletion_CaseSensitive(createBooleanSettingsItem(sFiltersCompletion_CaseSensitiveKey,
        [this](const bool& data){filtersCompletion_CaseSensitiveChanged(data);},
        [this](){tryStoreSettingsConfig();},
@@ -491,6 +501,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_UML_ShowArguments);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_WrapOutput);
     mUserSettingItemPtrVec.push_back(&mSetting_UML_Autonumber);
+    mUserSettingItemPtrVec.push_back(&mSetting_PlotViewFeatureActive);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CaseSensitive);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxNumberOfSuggestions);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxCharactersInSuggestion);
@@ -1597,6 +1608,12 @@ void CSettingsManager::setUML_Autonumber(const bool& val)
     mSetting_UML_Autonumber.setData(val);
 }
 
+void CSettingsManager::setPlotViewFeatureActive(const bool& val)
+{
+    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mPlotViewFeatureActiveProtector));
+    mSetting_PlotViewFeatureActive.setData(val);
+}
+
 void CSettingsManager::setFiltersCompletion_CaseSensitive(const bool& val)
 {
     mSetting_FiltersCompletion_CaseSensitive.setData(val);
@@ -1734,8 +1751,8 @@ bool CSettingsManager::getSearchResultMonoColorHighlighting() const
 
 tHighlightingGradient CSettingsManager::getSearchResultHighlightingGradient() const
 {
-   std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
-   return mSetting_SearchResultHighlightingGradient.getData();
+    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mSearchResultHighlightingGradientProtector));
+    return mSetting_SearchResultHighlightingGradient.getData();
 }
 
 const tSearchResultColumnsVisibilityMap& CSettingsManager::getSearchResultColumnsVisibilityMap() const
@@ -1832,6 +1849,12 @@ const bool& CSettingsManager::getUML_WrapOutput() const
 const bool& CSettingsManager::getUML_Autonumber() const
 {
     return mSetting_UML_Autonumber.getData();
+}
+
+const bool& CSettingsManager::getPlotViewFeatureActive() const
+{
+    std::lock_guard<std::recursive_mutex> lock(*const_cast<std::recursive_mutex*>(&mPlotViewFeatureActiveProtector));
+    return mSetting_PlotViewFeatureActive.getData();
 }
 
 const bool& CSettingsManager::getFiltersCompletion_CaseSensitive() const

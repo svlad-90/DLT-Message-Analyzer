@@ -50,7 +50,7 @@ To turn on the PlantUML feature of the plugin, enable it in the general context-
 > PlantUML feature is turned on by default
 ----
 
-The idea of this feature is that the user can specify to the plugin, which parts mean what in terms of a sequence diagram.
+The idea of this feature is that the user can specify to the plugin, which parts of message mean what in terms of a sequence diagram.
 A predefined set of the regex group names is used to identify different common parts of the sequence diagram.
 UML regex group identifiers, which are supported by the plugin:
 

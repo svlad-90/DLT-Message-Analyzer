@@ -22,7 +22,7 @@ class "CLogsWrapperComponent"
 class "IDLTLogsWrapperCreator"
 {
     + {abstract} virtual tFileWrapperPtr createDLTFileWrapper( QDltFile* pFile ) const = 0
-    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(const tPluginPtrList& decoderPlugins) const = 0
+    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(QDltMessageDecoder* pMessageDecoder) const = 0
     + {abstract} virtual tMsgWrapperPtr createDLTMsgWrapper( QDltMsg& msg ) const = 0
 }
 
