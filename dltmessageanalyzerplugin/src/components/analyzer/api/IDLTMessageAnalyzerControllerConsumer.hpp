@@ -34,7 +34,8 @@ public slots:
 protected:
     IDLTMessageAnalyzerControllerConsumer( const std::weak_ptr<IDLTMessageAnalyzerController>& pController );
     tRequestId requestAnalyze( const tRequestParameters& requestParameters,
-                               bool bUMLFeatureActive );
+                               bool bUMLFeatureActive,
+                               bool bPlotViewFeatureActive );
     void cancelRequest( const tRequestId& requestId );
 
 protected: // fields

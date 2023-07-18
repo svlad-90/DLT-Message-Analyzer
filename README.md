@@ -4,6 +4,12 @@
 
 ----
 
+## v.1.0.27 released!
+
+<span style="color:red">Checkout the ['plot view'](./md/plot_view/plot_view.md#plot-view) feature!</span>
+
+----
+
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
 
 ![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux%20Qt5/badge.svg)
@@ -79,6 +85,10 @@ There are the following schemas of deployment:
 ### [Integration with PlantUML](./md/plant_uml/plant_uml.md)
 
 - Plugin supports integration with the PlantUML tool, which allows you to create sequence diagrams out of the logs
+
+### [Plot view](./md/plot_view/plot_view.md)
+
+- Plugin supports integration with the QCustomPlot library, which allows you to create plots out of the logs
 
 ### [Files view](./md/files_view/files_view.md)
 

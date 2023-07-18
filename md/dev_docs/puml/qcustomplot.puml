@@ -1,0 +1,61 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CCustomPlotExtended"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+class "QWidget"
+{
+}
+
+}
+
+package "qcustomplot" #DDDDDD
+{
+
+class "QCPAxisRect"
+{
+}
+
+class "QCPGraph"
+{
+}
+
+class "QCPLegend"
+{
+}
+
+class "QCustomPlot"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QCustomPlot <|-- CCustomPlotExtended : extends
+QObject <|-- QCPAxisRect : extends
+QObject <|-- QCPGraph : extends
+QObject <|-- QCPLegend : extends
+QWidget <|-- QCustomPlot : extends
+
+'====================Dependencies section====================
+CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
+CCustomPlotExtended "1" *-- "*" QCPGraph : uses
+CCustomPlotExtended "1" o-- "*" QCPLegend : uses
+
+@enduml

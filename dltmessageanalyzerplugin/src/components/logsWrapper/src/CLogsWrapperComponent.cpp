@@ -47,47 +47,47 @@ tMsgDecoderPtr CLogsWrapperComponent::createMsgDecoder(const tPluginPtrList& dec
 
 DMA::tSyncInitOperationResult CLogsWrapperComponent::init()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       result.bIsOperationSuccessful = true;
-       result.returnCode = 0;
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+    try
+    {
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 DMA::tSyncInitOperationResult CLogsWrapperComponent::shutdown()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       // add logic here, when it will be needed
-       result.bIsOperationSuccessful = true;
-       result.returnCode = 0;
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+    try
+    {
+        // add logic here, when it will be needed
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 PUML_PACKAGE_BEGIN(DMA_LogsWrapper_API)
-   PUML_CLASS_BEGIN(CLogsWrapperComponent)
-       PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
-       PUML_INHERITANCE_CHECKED(IDLTLogsWrapperCreator, implements)
-       PUML_USE_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, *, creates instances)
-       PUML_USE_DEPENDENCY_CHECKED(CDLTMsgWrapper, 1, *, creates instances)
-       PUML_USE_DEPENDENCY_CHECKED(CDLTMsgDecoder, 1, *, creates instances)
-   PUML_CLASS_END()
+    PUML_CLASS_BEGIN(CLogsWrapperComponent)
+        PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+        PUML_INHERITANCE_CHECKED(IDLTLogsWrapperCreator, implements)
+        PUML_USE_DEPENDENCY_CHECKED(CDLTFileWrapper, 1, *, creates instances)
+        PUML_USE_DEPENDENCY_CHECKED(CDLTMsgWrapper, 1, *, creates instances)
+        PUML_USE_DEPENDENCY_CHECKED(CDLTMsgDecoder, 1, *, creates instances)
+    PUML_CLASS_END()
 PUML_PACKAGE_END()

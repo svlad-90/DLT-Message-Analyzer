@@ -8,8 +8,8 @@
 
 #include "DMA_Plantuml.hpp"
 
-CImageViewer::CImageViewer(QWidget *parent)
-   : QWidget(parent)
+CImageViewer::CImageViewer(QWidget *parent):
+    QWidget(parent)
 {}
 
 bool CImageViewer::loadFile(const QString &fileName)

@@ -474,17 +474,19 @@ void CUMLView::handleSettingsManagerChange()
             QAction* pAction = new QAction("Save as ...", this);
             connect(pAction, &QAction::triggered, [this]()
             {
+                QString pngFilter = "Portable network graphics (*.png)";
+                QString pumlFilter = "Plantuml (*.puml)";
+                QString svgFilter = "Scalable vector graphics (*.svg)";
+                QString selectedFilter;
+
                 QString targetFilePath = QFileDialog::getSaveFileName(this, tr("Save as"),
                                                                 mLastSelectedFolder + get_UML_File_Name(),
-                                                                tr("Portable network graphics (*.png);;"
-                                                                   "Plantuml (*.puml);;"
-                                                                   "Scalable vector graphics (*.svg)"));
+                                                                pngFilter + ";;" + pumlFilter + ";;" + svgFilter,
+                                                                &selectedFilter);
 
                 if(false == targetFilePath.isEmpty())
                 {
                     QFileInfo fileInfo(targetFilePath);
-
-                    auto extension = fileInfo.suffix();
 
                     // try to remove the file if it exists
                     if(fileInfo.exists())
@@ -493,24 +495,24 @@ void CUMLView::handleSettingsManagerChange()
                         QFile::remove(targetFilePath);
                     }
 
-                    if(extension == get_PNG_Extension())
+                    if(selectedFilter == pngFilter)
                     {
                         auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PNG_File_Name();
 
                         if(!QFile::copy(sourceFilePath, targetFilePath))
                         {
-                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath, targetFilePath));
                         }
                     }
-                    else if(extension == get_PUML_Extension())
+                    else if(selectedFilter == pumlFilter)
                     {
                         auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_PUML_File_Name();
                         if(!QFile::copy(sourceFilePath, targetFilePath))
                         {
-                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                            SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath, targetFilePath));
                         }
                     }
-                    else if(extension == get_SVG_Extension())
+                    else if(selectedFilter == svgFilter)
                     {
                         auto callback = [this, targetFilePath](int, QProcess::ExitStatus)
                         {
@@ -518,7 +520,7 @@ void CUMLView::handleSettingsManagerChange()
                             auto sourceFilePath = get_UML_Storage_Path(getSettingsManager()->getSettingsFilepath()) + get_UML_SVG_File_Name();
                             if(!QFile::copy(sourceFilePath, targetFilePath))
                             {
-                                SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath).arg(targetFilePath));
+                                SEND_ERR(QString("Failed to copy file \"%1\" to \"%2\"").arg(sourceFilePath, targetFilePath));
                             }
 
                             mpSaveSVGSubProcess.reset();

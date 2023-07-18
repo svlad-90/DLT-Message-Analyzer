@@ -211,6 +211,15 @@ class "CUMLView"
 
 }
 
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
 package "DMA_Plugin" #DDDDDD
 {
 
@@ -341,6 +350,27 @@ class "QWidget"
 
 }
 
+package "qcustomplot" #DDDDDD
+{
+
+class "QCPAxisRect"
+{
+}
+
+class "QCPGraph"
+{
+}
+
+class "QCPLegend"
+{
+}
+
+class "QCustomPlot"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QObject <|-- CDLTRegexAnalyzerWorker : extends
 QObject <|-- IDLTMessageAnalyzerController : extends
@@ -369,6 +399,10 @@ QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
 QObject <|-- CSearchViewComponent : extends
 QObject <|-- ISettingsManager : extends
+QObject <|-- QCPAxisRect : extends
+QObject <|-- QCPGraph : extends
+QObject <|-- QCPLegend : extends
+QWidget <|-- QCustomPlot : extends
 
 '====================Dependencies section====================
 CMTAnalyzer "1" *-- "*" QThread : contains
@@ -385,5 +419,7 @@ CConsoleInputProcessor "1" o-- "1" QLineEdit : console input
 CPatternsView "1" o-- "1" QLineEdit : patterns search input
 CImageViewer "1" *-- "1" QImage : contains
 CUMLView "1" *-- "2" QProcess : contains
+CPlotViewComponent "1" o-- "1" QPushButton : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" QTimer : contains
 
 @enduml

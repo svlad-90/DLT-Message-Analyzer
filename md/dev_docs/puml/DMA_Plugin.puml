@@ -92,6 +92,15 @@ class "CUMLViewComponent"
 
 }
 
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
 package "DMA_Plugin" #DDDDDD
 {
 
@@ -130,6 +139,10 @@ class "QObject"
 {
 }
 
+class "QTimer"
+{
+}
+
 }
 
 '====================Inheritance section====================
@@ -147,9 +160,11 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CLogComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CPlotViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" QTimer : contains
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 
 @enduml

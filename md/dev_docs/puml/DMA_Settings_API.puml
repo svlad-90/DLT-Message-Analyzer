@@ -117,6 +117,15 @@ class "CUMLViewComponent"
 
 }
 
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
 package "DMA_Plugin_API" #DDDDDD
 {
 
@@ -203,6 +212,7 @@ CSettingsManagerClient <|-- CPatternsView : extends
 CSettingsManagerClient <|-- CPatternsViewComponent : extends
 CSettingsManagerClient <|-- CUMLView : extends
 CSettingsManagerClient <|-- CUMLViewComponent : extends
+CSettingsManagerClient <|-- CPlotViewComponent : extends
 CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 CSettingsManagerClient <|-- Form : extends
 CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends

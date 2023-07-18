@@ -3,19 +3,6 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DLT" #DDDDDD
-{
-
-class "QDltPlugin"
-{
-}
-
-class "QDltPluginManager"
-{
-}
-
-}
-
 package "DMA_Analyzer_API" #DDDDDD
 {
 
@@ -214,6 +201,7 @@ class "ISearchResultModel"
     + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
     + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
     + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual tPlotContent createPlotContent() const = 0
     + {abstract} virtual void resetData() = 0
     + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
     + {abstract} virtual void updateView(const int& fromRow = 0) = 0
@@ -266,8 +254,7 @@ CDLTMessageAnalyzer "1" *-- "1" IGroupedViewModel : uses
 CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" ISettingsManager : gets and uses
-CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
-CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
+CDLTMessageAnalyzer "1" o-- "1" QDltMessageDecoder : uses
 Form "1" o-- "1" DLTMessageAnalyzerPlugin : uses
 Form "1" *-- "1" Ui::Form : contains
 Ui::Form "1" *-- "1" CConsoleView : contains

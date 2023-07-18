@@ -28,6 +28,7 @@ class "ISearchResultModel"
     + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
     + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
     + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual tPlotContent createPlotContent() const = 0
     + {abstract} virtual void resetData() = 0
     + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
     + {abstract} virtual void updateView(const int& fromRow = 0) = 0

@@ -26,7 +26,8 @@ IDLTMessageAnalyzerControllerConsumer::IDLTMessageAnalyzerControllerConsumer( co
 }
 
 tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequestParameters& requestParameters,
-                                                                  bool bUMLFeatureActive )
+                                                                  bool bUMLFeatureActive,
+                                                                  bool bPlotViewFeatureActive )
 {
     tRequestId requestId = INVALID_REQUEST_ID;
 
@@ -34,7 +35,7 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
     {
         tRegexScriptingMetadata regexMetadata;
 
-        bool bParseResult = regexMetadata.parse(requestParameters.regex, bUMLFeatureActive);
+        bool bParseResult = regexMetadata.parse(requestParameters.regex, bUMLFeatureActive, bPlotViewFeatureActive);
 
         if(false == bParseResult)
         {
@@ -51,6 +52,19 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
                     if(false == checkUMLDataResult.first) // let's check and trace the warnings
                     {
                         SEND_WRN(checkUMLDataResult.second);
+                    }
+                }
+            }
+
+            if(true == bPlotViewFeatureActive)
+            {
+                if(true == regexMetadata.doesContainAnyPlotViewGroup()) // if has at least one plot view group
+                {
+                    auto checkPlotViewDataResult = regexMetadata.doesContainConsistentPlotViewData(true, true);
+
+                    if(false == checkPlotViewDataResult.first) // let's check and trace the warnings
+                    {
+                        SEND_WRN(checkPlotViewDataResult.second);
                     }
                 }
             }

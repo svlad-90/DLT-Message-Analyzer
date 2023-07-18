@@ -43,6 +43,7 @@ class CUMLView;
 class CSearchResultView;
 class ISearchResultModel;
 class CTableMemoryJumper;
+class CCustomPlotExtended;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -70,7 +71,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
                             CSearchResultView* pSearchResultView,
                             const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                             const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
-                            const tSettingsManagerPtr& pSettingsManager);
+                            const tSettingsManagerPtr& pSettingsManager,
+                            CCustomPlotExtended* pCustomPlotExtended);
 
         /**
          * @brief setFile - set's the file to be used for analysis
@@ -139,7 +141,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
 
         /**
          * @brief searchView_clicked_jumpTo_inMainTable - scrolls main table of dlt-viewer to a specified index
-         * @param index - index to jump to.
+         * @param index - index to jump to
+         * @param setFocus - whether to set focus to the main table
          */
         void searchView_clicked_jumpTo_inMainTable(const QModelIndex &index);
 
@@ -207,6 +210,12 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
          * @brief createSequenceDiagram - trigger to create a sequence diagram
          */
         void createSequenceDiagram() const;
+
+        /**
+         * @brief jumpInMainTable - jumps in main dlt viewer table to a selected msg id
+         * @param msgId - msg id to jump to
+         */
+        void jumpInMainTable(const tMsgId& msgId);
 
 signals:
         /**
@@ -307,4 +316,6 @@ signals:
         QElapsedTimer mMeasurementRequestTimer;
         std::shared_ptr<CTableMemoryJumper> mpSearchViewTableJumper;
         std::weak_ptr<IDLTLogsWrapperCreator> mpDLTLogsWrapperCreator;
+
+        CCustomPlotExtended* mpCustomPlotExtended;
 };

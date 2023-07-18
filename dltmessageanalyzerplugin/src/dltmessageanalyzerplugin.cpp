@@ -10,6 +10,8 @@
 #include "QLineEdit"
 #include "QApplication"
 
+#include "qcustomplot.h"
+
 #include "dltmessageanalyzerplugin.hpp"
 #include "plugin/api/CDLTMessageAnalyzer.hpp"
 #include "components/patternsView/api/CPatternsView.hpp"
@@ -26,6 +28,7 @@
 #include "components/patternsView/api/CPatternsViewComponent.hpp"
 #include "components/filtersView/api/CFiltersViewComponent.hpp"
 #include "components/plant_uml/api/CUMLViewComponent.hpp"
+#include "components/plotView/api/CPlotViewComponent.hpp"
 #include "components/logo/api/CLogoComponent.hpp"
 #include "components/logsWrapper/api/CLogsWrapperComponent.hpp"
 #include "components/settings/api/CSettingsComponent.hpp"
@@ -55,7 +58,8 @@ mpFiltersViewComponent(nullptr),
 mpUMLViewComponent(nullptr),
 mpLogoComponent(nullptr),
 mpLogsWrapperComponent(nullptr),
-mpSettingsComponent(nullptr)
+mpSettingsComponent(nullptr),
+mDisconnectionTimer()
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
 #endif
@@ -65,6 +69,21 @@ mpSettingsComponent(nullptr)
 
     DMA::PlantUML::Creator::getInstance().initialize();
     DMA::PlantUML::Creator::getInstance().setBackgroundColor("#FEFEFE");
+
+    connect(&mDisconnectionTimer, &QTimer::timeout, [this]()
+    {
+        if( mpDLTMessageAnalyzer )
+        {
+            mpDLTMessageAnalyzer->connectionChanged(false);
+            if(nullptr != mpSettingsComponent->getSettingsManager() &&
+                true == mpSettingsComponent->getSettingsManager()->getContinuousSearch())
+            {
+                mpDLTMessageAnalyzer->stop(CDLTMessageAnalyzer::eStopAction::eStopIfNotFinished);
+            }
+        }
+
+        mDisconnectionTimer.stop();
+    });
 }
 
 QString DLTMessageAnalyzerPlugin::name()
@@ -248,6 +267,33 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
+        auto pPlotViewComponent = std::make_shared<CPlotViewComponent>(mpForm->getCustomPlot(),
+                                                                       mpForm->getCreatePlotButton(),
+                                                                       mpSearchViewComponent->getSearchResultModel(),
+                                                                       mpSettingsComponent->getSettingsManager());
+        mpPlotViewComponent = pPlotViewComponent;
+
+        auto initResult = pPlotViewComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pPlotViewComponent->getName()));
+        }
+        else
+        {
+            connect(pPlotViewComponent.get(), &CPlotViewComponent::messageIdSelected, this, [this](const tMsgId& msgId)
+            {
+                if(nullptr != mpDLTMessageAnalyzer)
+                {
+                    mpDLTMessageAnalyzer->jumpInMainTable(msgId);
+                }
+            });
+        }
+
+        mComponents.push_back(pPlotViewComponent);
+    }
+
+    {
         auto pLogoComponent = std::make_shared<CLogoComponent>(mpForm->getLogo());
         mpLogoComponent = pLogoComponent;
 
@@ -340,7 +386,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpSearchViewComponent->getSearchResultView(),
                                                                                                       mpSearchViewComponent->getSearchResultModel(),
                                                                                                       mpLogsWrapperComponent,
-                                                                                                      mpSettingsComponent->getSettingsManager());
+                                                                                                      mpSettingsComponent->getSettingsManager(),
+                                                                                                      mpPlotViewComponent->getPlot());
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)
@@ -529,20 +576,28 @@ bool DLTMessageAnalyzerPlugin::stateChanged(int, QDltConnection::QDltConnectionS
             }
         }
 
-        if( QDltConnection::QDltConnectionOnline == mConnectionState )
+        switch(mConnectionState)
         {
-            if( mpDLTMessageAnalyzer )
+            case QDltConnection::QDltConnectionOnline:
             {
-               mpDLTMessageAnalyzer->connectionChanged(true);
-            }
-        }
-        else
-        {
             if( mpDLTMessageAnalyzer )
-            {
-               mpDLTMessageAnalyzer->connectionChanged(false);
-               mpDLTMessageAnalyzer->stop(CDLTMessageAnalyzer::eStopAction::eStopIfNotFinished);
+                {
+                    mpDLTMessageAnalyzer->connectionChanged(true);
+                }
+
+                mDisconnectionTimer.stop();
             }
+            break;
+            case QDltConnection::QDltConnectionOffline:
+            {
+                mDisconnectionTimer.start(500);
+            }
+            break;
+            default:
+            {
+                // do nothing
+            }
+            break;
         }
     }
 
@@ -768,5 +823,7 @@ PUML_PACKAGE_BEGIN(DMA_Plugin)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogoComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogsWrapperComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CPlotViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(QTimer, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

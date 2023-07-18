@@ -57,6 +57,15 @@ class "IFileWrapper"
 
 }
 
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
 package "DMA_Plugin" #DDDDDD
 {
 
@@ -104,6 +113,7 @@ class "ISearchResultModel"
     + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
     + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
     + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual tPlotContent createPlotContent() const = 0
     + {abstract} virtual void resetData() = 0
     + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
     + {abstract} virtual void updateView(const int& fromRow = 0) = 0
@@ -141,6 +151,7 @@ DMA::IComponent <|-- CSearchViewComponent : implements
 QObject <|-- CSearchViewComponent : extends
 
 '====================Dependencies section====================
+CPlotViewComponent "1" o-- "1" ISearchResultModel : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses

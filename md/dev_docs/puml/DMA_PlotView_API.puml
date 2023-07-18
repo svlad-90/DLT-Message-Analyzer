@@ -1,0 +1,106 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CCustomPlotExtended"
+{
+}
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
+package "DMA_Plugin" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "ISearchResultModel"
+{
+    + {abstract} virtual int getFileIdx( const QModelIndex& idx ) const = 0
+    + {abstract} virtual std::pair<bool__tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0
+    + {abstract} virtual std::pair<int__QString > getUMLDiagramContent() const = 0
+    + {abstract} virtual tPlotContent createPlotContent() const = 0
+    + {abstract} virtual void resetData() = 0
+    + {abstract} virtual void setFile(const tFileWrapperPtr& pFile) = 0
+    + {abstract} virtual void updateView(const int& fromRow = 0) = 0
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QPushButton"
+{
+}
+
+}
+
+package "qcustomplot" #DDDDDD
+{
+
+class "QCPAxisRect"
+{
+}
+
+class "QCPGraph"
+{
+}
+
+class "QCPLegend"
+{
+}
+
+class "QCustomPlot"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QCustomPlot <|-- CCustomPlotExtended : extends
+CSettingsManagerClient <|-- CPlotViewComponent : extends
+DMA::IComponent <|-- CPlotViewComponent : implements
+
+'====================Dependencies section====================
+CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
+CCustomPlotExtended "1" *-- "*" QCPGraph : uses
+CCustomPlotExtended "1" o-- "*" QCPLegend : uses
+CPlotViewComponent "1" o-- "1" CCustomPlotExtended : uses
+CPlotViewComponent "1" o-- "1" ISearchResultModel : uses
+CPlotViewComponent "1" o-- "1" QPushButton : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CPlotViewComponent : contains
+
+@enduml
