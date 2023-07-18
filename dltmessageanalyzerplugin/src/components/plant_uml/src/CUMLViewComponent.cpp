@@ -17,75 +17,75 @@ mpUMLTextEditor(pUMLTextEditor)
 
 const char* CUMLViewComponent::getName() const
 {
-   return "CUMLViewComponent";
+    return "CUMLViewComponent";
 }
 
 DMA::tSyncInitOperationResult CUMLViewComponent::init()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       if(nullptr != mpUMLView)
-       {
-           mpUMLView->setSettingsManager(getSettingsManager());
+    try
+    {
+        if(nullptr != mpUMLView)
+        {
+            mpUMLView->setSettingsManager(getSettingsManager());
 
-           if(nullptr != mpUMLCreateDiagramFromTextButton)
-           {
-               mpUMLView->setUMLCreateDiagramFromTextButton(mpUMLCreateDiagramFromTextButton);
-           }
+            if(nullptr != mpUMLCreateDiagramFromTextButton)
+            {
+                mpUMLView->setUMLCreateDiagramFromTextButton(mpUMLCreateDiagramFromTextButton);
+            }
 
-           if(nullptr != mpUMLTextEditor)
-           {
-               mpUMLView->setUMLTextEditor(mpUMLTextEditor);
-           }
+            if(nullptr != mpUMLTextEditor)
+            {
+                mpUMLView->setUMLTextEditor(mpUMLTextEditor);
+            }
 
-           result.bIsOperationSuccessful = true;
-           result.returnCode = 0;
-       }
-       else
-       {
-           result.bIsOperationSuccessful = false;
-           result.returnCode = -1;
-       }
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+            result.bIsOperationSuccessful = true;
+            result.returnCode = 0;
+        }
+        else
+        {
+            result.bIsOperationSuccessful = false;
+            result.returnCode = -1;
+        }
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 DMA::tSyncInitOperationResult CUMLViewComponent::shutdown()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       // add logic here, when it will be needed
-       result.bIsOperationSuccessful = true;
-       result.returnCode = 0;
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+    try
+    {
+        // add logic here, when it will be needed
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 CUMLView* CUMLViewComponent::getUMLView() const
 {
-   return mpUMLView;
+    return mpUMLView;
 }
 
 PUML_PACKAGE_BEGIN(DMA_PlantumlView_API)
-   PUML_CLASS_BEGIN(CUMLViewComponent)
-       PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
-       PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
-       PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
-   PUML_CLASS_END()
+    PUML_CLASS_BEGIN(CUMLViewComponent)
+        PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
+        PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CUMLView, 1, 1, uses)
+    PUML_CLASS_END()
 PUML_PACKAGE_END()

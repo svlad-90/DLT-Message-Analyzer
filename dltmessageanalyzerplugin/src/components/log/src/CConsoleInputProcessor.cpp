@@ -53,7 +53,9 @@ static void supportedColors()
 {
     SEND_MSG("Supported colors:");
 
-    for(const auto& colorItem : sColorsMap)
+    const auto& colorsMap = getColorsMap();
+
+    for(const auto& colorItem : colorsMap)
     {
         SEND_MSG_COLORED(colorItem.first, colorItem.second);
     }
@@ -270,6 +272,36 @@ static void UML_sequence_identifiers()
     }
 }
 
+static void plot_sequence_identifiers()
+{
+    SEND_MSG("Plot regex group identifiers, which are supported by the plugin:");
+
+    for(const auto& item : sPlotViewIDsMap)
+    {
+        QString id_type_msg = QString("Type - ").append(getPlotIDTypeAsString(item.second.id_type));
+
+        SEND_MSG(QString("[%1] : %2 | <%3>")
+                     .arg( getPlotIDAsString( item.first ) )
+                     .arg(item.second.description)
+                     .arg(id_type_msg));
+    }
+}
+
+static void plot_operations()
+{
+    SEND_MSG("How to work with the plot?");
+    SEND_MSG("- Scroll - zoom horizontally");
+    SEND_MSG("- Click+move - drag horizontally");
+    SEND_MSG("- Shift+scroll - zoom vertically");
+    SEND_MSG("- Shift+click+move - drag vertically");
+    SEND_MSG("- Ctrl+scroll - change opacity");
+    SEND_MSG("- 'F' key with having a selected point on the graph - filter/unfilter the selected graph");
+    SEND_MSG("- Click on the legend item - hide/show the selected graph");
+    SEND_MSG("- Ctrl+click on the legend item - move the selected graph to the font");
+    SEND_MSG("- Space - reset the vertical scale of all charts");
+    SEND_MSG("- Click on the graph point - jump to the corresponding message in the dlt-viewer's main table, and show the point details");
+}
+
 void CConsoleInputProcessor::printHelp(const QString& command)
 {
     static const auto scenarioMap = createScenariosMap();
@@ -355,6 +387,10 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                       "- clears debug view");
     result["color-aliases"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedColors();}
                               , "- prints all supported color aliases");
+    result["plot-sequence-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_sequence_identifiers();}
+                                  , "- prints information about regex names scripting in area of the plot diagrams.");
+    result["plot-operations"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_operations();}
+                                  , "- prints information about regex names scripting in area of the plot diagrams.");
     result["support"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){support();}
                         , "- prints information regarding how to get support");
     result["version"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){version();}

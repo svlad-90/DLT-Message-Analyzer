@@ -1,0 +1,54 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PlotView_API" #DDDDDD
+{
+
+class "CCustomPlotExtended"
+{
+}
+
+class "CPlotViewComponent"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
+package "qcustomplot" #DDDDDD
+{
+
+class "QCustomPlot"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QCustomPlot <|-- CCustomPlotExtended : extends
+CSettingsManagerClient <|-- CPlotViewComponent : extends
+DMA::IComponent <|-- CPlotViewComponent : implements
+
+'====================Dependencies section====================
+CPlotViewComponent "1" o-- "1" CCustomPlotExtended : uses
+
+@enduml

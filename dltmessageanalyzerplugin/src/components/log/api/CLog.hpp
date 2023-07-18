@@ -18,7 +18,7 @@ namespace DMA_Log
 #define SEND_MSG(STRING)\
 do\
 {\
-   DMA_Log::sendMessage(STRING);\
+    DMA_Log::sendMessage(STRING);\
 }while(false)
 
 /**
@@ -27,7 +27,7 @@ do\
 #define SEND_WRN(STRING)\
 do\
 {\
-   DMA_Log::sendWarning(STRING);\
+    DMA_Log::sendWarning(STRING);\
 }while(false)
 
 /**
@@ -36,7 +36,7 @@ do\
 #define SEND_ERR(STRING)\
 do\
 {\
-   DMA_Log::sendError(STRING);\
+    DMA_Log::sendError(STRING);\
 }while(false)
 
 /**
@@ -45,11 +45,11 @@ do\
 #define SEND_MSG_COLORED(STRING, COLOR)\
 do\
 {\
-   DMA_Log::sendMessageColored(STRING, COLOR);\
+    DMA_Log::sendMessageColored(STRING, COLOR);\
 }while(false)
 
 #define CLEAR_CONSOLE_VIEW()\
 do\
 {\
-   DMA_Log::clearConsole();\
+    DMA_Log::clearConsole();\
 }while(false)

@@ -14,10 +14,6 @@ class "QDltMsg"
 {
 }
 
-class "QDltPlugin"
-{
-}
-
 }
 
 package "DMA_Analyzer_API" #DDDDDD
@@ -75,7 +71,7 @@ class "CLogsWrapperComponent"
 class "IDLTLogsWrapperCreator"
 {
     + {abstract} virtual tFileWrapperPtr createDLTFileWrapper( QDltFile* pFile ) const = 0
-    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(const tPluginPtrList& decoderPlugins) const = 0
+    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(QDltMessageDecoder* pMessageDecoder) const = 0
     + {abstract} virtual tMsgWrapperPtr createDLTMsgWrapper( QDltMsg& msg ) const = 0
 }
 
@@ -204,8 +200,8 @@ IDLTLogsWrapperCreator "1" --> "*" IFileWrapper : creates
 IDLTLogsWrapperCreator "1" --> "*" IMsgDecoder : creates
 IDLTLogsWrapperCreator "1" --> "*" IMsgWrapper : creates
 IDLTLogsWrapperCreator "1" --> "*" QDltFile : uses
+IDLTLogsWrapperCreator "1" --> "1" QDltMessageDecoder : uses
 IDLTLogsWrapperCreator "1" --> "*" QDltMsg : uses
-IDLTLogsWrapperCreator "1" --> "*" QDltPlugin : uses
 IFileWrapper "1" --> "1" IMsgDecoder : uses
 IFileWrapper "1" --> "1" IMsgWrapper : provides
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains

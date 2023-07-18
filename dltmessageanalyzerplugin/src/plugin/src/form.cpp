@@ -69,7 +69,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         mpUI->iconButton->setText("");
 
-        connect(mpUI->iconButton, &QPushButton::clicked, [this]()
+        connect(mpUI->iconButton, &QPushButton::clicked, this, [this]()
         {
             if(nullptr != mpDLTMessageAnalyzerPlugin)
             {
@@ -136,7 +136,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         {
             QAction* pAction = new QAction("Write settings on each update", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setWriteSettingsOnEachUpdate(checked);
             });
@@ -149,7 +149,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         {
             QAction* pAction = new QAction("Enable cache", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setCacheEnabled(checked);
             });
@@ -164,7 +164,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                 QString msg = QString("Set cache size (cur. value - %1 Mb) ...").arg(getSettingsManager()->getCacheMaxSizeMB());
 
                 QAction* pAction = new QAction(msg, this);
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     tCacheSizeMB maxRAMSize = 0;
 
@@ -198,7 +198,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
             if(true == getSettingsManager()->getCacheEnabled())
             {
                 QAction* pAction = new QAction("Reset cache ...", this);
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     if(nullptr != mpDLTMessageAnalyzerPlugin)
                     {
@@ -213,7 +213,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         {
             QAction* pAction = new QAction("PlantUML", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setUML_FeatureActive(checked);
             });
@@ -224,9 +224,23 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         contextMenu.addSeparator();
 
+
+        {
+            QAction* pAction = new QAction("Plot view", this);
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
+                    {
+                        getSettingsManager()->setPlotViewFeatureActive(checked);
+                    });
+            pAction->setCheckable(true);
+            pAction->setChecked(getSettingsManager()->getPlotViewFeatureActive());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
         {
             QAction* pAction = new QAction("Open settings folder", this);
-            connect(pAction, &QAction::triggered, [this]()
+            connect(pAction, &QAction::triggered, this, [this]()
             {
                 SEND_MSG(QString("[Form]: Attempt to open path - \"%1\"")
                          .arg(getSettingsManager()->getSettingsFilepath()));
@@ -240,7 +254,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
         {
             QAction* pAction = new QAction("RDP mode", this);
-            connect(pAction, &QAction::triggered, [this](bool checked)
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
                 getSettingsManager()->setRDPMode(checked);
             });
@@ -256,7 +270,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
     if(nullptr != mpUI->patternsTreeView)
     {
-        connect(mpUI->patternsTreeView, &CPatternsView::patternSelected, [this]( const QString& )
+        connect(mpUI->patternsTreeView, &CPatternsView::patternSelected, this, [this]( const QString& )
         {
             if(nullptr != mpDLTMessageAnalyzerPlugin)
             {
@@ -271,12 +285,12 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
     if(nullptr != mpUI->PNG_UML_View
     && nullptr != mpUI->createSequenceDiagram)
     {
-        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationStarted, [this]()
+        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationStarted, this, [this]()
         {
             mpUI->createSequenceDiagram->setText("Cancel");
         });
 
-        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationFinished, [this](bool)
+        connect(mpUI->PNG_UML_View, &CUMLView::diagramGenerationFinished, this, [this](bool)
         {
             mpUI->createSequenceDiagram->setText("Create sequence diagram");
         });
@@ -312,7 +326,66 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                 });
             }
         }
+
+        {
+            auto pPlotViewWidget = mpUI->tabWidget->findChild<QWidget*>(QString("plotViewTab"));
+
+            if(nullptr != pPlotViewWidget)
+            {
+                auto enablePlotViewWidget = [this, pPlotViewWidget](bool val)
+                {
+                    if(nullptr != mpUI && nullptr != mpUI->tabWidget)
+                    {
+                        if(mpUI->tabWidget->count() > 0)
+                        {
+                            if(true != val)
+                            {
+                                mpUI->tabWidget->removeTab(mpUI->tabWidget->indexOf(pPlotViewWidget));
+                            }
+                            else
+                            {
+                                mpUI->tabWidget->insertTab(true == getSettingsManager()->getUML_FeatureActive() ? 4 : 3, pPlotViewWidget, "Plot view");
+                            }
+                        }
+                    }
+                };
+
+                enablePlotViewWidget(getSettingsManager()->getPlotViewFeatureActive());
+
+                connect(getSettingsManager().get(), &ISettingsManager::plotViewFeatureActiveChanged, [enablePlotViewWidget](bool val)
+                {
+                    enablePlotViewWidget(val);
+                });
+            }
+        }
     }
+
+    connect(mpUI->tabWidget, &QTabWidget::currentChanged, this, [this](int index)
+    {
+        int32_t plotViewTabIndex = -1;
+
+        for (int i = 0; i < mpUI->tabWidget->count(); ++i)
+        {
+            if (mpUI->tabWidget->tabText(i) == "Plot view")
+            {
+                plotViewTabIndex = i;
+                break;
+            }
+        }
+
+        if(plotViewTabIndex >= 0)
+        {
+            if(index == plotViewTabIndex)
+            {
+                mpUI->plot->setFocus();
+            }
+        }
+    });
+
+    connect(mpUI->CreatePlotButton, &QPushButton::clicked, this, [this](bool)
+    {
+        mpUI->plot->setFocus();
+    });
 
     QList<int> newSplitterSizes;
     newSplitterSizes.push_back(1000);
@@ -624,6 +697,11 @@ CUMLView* Form::getUMLView()
     return pResult;
 }
 
+CCustomPlotExtended* Form::getCustomPlot()
+{
+    return mpUI->plot;
+}
+
 QPushButton* Form::getCreateSequenceDiagramButton()
 {
     QPushButton* pResult = nullptr;
@@ -655,6 +733,18 @@ QPushButton* Form::getUMLCreateDiagramFromTextButton()
     if(mpUI)
     {
         pResult = mpUI->UMLCreateDiagramFromTextButton;
+    }
+
+    return pResult;
+}
+
+QPushButton* Form::getCreatePlotButton()
+{
+    QPushButton* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CreatePlotButton;
     }
 
     return pResult;

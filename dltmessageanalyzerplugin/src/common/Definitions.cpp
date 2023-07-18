@@ -9,6 +9,7 @@
 #include <map>
 #include <vector>
 #include <atomic>
+#include <random>
 
 #include <QDateTime>
 
@@ -138,166 +139,191 @@ const tUML_IDs_Map s_UML_IDs_Map = createUMLIDsMap();
 const tMsgId INVALID_MSG_ID = -1;
 const tRequestId INVALID_REQUEST_ID = static_cast<uint>(-1);
 
-const std::map<QString, QColor> sColorsMap =
+const std::map<QString, QColor>& getColorsMap()
 {
-{"ok", QColor(0,150,0)},
-{"warning", QColor(150,150,0)},
-{"error", QColor(150,0,0)},
-{"black", QColor(0,0,0)},
-{"white", QColor(255,255,255)},
-{"red", QColor(255,0,0)},
-{"lime", QColor(0,255,0)},
-{"blue", QColor(0,0,255)},
-{"yellow", QColor(255,255,0)},
-{"cyan", QColor(0,255,255)},
-{"magenta", QColor(255,0,255)},
-{"silver", QColor(192,192,192)},
-{"gray", QColor(128,128,128)},
-{"maroon", QColor(128,0,0)},
-{"olive", QColor(128,128,0)},
-{"green", QColor(0,128,0)},
-{"purple", QColor(128,0,128)},
-{"teal", QColor(0,128,128)},
-{"navy", QColor(0,0,128)},
-{"maroon", QColor(128,0,0)},
-{"dark_red", QColor(139,0,0)},
-{"brown", QColor(165,42,42)},
-{"firebrick", QColor(178,34,34)},
-{"crimson", QColor(220,20,60)},
-{"red", QColor(255,0,0)},
-{"tomato", QColor(255,99,71)},
-{"coral", QColor(255,127,80)},
-{"indian_red", QColor(205,92,92)},
-{"light_coral", QColor(240,128,128)},
-{"dark_salmon", QColor(233,150,122)},
-{"salmon", QColor(250,128,114)},
-{"light_salmon", QColor(255,160,122)},
-{"orange_red", QColor(255,69,0)},
-{"dark_orange", QColor(255,140,0)},
-{"orange", QColor(255,165,0)},
-{"gold", QColor(255,215,0)},
-{"dark_golden_rod", QColor(184,134,11)},
-{"golden_rod", QColor(218,165,32)},
-{"pale_golden_rod", QColor(238,232,170)},
-{"dark_khaki", QColor(189,183,107)},
-{"khaki", QColor(240,230,140)},
-{"olive", QColor(128,128,0)},
-{"yellow", QColor(255,255,0)},
-{"yellow_green", QColor(154,205,50)},
-{"dark_olive_green", QColor(85,107,47)},
-{"olive_drab", QColor(107,142,35)},
-{"lawn_green", QColor(124,252,0)},
-{"chart_reuse", QColor(127,255,0)},
-{"green_yellow", QColor(173,255,47)},
-{"dark_green", QColor(0,100,0)},
-{"green", QColor(0,128,0)},
-{"forest_green", QColor(34,139,34)},
-{"lime", QColor(0,255,0)},
-{"lime_green", QColor(50,205,50)},
-{"light_green", QColor(144,238,144)},
-{"pale_green", QColor(152,251,152)},
-{"dark_sea_green", QColor(143,188,143)},
-{"medium_spring_green", QColor(0,250,154)},
-{"spring_green", QColor(0,255,127)},
-{"sea_green", QColor(46,139,87)},
-{"medium_aqua_marine", QColor(102,205,170)},
-{"medium_sea_green", QColor(60,179,113)},
-{"light_sea_green", QColor(32,178,170)},
-{"dark_slate_gray", QColor(47,79,79)},
-{"teal", QColor(0,128,128)},
-{"dark_cyan", QColor(0,139,139)},
-{"aqua", QColor(0,255,255)},
-{"cyan", QColor(0,255,255)},
-{"light_cyan", QColor(224,255,255)},
-{"dark_turquoise", QColor(0,206,209)},
-{"turquoise", QColor(64,224,208)},
-{"medium_turquoise", QColor(72,209,204)},
-{"pale_turquoise", QColor(175,238,238)},
-{"aqua_marine", QColor(127,255,212)},
-{"powder_blue", QColor(176,224,230)},
-{"cadet_blue", QColor(95,158,160)},
-{"steel_blue", QColor(70,130,180)},
-{"corn_flower_blue", QColor(100,149,237)},
-{"deep_sky_blue", QColor(0,191,255)},
-{"dodger_blue", QColor(30,144,255)},
-{"light_blue", QColor(173,216,230)},
-{"sky_blue", QColor(135,206,235)},
-{"light_sky_blue", QColor(135,206,250)},
-{"midnight_blue", QColor(25,25,112)},
-{"navy", QColor(0,0,128)},
-{"dark_blue", QColor(0,0,139)},
-{"medium_blue", QColor(0,0,205)},
-{"blue", QColor(0,0,255)},
-{"royal_blue", QColor(65,105,225)},
-{"blue_violet", QColor(138,43,226)},
-{"indigo", QColor(75,0,130)},
-{"dark_slate_blue", QColor(72,61,139)},
-{"slate_blue", QColor(106,90,205)},
-{"medium_slate_blue", QColor(123,104,238)},
-{"medium_purple", QColor(147,112,219)},
-{"dark_magenta", QColor(139,0,139)},
-{"dark_violet", QColor(148,0,211)},
-{"dark_orchid", QColor(153,50,204)},
-{"medium_orchid", QColor(186,85,211)},
-{"purple", QColor(128,0,128)},
-{"thistle", QColor(216,191,216)},
-{"plum", QColor(221,160,221)},
-{"violet", QColor(238,130,238)},
-{"magenta", QColor(255,0,255)},
-{"orchid", QColor(218,112,214)},
-{"medium_violet_red", QColor(199,21,133)},
-{"pale_violet_red", QColor(219,112,147)},
-{"deep_pink", QColor(255,20,147)},
-{"hot_pink", QColor(255,105,180)},
-{"light_pink", QColor(255,182,193)},
-{"pink", QColor(255,192,203)},
-{"antique_white", QColor(250,235,215)},
-{"beige", QColor(245,245,220)},
-{"bisque", QColor(255,228,196)},
-{"blanched_almond", QColor(255,235,205)},
-{"wheat", QColor(245,222,179)},
-{"corn_silk", QColor(255,248,220)},
-{"lemon_chiffon", QColor(255,250,205)},
-{"light golden rod yellow", QColor(250,250,210)},
-{"light_yellow", QColor(255,255,224)},
-{"saddle_brown", QColor(139,69,19)},
-{"sienna", QColor(160,82,45)},
-{"chocolate", QColor(210,105,30)},
-{"peru", QColor(205,133,63)},
-{"sandy_brown", QColor(244,164,96)},
-{"burly_wood", QColor(222,184,135)},
-{"tan", QColor(210,180,140)},
-{"rosy_brown", QColor(188,143,143)},
-{"moccasin", QColor(255,228,181)},
-{"navajo_white", QColor(255,222,173)},
-{"peach_puff", QColor(255,218,185)},
-{"misty_rose", QColor(255,228,225)},
-{"lavender_blush", QColor(255,240,245)},
-{"linen", QColor(250,240,230)},
-{"old_lace", QColor(253,245,230)},
-{"papaya_whip", QColor(255,239,213)},
-{"sea_shell", QColor(255,245,238)},
-{"mint_cream", QColor(245,255,250)},
-{"slate_gray", QColor(112,128,144)},
-{"light_slate_gray", QColor(119,136,153)},
-{"light_steel_blue", QColor(176,196,222)},
-{"lavender", QColor(230,230,250)},
-{"floral_white", QColor(255,250,240)},
-{"alice_blue", QColor(240,248,255)},
-{"ghost_white", QColor(248,248,255)},
-{"honeydew", QColor(240,255,240)},
-{"ivory", QColor(255,255,240)},
-{"azure", QColor(240,255,255)},
-{"snow", QColor(255,250,250)},
-{"black", QColor(0,0,0)},
-{"dim_gray", QColor(105,105,105)},
-{"gray", QColor(128,128,128)},
-{"dark_gray", QColor(169,169,169)},
-{"silver", QColor(192,192,192)},
-{"ight_gray", QColor(211,211,211)},
-{"gainsboro", QColor(220,220,220)},
-{"white_smoke", QColor(245,245,245)},
-{"white", QColor(255,255,255)}};
+    static const std::map<QString, QColor> sColorsMap =
+        {
+         {"ok", QColor(0,150,0)},
+         {"warning", QColor(150,150,0)},
+         {"error", QColor(150,0,0)},
+         {"black", QColor(0,0,0)},
+         {"white", QColor(255,255,255)},
+         {"red", QColor(255,0,0)},
+         {"lime", QColor(0,255,0)},
+         {"blue", QColor(0,0,255)},
+         {"yellow", QColor(255,255,0)},
+         {"cyan", QColor(0,255,255)},
+         {"magenta", QColor(255,0,255)},
+         {"silver", QColor(192,192,192)},
+         {"gray", QColor(128,128,128)},
+         {"maroon", QColor(128,0,0)},
+         {"olive", QColor(128,128,0)},
+         {"green", QColor(0,128,0)},
+         {"purple", QColor(128,0,128)},
+         {"teal", QColor(0,128,128)},
+         {"navy", QColor(0,0,128)},
+         {"maroon", QColor(128,0,0)},
+         {"dark_red", QColor(139,0,0)},
+         {"brown", QColor(165,42,42)},
+         {"firebrick", QColor(178,34,34)},
+         {"crimson", QColor(220,20,60)},
+         {"red", QColor(255,0,0)},
+         {"tomato", QColor(255,99,71)},
+         {"coral", QColor(255,127,80)},
+         {"indian_red", QColor(205,92,92)},
+         {"light_coral", QColor(240,128,128)},
+         {"dark_salmon", QColor(233,150,122)},
+         {"salmon", QColor(250,128,114)},
+         {"light_salmon", QColor(255,160,122)},
+         {"orange_red", QColor(255,69,0)},
+         {"dark_orange", QColor(255,140,0)},
+         {"orange", QColor(255,165,0)},
+         {"gold", QColor(255,215,0)},
+         {"dark_golden_rod", QColor(184,134,11)},
+         {"golden_rod", QColor(218,165,32)},
+         {"pale_golden_rod", QColor(238,232,170)},
+         {"dark_khaki", QColor(189,183,107)},
+         {"khaki", QColor(240,230,140)},
+         {"olive", QColor(128,128,0)},
+         {"yellow", QColor(255,255,0)},
+         {"yellow_green", QColor(154,205,50)},
+         {"dark_olive_green", QColor(85,107,47)},
+         {"olive_drab", QColor(107,142,35)},
+         {"lawn_green", QColor(124,252,0)},
+         {"chart_reuse", QColor(127,255,0)},
+         {"green_yellow", QColor(173,255,47)},
+         {"dark_green", QColor(0,100,0)},
+         {"green", QColor(0,128,0)},
+         {"forest_green", QColor(34,139,34)},
+         {"lime", QColor(0,255,0)},
+         {"lime_green", QColor(50,205,50)},
+         {"light_green", QColor(144,238,144)},
+         {"pale_green", QColor(152,251,152)},
+         {"dark_sea_green", QColor(143,188,143)},
+         {"medium_spring_green", QColor(0,250,154)},
+         {"spring_green", QColor(0,255,127)},
+         {"sea_green", QColor(46,139,87)},
+         {"medium_aqua_marine", QColor(102,205,170)},
+         {"medium_sea_green", QColor(60,179,113)},
+         {"light_sea_green", QColor(32,178,170)},
+         {"dark_slate_gray", QColor(47,79,79)},
+         {"teal", QColor(0,128,128)},
+         {"dark_cyan", QColor(0,139,139)},
+         {"aqua", QColor(0,255,255)},
+         {"cyan", QColor(0,255,255)},
+         {"light_cyan", QColor(224,255,255)},
+         {"dark_turquoise", QColor(0,206,209)},
+         {"turquoise", QColor(64,224,208)},
+         {"medium_turquoise", QColor(72,209,204)},
+         {"pale_turquoise", QColor(175,238,238)},
+         {"aqua_marine", QColor(127,255,212)},
+         {"powder_blue", QColor(176,224,230)},
+         {"cadet_blue", QColor(95,158,160)},
+         {"steel_blue", QColor(70,130,180)},
+         {"corn_flower_blue", QColor(100,149,237)},
+         {"deep_sky_blue", QColor(0,191,255)},
+         {"dodger_blue", QColor(30,144,255)},
+         {"light_blue", QColor(173,216,230)},
+         {"sky_blue", QColor(135,206,235)},
+         {"light_sky_blue", QColor(135,206,250)},
+         {"midnight_blue", QColor(25,25,112)},
+         {"navy", QColor(0,0,128)},
+         {"dark_blue", QColor(0,0,139)},
+         {"medium_blue", QColor(0,0,205)},
+         {"blue", QColor(0,0,255)},
+         {"royal_blue", QColor(65,105,225)},
+         {"blue_violet", QColor(138,43,226)},
+         {"indigo", QColor(75,0,130)},
+         {"dark_slate_blue", QColor(72,61,139)},
+         {"slate_blue", QColor(106,90,205)},
+         {"medium_slate_blue", QColor(123,104,238)},
+         {"medium_purple", QColor(147,112,219)},
+         {"dark_magenta", QColor(139,0,139)},
+         {"dark_violet", QColor(148,0,211)},
+         {"dark_orchid", QColor(153,50,204)},
+         {"medium_orchid", QColor(186,85,211)},
+         {"purple", QColor(128,0,128)},
+         {"thistle", QColor(216,191,216)},
+         {"plum", QColor(221,160,221)},
+         {"violet", QColor(238,130,238)},
+         {"magenta", QColor(255,0,255)},
+         {"orchid", QColor(218,112,214)},
+         {"medium_violet_red", QColor(199,21,133)},
+         {"pale_violet_red", QColor(219,112,147)},
+         {"deep_pink", QColor(255,20,147)},
+         {"hot_pink", QColor(255,105,180)},
+         {"light_pink", QColor(255,182,193)},
+         {"pink", QColor(255,192,203)},
+         {"antique_white", QColor(250,235,215)},
+         {"beige", QColor(245,245,220)},
+         {"bisque", QColor(255,228,196)},
+         {"blanched_almond", QColor(255,235,205)},
+         {"wheat", QColor(245,222,179)},
+         {"corn_silk", QColor(255,248,220)},
+         {"lemon_chiffon", QColor(255,250,205)},
+         {"light golden rod yellow", QColor(250,250,210)},
+         {"light_yellow", QColor(255,255,224)},
+         {"saddle_brown", QColor(139,69,19)},
+         {"sienna", QColor(160,82,45)},
+         {"chocolate", QColor(210,105,30)},
+         {"peru", QColor(205,133,63)},
+         {"sandy_brown", QColor(244,164,96)},
+         {"burly_wood", QColor(222,184,135)},
+         {"tan", QColor(210,180,140)},
+         {"rosy_brown", QColor(188,143,143)},
+         {"moccasin", QColor(255,228,181)},
+         {"navajo_white", QColor(255,222,173)},
+         {"peach_puff", QColor(255,218,185)},
+         {"misty_rose", QColor(255,228,225)},
+         {"lavender_blush", QColor(255,240,245)},
+         {"linen", QColor(250,240,230)},
+         {"old_lace", QColor(253,245,230)},
+         {"papaya_whip", QColor(255,239,213)},
+         {"sea_shell", QColor(255,245,238)},
+         {"mint_cream", QColor(245,255,250)},
+         {"slate_gray", QColor(112,128,144)},
+         {"light_slate_gray", QColor(119,136,153)},
+         {"light_steel_blue", QColor(176,196,222)},
+         {"lavender", QColor(230,230,250)},
+         {"floral_white", QColor(255,250,240)},
+         {"alice_blue", QColor(240,248,255)},
+         {"ghost_white", QColor(248,248,255)},
+         {"honeydew", QColor(240,255,240)},
+         {"ivory", QColor(255,255,240)},
+         {"azure", QColor(240,255,255)},
+         {"snow", QColor(255,250,250)},
+         {"black", QColor(0,0,0)},
+         {"dim_gray", QColor(105,105,105)},
+         {"gray", QColor(128,128,128)},
+         {"dark_gray", QColor(169,169,169)},
+         {"silver", QColor(192,192,192)},
+         {"ight_gray", QColor(211,211,211)},
+         {"gainsboro", QColor(220,220,220)},
+         {"white_smoke", QColor(245,245,245)},
+         {"white", QColor(255,255,255)}};
+
+    return sColorsMap;
+}
+
+static std::list<QColor> createColorsList()
+{
+    std::list<QColor> result;
+
+    const auto& colorsMap = getColorsMap();
+
+    for(const auto& colorPair : colorsMap)
+    {
+        result.push_back(colorPair.second);
+    }
+
+    return result;
+}
+
+const std::list<QColor>& getColorsList()
+{
+    static std::list<QColor> sColorsList = createColorsList();
+    return sColorsList;
+}
 
 QVector<QColor> generateColors( const tHighlightingGradient& gradient )
 {
@@ -415,29 +441,29 @@ from(0), to(0), color(0,0,0), explicitColor(false)
 
 bool tHighlightingRange::operator< ( const tHighlightingRange& rVal ) const
 {
-   bool bResult = false;
+    bool bResult = false;
 
-   if( from < rVal.from )
-   {
-       bResult = true;
-   }
-   else if( from > rVal.from )
-   {
-       bResult = false;
-   }
-   else // if from == rVal.from
-   {
-       if( to < rVal.to )
-       {
-           bResult = true;
-       }
-       else
-       {
-           bResult = false;
-       }
-   }
+    if( from < rVal.from )
+    {
+        bResult = true;
+    }
+    else if( from > rVal.from )
+    {
+        bResult = false;
+    }
+    else // if from == rVal.from
+    {
+        if( to < rVal.to )
+        {
+            bResult = true;
+        }
+        else
+        {
+            bResult = false;
+        }
+    }
 
-   return bResult;
+    return bResult;
 }
 
 /////////////////////////////tIntRangePtrWrapper/////////////////////////////
@@ -998,8 +1024,8 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
 }
 
 tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMatches& foundMatches,
-                                                const tRegexScriptingMetadata& regexScriptingMetadata,
-                                                tTreeItemSharedPtr pTree)
+                                                                 const tRegexScriptingMetadata& regexScriptingMetadata,
+                                                                 tTreeItemSharedPtr pTree)
 {
     tUpdateUMLInfoResult result;
 
@@ -1027,7 +1053,8 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
      * UMLDataMap( { eUML_ID::UML_CLIENT, { eSearchResultColumn::Apid, {0, 3} },
      *             { eUML_ID::UML_SEQUENCE_ID, { eSearchResultColumn::Payload, {22, 26} }
      *             { eUML_ID::UML_SERVICE, { eSearchResultColumn::Payload, {28, 40} }
-     *             { eUML_ID::UML_RESPONSE, { eSearchResultColumn::Payload, {44, 45} } )
+     *             { eUML_ID::UML_RESPONSE, { eSearchResultColumn::Payload, {44, 45} } ),
+     * bContains_Req_Resp_Ev = false
      *  );
      */
 
@@ -1058,7 +1085,7 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                         const auto& pGroupMetadata = groups[groupIdx];
 
                         if(nullptr != pGroupMetadata &&
-                           ( false == pGroupMetadata->optionalUML_ID.optional_UML_IDMap.empty() ) )
+                            ( false == pGroupMetadata->optionalUML_ID.optional_UML_IDMap.empty() ) )
                         {
                             res.first = true; // we got the UML data
                             res.second = &pGroupMetadata->optionalUML_ID.optional_UML_IDMap;
@@ -1079,13 +1106,14 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                         auto isReqResEv = [&UML_IDItem]()
                         {
                             return UML_IDItem.first == eUML_ID::UML_REQUEST ||
-                               UML_IDItem.first == eUML_ID::UML_RESPONSE ||
-                               UML_IDItem.first == eUML_ID::UML_EVENT;
+                                   UML_IDItem.first == eUML_ID::UML_RESPONSE ||
+                                   UML_IDItem.first == eUML_ID::UML_EVENT;
                         };
 
                         if(false == isReqResEv() || false == UMLInfo.bContains_Req_Resp_Ev)
                         {
-                            if(true == UML_IDItem.second.UML_Custom_Value.isEmpty()) // if there is no client's custom value
+                            if(nullptr == UML_IDItem.second.pUML_Custom_Value ||
+                               true == UML_IDItem.second.pUML_Custom_Value->isEmpty()) // if there is no client's custom value
                             {
                                 //let's grab groups content
                                 tUMLDataItem UMLDataItem;
@@ -1095,13 +1123,13 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                                     const auto& fieldRange = *it;
 
                                     bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
-                                            (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
+                                                       (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
 
                                     if(true == insideRange) // if group is even partially inside the range
                                     {
                                         tStringCoverageItem stringCoverageItem;
                                         stringCoverageItem.range = tIntRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
-                                                                           std::min( fieldRange.to, match.range.to ) - fieldRange.from );
+                                                                             std::min( fieldRange.to, match.range.to ) - fieldRange.from );
                                         stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
                                         UMLDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
                                     }
@@ -1113,7 +1141,7 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                             {
                                 // let's directly assign custom client's value
                                 tUMLDataItem UMLDataItem;
-                                UMLDataItem.UML_Custom_Value = UML_IDItem.second.UML_Custom_Value;
+                                UMLDataItem.pUML_Custom_Value = UML_IDItem.second.pUML_Custom_Value;
                                 UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
                             }
 
@@ -1126,6 +1154,132 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                         {
                             result.bUML_Req_Res_Ev_DuplicateFound = true;
                         }
+                    }
+                }
+
+                return true;
+            };
+
+            pMatchesTree->visit(preVisitFunction, CTreeItem::tVisitFunction(), false, true, false);
+        }
+    }
+
+    result.pTreeItem = pMatchesTree;
+
+    return result;
+}
+
+tItemMetadata::tUpdatePlotViewInfoResult
+tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
+                                  const tRegexScriptingMetadata& regexScriptingMetadata,
+                                  tTreeItemSharedPtr pTree)
+{
+    tUpdatePlotViewInfoResult result;
+
+    tRegexScriptingMetadata::tCheckIDs checkIDs;
+
+    for(const auto& match : foundMatches)
+    {
+        checkIDs.insert(match.idx);
+    }
+
+    // check if string matches all required UML attributes
+    plotViewInfo.bPlotViewConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentPlotViewData(false, checkIDs, true).first;
+    plotViewInfo.plotViewDataMap.clear();
+
+    /*
+     * What should we fill in here?
+     * E.g. for the following string:
+     * {"TIMESTAMP": 1682268321.122626, "MODULE_NAME": "CPU_LOAD", "THREAD_ID": 281472591822624, "API_NAME": "MY_API", "CPU": 7.142857}
+     * With the following regex:
+     * (?<PXN_CPUC_Timestamp>(?<PYN_CPUC_CPUConsumption>{))"TIMESTAMP": (?<PXData_CPUC_1>([\d]+\.[\d]+)).*?
+     * "MODULE_NAME": .*?"CPU_LOAD".*API_NAME": "(?<PGN_CPUC>.*?)".*?"CPU": (?<PYData_CPUC_1>[\d]+\.[\d]+)
+     * We will need to fill in the following information:
+     * tPlotViewInfo( bPlotViewConstraintsFulfilled = true,
+     * plotViewDataMap( { ePlotViewID::PLOT_X_NAME, { eSearchResultColumn::Payload, {0, 0} },
+     *             { ePlotViewID::PLOT_Y_NAME, { eSearchResultColumn::Payload, {0, 0} },
+     *             { ePlotViewID::PLOT_X_DATA, { eSearchResultColumn::Payload, {15, 31} },
+     *             { ePlotViewID::PLOT_GRAPH_NAME, { eSearchResultColumn::Payload, {104, 109} },
+     *             { ePlotViewID::PLOT_Y_DATA, { eSearchResultColumn::Payload, {120, 127} } )
+     * );
+     */
+
+    auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
+
+    if(true == plotViewInfo.bPlotViewConstraintsFulfilled) // if UML matches are sufficient
+    {
+        if(nullptr != pMatchesTree)
+        {
+            auto preVisitFunction = [&regexScriptingMetadata, this](tTreeItem* pItem)
+            {
+                const auto& match = *(pItem->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
+
+                // for each tree element we should check, whether it is related to the plot view data representation.
+                // That can be done with checking each tree element against regexScriptingMetadata
+
+                // lambda, which checks whether specific match is representing a plot view data
+                auto isPlotViewData = [&match, &regexScriptingMetadata]()->std::pair<bool, tPlotViewIDParametersMap*>
+                {
+                    std::pair<bool, tPlotViewIDParametersMap*> res;
+                    res.first = false;
+
+                    auto groupIdx = match.idx;
+                    auto groups = regexScriptingMetadata.getItemsVec();
+
+                    if(groupIdx >= 0 && groupIdx < groups.size())
+                    {
+                        const auto& pGroupMetadata = groups[groupIdx];
+
+                        if(nullptr != pGroupMetadata &&
+                            ( false == pGroupMetadata->plotViewIDParameters.plotViewIDParametersMap.empty() ) )
+                        {
+                            res.first = true; // we got the UML data
+                            res.second = &pGroupMetadata->plotViewIDParameters.plotViewIDParametersMap;
+                        }
+                    }
+
+                    return res;
+                };
+
+                auto plotViewDataRes = isPlotViewData();
+
+                if(true == plotViewDataRes.first) // if we have a plot view data
+                {
+                    auto fillInFieldRanges = [this, &match](tPlotViewDataItem& plotViewDataItem)
+                    {
+                        //let's grab groups content
+                        for(auto it = fieldRanges.begin(); it != fieldRanges.end(); ++it)
+                        {
+                            const auto& fieldRange = *it;
+
+                            bool insideRange = (match.range.from >= fieldRange.from || match.range.to >= fieldRange.from) &&
+                                               (match.range.from <= fieldRange.to || match.range.to <= fieldRange.to);
+
+                            if(true == insideRange) // if group is even partially inside the range
+                            {
+                                tStringCoverageItem stringCoverageItem;
+                                stringCoverageItem.range = tIntRange( std::max(fieldRange.from, match.range.from) - fieldRange.from,
+                                                                     std::min( fieldRange.to, match.range.to ) - fieldRange.from );
+                                stringCoverageItem.bAddSeparator = match.range.to > fieldRange.to;
+                                plotViewDataItem.stringCoverageMap[it.key()] = stringCoverageItem;
+                            }
+                        }
+                    };
+
+                    auto fillInParameters = [this](tPlotViewDataItem& plotViewDataItem, const tPlotViewIDParametersMap::value_type& plotViewIDParametersMap)
+                    {
+                        plotViewDataItem.optColor = plotViewIDParametersMap.second.optColor;
+                        plotViewDataItem.pPlotViewGroupName = plotViewIDParametersMap.second.pPlotViewGroupName;
+                        plotViewDataItem.plotViewSplitParameters = plotViewIDParametersMap.second.plotViewSplitParameters;
+                        plotViewInfo.plotViewDataMap[plotViewIDParametersMap.first].push_back(plotViewDataItem);
+                    };
+
+                    for(const auto& plotViewIDParametersItem : *(plotViewDataRes.second))
+                    {
+                        tPlotViewDataItem plotViewDataItem;
+
+                        fillInFieldRanges(plotViewDataItem);
+                        fillInParameters(plotViewDataItem, plotViewIDParametersItem);
                     }
                 }
 
@@ -1225,6 +1379,11 @@ QString getName(eSearchResultColumn val)
         case eSearchResultColumn::UML_Applicability:
         {
             result = "UML";
+        }
+            break;
+        case eSearchResultColumn::PlotView_Applicability:
+        {
+            result = "Plot";
         }
             break;
         case eSearchResultColumn::Apid:
@@ -1613,7 +1772,9 @@ bool tHighlightingGradient::operator!=(const tHighlightingGradient& rhs) const
     return !( *this == rhs );
 }
 
-tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bool bParseUMLData )
+tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
+                                                    bool bParseUMLData,
+                                                    bool bParsePlotViewData )
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
@@ -1632,33 +1793,6 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
     static const QRegularExpression rgbRegex(rgbRegexStr, QRegularExpression::CaseInsensitiveOption);
     static const QString varRegexStr( QString("%1([\\w\\d]+)").arg(sVARPrefix) );
     static const QRegularExpression varRegex(varRegexStr, QRegularExpression::CaseInsensitiveOption);
-
-    auto createUMLRegexStr = [](  ) -> QString
-    {
-        QString resultRegex("^(");
-
-        auto finalIter = s_UML_IDs_Map.end();
-        --finalIter;
-
-        for( auto it = s_UML_IDs_Map.begin(); it != s_UML_IDs_Map.end(); ++it )
-        {
-            const auto& UML_IDs_MapItem = *it;
-
-            resultRegex.append(UML_IDs_MapItem.second.id_str);
-
-            if(it != finalIter)
-            {
-                resultRegex.append("|");
-            }
-        }
-
-        resultRegex.append(QString(")[%1]{0,1}([\\w\\d]*)$").arg(s_UML_ALIAS_DELIMITER));
-
-        return resultRegex;
-    };
-
-    static const QString UMLRegexStr = createUMLRegexStr();
-    static const QRegularExpression UMLRegex(UMLRegexStr, QRegularExpression::CaseInsensitiveOption);
 
     auto normalizeRGBItem = [](const int& rgbItem)->int
     {
@@ -1687,6 +1821,8 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
     optVarName.first = false;
 
     tOptional_UML_ID optUML_ID;
+
+    tPlotViewIDParameters plotViewIDParameters;
 
     for( const auto& groupNamePart : splitGroupName )
     {
@@ -1770,9 +1906,11 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
             {
                 QString lowerGroupNamePart = groupNamePart.toLower();
 
-                auto foundColor = sColorsMap.find(lowerGroupNamePart);
+                const auto& colorsMap = getColorsMap();
 
-                if(sColorsMap.end() != foundColor)
+                auto foundColor = colorsMap.find(lowerGroupNamePart);
+
+                if(colorsMap.end() != foundColor)
                 {
                     optColor.isSet = true;
                     optColor.color = foundColor->second;
@@ -1800,6 +1938,33 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
         if(true == bParseUMLData)
         {
             // parse UML data
+            auto createUMLRegexStr = [](  ) -> QString
+            {
+                QString resultRegex("^(");
+
+                auto finalIter = s_UML_IDs_Map.end();
+                --finalIter;
+
+                for( auto it = s_UML_IDs_Map.begin(); it != s_UML_IDs_Map.end(); ++it )
+                {
+                    const auto& UML_IDs_MapItem = *it;
+
+                    resultRegex.append(UML_IDs_MapItem.second.id_str);
+
+                    if(it != finalIter)
+                    {
+                        resultRegex.append("|");
+                    }
+                }
+
+                resultRegex.append(QString(")[%1]{0,1}([\\w\\d]*)$").arg(s_UML_ALIAS_DELIMITER));
+
+                return resultRegex;
+            };
+
+            static const QString UMLRegexStr = createUMLRegexStr();
+            static const QRegularExpression UMLRegex(UMLRegexStr, QRegularExpression::CaseInsensitiveOption);
+
             QRegularExpressionMatch varMatch = UMLRegex.match(groupNamePart);
 
             if(varMatch.hasMatch())
@@ -1814,7 +1979,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
                     if(true == bUML_ID_Parsed)
                     {
                         const auto& key = UML_ID;
-                        auto& value = optUML_ID.optional_UML_IDMap[key].UML_Custom_Value;
+                        auto& pValue = optUML_ID.optional_UML_IDMap[key].pUML_Custom_Value;
 
                         if(varMatch.lastCapturedIndex() == 2) // if 2 groups found
                         {
@@ -1823,7 +1988,46 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
 
                             if(true == b_UML_Custom_Value_Found)
                             {
-                                value = capturedString;
+                                pValue = std::make_shared<QString>(capturedString);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(true == bParsePlotViewData)
+        {
+            static const QRegularExpression plotViewRegex = createPlotViewRegex();
+
+            QRegularExpressionMatch varMatch = plotViewRegex.match(groupNamePart);
+
+            if(varMatch.hasMatch())
+            {
+                bool b_PlotView_ID_Found = varMatch.lastCapturedIndex() >= 1; // if 1 or more groups found
+
+                if(true == b_PlotView_ID_Found)
+                {
+                    ePlotViewID plotView_ID = ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE; // any value
+                    bool bPlotView_ID_Parsed = parsePlotViewIDFromString( varMatch.captured(1), plotView_ID );
+
+                    if(true == bPlotView_ID_Parsed)
+                    {
+                        const auto& key = plotView_ID;
+                        plotViewIDParameters.plotViewIDParametersMap[key].pPlotViewGroupName = std::make_shared<QString>(groupName);
+
+                        if(varMatch.lastCapturedIndex() == 2) // if 2 groups found
+                        {
+                            QString parameters = varMatch.captured(2);
+                            bool b_PlotView_Parameters_Found = false == parameters.isEmpty();     // if 2 groups found
+
+                            if(true == b_PlotView_Parameters_Found)
+                            {
+                                auto splitParameters = splitPlotViewParameters(parameters);
+                                for(const auto& splitParameter : splitParameters)
+                                {
+                                        plotViewIDParameters.plotViewIDParametersMap[key].plotViewSplitParameters.push_back(std::make_shared<QString>(splitParameter));
+                                }
                             }
                         }
                     }
@@ -1832,16 +2036,24 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bo
         }
     }
 
+    for(auto& pair : plotViewIDParameters.plotViewIDParametersMap)
+    {
+        pair.second.optColor = optColor;
+    }
+
     tRegexScriptingMetadataItemPtr pItem = std::make_shared<tRegexScriptingMetadataItem>();
     pItem->highlightingColor = optColor;
     pItem->varName = optVarName;
     pItem->optionalUML_ID = optUML_ID;
+    pItem->plotViewIDParameters = plotViewIDParameters;
 
     return pItem;
 }
 
 //tRegexScriptingMetadata
-bool tRegexScriptingMetadata::parse(const QRegularExpression& regex, bool bParseUMLData)
+bool tRegexScriptingMetadata::parse(const QRegularExpression& regex,
+                                    bool bParseUMLData,
+                                    bool bParsePlotViewData )
 {
     bool bResult = true;
 
@@ -1851,7 +2063,9 @@ bool tRegexScriptingMetadata::parse(const QRegularExpression& regex, bool bParse
 
         for(const auto& groupName : groupNames)
         {
-            mItemsVec.push_back(parseRegexGroupName(groupName, bParseUMLData));
+            mItemsVec.push_back(parseRegexGroupName(groupName,
+                                                    bParseUMLData,
+                                                    bParsePlotViewData));
         }
     }
     else
@@ -1867,27 +2081,28 @@ const tRegexScriptingMetadataItemPtrVec& tRegexScriptingMetadata::getItemsVec() 
     return mItemsVec;
 }
 
-std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::tStatusPair
 tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg) const
 {
     return doesContainConsistentUMLData(fillInStringMsg, tCheckIDs(), true);
 }
 
-std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::tStatusPair
 tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const
 {
     return doesContainConsistentUMLData(fillInStringMsg, checkIDs, false);
 }
 
-std::pair<bool /*status*/, QString /*status description*/>
+tRegexScriptingMetadata::tStatusPair
 tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const
 {
     std::pair<bool /*status*/, QString /*status description*/> result;
+
     result.first = false;
 
     if(true == fillInStringMsg)
     {
-        result.second.append("UML parsing result: ");
+        result.second.append("UML parsing result:");
     }
 
     if(false == bCheckAll && true == checkIDs.empty())
@@ -1942,7 +2157,7 @@ tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, cons
 
                             if(true == mandatoryUMLElements.empty())
                             {
-                                break;
+                                    break;
                             }
                         }
                     }
@@ -2043,7 +2258,7 @@ tRegexScriptingMetadata::doesContainConsistentUMLData(bool fillInStringMsg, cons
         }
     }
 
-        return result;
+    return result;
 }
 
 bool tRegexScriptingMetadata::doesContainAnyUMLGroup() const
@@ -2070,6 +2285,240 @@ bool tRegexScriptingMetadata::doesContainAnyUMLGroup() const
     return bResult;
 }
 
+tRegexScriptingMetadata::tStatusPair
+tRegexScriptingMetadata::doesContainConsistentPlotViewData(bool fillInStringMsg, bool checkParameters) const
+{
+    return doesContainConsistentPlotViewData(fillInStringMsg, tCheckIDs(), true, checkParameters);
+}
+
+tRegexScriptingMetadata::tStatusPair
+tRegexScriptingMetadata::doesContainConsistentPlotViewData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool checkParameters) const
+{
+    return doesContainConsistentPlotViewData(fillInStringMsg, checkIDs, false, checkParameters);
+}
+
+tRegexScriptingMetadata::tStatusPair
+tRegexScriptingMetadata::doesContainConsistentPlotViewData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll, bool checkParameters) const
+{
+    std::pair<bool /*status*/, QString /*status description*/> result;
+    result.first = false;
+
+    if(true == fillInStringMsg)
+    {
+        result.second.append("Plot view parsing result:");
+    }
+
+    if(false == bCheckAll && true == checkIDs.empty())
+    {
+        if(true == fillInStringMsg)
+        {
+            result.second.append("No groups available. Result is \"false\"");
+        }
+    }
+    else
+    {
+        tRegexScriptingMetadataItemPtrVec iterationVec;
+
+        if(true == bCheckAll)
+        {
+            iterationVec = mItemsVec;
+        }
+        else
+        {
+            for(const auto& checkId : checkIDs)
+            {
+                if(checkId >= 0 && checkId < mItemsVec.size())
+                {
+                    iterationVec.push_back(mItemsVec[checkId]);
+                }
+            }
+        }
+
+        auto checkMandatoryElements = [&iterationVec, &fillInStringMsg]( ePlotViewIDType parameterType, QString& msg ) -> bool
+        {
+            bool bResult = false;
+
+            tPlotViewIDsMap mandatoryElements;
+
+            for(const auto& element : sPlotViewIDsMap)
+            {
+                if(element.second.id_type == parameterType)
+                {
+                    mandatoryElements.insert(std::make_pair(element.first, element.second));
+                }
+            }
+
+            for(const auto& pElement : iterationVec)
+            {
+                if(nullptr != pElement)
+                {
+                    if(false == pElement->plotViewIDParameters.plotViewIDParametersMap.empty())
+                    {
+                        for(const auto& PlotView_IDItem : pElement->plotViewIDParameters.plotViewIDParametersMap)
+                        {
+                            auto foundElement = mandatoryElements.find(PlotView_IDItem.first);
+
+                            if(foundElement != mandatoryElements.end())
+                            {
+                                mandatoryElements.erase(foundElement);
+
+                                if(true == mandatoryElements.empty())
+                                {
+                                    bResult = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(false == mandatoryElements.empty())
+            {
+                bResult = false;
+
+                if(true == fillInStringMsg)
+                {
+                    // collect warning string
+                    for(const auto& element : mandatoryElements)
+                    {
+                        msg.append(QString(" <Mandatory element %1 not found>").arg(getPlotIDAsString(element.first)));
+                    }
+                }
+            }
+
+            return bResult;
+        };
+
+        auto checkAllParameters = [&iterationVec, &fillInStringMsg](QString& msg) -> bool
+        {
+            bool bResult = true;
+
+            for(const auto& pElement : iterationVec)
+            {
+                if(nullptr != pElement)
+                {
+                    if(false == pElement->plotViewIDParameters.plotViewIDParametersMap.empty())
+                    {
+                        bool bCheckParametersTmp = checkPlotViewParameters(msg, fillInStringMsg, pElement->plotViewIDParameters.plotViewIDParametersMap);
+
+                        if(true == bResult)
+                        {
+                            bResult = bCheckParametersTmp;
+                        }
+                    }
+                }
+            }
+
+            return bResult;
+        };
+
+        auto uniqueAvailableAxisTypes = getUniqueAvailableAxisTypes();
+
+        if(uniqueAvailableAxisTypes.find(ePlotViewAxisType::e_GANTT) != uniqueAvailableAxisTypes.end())
+        {
+            bool bMandatoryGanttParametersCheck = checkMandatoryElements(ePlotViewIDType::e_Mandatory_Gantt, result.second);
+            bool bMandatoryNonGanttParametersCheck = true;
+
+            if(uniqueAvailableAxisTypes.size() > 1)
+            {
+                bMandatoryNonGanttParametersCheck = checkMandatoryElements(ePlotViewIDType::e_Mandatory_Non_Gantt, result.second);
+            }
+
+            if(true == checkParameters)
+            {
+                bool bCheckParameters = checkAllParameters(result.second);
+                result.first = bMandatoryGanttParametersCheck && bMandatoryNonGanttParametersCheck && bCheckParameters;
+            }
+            else
+            {
+                result.first = bMandatoryGanttParametersCheck && bMandatoryNonGanttParametersCheck;
+            }
+        }
+        else if(false == uniqueAvailableAxisTypes.empty())
+        {
+            bool bMandatoryNonGanttParametersCheck = checkMandatoryElements(ePlotViewIDType::e_Mandatory_Non_Gantt, result.second);
+
+            if(true == checkParameters)
+            {
+                bool bCheckParameters = checkAllParameters(result.second);
+                result.first = bMandatoryNonGanttParametersCheck && bCheckParameters;
+            }
+            else
+            {
+                result.first = bMandatoryNonGanttParametersCheck;
+            }
+        }
+    }
+
+    return result;
+}
+
+bool tRegexScriptingMetadata::doesContainAnyPlotViewGroup() const
+{
+    bool bResult = false;
+
+    for(const auto& element : mItemsVec)
+    {
+        if(false == element->plotViewIDParameters.plotViewIDParametersMap.empty())
+        {
+            for(const auto& UML_IDItem : element->plotViewIDParameters.plotViewIDParametersMap)
+            {
+                auto foundElement = sPlotViewIDsMap.find(UML_IDItem.first);
+
+                if(foundElement != sPlotViewIDsMap.end()) // match found
+                {
+                    bResult = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return bResult;
+}
+
+std::set<ePlotViewAxisType> sAllAxisTypes =
+{
+    ePlotViewAxisType::e_GANTT,
+    ePlotViewAxisType::e_LINEAR,
+    ePlotViewAxisType::e_POINT
+};
+
+std::set<ePlotViewAxisType> tRegexScriptingMetadata::getUniqueAvailableAxisTypes() const
+{
+    std::set<ePlotViewAxisType> result;
+
+    for(const auto& item : mItemsVec)
+    {
+        const auto& optionalPlot_IDMap = item->plotViewIDParameters.plotViewIDParametersMap;
+        auto foundItem = optionalPlot_IDMap.find(ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE);
+        if(foundItem != optionalPlot_IDMap.end())
+        {
+            ePlotViewAxisType axisType = ePlotViewAxisType::e_LINEAR;
+            auto parameterIndex = getPlotViewParameterIndex(ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE, "axisRectType");
+
+            if(parameterIndex >= 0 && parameterIndex <= static_cast<int32_t>(foundItem->second.plotViewSplitParameters.size() - 1) )
+            {
+                assert(foundItem->second.plotViewSplitParameters[parameterIndex] != nullptr);
+                if(true == parseAxisTypeFromString(*foundItem->second.plotViewSplitParameters[parameterIndex], axisType))
+                {
+                    result.insert(axisType);
+                    if(result == sAllAxisTypes)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if(true == result.empty())
+    {
+        result.insert(ePlotViewAxisType::e_LINEAR);
+    }
+
+    return result;
+}
 //////////////////////////////////////////////////////////
 
 Qt::CheckState V_2_CS( const tDataItem& val )
@@ -2207,11 +2656,6 @@ tDataItem toRegexDataItem(const QVariant& variant, const eRegexFiltersColumn& co
     return result;
 }
 
-bool QOptionalColor::operator== ( const QOptionalColor& rhs ) const
-{
-    return color == rhs.color && isSet == rhs.isSet;
-}
-
 bool tColorWrapper::operator< ( const tColorWrapper& rhs ) const
 {
     bool bResult;
@@ -2261,7 +2705,6 @@ bool tColorWrapper::operator== ( const tColorWrapper& rhs ) const
 {
     return optColor == rhs.optColor;
 }
-
 
 QString rgb2hex(const QColor& color, bool with_head)
 {
@@ -3021,6 +3464,11 @@ tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, e
         *pStrRes = ""; // no string value provided for this column
     }
     break;
+    case eSearchResultColumn::PlotView_Applicability:
+    {
+        *pStrRes = ""; // no string value provided for this column
+    }
+    break;
     case eSearchResultColumn::Last:
     {
         *pStrRes = "Unhandled field type!";
@@ -3031,6 +3479,37 @@ tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, e
     }
 
     return pStrRes;
+}
+
+QColor getChartColor()
+{
+    static const std::vector<QColor> sColors
+    {
+        QColor(230, 25, 75),
+        QColor(60, 180, 75),
+        QColor(255, 255, 25),
+        QColor(67, 99, 216),
+        QColor(245, 130, 49),
+        QColor(145, 30, 180),
+        QColor(70, 240, 240),
+        QColor(240, 50, 230),
+        QColor(188, 246, 12),
+        QColor(250, 190, 190),
+        QColor(0, 128, 128),
+        QColor(230, 190, 255),
+        QColor(154, 99, 36),
+        QColor(255, 250, 200),
+        QColor(128, 0, 0),
+        QColor(170, 255, 195),
+        QColor(255, 216, 177),
+        QColor(0, 0, 117),
+        QColor(128, 128, 128),
+        QColor(99, 243, 163),
+        QColor(25, 64, 163),
+    };
+    static const int sColorsSize = sColors.size();
+    static std::atomic<int> sColorsCounter(0);
+    return sColors[sColorsCounter++ % sColorsSize];
 }
 
 PUML_PACKAGE_BEGIN(Qt)
@@ -3086,5 +3565,20 @@ PUML_PACKAGE_BEGIN(DLT)
     PUML_CLASS_BEGIN(QDltFile)
     PUML_CLASS_END()
     PUML_CLASS_BEGIN(QDltMsg)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()
+
+PUML_PACKAGE_BEGIN(qcustomplot)
+    PUML_CLASS_BEGIN(QCustomPlot)
+        PUML_INHERITANCE(QWidget, extends)
+    PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QCPLegend)
+        PUML_INHERITANCE(QObject, extends)
+    PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QCPAxisRect)
+        PUML_INHERITANCE(QObject, extends)
+    PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QCPGraph)
+        PUML_INHERITANCE(QObject, extends)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -9,13 +9,14 @@
 #include "memory"
 
 #include <QObject>
+#include <QTimer>
 
 #include "plugininterface.h"
 
 #include "common/Definitions.hpp"
 
 #define DLT_MESSAGE_ANALYZER_NAME "DLT-Message-Analyzer"
-#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.26"
+#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.27"
 #define DLT_MESSAGE_ANALYZER_PLUGIN_AUTHOR "Vladyslav Goncharuk <svlad1990@gmail.com>"
 
 class CDLTMessageAnalyzer;
@@ -28,6 +29,7 @@ class CGroupedViewComponent;
 class CPatternsViewComponent;
 class CFiltersViewComponent;
 class CUMLViewComponent;
+class CPlotViewComponent;
 class CLogoComponent;
 class CLogsWrapperComponent;
 class CSettingsComponent;
@@ -145,9 +147,12 @@ private: // members
     std::shared_ptr<CPatternsViewComponent> mpPatternsViewComponent;
     std::shared_ptr<CFiltersViewComponent> mpFiltersViewComponent;
     std::shared_ptr<CUMLViewComponent> mpUMLViewComponent;
+    std::shared_ptr<CPlotViewComponent> mpPlotViewComponent;
     std::shared_ptr<CLogoComponent> mpLogoComponent;
     std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
     std::shared_ptr<CSettingsComponent> mpSettingsComponent;
+
+    QTimer mDisconnectionTimer;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     QTableView* mpMainTableView;

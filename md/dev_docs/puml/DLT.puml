@@ -59,7 +59,7 @@ package "DMA_LogsWrapper_API" #DDDDDD
 class "IDLTLogsWrapperCreator"
 {
     + {abstract} virtual tFileWrapperPtr createDLTFileWrapper( QDltFile* pFile ) const = 0
-    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(const tPluginPtrList& decoderPlugins) const = 0
+    + {abstract} virtual tMsgDecoderPtr createMsgDecoder(QDltMessageDecoder* pMessageDecoder) const = 0
     + {abstract} virtual tMsgWrapperPtr createDLTMsgWrapper( QDltMsg& msg ) const = 0
 }
 
@@ -69,15 +69,6 @@ package "DMA_Plugin" #DDDDDD
 {
 
 class "DLTMessageAnalyzerPlugin"
-{
-}
-
-}
-
-package "DMA_Plugin_API" #DDDDDD
-{
-
-class "CDLTMessageAnalyzer"
 {
 }
 
@@ -94,8 +85,5 @@ CDLTMsgDecoder "1" o-- "1" QDltMsg : uses
 CDLTMsgWrapper "1" --> "1" QDltMsg : uses
 IDLTLogsWrapperCreator "1" --> "*" QDltFile : uses
 IDLTLogsWrapperCreator "1" --> "*" QDltMsg : uses
-IDLTLogsWrapperCreator "1" --> "*" QDltPlugin : uses
-CDLTMessageAnalyzer "1" o-- "many" QDltPlugin : uses
-CDLTMessageAnalyzer "1" *-- "1" QDltPluginManager : contains
 
 @enduml

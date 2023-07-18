@@ -26,7 +26,7 @@ void CSettingsManagerClient::setSettingsManager(const tSettingsManagerPtr& pSett
 }
 
 PUML_PACKAGE_BEGIN(DMA_Settings_API)
-   PUML_CLASS_BEGIN(CSettingsManagerClient)
-       PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, uses)
-   PUML_CLASS_END()
+    PUML_CLASS_BEGIN(CSettingsManagerClient)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, uses)
+    PUML_CLASS_END()
 PUML_PACKAGE_END()

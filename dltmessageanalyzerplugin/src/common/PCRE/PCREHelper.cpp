@@ -138,7 +138,9 @@ public:
 
                     currentParsingItem.groupName = QString::fromStdString(text);
 
-                    auto pRegexMetadataItem = parseRegexGroupName(QString::fromStdString(text), false);
+                    auto pRegexMetadataItem = parseRegexGroupName(QString::fromStdString(text),
+                                                                  false,
+                                                                  false);
 
                     if(nullptr != pRegexMetadataItem)
                     {

@@ -88,6 +88,7 @@ public:
     void setUML_ShowArguments(const bool& val) override;
     void setUML_WrapOutput(const bool& val) override;
     void setUML_Autonumber(const bool& val) override;
+    void setPlotViewFeatureActive(const bool& val) override;
     void setFiltersCompletion_CaseSensitive(const bool& val) override;
     void setFiltersCompletion_MaxNumberOfSuggestions(const int& val) override;
     void setFiltersCompletion_MaxCharactersInSuggestion(const int& val) override;
@@ -146,6 +147,7 @@ public:
     const bool& getUML_ShowArguments() const override;
     const bool& getUML_WrapOutput() const override;
     const bool& getUML_Autonumber() const override;
+    const bool& getPlotViewFeatureActive() const override;
     const bool& getFiltersCompletion_CaseSensitive() const override;
     const int& getFiltersCompletion_MaxNumberOfSuggestions() const override;
     const int& getFiltersCompletion_MaxCharactersInSuggestion() const override;
@@ -428,6 +430,10 @@ private: // fields
     TSettingItem<bool> mSetting_UML_ShowArguments;
     TSettingItem<bool> mSetting_UML_WrapOutput;
     TSettingItem<bool> mSetting_UML_Autonumber;
+
+    // Plot view settings
+    std::recursive_mutex mPlotViewFeatureActiveProtector;
+    TSettingItem<bool> mSetting_PlotViewFeatureActive;
 
     // Filters view completion settings
     TSettingItem<bool> mSetting_FiltersCompletion_CaseSensitive;

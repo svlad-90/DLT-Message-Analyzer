@@ -670,7 +670,7 @@ public:
 template< class List >
 struct typelist_size
 {
-   enum V { value = 1 };
+    enum V { value = 1 };
 };
 
 template<> struct typelist_size< T0 > { enum V { value = 0 }; };

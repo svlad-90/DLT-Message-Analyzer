@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include "stdint.h"
 
 #include "QRegularExpression"
@@ -44,7 +46,7 @@ struct tProgressNotificationData
 {
     tProgressNotificationData();
 
-   /*
+    /*
     * @param requestId - id of the request, about which we notify the client
     * @param requestState - the state of the request
     * @param progress - progress in percents

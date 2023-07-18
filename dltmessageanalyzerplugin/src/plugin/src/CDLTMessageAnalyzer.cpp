@@ -47,6 +47,7 @@
 #include "components/log/api/CLog.hpp"
 #include "components/plant_uml/api/CUMLView.hpp"
 #include "common/CTableMemoryJumper.hpp"
+#include "components/plotView/api/CCustomPlotExtended.hpp"
 
 #include "components/logsWrapper/api/IDLTLogsWrapperCreator.hpp"
 
@@ -76,7 +77,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          CSearchResultView* pSearchResultView,
                                          const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                                          const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
-                                         const tSettingsManagerPtr& pSettingsManager):
+                                         const tSettingsManagerPtr& pSettingsManager,
+                                         CCustomPlotExtended* pCustomPlotExtended):
     IDLTMessageAnalyzerControllerConsumer (pController),
     CSettingsManagerClient(pSettingsManager),
     // default widgets
@@ -119,6 +121,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   , mMeasurementRequestTimer()
   , mpSearchViewTableJumper(pSearchViewTableJumper)
   , mpDLTLogsWrapperCreator(pDLTLogsWrapperCreator)
+  , mpCustomPlotExtended(pCustomPlotExtended)
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
@@ -595,6 +598,37 @@ void CDLTMessageAnalyzer::createSequenceDiagram() const
     }
 }
 
+void CDLTMessageAnalyzer::jumpInMainTable(const tMsgId& msgId)
+{
+    if(nullptr != mpMainTableView)
+    {
+        if(msgId >= 0)
+        {
+            auto firstVisibleColumn = -1;
+
+            const int columnsSize = mpMainTableView->model()->columnCount();
+
+            for(int columnCouner = 0; columnCouner < columnsSize; ++columnCouner)
+            {
+                if(false == mpMainTableView->isColumnHidden(columnCouner))
+                {
+                    firstVisibleColumn = columnCouner;
+                    break;
+                }
+            }
+
+            if(firstVisibleColumn != -1)
+            {
+                auto jumpIndex = mpMainTableView->model()->index( msgId, firstVisibleColumn );
+
+                mpMainTableView->setFocus();
+                mpMainTableView->scrollTo( jumpIndex, QAbstractItemView::ScrollHint::PositionAtCenter );
+                mpMainTableView->setCurrentIndex(jumpIndex);
+            }
+        }
+    }
+}
+
 void CDLTMessageAnalyzer::handleLoadedConfig()
 {
     if(nullptr != mpNumberOfThreadsCombobBox)
@@ -815,6 +849,12 @@ bool CDLTMessageAnalyzer::analyze()
         }
     }
 
+    if(nullptr != mpCustomPlotExtended)
+    {
+        mpCustomPlotExtended->reset();
+        mpCustomPlotExtended->replot();
+    }
+
     if( nullptr == mpProgressBar ||
             nullptr == mpGroupedViewModel ||
             nullptr == mpNumberOfThreadsCombobBox ||
@@ -899,7 +939,8 @@ bool CDLTMessageAnalyzer::analyze()
         );
 
         auto requestId = requestAnalyze( requestParameters,
-                                         getSettingsManager()->getUML_FeatureActive() );
+                                         getSettingsManager()->getUML_FeatureActive(),
+                                         getSettingsManager()->getPlotViewFeatureActive() );
 
         setReuqestId(requestId);
 
@@ -1013,7 +1054,7 @@ void CDLTMessageAnalyzer::animateError( QWidget* pAnimationWidget )
 
         QPropertyAnimation *pColor = new QPropertyAnimation(pAnimationProxy, "color");
         pColor->setDuration(250);
-        pColor->setStartValue(qApp->palette().window());
+        pColor->setStartValue(qApp->palette().base());
         pColor->setEndValue(QColor(255, 0, 0));
 
         pAnimSeq->addAnimation(pColor);
@@ -1021,7 +1062,7 @@ void CDLTMessageAnalyzer::animateError( QWidget* pAnimationWidget )
         QPropertyAnimation *pUncolor = new QPropertyAnimation(pAnimationProxy, "color");
         pUncolor->setDuration(250);
         pUncolor->setStartValue(QColor(255, 0, 0));
-        pUncolor->setEndValue(qApp->palette().window());
+        pUncolor->setEndValue(qApp->palette().base());
 
         pAnimSeq->addAnimation(pUncolor);
 
@@ -1691,7 +1732,6 @@ void CDLTMessageAnalyzer::searchView_clicked_jumpTo_inMainTable(const QModelInde
             auto firstVisibleColumn = -1;
 
             const int columnsSize = mpMainTableView->model()->columnCount();
-
 
             for(int columnCouner = 0; columnCouner < columnsSize; ++columnCouner)
             {

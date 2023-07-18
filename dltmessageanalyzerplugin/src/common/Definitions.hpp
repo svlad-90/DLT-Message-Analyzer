@@ -6,8 +6,8 @@
 #ifndef DEFINITIONS_HPP
 #define DEFINITIONS_HPP
 
-#include "memory"
-#include "set"
+#include <list>
+#include <set>
 
 #include "QMap"
 #include "QString"
@@ -15,12 +15,17 @@
 #include "QMetaType"
 #include "QColor"
 #include "QPair"
+#include "TOptional.hpp"
 
 #include "../common/variant/variant.hpp"
 
+#include "BaseDefinitions.hpp"
+#include "PlotDefinitions.hpp"
+
 //#define DEBUG_BUILD
 
-extern const std::map<QString, QColor> sColorsMap;
+const std::map<QString, QColor>& getColorsMap();
+const std::list<QColor>& getColorsList();
 
 extern const QString sVARPrefix;
 extern const QString sRegexScriptingDelimiter;
@@ -81,18 +86,7 @@ typedef std::shared_ptr<IPatternsModel> tPatternsModelPtr;
 extern const QString sDefaultStatusText;
 extern const QString sDefaultRegexFileName;
 
-typedef std::shared_ptr<QString> tQStringPtr;
 
-struct tQStringPtrWrapper
-{
-    tQStringPtrWrapper();
-    tQStringPtrWrapper(const tQStringPtr& pString_);
-    bool operator== ( const tQStringPtrWrapper& rVal ) const;
-    bool operator< ( const tQStringPtrWrapper& rVal ) const;
-    tQStringPtr pString = nullptr;
-};
-
-Q_DECLARE_METATYPE(tQStringPtrWrapper)
 
 typedef int tMsgId;
 extern const tMsgId INVALID_MSG_ID;
@@ -184,6 +178,7 @@ typedef std::set<tIntRange> tIntRangeSet;
 enum class eSearchResultColumn : int
 {
     UML_Applicability = 0,
+    PlotView_Applicability,
     Index,
     Time,
     Timestamp,
@@ -371,14 +366,6 @@ struct tFoundMatch
 
 Q_DECLARE_METATYPE( const tFoundMatch* )
 
-struct QOptionalColor
-{
-    bool isSet;
-    QColor color;
-    bool operator== ( const QOptionalColor& rhs ) const;
-};
-typedef QVector<QOptionalColor> QOptionalColorVec;
-
 struct tColorWrapper
 {
     QOptionalColor optColor;
@@ -418,7 +405,7 @@ struct tOptional_UML_ID_Item
 {
     // optional string, which can be assigned by the user in form of e.g. <US_myService>.
     // In above case this variable will be filled in with "myService" value
-    QString UML_Custom_Value;
+    tQStringPtr pUML_Custom_Value;
 };
 
 typedef std::map<eUML_ID, tOptional_UML_ID_Item> tOptional_UML_IDMap;
@@ -445,6 +432,9 @@ public:
 
     // UML_ID data
     tOptional_UML_ID optionalUML_ID;
+
+    // PlotView data
+    tPlotViewIDParameters plotViewIDParameters;
 };
 
 typedef std::shared_ptr<tRegexScriptingMetadataItem> tRegexScriptingMetadataItemPtr;
@@ -461,22 +451,34 @@ Q_DECLARE_METATYPE( tRegexScriptingMetadataItemPtr )
  */
 struct tRegexScriptingMetadata
 {
-    bool parse(const QRegularExpression& regex, bool bParseUMLData);
+    typedef std::pair<bool /*status*/, QString /*status description*/> tStatusPair;
+    bool parse(const QRegularExpression& regex,
+               bool bParseUMLData,
+               bool bParsePlotViewData);
     const tRegexScriptingMetadataItemPtrVec& getItemsVec() const;
     typedef std::set<int> tCheckIDs;
-    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg) const;
-    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const;
+    tStatusPair doesContainConsistentUMLData(bool fillInStringMsg) const;
+    tStatusPair doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs) const;
     bool doesContainAnyUMLGroup() const;
+    tStatusPair doesContainConsistentPlotViewData(bool fillInStringMsg, bool checkParameters) const;
+    tStatusPair doesContainConsistentPlotViewData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool checkParameters) const;
+    bool doesContainAnyPlotViewGroup() const;
 
 private:
-    std::pair<bool /*status*/, QString /*status description*/> doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const;
+    tStatusPair doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const;
+    tStatusPair doesContainConsistentPlotViewData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll, bool checkParameters) const;
+    std::set<ePlotViewAxisType> getUniqueAvailableAxisTypes() const;
+    typedef TOptional<tStatusPair> tOptionalStatusPair;
+    typedef TOptional<bool> tOptionalBool;
 
 private:
     tRegexScriptingMetadataItemPtrVec mItemsVec;
 };
 Q_DECLARE_METATYPE(tRegexScriptingMetadata)
 
-tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName, bool bParseUMLData );
+tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
+                                                    bool bParseUMLData,
+                                                    bool bParsePlotViewData );
 
 ////////////////////////////////////////////////////////////
 
@@ -523,9 +525,11 @@ struct tStringCoverageItem
 
 typedef std::map<eSearchResultColumn, tStringCoverageItem> tStringCoverageMap;
 
+// UML data, parsed from each processed string
+
 struct tUMLDataItem
 {
-    QString UML_Custom_Value;
+    tQStringPtr pUML_Custom_Value;
     tStringCoverageMap stringCoverageMap;
 };
 
@@ -538,6 +542,26 @@ struct tUMLInfo
     bool bApplyForUMLCreation = false;
     tUMLDataMap UMLDataMap;
     bool bContains_Req_Resp_Ev = false;
+};
+
+// Plot view data, that is parsed from each processed string
+
+struct tPlotViewDataItem
+{
+    QOptionalColor optColor;
+    tQStringPtr pPlotViewGroupName;
+    tQStringPtrVec plotViewSplitParameters;
+    tStringCoverageMap stringCoverageMap;
+};
+
+typedef std::vector<tPlotViewDataItem> tPlotViewDataItemVec;
+
+typedef std::map<ePlotViewID, tPlotViewDataItemVec> tPlotViewDataMap;
+struct tPlotViewInfo
+{
+    bool bPlotViewConstraintsFulfilled = false;
+    bool bApplyForPlotCreation = false;
+    tPlotViewDataMap plotViewDataMap;
 };
 
 struct tItemMetadata
@@ -563,6 +587,16 @@ struct tItemMetadata
     tUpdateUMLInfoResult updateUMLInfo(const tFoundMatches& foundMatches,
                        const tRegexScriptingMetadata& regexScriptingMetadata,
                        tTreeItemSharedPtr pTree = nullptr);
+
+    struct tUpdatePlotViewInfoResult
+    {
+        tTreeItemSharedPtr pTreeItem;
+    };
+
+    tUpdatePlotViewInfoResult updatePlotViewInfo(const tFoundMatches& foundMatches,
+                                       const tRegexScriptingMetadata& regexScriptingMetadata,
+                                       tTreeItemSharedPtr pTree = nullptr);
+
     tMsgId msgId;
     tMsgId msgIdFiltered;
     tHighlightingInfoMulticolor highlightingInfoMultiColor;
@@ -571,6 +605,7 @@ struct tItemMetadata
     unsigned int msgSize;
     unsigned int timeStamp;
     tUMLInfo UMLInfo;
+    tPlotViewInfo plotViewInfo;
 };
 
 typedef QPair<tItemMetadata, tQStringPtr> tProcessingStringItem;
@@ -716,5 +751,10 @@ bool isDarkMode();
  * @return - shared pointer to a string with a gathered information
  */
 tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, eSearchResultColumn field);
+
+/**
+ * @brief getChartColor - get color for chart
+ */
+QColor getChartColor();
 
 #endif // DEFINITIONS_HPP

@@ -118,6 +118,7 @@ public:
     virtual void setUML_ShowArguments(const bool& val) = 0;
     virtual void setUML_WrapOutput(const bool& val) = 0;
     virtual void setUML_Autonumber(const bool& val) = 0;
+    virtual void setPlotViewFeatureActive(const bool& val) = 0;
     virtual void setFiltersCompletion_CaseSensitive(const bool& val) = 0;
     virtual void setFiltersCompletion_MaxNumberOfSuggestions(const int& val) = 0;
     virtual void setFiltersCompletion_MaxCharactersInSuggestion(const int& val) = 0;
@@ -180,7 +181,8 @@ public:
     virtual const int& getUML_MaxNumberOfRowsInDiagram() const = 0;
     virtual const bool& getUML_ShowArguments() const = 0;
     virtual const bool& getUML_WrapOutput() const = 0;
-    virtual const bool& getUML_Autonumber() const = 0;    
+    virtual const bool& getUML_Autonumber() const = 0;
+    virtual const bool& getPlotViewFeatureActive() const = 0;
     virtual const bool& getFiltersCompletion_CaseSensitive() const = 0;
     virtual const int& getFiltersCompletion_MaxNumberOfSuggestions() const = 0;
     virtual const int& getFiltersCompletion_MaxCharactersInSuggestion() const = 0;
@@ -244,6 +246,7 @@ signals:
     void UML_ShowArgumentsChanged(const bool& UML_ShowArguments);
     void UML_WrapOutputChanged(const bool& UML_WrapOutput);
     void UML_AutonumberChanged(const bool& UML_Autonumber);
+    void plotViewFeatureActiveChanged(const bool& plotViewFeatureActive);
     void filtersCompletion_CaseSensitiveChanged(const bool& filtersCompletion_CaseSensitive);
     void filtersCompletion_MaxNumberOfSuggestionsChanged(const int& filtersCompletion_MaxNumberOfSuggestions);
     void filtersCompletion_MaxCharactersInSuggestionChanged(const int& filtersCompletion_MaxCharactersInSuggestion);

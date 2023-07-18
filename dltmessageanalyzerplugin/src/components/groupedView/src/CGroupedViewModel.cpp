@@ -33,59 +33,25 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                             const int& sortingColumn,
                             Qt::SortOrder sortingOrder) -> QVector<tTreeItemPtr>
     {
-        tTreeItem::tChildrenVector result;
+        auto result = children;
 
         switch(static_cast<eGroupedViewColumn>(sortingColumn))
         {
             case eGroupedViewColumn::SubString:
             {
-                struct tComparator
+                result = children;
+                std::sort(result.begin(), result.end(),
+                    [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
-                    QString val;
-                    bool operator< (const tComparator& rVal) const
+                    const tQStringPtrWrapper& lValSubString = lVal->data(sortingColumn).get<tQStringPtrWrapper>();
+                    const tQStringPtrWrapper& rValSubString = rVal->data(sortingColumn).get<tQStringPtrWrapper>();
+                    bool bResult = false;
+                    if(nullptr != lValSubString.pString && nullptr != rValSubString.pString)
                     {
-                        return val.compare( rVal.val, Qt::CaseInsensitive ) < 0;
+                        bResult = lValSubString.pString->compare( *rValSubString.pString ) < 0;
                     }
-                };
-
-
-                QMultiMap<tComparator, tTreeItemPtr> sortedChildrenMap;
-
-                for(const auto& pChild : children)
-                {
-                    if(nullptr != pChild)
-                    {
-                        const tQStringPtrWrapper& subString = pChild->data(sortingColumn).get<tQStringPtrWrapper>();
-                        tComparator comparator;
-
-                        if(nullptr != subString.pString)
-                        {
-                            comparator.val = *subString.pString;
-                        }
-
-                        sortedChildrenMap.insert(comparator, pChild);
-                    }
-                }
-
-                for(const auto& pChild : sortedChildrenMap)
-                {
-                    if(nullptr != pChild)
-                    {
-                        switch(sortingOrder)
-                        {
-                            case Qt::SortOrder::AscendingOrder:
-                            {
-                                result.push_back(pChild);
-                            }
-                                break;
-                            case Qt::SortOrder::DescendingOrder:
-                            {
-                                result.push_front(pChild);
-                            }
-                                break;
-                        }
-                    }
-                }
+                    return bResult;
+                });
             }
                 break;
             case eGroupedViewColumn::Messages:
@@ -93,8 +59,6 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
             case eGroupedViewColumn::Payload:
             case eGroupedViewColumn::PayloadPerSecondAverage:
             {
-                QMultiMap<int, tTreeItemPtr> sortedChildrenMap;
-
                 for(const auto& pChild : children)
                 {
                     if(nullptr != pChild)
@@ -107,38 +71,22 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                         {
                             updateAverageValues(pChild, false, true);
                         }
-
-                        int statistics = pChild->data(static_cast<int>(sortingColumn)).get<int>();
-                        sortedChildrenMap.insert(statistics, pChild);
                     }
                 }
 
-                for(const auto& pChild : sortedChildrenMap)
+                result = children;
+                std::sort(result.begin(), result.end(),
+                [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
-                    if(nullptr != pChild)
-                    {
-                        switch(sortingOrder)
-                        {
-                            case Qt::SortOrder::AscendingOrder:
-                            {
-                                result.push_back(pChild);
-                            }
-                                break;
-                            case Qt::SortOrder::DescendingOrder:
-                            {
-                                result.push_front(pChild);
-                            }
-                                break;
-                        }
-                    }
-                }
+                    const auto& lValInt = lVal->data(sortingColumn).get<int>();
+                    const auto& rValInt = rVal->data(sortingColumn).get<int>();
+                    return lValInt < rValInt;
+                });
             }
                 break;
             case eGroupedViewColumn::PayloadPercantage:
             case eGroupedViewColumn::MessagesPercantage:
             {
-                QMultiMap<double, tTreeItemPtr> sortedChildrenMap;
-
                 for(const auto& pChild : children)
                 {
                     if(nullptr != pChild)
@@ -151,37 +99,28 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                         {
                             updatePercentageValues(pChild, false, true);
                         }
-
-                        double statistics = pChild->data(static_cast<int>(sortingColumn)).get<double>();
-                        sortedChildrenMap.insert(statistics, pChild);
                     }
                 }
 
-                for(const auto& pChild : sortedChildrenMap)
+                result = children;
+                std::sort(result.begin(), result.end(),
+                [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
-                    if(nullptr != pChild)
-                    {
-                        switch(sortingOrder)
-                        {
-                            case Qt::SortOrder::AscendingOrder:
-                            {
-                                result.push_back(pChild);
-                            }
-                                break;
-                            case Qt::SortOrder::DescendingOrder:
-                            {
-                                result.push_front(pChild);
-                            }
-                                break;
-                        }
-                    }
-                }
+                    const auto& lValInt = lVal->data(sortingColumn).get<double>();
+                    const auto& rValInt = rVal->data(sortingColumn).get<double>();
+                    return lValInt < rValInt;
+                });
             }
                 break;
             case eGroupedViewColumn::AfterLastVisible:
             case eGroupedViewColumn::Metadata:
             case eGroupedViewColumn::Last:
                 break;
+        }
+
+        if( sortingOrder == Qt::SortOrder::DescendingOrder)
+        {
+            std::reverse(result.begin(), result.end());
         }
 
         return result;
@@ -622,11 +561,11 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
         if(true == bIsAnythingToShow)
         {
             mpRootItem->sort(static_cast<int>(mSortingColumn), mSortOrder, true);
-    
+
             QString& finalText = resultHTML;
-    
+
             QString currentTime = QString().append("[").append(QDateTime::currentDateTime().toString()).append("]");
-    
+
             finalText.append(QString("<!DOCTYPE html>\n"
                              "<html lang=\"en\">\n"
                              "<head>\n"
@@ -671,7 +610,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
                              "</style>\n"
                              "</head>\n"
                              "<body>\n");
-    
+
             finalText.append( QString("\n<h2>Trace spam analysis report %1</h2>").arg(currentTime) );
             finalText.append( QString("\n<h3>Analysis based on regex: \"").append(mRegex.toHtmlEscaped()).append("\"</h3>") );
             finalText.append("<ul id=\"myUL\">");
@@ -792,7 +731,7 @@ std::pair<bool /*result*/, QString /*error*/> CGroupedViewModel::exportToHTML(QS
             };
 
             mpRootItem->visit( preVisitFunction, postVisitFunction );
-    
+
             finalText.append("</ul>"
             ""
             "<script>\n"

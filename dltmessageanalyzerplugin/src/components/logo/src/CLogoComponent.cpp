@@ -16,48 +16,48 @@ const char* CLogoComponent::getName() const
 
 DMA::tSyncInitOperationResult CLogoComponent::init()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       if(nullptr != mpLogoView)
-       {
-           // add logic here, when it will be needed
-           result.bIsOperationSuccessful = true;
-           result.returnCode = 0;
-       }
-       else
-       {
-           result.bIsOperationSuccessful = false;
-           result.returnCode = -1;
-       }
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+    try
+    {
+        if(nullptr != mpLogoView)
+        {
+            // add logic here, when it will be needed
+            result.bIsOperationSuccessful = true;
+            result.returnCode = 0;
+        }
+        else
+        {
+            result.bIsOperationSuccessful = false;
+            result.returnCode = -1;
+        }
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 DMA::tSyncInitOperationResult CLogoComponent::shutdown()
 {
-   DMA::tSyncInitOperationResult result;
+    DMA::tSyncInitOperationResult result;
 
-   try
-   {
-       // add logic here, when it will be needed
-       result.bIsOperationSuccessful = true;
-       result.returnCode = 0;
-   }
-   catch (...)
-   {
-       result.bIsOperationSuccessful = false;
-       result.returnCode = -1;
-   }
+    try
+    {
+        // add logic here, when it will be needed
+        result.bIsOperationSuccessful = true;
+        result.returnCode = 0;
+    }
+    catch (...)
+    {
+        result.bIsOperationSuccessful = false;
+        result.returnCode = -1;
+    }
 
-   return result;
+    return result;
 }
 
 PUML_PACKAGE_BEGIN(DMA_Logo_API)
