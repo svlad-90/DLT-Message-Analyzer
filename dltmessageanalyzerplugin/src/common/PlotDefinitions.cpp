@@ -1000,7 +1000,12 @@ bool checkPlotViewParameter(QString& errorMsg,
 
 QStringList splitPlotViewParameters(const QString& parameters)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    return parameters.split(s_PLOT_PARAMETER_DELIMITER, QString::SplitBehavior::SkipEmptyParts);
+#else
     return parameters.split(s_PLOT_PARAMETER_DELIMITER, Qt::SkipEmptyParts);
+#endif
+
 }
 
 int32_t getPlotViewParameterIndex(ePlotViewID plotViewID, const QString& parameterName)
