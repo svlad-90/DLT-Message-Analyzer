@@ -907,7 +907,7 @@ void CSearchResultView::copyMessageFiles()
             else if(selectedRowsSize == 1)
             {
                 auto selectedRowModelIdx = selectedRows.front();
-                auto selectedRowIdx = selectedRowModelIdx.sibling(selectedRowModelIdx.row(), static_cast<int>(eSearchResultColumn::UML_Applicability)).data().value<int>();
+                auto selectedRowIdx = selectedRowModelIdx.sibling(selectedRowModelIdx.row(), static_cast<int>(eSearchResultColumn::Index)).data().value<int>();
 
                 mpFile->copyFileNameToClipboard(selectedRowIdx);
             }

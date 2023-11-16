@@ -720,7 +720,7 @@ static tPlotViewIDsMap createPlotIDsMap()
         item.id_type = ePlotViewIDType::e_Mandatory_Gantt;
         item.id_str = s_PLOT_GANTT_EVENT;
         formGanttParameters(item);
-        item.description = QString("Declares event of a certain type ( either \"start\" or \"end\" ). "
+        item.description = QString("Declares event of a certain type ( either \"start\" or \"end\" ). %1."
                                    "Used to identify start and end points of different events, which should "
                                    "be represented on the Gantt chart. "
                                    "Mandatory. One or more.").arg(item.getParametersDescription());
