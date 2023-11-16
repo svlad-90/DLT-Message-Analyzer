@@ -198,19 +198,22 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
 
                         auto pStringData = getDataStrFromMsg(msgIdx, pMsg, *iter);
 
-                        pStr->append(*pStringData);
-                        newRangeCounter += pStringData->size() - 1;
-
-                        if (std::next(iter) != searchColumnsSet.end())
+                        if(nullptr != pStringData)
                         {
-                            pStr->append(" ");
-                            newRangeCounter += 2;
+                            pStr->append(*pStringData);
+                            newRangeCounter += pStringData->size() - 1;
+
+                            if (std::next(iter) != searchColumnsSet.end())
+                            {
+                                pStr->append(" ");
+                                newRangeCounter += 2;
+                            }
+
+                            tIntRange strRange(rangeCounter, rangeCounter + pStringData->size() - 1);
+                            fieldRanges.insert(*iter, strRange);
+
+                            rangeCounter = newRangeCounter;
                         }
-
-                        tIntRange strRange(rangeCounter, rangeCounter + pStringData->size() - 1);
-                        fieldRanges.insert(*iter, strRange);
-
-                        rangeCounter = newRangeCounter;
                     }
 
                     tItemMetadata itemMetadata( msgIdx,
