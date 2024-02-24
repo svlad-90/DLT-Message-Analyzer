@@ -5,7 +5,7 @@ include(ExternalProject)
 set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime/src/antlr4_runtime)
 set(ANTLR4_INCLUDE_DIRS ${ANTLR4_ROOT}/runtime/Cpp/runtime/src)
 set(ANTLR4_GIT_REPOSITORY https://github.com/antlr/antlr4.git)
-set(ANTLR4_ZIP_REPOSITORY ${CMAKE_CURRENT_SOURCE_DIR}/../../thirdparty/antlr/antlr4-4.8.zip)
+set(ANTLR4_ZIP_REPOSITORY https://github.com/antlr/antlr4/archive/refs/tags/4.13.1.zip)
 if(NOT DEFINED ANTLR4_TAG)
   # Set to branch name to keep library updated at the cost of needing to rebuild after 'clean'
   # Set to commit hash to keep the build stable and does not need to rebuild after 'clean'
@@ -76,6 +76,10 @@ if(NOT DEFINED ANTLR4_WITH_STATIC_CRT)
   set(ANTLR4_WITH_STATIC_CRT ON)
 endif()
 
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
 if(ANTLR4_ZIP_REPOSITORY)
   ExternalProject_Add(
       antlr4_runtime
@@ -89,6 +93,7 @@ if(ANTLR4_ZIP_REPOSITORY)
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
       INSTALL_COMMAND ""
       EXCLUDE_FROM_ALL 1)
 else()

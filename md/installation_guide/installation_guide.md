@@ -31,7 +31,7 @@ Table of contents
 
 > **Note!**
 > 
-> Currently plugin can be built against the v2.24.0 release.
+> Currently plugin can be built against the v2.25.0 release.
 >
 > The build under the earlier versions, down to the the v2.19.0 is also supported. But you will need to use the compatibility mode. Such an option is described below later on down this page. Search for the "PLUGIN_INTERFACE_VERSION" keyword.
 >

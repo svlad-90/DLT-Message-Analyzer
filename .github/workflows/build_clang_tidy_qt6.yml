@@ -8,13 +8,13 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch'     
+        description: 'Target branch'
         required: true
         default: 'master'
 
 jobs:
   build_clang_tidy:
-    
+
     runs-on: ubuntu-latest
 
     steps:
@@ -31,12 +31,25 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
       shell: bash
 
-    # Checkout dlt-viewer's revision v2.24.0
+    # Install Java 11
+    - name: Install Java 11
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    # Install cmake version v3.24.x
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: 'v3.24.x'
+
+    # Checkout dlt-viewer's revision v2.25.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v3
       with:
         repository: GENIVI/dlt-viewer
-        ref: ebb3c355bc0edf2b6c3be84452b8afa4d1a82641
+        ref: v2.25.0
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
@@ -45,7 +58,7 @@ jobs:
         repository: svlad-90/${{ github.event.repository.name }}
         path: ./plugin/${{ github.event.repository.name }}
         ref: ${{ github.ref }}
-        
+
     # Adjust dlt-viewer's CMake file to sub-include the plugin
     - name: Patch dlt-viewer's CMakeLists.txt
       run: echo 'add_subdirectory(${{ github.event.repository.name }}/dltmessageanalyzerplugin/src)' >> CMakeLists.txt
@@ -74,7 +87,7 @@ jobs:
       run: cmake ../${{ github.event.repository.name }} -DDMA_CLANG_TIDY_BUILD=true
       shell: bash
       working-directory: ../build
-    
+
     # Build of the project with proceed on error
     - name: Make
       run: make -k -j8
