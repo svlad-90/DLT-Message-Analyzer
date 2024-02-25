@@ -25,6 +25,8 @@
 | stefanzweifel/git_auto_commit_action |[Repository](https://github.com/stefanzweifel/git-auto-commit-action) | MIT | [License](https://github.com/stefanzweifel/git-auto-commit-action/blob/master/LICENSE) |
 | qcustomplot |[Repository](https://gitlab.com/DerManu/QCustomPlot) | GPL-3.0 | [License](https://gitlab.com/DerManu/QCustomPlot/-/blob/master/GPL.txt?ref_type=heads) |
 
+**Note** antlr4 requires at least Java SE 11 runtime during the build process to generate the C++ lexer and parser.
+
 ----
 
 ### Dependency diagram
