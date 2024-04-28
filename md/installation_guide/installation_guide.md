@@ -63,15 +63,31 @@ Your target path to the plugin should look like **"./dlt-viewer/plugin/DLT-Messa
 
 - Open console in the "./dlt-viewer" folder:
 
-![Screenshot of console](./installation_guide_console.png)
+  ![Screenshot of console](./installation_guide_console.png)
 
 - Run the following set of commands in it:
 
-<pre>mkdir build
-cd build
-cmake ..
-make -j4
-</pre>
+  <pre># Install the 'libqt5svg5-dev' or 'libqt6svg6-dev' dependency
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libqt5svg5-dev
+  # create build directory
+  mkdir build
+  # Enter the build directory
+  cd build
+  # Run cmake
+  cmake ..
+  # Build the project
+  make -j4
+  # Install dlt-viewer into the system
+  sudo make install .
+  # update the cache for the linker
+  sudo ldconfig
+  </pre>
+
+- Then you can run the dlt-viewer from the following location:
+
+  ```
+  /usr/local/DLTViewer/usr/bin/dlt-viewer
+  ```
 
 ----
 
@@ -144,7 +160,7 @@ As of now, they are Linux and Windows.
 
 ## Run dlt-viewer and enable the plugin
 
-- Proceed to the build's artifacts folder and run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
+- Run the dlt-viewer. It should already include and load the dynamic library of the DLT-Message-Analyzer plugin
 - Enable and show the DLT-Message-Analyzer plugin:
 
 ![Screenshot of enabling the plugin](./installation_guide_enable_plugin.png)
