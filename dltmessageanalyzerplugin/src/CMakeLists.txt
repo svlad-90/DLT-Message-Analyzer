@@ -83,6 +83,7 @@ DMA_sync_g_test_framework()
 DMA_sync_plantuml()
 DMA_sync_framework()
 DMA_sync_q_custom_plot()
+install(TARGETS qcustomplot LIBRARY DESTINATION ${DLT_LIBRARY_INSTALLATION_PATH} )
 ################### DEPENDENCIES ( END )###################
 
 ################### COMPATIBILITY #########################
