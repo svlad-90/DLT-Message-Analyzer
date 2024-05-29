@@ -84,6 +84,7 @@ public:
     struct tPlotAxisItem
     {
         TOptional<ePlotViewAxisType> axisType;
+        TOptional<QString> axisLabel;
         TOptional<QString> xName;
         TOptional<QString> yName;
         TOptional<QString> xUnit;

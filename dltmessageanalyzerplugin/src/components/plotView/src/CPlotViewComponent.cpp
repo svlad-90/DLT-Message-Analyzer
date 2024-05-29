@@ -225,13 +225,24 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
     pAxisRect->insetLayout()->addElement(pLegend, Qt::AlignRight|Qt::AlignTop);  // Adjust position as needed
     pLegend->setLayer(QLatin1String("legend"));
 
-    pAxisRect->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignRight);  // Position of legend
     auto* pLeftAxis = pAxisRect->axis(QCPAxis::atLeft);
     auto* pBottomAxis = pAxisRect->axis(QCPAxis::atBottom);
 
     pPlot->plotLayout()->addElement(rowCounter, 0, pAxisRect);
     pAxisRect->axis(QCPAxis::atBottom)->setLayer("axes");
     pAxisRect->axis(QCPAxis::atBottom)->grid()->setLayer("grid");
+
+    {
+        if (plotAxis.axisLabel.isSet())
+        {
+            QCPTextElement *pTitleLabel = new QCPTextElement(pPlot, plotAxis.axisLabel.getValue(), QFont("sans", 12, QFont::Bold));
+            pTitleLabel->setVisible(true);
+            pAxisRect->insetLayout()->addElement(pTitleLabel, QRectF(0.005, 0.0, 0.0, 0.0));
+            pTitleLabel->setLayer(QLatin1String("axis_rect_label"));
+            pTitleLabel->setSelectable(false);
+        }
+    }
+
     // bring bottom and main axis rect closer together:
     pAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
     pAxisRect->setMargins(QMargins(0, 0, 0, 0));

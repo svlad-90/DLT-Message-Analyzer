@@ -30,6 +30,7 @@ typedef std::unordered_map<tPlotGraphMetadataKey, tPlotGraphMetadataValue> tPlot
 enum class ePlotViewID
 {
     PLOT_AXIS_RECTANGLE_TYPE = 0,
+    PLOT_AXIS_RECTANGLE_LABEL,
     PLOT_X_MAX,
     PLOT_X_MIN,
     PLOT_Y_MAX,
@@ -197,6 +198,44 @@ struct tPlotParametersParser<ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE>
                     result.errors.append(QString(" < Unknown axis type '%1'>").arg(axisTypeStr));
                 }
             }
+        }
+
+        return result;
+    }
+};
+
+template<>
+struct tPlotParametersParser<ePlotViewID::PLOT_AXIS_RECTANGLE_LABEL>
+{
+    ePlotViewID plotViewId = ePlotViewID::PLOT_AXIS_RECTANGLE_LABEL;
+
+    struct tParsingResult
+    {
+        bool bParsingSuccessful = false;
+        QString errors;
+        QString axisRectName;
+        QString axisRectLabel;
+    };
+
+    tParsingResult parse(bool fillInStringMsg,
+                         const tQStringPtr& pPlotViewGroupName,
+                         const tQStringPtrVec& splitParameters)
+    {
+        tParsingResult result;
+
+        if(checkPlotViewParameter(result.errors,
+                                  fillInStringMsg,
+                                  plotViewId,
+                                  pPlotViewGroupName,
+                                  splitParameters))
+        {
+            assert(splitParameters[0] != nullptr);
+            result.axisRectName = *splitParameters[0];
+
+            assert(splitParameters[1] != nullptr);
+            result.axisRectLabel = *splitParameters[1];
+
+            result.bParsingSuccessful = true;
         }
 
         return result;

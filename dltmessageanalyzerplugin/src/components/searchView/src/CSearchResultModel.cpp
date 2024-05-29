@@ -580,7 +580,15 @@ namespace detail
     };
 
     typedef std::map<tGraphId, tGraphMetadataItem> tGraphIdMetadataMap;
-    typedef std::map<QString, tGraphIdMetadataMap> tAxisNameMetadataMap;
+
+    struct tAxisRectMetadataItem
+    {
+        tGraphIdMetadataMap graphIdMetadataMap;
+        bool bLabelParsed = false;
+        bool bLabelParsingLocked = false;
+    };
+
+    typedef std::map<QString, tAxisRectMetadataItem> tAxisNameMetadataMap;
 
     struct tMetadataItem
     {
@@ -596,24 +604,67 @@ namespace detail
         for (int i = 0; i < val.size(); ++i)
         {
             QChar ch = val[i];
+            bool bIsFirstCharacter = i == 0;
             bool bIsLastCharacter = i == val.size() - 1;
 
-            if(true == bIsLastCharacter)
+            if (bIsLastCharacter)
             {
-                result.append(ch);
+                if(bIsFirstCharacter == bIsLastCharacter)
+                {
+                    result.append(ch.toUpper());
+                }
+                else
+                {
+                    result.append(ch);
+                }
             }
             else
             {
-                QChar nextCh = val[i+1];
+                QChar nextCh = val[i + 1];
 
-                bool bIsFirstCharacter = i == 0;
-
-                if(true == ch.isUpper() &&
-                   true == nextCh.isLower() &&
-                   false == bIsFirstCharacter)
+                // Add a space if the current character is lowercase and next character is uppercase
+                // helloWorld => Hello world
+                if (ch.isLower() && nextCh.isUpper())
                 {
+                    result.append(ch);
                     result.append(" ");
-                    result.append(ch.toLower());
+                }
+                else if (ch.isLower() && nextCh.isLower())
+                {
+                    result.append(ch);
+                }
+                else if (ch.isUpper())
+                {
+                    // Add a space if the current and next characters are uppercase, but the one after is lowercase
+                    // RAMLoad => RAM load
+                    if (nextCh.isUpper() && (i + 2 < val.size() && val[i + 2].isLower()))
+                    {
+                        if (bIsFirstCharacter)
+                        {
+                            result.append(ch.toUpper());
+                        }
+                        else
+                        {
+                            result.append(ch);
+                        }
+
+                        result.append(" ");
+                    }
+                    else if (nextCh.isLower())
+                    {
+                        if (bIsFirstCharacter)
+                        {
+                            result.append(ch.toUpper());
+                        }
+                        else
+                        {
+                            result.append(ch.toLower());
+                        }
+                    }
+                    else if (nextCh.isUpper())
+                    {
+                        result.append(ch);
+                    }
                 }
                 else
                 {
@@ -768,6 +819,40 @@ namespace detail
                         {
                             //SEND_WRN(QString("Duplicated '%1' flag with content '%2' was parsed. Ignoring.")
                             //             .arg(getPlotIDAsString(plotViewID), *plotViewDataItem.pPlotViewGroupName));
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_AXIS_RECTANGLE_LABEL:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_AXIS_RECTANGLE_LABEL>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        auto& axisRectData = axisNameMetadataMap[parsingResult.axisRectName];
+                        if(false == axisRectData.bLabelParsingLocked)
+                        {
+                            if(false == plotContent.plotAxisMap[parsingResult.axisRectName].axisLabel.isSet())
+                            {
+                                plotContent.plotAxisMap[parsingResult.axisRectName].axisLabel.setValue(parsingResult.axisRectLabel);
+                            }
+                            else
+                            {
+                                plotContent.plotAxisMap[parsingResult.axisRectName].axisLabel.getWriteableValue().append(parsingResult.axisRectLabel);
+                            }
+
+                            axisRectData.bLabelParsed = true;
                         }
                     }
                     else
@@ -1045,9 +1130,9 @@ namespace detail
 
                             if(foundAxisNameMetadata != axisNameMetadataMap.end())
                             {
-                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.graphIdMetadataMap.find(parsingResult.graphId);
 
-                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.graphIdMetadataMap.end())
                                 {
                                     assert(true == foundGraphIdMetadata->second.graphName.isSet());
                                     auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
@@ -1143,9 +1228,9 @@ namespace detail
 
                             if(foundAxisNameMetadata != axisNameMetadataMap.end())
                             {
-                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+                                auto foundGraphIdMetadata = foundAxisNameMetadata->second.graphIdMetadataMap.find(parsingResult.graphId);
 
-                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                                if(foundGraphIdMetadata != foundAxisNameMetadata->second.graphIdMetadataMap.end())
                                 {
                                     assert(true == foundGraphIdMetadata->second.graphName.isSet());
                                     auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
@@ -1234,7 +1319,7 @@ namespace detail
 
                     if(true == parsingResult.bParsingSuccessful)
                     {
-                        auto& axisRectNameMap = axisNameMetadataMap[parsingResult.axisRectName];
+                        auto& axisRectNameMap = axisNameMetadataMap[parsingResult.axisRectName].graphIdMetadataMap;
                         auto& metadataItem = axisRectNameMap[parsingResult.graphId];
 
                         metadataItem.graphName.setValue("");
@@ -1273,9 +1358,9 @@ namespace detail
 
                         if(foundAxisNameMetadata != axisNameMetadataMap.end())
                         {
-                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.graphIdMetadataMap.find(parsingResult.graphId);
 
-                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.graphIdMetadataMap.end())
                             {
                                 assert(true == foundGraphIdMetadata->second.graphName.isSet());
                                 auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
@@ -1328,9 +1413,9 @@ namespace detail
 
                         if(foundAxisNameMetadata != axisNameMetadataMap.end())
                         {
-                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.find(parsingResult.graphId);
+                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.graphIdMetadataMap.find(parsingResult.graphId);
 
-                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.end())
+                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.graphIdMetadataMap.end())
                             {
                                 assert(true == foundGraphIdMetadata->second.graphName.isSet());
                                 auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
@@ -1343,7 +1428,7 @@ namespace detail
 
                                 auto& dataItem = graphSubItem.dataItems.back();
 
-                                ISearchResultModel::eGanttDataItemType eventType;
+                                ISearchResultModel::eGanttDataItemType eventType = ISearchResultModel::eGanttDataItemType::START;
 
                                 switch(parsingResult.eventType)
                                 {
@@ -1409,7 +1494,7 @@ ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
                 const auto& plotViewID = plotViewDataMap.first;
                 const auto& plotViewDataItemVec = plotViewDataMap.second;
 
-                skipRowFlag = !processPlotViewDataItemVec(*this,
+                skipRowFlag = !detail::processPlotViewDataItemVec(*this,
                                            plotViewID,
                                            plotViewDataItemVec,
                                            result,
@@ -1421,6 +1506,24 @@ ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
             }
         }
         ++row;
+
+        // Lock labels parsing for axis rects where they were already parsed,
+        // cause we do not expect new content for those in other found lines.
+        for(auto& axisNameMetadataMapPair : axisNameMetadataMap)
+        {
+            if(true == axisNameMetadataMapPair.second.bLabelParsed)
+            {
+                axisNameMetadataMapPair.second.bLabelParsingLocked = true;
+            }
+        }
+    }
+
+    for(auto& resultItem : result.plotAxisMap)
+    {
+        if(true == resultItem.second.axisLabel.isSet())
+        {
+            resultItem.second.axisLabel.setValue(detail::splitCamelCase(resultItem.second.axisLabel.getValue()));
+        }
     }
 
     return result;

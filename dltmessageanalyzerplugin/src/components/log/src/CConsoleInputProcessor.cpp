@@ -272,7 +272,7 @@ static void UML_sequence_identifiers()
     }
 }
 
-static void plot_sequence_identifiers()
+static void plot_identifiers()
 {
     SEND_MSG("Plot regex group identifiers, which are supported by the plugin:");
 
@@ -387,7 +387,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                       "- clears debug view");
     result["color-aliases"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedColors();}
                               , "- prints all supported color aliases");
-    result["plot-sequence-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_sequence_identifiers();}
+    result["plot-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_identifiers();}
                                   , "- prints information about regex names scripting in area of the plot diagrams.");
     result["plot-operations"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_operations();}
                                   , "- prints information about regex names scripting in area of the plot diagrams.");

@@ -12,6 +12,7 @@
 
 //////// PLOT_IDENTIFIERS ////////
 const QString s_PLOT_AXIS_RECTANGLE_TYPE = "PARType";
+const QString s_PLOT_AXIS_RECTANGLE_LABEL = "PARL";
 const QString s_PLOT_X_MAX = "PXMx";
 const QString s_PLOT_X_MIN = "PXMn";
 const QString s_PLOT_Y_MAX = "PYMx";
@@ -138,11 +139,38 @@ static tPlotViewIDsMap createPlotIDsMap()
 
         item.description = QString("Plot axis rectangle type. %1. "
                                    "PARType_CPUC_LINEAR. Type of the specific plot axis rectangle. "
-                                   "Supported types are - GANNT, BAR, POINT, LINEAR. "
+                                   "Supported types are - GANTT, BAR, POINT, LINEAR. "
                                    "If not specified, the LINEAR value is used. "
                                    "If multiple values appear - the 'last win' strategy is applied.").arg(item.getParametersDescription());
 
         result.insert(std::make_pair(ePlotViewID::PLOT_AXIS_RECTANGLE_TYPE, item));
+    }
+
+    {
+        tPlotViewIDItem item;
+        item.id_type = ePlotViewIDType::e_Optional;
+        item.id_str = s_PLOT_AXIS_RECTANGLE_LABEL;
+
+        {
+            tPlotViewIDParameterPtr pParameter = std::make_shared<tPlotViewIDparameter>();
+            pParameter->name = "axisRectName";
+            pParameter->type = ePlotViewParameterType::e_Mandatory;
+            item.addParameter(pParameter);
+        }
+
+        {
+            tPlotViewIDParameterPtr pParameter = std::make_shared<tPlotViewIDparameter>();
+            pParameter->name = "axisRectLabel";
+            pParameter->type = ePlotViewParameterType::e_Mandatory;
+            item.addParameter(pParameter);
+        }
+
+        item.description = QString("Plot axis rectangle label. %1. "
+                                   "PARL_CPUC_MyChart. The label, that will be created above the corresponding plot axis rectangle. "
+                                   "If not specified, the label is not created. "
+                                   "If multiple values appear for the same 'axisRectName' - they are concatenated.").arg(item.getParametersDescription());
+
+        result.insert(std::make_pair(ePlotViewID::PLOT_AXIS_RECTANGLE_LABEL, item));
     }
 
     auto formMinMaxParameters = [](tPlotViewIDItem& item)
@@ -873,9 +901,9 @@ QRegularExpression createPlotViewRegex()
 
         for( auto it = sPlotViewIDsMap.begin(); it != sPlotViewIDsMap.end(); ++it )
         {
-            const auto& UML_IDs_MapItem = *it;
+            const auto& Plot_IDs_MapItem = *it;
 
-            resultRegex.append(UML_IDs_MapItem.second.id_str);
+            resultRegex.append(Plot_IDs_MapItem.second.id_str);
 
             if(it != finalIter)
             {
