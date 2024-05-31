@@ -498,19 +498,22 @@ std::pair<bool, ePlotViewAxisType> CCustomPlotExtended::getAxisRectType(QCPAxisR
 
 void CCustomPlotExtended::filterGraphBySelectedItem()
 {
-    int numberOfVisibleGraphs = 0;
-    QCPPlottableLegendItem* pSelectedLegendItem = nullptr;
-    const QCPLegend* pSelectedLegend = nullptr;
+    bool bReplot = false;
+    bool isSelectedItemAvailable =false;
 
     for(const auto& axisRectPair : mPlotAxisRectDataMap)
     {
-        bool leaveCycle = false;
+        QCPPlottableLegendItem* pSelectedLegendItem = nullptr;
+        int numberOfVisibleGraphs = 0;
+        int numberOfGraphs = 0;
 
         const auto* pLegend = axisRectPair.second.pLegend;
 
         if(nullptr != pLegend)
         {
-            for (int i = 0; i < pLegend->itemCount(); ++i)
+            numberOfGraphs = pLegend->itemCount();
+
+            for (int i = 0; i < numberOfGraphs; ++i)
             {
                 QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pLegend->item(i));
                 if (nullptr != pItem)
@@ -520,69 +523,69 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
                         ++numberOfVisibleGraphs;
                     }
 
-                    if(nullptr == pSelectedLegendItem || nullptr == pSelectedLegend)
+                    if(nullptr == pSelectedLegendItem)
                     {
                         if(false == pItem->plottable()->selection().isEmpty())
                         {
                             pSelectedLegendItem = pItem;
-                            pSelectedLegend = pLegend;
+                            isSelectedItemAvailable = true;
                         }
                     }
+                }
+            }
 
-                    if(numberOfVisibleGraphs > 1 &&
-                       nullptr != pSelectedLegendItem &&
-                       nullptr != pSelectedLegend)
+            enum class eAction
+            {
+                eApplyFiltrer,
+                eRemoveFiltrer,
+                eDoNothing
+            };
+
+            eAction action = eAction::eDoNothing;
+
+            if(numberOfGraphs != numberOfVisibleGraphs && numberOfVisibleGraphs > 1 && nullptr == pSelectedLegendItem)
+                action = eAction::eDoNothing;
+            else if(numberOfVisibleGraphs > 1 && numberOfVisibleGraphs > 1 && nullptr != pSelectedLegendItem)
+                action = eAction::eApplyFiltrer;
+            else if(numberOfGraphs > 1 && numberOfVisibleGraphs == 1 && nullptr != pSelectedLegendItem)
+                action = eAction::eRemoveFiltrer;
+
+            for (int i = 0; i < pLegend->itemCount(); ++i)
+            {
+                QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pLegend->item(i));
+
+                if(nullptr != pItem)
+                {
+                    switch(action)
                     {
-                        leaveCycle = true;
+                    case eAction::eApplyFiltrer:
+                        if(true == pItem->plottable()->visible() && pItem != pSelectedLegendItem)
+                        {
+                            changeLegendItemVisibility(pItem);
+                            bReplot = true;
+                        }
+                        break;
+                    case eAction::eRemoveFiltrer:
+                        if(false == pItem->plottable()->visible())
+                        {
+                            changeLegendItemVisibility(pItem);
+                            bReplot = true;
+                        }
+                        break;
+                    case eAction::eDoNothing:
+                        // do nothing
                         break;
                     }
                 }
             }
-
-            if(true == leaveCycle)
-            {
-                break;
-            }
         }
     }
 
-    bool bReplot = false;
-
-    if(nullptr != pSelectedLegend)
-    {
-        bool bFilterOut = numberOfVisibleGraphs > 1;
-
-        for (int i = 0; i < pSelectedLegend->itemCount(); ++i)
-        {
-            QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pSelectedLegend->item(i));
-
-            if(nullptr != pItem)
-            {
-                if(true == bFilterOut)
-                {
-                    if(true == pItem->plottable()->visible() && pItem != pSelectedLegendItem)
-                    {
-                        changeLegendItemVisibility(pItem);
-                        bReplot = true;
-                    }
-                }
-                else
-                {
-                    if(false == pItem->plottable()->visible())
-                    {
-                        changeLegendItemVisibility(pItem);
-                        bReplot = true;
-                    }
-                }
-            }
-        }
-    }
-    else
+    if(false == isSelectedItemAvailable)
     {
         for(const auto& axisRectPair : mPlotAxisRectDataMap)
         {
             const auto* pLegend = axisRectPair.second.pLegend;
-
             if(nullptr != pLegend)
             {
                 for (int i = 0; i < pLegend->itemCount(); ++i)
@@ -599,6 +602,7 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
                 }
             }
         }
+
     }
 
     if(true == bReplot)
