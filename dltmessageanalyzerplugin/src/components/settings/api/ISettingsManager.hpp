@@ -131,6 +131,7 @@ public:
     virtual void setJavaPathMode(const int& val) = 0;
     virtual void setJavaPathEnvVar(const QString& val) = 0;
     virtual void setJavaCustomPath(const QString& val) = 0;
+    virtual void setGroupedViewFeatureActive(bool val) = 0;
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -195,6 +196,7 @@ public:
     virtual const int& getJavaPathMode() const = 0;
     virtual const QString& getJavaPathEnvVar() const = 0;
     virtual const QString& getJavaCustomPath() const = 0;
+    virtual const bool& getGroupedViewFeatureActive() const = 0;
 
     // allowed ranges
     virtual const TOptional<tRange<int>>& getSetting_NumberOfThreads_AllowedRange() const = 0;
@@ -259,4 +261,5 @@ signals:
     void javaPathModeChanged(const int& plantumlPathMode);
     void javaPathEnvVarChanged(const QString& plantumlPathEnvVar);
     void javaCustomPathChanged(const QString& plantumlPathEnvVar);
+    void groupedViewFeatureActiveChanged(const bool& groupedViewFeatureActive);
 };

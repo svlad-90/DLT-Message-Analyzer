@@ -86,8 +86,6 @@ typedef std::shared_ptr<IPatternsModel> tPatternsModelPtr;
 extern const QString sDefaultStatusText;
 extern const QString sDefaultRegexFileName;
 
-
-
 typedef int tMsgId;
 extern const tMsgId INVALID_MSG_ID;
 

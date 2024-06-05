@@ -212,6 +212,19 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         contextMenu.addSeparator();
 
         {
+            QAction* pAction = new QAction("Grouped view", this);
+            connect(pAction, &QAction::triggered, this, [this](bool checked)
+            {
+                getSettingsManager()->setGroupedViewFeatureActive(checked);
+            });
+            pAction->setCheckable(true);
+            pAction->setChecked(getSettingsManager()->getGroupedViewFeatureActive());
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
+
+        {
             QAction* pAction = new QAction("PlantUML", this);
             connect(pAction, &QAction::triggered, this, [this](bool checked)
             {
@@ -223,7 +236,6 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         }
 
         contextMenu.addSeparator();
-
 
         {
             QAction* pAction = new QAction("Plot view", this);
@@ -296,6 +308,38 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         });
 
         {
+            auto pGroupedViewWidget = mpUI->tabWidget->findChild<QWidget*>(QString("groupedViewTab"));
+
+            if(nullptr != pGroupedViewWidget)
+            {
+                auto enableGroupedViewWidget = [this, pGroupedViewWidget](bool val)
+                {
+                    if(nullptr != mpUI && nullptr != mpUI->tabWidget)
+                    {
+                        if(mpUI->tabWidget->count() > 0)
+                        {
+                            if(true != val)
+                            {
+                                mpUI->tabWidget->removeTab(mpUI->tabWidget->indexOf(pGroupedViewWidget));
+                            }
+                            else
+                            {
+                                mpUI->tabWidget->insertTab(2, pGroupedViewWidget, "Grouped view");
+                            }
+                        }
+                    }
+                };
+
+                enableGroupedViewWidget(getSettingsManager()->getGroupedViewFeatureActive());
+
+                connect(getSettingsManager().get(), &ISettingsManager::groupedViewFeatureActiveChanged, [enableGroupedViewWidget](bool val)
+                {
+                    enableGroupedViewWidget(val);
+                });
+            }
+        }
+
+        {
             auto pUMLWidget = mpUI->tabWidget->findChild<QWidget*>(QString("UMLView"));
 
             if(nullptr != pUMLWidget)
@@ -312,7 +356,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                             }
                             else
                             {
-                                mpUI->tabWidget->insertTab(3, pUMLWidget, "UML View");
+                                mpUI->tabWidget->insertTab(true == getSettingsManager()->getGroupedViewFeatureActive() ? 3 : 2, pUMLWidget, "UML View");
                             }
                         }
                     }
@@ -344,7 +388,28 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                             }
                             else
                             {
-                                mpUI->tabWidget->insertTab(true == getSettingsManager()->getUML_FeatureActive() ? 4 : 3, pPlotViewWidget, "Plot view");
+                                auto bGroupedViewFeatureActive = getSettingsManager()->getGroupedViewFeatureActive();
+                                auto bUML_FeatureActive = getSettingsManager()->getUML_FeatureActive();
+                                int tabIndex = 0;
+
+                                if(true == bGroupedViewFeatureActive &&
+                                   true == bUML_FeatureActive)
+                                {
+                                    tabIndex = 4;
+                                }
+                                else if((true == bGroupedViewFeatureActive &&
+                                        false == bUML_FeatureActive) ||
+                                        (false == bGroupedViewFeatureActive &&
+                                        true == bUML_FeatureActive))
+                                {
+                                    tabIndex = 3;
+                                }
+                                else
+                                {
+                                    tabIndex = 2;
+                                }
+
+                                mpUI->tabWidget->insertTab(tabIndex, pPlotViewWidget, "Plot view");
                             }
                         }
                     }

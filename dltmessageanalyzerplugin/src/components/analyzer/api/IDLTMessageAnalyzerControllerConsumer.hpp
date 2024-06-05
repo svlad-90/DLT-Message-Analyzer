@@ -35,12 +35,16 @@ protected:
     IDLTMessageAnalyzerControllerConsumer( const std::weak_ptr<IDLTMessageAnalyzerController>& pController );
     tRequestId requestAnalyze( const tRequestParameters& requestParameters,
                                bool bUMLFeatureActive,
-                               bool bPlotViewFeatureActive );
+                               bool bPlotViewFeatureActive,
+                               bool bGroupedViewFeatureActive );
     void cancelRequest( const tRequestId& requestId );
+    bool isGroupedViewFeatureActiveForCurrentAnalysis() const;
 
 protected: // fields
     std::weak_ptr<IDLTMessageAnalyzerController> mpController;
 
+private: // fields
+    bool mbGroupedViewFeatureActiveForCurrentAnalysis;
 };
 
 typedef std::shared_ptr<IDLTMessageAnalyzerControllerConsumer> tDLTMessageAnalyzerControllerConsumerPtr;

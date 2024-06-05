@@ -101,6 +101,7 @@ public:
     void setJavaPathMode(const int& val) override;
     void setJavaPathEnvVar(const QString& val) override;
     void setJavaCustomPath(const QString& val) override;
+    void setGroupedViewFeatureActive(bool val) override;
 
     void setSelectedRegexFile(const QString& val) override;
 
@@ -160,6 +161,7 @@ public:
     const int& getJavaPathMode() const override;
     const QString& getJavaPathEnvVar() const override;
     const QString& getJavaCustomPath() const override;
+    const bool& getGroupedViewFeatureActive() const override;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
@@ -453,6 +455,9 @@ private: // fields
     TRangedSettingItem<int> mSetting_JavaPathMode;
     TSettingItem<QString> mSetting_JavaPathEnvVar;
     TSettingItem<QString> mSetting_JavaCustomPath;
+
+    // Grouped view settings
+    TSettingItem<bool> mSetting_GroupedViewFeatureActive;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

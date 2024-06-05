@@ -20,14 +20,16 @@ IDLTMessageAnalyzerControllerConsumer::~IDLTMessageAnalyzerControllerConsumer()
 
 IDLTMessageAnalyzerControllerConsumer::IDLTMessageAnalyzerControllerConsumer( const std::weak_ptr<IDLTMessageAnalyzerController>& pController ):
     std::enable_shared_from_this<IDLTMessageAnalyzerControllerConsumer>(),
-    mpController(pController)
+    mpController(pController),
+    mbGroupedViewFeatureActiveForCurrentAnalysis(false)
 {
 
 }
 
 tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequestParameters& requestParameters,
                                                                   bool bUMLFeatureActive,
-                                                                  bool bPlotViewFeatureActive )
+                                                                  bool bPlotViewFeatureActive,
+                                                                  bool bGroupedViewFeatureActive )
 {
     tRequestId requestId = INVALID_REQUEST_ID;
 
@@ -35,7 +37,9 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
     {
         tRegexScriptingMetadata regexMetadata;
 
-        bool bParseResult = regexMetadata.parse(requestParameters.regex, bUMLFeatureActive, bPlotViewFeatureActive);
+        bool bParseResult = regexMetadata.parse(requestParameters.regex,
+                                                bUMLFeatureActive,
+                                                bPlotViewFeatureActive);
 
         if(false == bParseResult)
         {
@@ -71,9 +75,15 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
         }
 
         requestId = mpController.lock()->requestAnalyze(shared_from_this(), requestParameters, regexMetadata);
+        mbGroupedViewFeatureActiveForCurrentAnalysis = bGroupedViewFeatureActive;
     }
 
     return requestId;
+}
+
+bool IDLTMessageAnalyzerControllerConsumer::isGroupedViewFeatureActiveForCurrentAnalysis() const
+{
+    return mbGroupedViewFeatureActiveForCurrentAnalysis;
 }
 
 void IDLTMessageAnalyzerControllerConsumer::cancelRequest( const tRequestId& requestId )
