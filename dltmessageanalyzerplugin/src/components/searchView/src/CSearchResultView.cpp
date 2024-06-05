@@ -1791,6 +1791,11 @@ void CSearchResultView::handleSettingsManagerChange()
         forceUpdateWidthAndResetContentMap();
     });
 
+    connect( getSettingsManager().get(), &ISettingsManager::groupedViewFeatureActiveChanged, this, [this]()
+    {
+        restartSearch();
+    });
+
     connect( getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, this, [this]()
     {
         restartSearch();

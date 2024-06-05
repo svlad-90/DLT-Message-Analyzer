@@ -940,7 +940,8 @@ bool CDLTMessageAnalyzer::analyze()
 
         auto requestId = requestAnalyze( requestParameters,
                                          getSettingsManager()->getUML_FeatureActive(),
-                                         getSettingsManager()->getPlotViewFeatureActive() );
+                                         getSettingsManager()->getPlotViewFeatureActive(),
+                                         getSettingsManager()->getGroupedViewFeatureActive());
 
         setReuqestId(requestId);
 
@@ -1137,7 +1138,11 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                     progressNotificationData.processedMatches.matchedItemVec.end(); ++foundMatchesIt)
                 {
                     auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
-                    mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+                    if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                    {
+                        mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+                    }
+
                     mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 
@@ -1179,7 +1184,12 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                     ++foundMatchesIt)
                 {
                     auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
-                    mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+
+                    if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                    {
+                        mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
+                    }
+
                     mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
                 }
 

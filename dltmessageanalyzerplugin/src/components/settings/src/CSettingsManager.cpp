@@ -84,6 +84,8 @@ static const QString sJavaPathMode = "JavaPathMode";
 static const QString sJavaPathEnvVar = "JavaPathEnvVar";
 static const QString sJavaCustomPath = "JavaCustomPath";
 
+static const QString sGroupedViewFeatureActive = "GroupedViewFeatureActive";
+
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
 
@@ -460,6 +462,10 @@ CSettingsManager::CSettingsManager():
         [this](const QString& data){javaCustomPathChanged(data);},
         [this](){tryStoreSettingsConfig();},
         "")),
+    mSetting_GroupedViewFeatureActive(createBooleanSettingsItem(sGroupedViewFeatureActive,
+        [this](const bool& data){groupedViewFeatureActiveChanged(data);},
+        [this](){tryStoreSettingsConfig();},
+        true)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -484,7 +490,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultHighlightingGradient);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsCopyPasteMap);
-     mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsSearchMap);
+    mUserSettingItemPtrVec.push_back(&mSetting_SearchResultColumnsSearchMap);
     mUserSettingItemPtrVec.push_back(&mSetting_MarkTimeStampWithBold);
     mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsVisibilityMap);
     mUserSettingItemPtrVec.push_back(&mSetting_PatternsColumnsCopyPasteMap);
@@ -514,6 +520,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_JavaPathMode);
     mUserSettingItemPtrVec.push_back(&mSetting_JavaPathEnvVar);
     mUserSettingItemPtrVec.push_back(&mSetting_JavaCustomPath);
+    mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewFeatureActive);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1674,6 +1681,11 @@ void CSettingsManager::setJavaCustomPath(const QString& val)
     mSetting_JavaCustomPath.setData(val);
 }
 
+void CSettingsManager::setGroupedViewFeatureActive(bool val)
+{
+    mSetting_GroupedViewFeatureActive.setData(val);
+}
+
 void CSettingsManager::setSelectedRegexFile(const QString& val)
 {
     mSetting_SelectedRegexFile.setData(val);
@@ -1915,6 +1927,11 @@ const QString& CSettingsManager::getJavaPathEnvVar() const
 const QString& CSettingsManager::getJavaCustomPath() const
 {
     return mSetting_JavaCustomPath.getData();
+}
+
+const bool& CSettingsManager::getGroupedViewFeatureActive() const
+{
+    return mSetting_GroupedViewFeatureActive.getData();
 }
 
 QString CSettingsManager::getRegexDirectory() const
