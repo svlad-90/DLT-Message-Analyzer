@@ -253,19 +253,20 @@ private:
     void setIdx(const int& val);
 
 private:
-    tData mData;
-    tHandleDuplicateFunc mHandleDuplicateFunc;
+
     tChildrenMap mChildItems;
-    tTreeItemPtr mpParentItem;
-    QVector<tTreeItemPtr> mSortedChildren;
-    bool mbFirstLevelSorted;
-    bool mbWholeSorted;
-    int mSortingColumn;
-    Qt::SortOrder mSortOrder;
     tSortingFunction mSortingFunction;
     tFindItemFunc mFindFunc;
-    int mIdx; // idx in parent's collection
+    tHandleDuplicateFunc mHandleDuplicateFunc;
+    tData mData;
+    QVector<tTreeItemPtr> mSortedChildren;
     tGuarded mpGuard;
+    tTreeItemPtr mpParentItem;
+    Qt::SortOrder mSortOrder;
+    int mIdx; // idx in parent's collection
+    int mSortingColumn;
+    bool mbFirstLevelSorted;
+    bool mbWholeSorted;
 };
 
 #endif // CTreeItem_HPP

@@ -432,11 +432,11 @@ tHighlightingRange::tHighlightingRange( const tHighlightingRangeItem& from_,
                                         const tHighlightingRangeItem& to_,
                                         const QColor& color_,
                                         bool explicitColor_ ):
-from(from_), to(to_), color(color_), explicitColor(explicitColor_)
+from(from_), to(to_), color_code(color_.rgb()), explicitColor(explicitColor_)
 {}
 
 tHighlightingRange::tHighlightingRange():
-from(0), to(0), color(0,0,0), explicitColor(false)
+from(0), to(0), color_code(RGB_MASK), explicitColor(false)
 {}
 
 bool tHighlightingRange::operator< ( const tHighlightingRange& rVal ) const
@@ -634,7 +634,6 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches )
 
         typedef std::vector<const tFoundMatch*> tStack;
         tStack matchesStack;
-        matchesStack.reserve(static_cast<std::size_t>(foundMatches.size()) + 10); // +10 to cover possible overhead of nested groups.
 
         auto switchToParent = [&pCurrentItem, &matchesStack](int numberOfElementsToPop)
         {
@@ -664,7 +663,7 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches )
             matchesStack.push_back( &match ); // push new element to the stack
         };
 
-        for(const auto& match : foundMatches)
+        for(const auto& match : foundMatches.foundMatchesVec)
         {
             int counter = 0;
 
@@ -735,10 +734,11 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
         return dummyResult;
     }
 
-    tHighlightingRangeList resultList;
-    resultList.reserve(static_cast<std::size_t>(regexScriptingMetadata.getItemsVec().size() + 10)); // +10 to cover overhead which might be caused with nested groups
+    tCalcRangesCoverageMulticolorResult result;
+    tHighlightingRangeVec& resultVec = result.highlightingRangeVec;
+    resultVec.reserve(static_cast<std::size_t>(regexScriptingMetadata.getItemsVec().size()));
 
-    auto postVisitFunction = [&resultList, &inputRange, &regexScriptingMetadata, &gradientColors, &groupIdToColorMap](tTreeItem* pItem)
+    auto postVisitFunction = [&resultVec, &inputRange, &regexScriptingMetadata, &gradientColors, &groupIdToColorMap](tTreeItem* pItem)
     {
         const auto& match = *(pItem->data(static_cast<int>(eTreeColumns::eTreeColumn_FoundMatch)).get<const tFoundMatch*>());
 
@@ -777,7 +777,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
             if(true == scriptedColor.isSet)
             {
-                color = scriptedColor.color;
+                color = QColor(scriptedColor.color_code);
                 bIsExplicitColor = true;
             }
             else
@@ -810,7 +810,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 {
                     // let's add it
                     tAnalysisRange rangeToBeAdded( tIntRange( analysisRange.from, firstChildAnalysisRange.from - 1 ), inputRange);
-                    resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
+                    resultVec.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
                                                               selectedColor.first ) );
@@ -831,7 +831,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                     if((secondChildAnalysisRange.from - firstChildAnalysisRange.to) > 1)
                     {
                         tAnalysisRange rangeToBeAdded( tIntRange( firstChildAnalysisRange.to+1, secondChildAnalysisRange.from-1 ), inputRange);
-                        resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
+                        resultVec.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                                   rangeToBeAdded.to,
                                                                   selectedColor.second,
                                                                   selectedColor.first ) );
@@ -849,7 +849,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
                 {
                     // let's add it
                     tAnalysisRange rangeToBeAdded( tIntRange( lastChildAnalysisRange.to + 1, analysisRange.to ), inputRange);
-                    resultList.push_back( tHighlightingRange( rangeToBeAdded.from,
+                    resultVec.push_back( tHighlightingRange( rangeToBeAdded.from,
                                                               rangeToBeAdded.to,
                                                               selectedColor.second,
                                                               selectedColor.first ) );
@@ -859,7 +859,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
         else // if there are no children
         {
             // let's add item unconditionally
-            resultList.push_back( tHighlightingRange( analysisRange.from,
+            resultVec.push_back( tHighlightingRange( analysisRange.from,
                                                       analysisRange.to,
                                                       selectedColor.second,
                                                       selectedColor.first ) );
@@ -874,28 +874,21 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 
     if(0 != normalizationIdx)
     {
-        for(auto& resultListItem : resultList)
+        for(auto& resultVecItem : resultVec)
         {
-            resultListItem.from = resultListItem.from - normalizationIdx;
-            resultListItem.to = resultListItem.to - normalizationIdx;
+            resultVecItem.from = resultVecItem.from - normalizationIdx;
+            resultVecItem.to = resultVecItem.to - normalizationIdx;
         }
     }
 
-    tCalcRangesCoverageMulticolorResult result;
-
-
-    result.highlightingRangeSet.insert(resultList.begin(), resultList.end());
-
-    //for( const auto& resultItem : resultList )
-    //{
-        //SEND_MSG(QString("[calcRangesCoverageMulticolor][result] - |from-%1;to-%2;red-%3;green-%4;blue-%5,expColor-%6|")
-        //        .arg(resultItem.from)
-        //        .arg(resultItem.to)
-        //        .arg(resultItem.color.red())
-        //        .arg(resultItem.color.green())
-        //        .arg(resultItem.color.blue())
-        //        .arg(resultItem.explicitColor));
-    //}
+    //  for( const auto& resultItem : result.highlightingRangeVec )
+    //  {
+    //      SEND_MSG(QString("[calcRangesCoverageMulticolor][result] - |from-%1;to-%2;color-%3,expColor-%4|")
+    //              .arg(resultItem.from)
+    //              .arg(resultItem.to)
+    //              .arg(resultItem.color_code)
+    //              .arg(resultItem.explicitColor));
+    //  }
 
 #ifdef DEBUG_CALC_RANGES
     auto nsecEnd = timer.nsecsElapsed();
@@ -910,28 +903,61 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
 }
 
 //tItemMetadata
-tItemMetadata::tItemMetadata(): msgId(-1),
+tItemMetadata::tItemMetadata():
     highlightingInfoMultiColor(),
     fieldRanges(),
+    msgId(-1),
     strSize(0),
-    msgSize(0u),
-    timeStamp(0u)
+    timeStamp(0u),
+    msgSize(0u)
 {
 
+}
+
+tItemMetadata::tItemMetadata(const tItemMetadata& rhs):
+highlightingInfoMultiColor(rhs.highlightingInfoMultiColor),
+fieldRanges(rhs.fieldRanges),
+pUMLInfo(rhs.pUMLInfo == nullptr ? nullptr : std::make_unique<tUMLInfo>(*rhs.pUMLInfo)),
+pPlotViewInfo(rhs.pPlotViewInfo == nullptr ? nullptr : std::make_unique<tPlotViewInfo>(*rhs.pPlotViewInfo)),
+msgId(rhs.msgId),
+msgIdFiltered(rhs.msgIdFiltered),
+strSize(rhs.strSize),
+timeStamp(rhs.timeStamp),
+msgSize(rhs.msgSize)
+{
+
+}
+
+tItemMetadata& tItemMetadata::operator= (const tItemMetadata& rhs)
+{
+    if(&rhs == this)
+        return *this;
+
+    highlightingInfoMultiColor = rhs.highlightingInfoMultiColor;
+    fieldRanges = rhs.fieldRanges;
+    pUMLInfo = rhs.pUMLInfo == nullptr ? nullptr : std::make_unique<tUMLInfo>(*rhs.pUMLInfo);
+    pPlotViewInfo = rhs.pPlotViewInfo == nullptr ? nullptr : std::make_unique<tPlotViewInfo>(*rhs.pPlotViewInfo);
+    msgId = rhs.msgId;
+    msgIdFiltered = rhs.msgIdFiltered;
+    strSize = rhs.strSize;
+    timeStamp = rhs.timeStamp;
+    msgSize = rhs.msgSize;
+
+    return *this;
 }
 
 tItemMetadata::tItemMetadata( const tMsgId& msgId_,
                               const tMsgId& msgIdFiltered_,
                               const tFieldRanges& fieldRanges_,
                               const int& strSize_,
-                              const unsigned int& msgSize_,
+                              const std::uint32_t& msgSize_,
                               const unsigned int& timeStamp_):
+    fieldRanges(fieldRanges_),
     msgId(msgId_),
     msgIdFiltered(msgIdFiltered_),
-    fieldRanges(fieldRanges_),
     strSize(strSize_),
-    msgSize(msgSize_),
-    timeStamp(timeStamp_)
+    timeStamp(timeStamp_),
+    msgSize(msgSize_)
 {
 
 }
@@ -981,7 +1007,7 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
         typedef std::map<tSortedMatchKey, const tFoundMatch*> tSortedMatches;
         tSortedMatches sortedMatches;
 
-        for(const auto& match : foundMatches)
+        for(const auto& match : foundMatches.foundMatchesVec)
         {
             sortedMatches.insert(std::make_pair(tSortedMatchKey(match.range.from, match.range.to - match.range.from), &match));
         }
@@ -1004,9 +1030,9 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
     {
         auto highlightingRangesMulticolorRes = calcRangesCoverageMulticolor( pMatchesTree, it.value(), regexScriptingMetadata, gradientColors, createColorsMappingTable() );
 
-        if(false == highlightingRangesMulticolorRes.highlightingRangeSet.empty())
+        if(false == highlightingRangesMulticolorRes.highlightingRangeVec.empty())
         {
-            highlightingInfoMultiColor.insert( it.key(), highlightingRangesMulticolorRes.highlightingRangeSet );
+            highlightingInfoMultiColor.insert( it.key(), highlightingRangesMulticolorRes.highlightingRangeVec );
         }
     }
 
@@ -1031,14 +1057,16 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
 
     tRegexScriptingMetadata::tCheckIDs checkIDs;
 
-    for(const auto& match : foundMatches)
+    for(const auto& match : foundMatches.foundMatchesVec)
     {
         checkIDs.insert(match.idx);
     }
 
+    pUMLInfo = std::make_unique<tUMLInfo>();
+
     // check if string matches all required UML attributes
-    UMLInfo.bUMLConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentUMLData(false, checkIDs).first;
-    UMLInfo.UMLDataMap.clear();
+    pUMLInfo->bUMLConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentUMLData(false, checkIDs).first;
+    pUMLInfo->UMLDataMap.clear();
 
     /*
      * What should we fill in here?
@@ -1060,7 +1088,7 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
 
     auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
 
-    if(true == UMLInfo.bUMLConstraintsFulfilled) // if UML matches are sufficient
+    if(true == pUMLInfo->bUMLConstraintsFulfilled) // if UML matches are sufficient
     {
         if(nullptr != pMatchesTree)
         {
@@ -1110,7 +1138,7 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                                    UML_IDItem.first == eUML_ID::UML_EVENT;
                         };
 
-                        if(false == isReqResEv() || false == UMLInfo.bContains_Req_Resp_Ev)
+                        if(false == isReqResEv() || false == pUMLInfo->bContains_Req_Resp_Ev)
                         {
                             if(nullptr == UML_IDItem.second.pUML_Custom_Value ||
                                true == UML_IDItem.second.pUML_Custom_Value->isEmpty()) // if there is no client's custom value
@@ -1135,19 +1163,19 @@ tItemMetadata::tUpdateUMLInfoResult tItemMetadata::updateUMLInfo(const tFoundMat
                                     }
                                 }
 
-                                UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                                pUMLInfo->UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
                             }
                             else // otherwise
                             {
                                 // let's directly assign custom client's value
                                 tUMLDataItem UMLDataItem;
                                 UMLDataItem.pUML_Custom_Value = UML_IDItem.second.pUML_Custom_Value;
-                                UMLInfo.UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
+                                pUMLInfo->UMLDataMap[UML_IDItem.first].push_back(UMLDataItem);
                             }
 
                             if(true == isReqResEv())
                             {
-                                UMLInfo.bContains_Req_Resp_Ev = true;
+                                pUMLInfo->bContains_Req_Resp_Ev = true;
                             }
                         }
                         else
@@ -1178,14 +1206,16 @@ tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
 
     tRegexScriptingMetadata::tCheckIDs checkIDs;
 
-    for(const auto& match : foundMatches)
+    for(const auto& match : foundMatches.foundMatchesVec)
     {
         checkIDs.insert(match.idx);
     }
 
+    pPlotViewInfo = std::make_unique<tPlotViewInfo>();
+
     // check if string matches all required UML attributes
-    plotViewInfo.bPlotViewConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentPlotViewData(false, checkIDs, true).first;
-    plotViewInfo.plotViewDataMap.clear();
+    pPlotViewInfo->bPlotViewConstraintsFulfilled = regexScriptingMetadata.doesContainConsistentPlotViewData(false, checkIDs, true).first;
+    pPlotViewInfo->plotViewDataMap.clear();
 
     /*
      * What should we fill in here?
@@ -1206,7 +1236,7 @@ tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
 
     auto pMatchesTree = pTree != nullptr ? pTree : getMatchesTree(foundMatches);
 
-    if(true == plotViewInfo.bPlotViewConstraintsFulfilled) // if UML matches are sufficient
+    if(true == pPlotViewInfo->bPlotViewConstraintsFulfilled) // if UML matches are sufficient
     {
         if(nullptr != pMatchesTree)
         {
@@ -1271,7 +1301,7 @@ tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
                         plotViewDataItem.optColor = plotViewIDParametersMap.second.optColor;
                         plotViewDataItem.pPlotViewGroupName = plotViewIDParametersMap.second.pPlotViewGroupName;
                         plotViewDataItem.plotViewSplitParameters = plotViewIDParametersMap.second.plotViewSplitParameters;
-                        plotViewInfo.plotViewDataMap[plotViewIDParametersMap.first].push_back(plotViewDataItem);
+                        pPlotViewInfo->plotViewDataMap[plotViewIDParametersMap.first].push_back(plotViewDataItem);
                     };
 
                     for(const auto& plotViewIDParametersItem : *(plotViewDataRes.second))
@@ -1299,30 +1329,37 @@ tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
 tFoundMatch::tFoundMatch():
 pMatchStr(std::make_shared<QString>()),
 range(0,0),
-idx(0),
-msgSizeBytes(0u),
-timeStamp(0u),
-msgId(0)
+idx(0)
 {}
 
 tFoundMatch::tFoundMatch( const tQStringPtr& pMatchStr_,
                           const tIntRange& range_,
-                          const int& idx_,
-                          const unsigned int& msgSizeBytes_,
-                          const unsigned int& timeStamp_,
-                          const tMsgId& msgId_):
+                          const int& idx_):
 pMatchStr((nullptr!=pMatchStr_)?pMatchStr_:std::make_shared<QString>()),
 range(range_),
-idx(idx_),
-msgSizeBytes(msgSizeBytes_),
-timeStamp(timeStamp_),
-msgId(msgId_)
+idx(idx_)
 {}
 
 bool tFoundMatch::operator< (const tFoundMatch& rhs) const
 {
-    return msgId < rhs.msgId;
+    Q_UNUSED(rhs);
+    return false;
 }
+
+//tFoundMatches
+tFoundMatches::tFoundMatches():
+timeStamp(0u),
+msgId(0),
+msgSizeBytes(0u)
+{}
+
+tFoundMatches::tFoundMatches(const std::uint32_t& msgSizeBytes_,
+                             const unsigned int& timeStamp_,
+                             const tMsgId& msgId_):
+timeStamp(timeStamp_),
+msgId(msgId_),
+msgSizeBytes(msgSizeBytes_)
+{}
 
 //tFoundMatchesPackItem
 tFoundMatchesPackItem::tFoundMatchesPackItem()
@@ -1332,7 +1369,7 @@ tFoundMatchesPackItem::tFoundMatchesPackItem()
 
 tFoundMatchesPackItem::tFoundMatchesPackItem( tItemMetadata&& itemMetadata_,
                                               tFoundMatches&& foundMatches_ ):
-  mItemMetadata(itemMetadata_),
+  mItemMetadata(std::move(itemMetadata_)),
   mFoundMatches(foundMatches_)
 {
 }
@@ -1898,7 +1935,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                      && true == bBlueParsed)
                     {
                         optColor.isSet = true;
-                        optColor.color = QColor(red, green, blue);
+                        optColor.color_code = QColor(red, green, blue).rgb();
                     }
                 }
             }
@@ -1913,7 +1950,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                 if(colorsMap.end() != foundColor)
                 {
                     optColor.isSet = true;
-                    optColor.color = foundColor->second;
+                    optColor.color_code = foundColor->second.rgb();
                 }
             }
         }
@@ -2666,27 +2703,27 @@ bool tColorWrapper::operator< ( const tColorWrapper& rhs ) const
     }
     else
     {
-        if( optColor.color.red() < rhs.optColor.color.red() )
+        if( qRed(optColor.color_code) < qRed(rhs.optColor.color_code) )
         {
             bResult = true;
         }
-        else if( optColor.color.red() > rhs.optColor.color.red() )
+        else if( qRed(optColor.color_code) > qRed(rhs.optColor.color_code) )
         {
             bResult = false;
         }
         else
         {
-            if( optColor.color.green() < rhs.optColor.color.green() )
+            if( qGreen(optColor.color_code) < qGreen(rhs.optColor.color_code) )
             {
                 bResult = true;
             }
-            else if( optColor.color.green() > rhs.optColor.color.green() )
+            else if( qGreen(optColor.color_code) > qGreen(rhs.optColor.color_code) )
             {
                 bResult = false;
             }
             else
             {
-                if( optColor.color.blue() < rhs.optColor.color.blue() )
+                if( qBlue(optColor.color_code) < qBlue(rhs.optColor.color_code) )
                 {
                     bResult = true;
                 }

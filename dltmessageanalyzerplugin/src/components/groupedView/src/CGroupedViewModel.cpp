@@ -467,39 +467,42 @@ void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
 {
     if(mpRootItem)
     {   
-        if(false == matches.empty())
+        if(false == matches.foundMatchesVec.empty())
         {
             tTreeItem::tDataVec dataVec;
+            dataVec.reserve(matches.foundMatchesVec.size() + 1);
 
             {
                 CTreeItem::tData data;
+                data.reserve(9);
                 data.push_back( tQStringPtrWrapper(sRootItemName) ); /*SubString*/
                 data.push_back(tDataItem(1)); /*Messages*/
                 data.push_back(tDataItem(0)); /*MessagesPercantage*/
                 data.push_back(tDataItem(0)); /*MessagesPerSecond*/
-                data.push_back(tDataItem(static_cast<int>(matches[0].msgSizeBytes))); /*Payload*/
+                data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
                 data.push_back(tDataItem(0)); /*PayloadPercantage*/
                 data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
                 data.push_back(tDataItem()); /*AfterLastVisible*/
-                data.push_back(tDataItem(tGroupedViewMetadata(matches[0].timeStamp, matches[0].msgId))); /*Metadata*/
+                data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
                 dataVec.push_back( data );
 
                 mAnalyzedValues.analyzedMessages += 1;
-                mAnalyzedValues.analyzedPayload += matches[0].msgSizeBytes;
+                mAnalyzedValues.analyzedPayload += matches.msgSizeBytes;
             }
 
-            for(const auto& match : matches)
+            for(const auto& match : matches.foundMatchesVec)
             {
                 CTreeItem::tData data;
+                data.reserve(9);
                 data.push_back( tQStringPtrWrapper(match.pMatchStr) ); /*SubString*/
                 data.push_back(tDataItem(1)); /*Messages*/
                 data.push_back(tDataItem(0)); /*MessagesPercantage*/
                 data.push_back(tDataItem(0)); /*MessagesPerSecond*/
-                data.push_back(tDataItem(static_cast<int>(match.msgSizeBytes))); /*Payload*/
+                data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
                 data.push_back(tDataItem(0)); /*PayloadPercantage*/
                 data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
                 data.push_back(tDataItem()); /*AfterLastVisible*/
-                data.push_back(tDataItem(tGroupedViewMetadata(match.timeStamp, match.msgId))); /*Metadata*/
+                data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
                 dataVec.push_back( data );
             }
 

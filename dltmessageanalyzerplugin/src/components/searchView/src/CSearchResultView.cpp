@@ -578,7 +578,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
 
             if(true == isExplicitColor)
             {
-                result = range.color;
+                result = range.color_code;
             }
             else
             {
@@ -588,7 +588,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                 }
                 else
                 {
-                    result = range.color;
+                    result = range.color_code;
                 }
             }
 

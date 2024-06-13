@@ -89,7 +89,7 @@ extern const QString sDefaultRegexFileName;
 typedef int tMsgId;
 extern const tMsgId INVALID_MSG_ID;
 
-typedef int tHighlightingRangeItem;
+typedef std::int32_t tHighlightingRangeItem;
 
 struct tHighlightingRange
 {
@@ -98,10 +98,10 @@ struct tHighlightingRange
     bool operator< ( const tHighlightingRange& rVal ) const;
     tHighlightingRangeItem from;
     tHighlightingRangeItem to;
-    QColor color;
+    QRgb color_code;
     bool explicitColor;
 };
-typedef std::vector<tHighlightingRange> tHighlightingRangeList;
+typedef std::vector<tHighlightingRange> tHighlightingRangeVec;
 typedef std::set<tHighlightingRange> tHighlightingRangeSet;
 
 template <typename T>
@@ -154,7 +154,6 @@ struct tRange
 };
 
 typedef tRange<int> tIntRange;
-
 Q_DECLARE_METATYPE(tIntRange)
 
 struct tIntRangePtrWrapper
@@ -333,7 +332,7 @@ struct tHighlightingGradient
 // generates a set of colors from a gradient's definition
 QVector<QColor> generateColors( const tHighlightingGradient& gradient );
 
-typedef QMap<eSearchResultColumn, tHighlightingRangeSet> tHighlightingInfoMulticolor;
+typedef QMap<eSearchResultColumn, tHighlightingRangeVec> tHighlightingInfoMulticolor;
 typedef QMap<eSearchResultColumn, tIntRange> tFieldRanges;
 
 struct tFoundMatch
@@ -341,10 +340,7 @@ struct tFoundMatch
     tFoundMatch();
     tFoundMatch( const tQStringPtr& pMatchStr_,
                  const tIntRange& range_,
-                 const int& idx_,
-                 const unsigned int& msgSizeBytes_,
-                 const unsigned int& timeStamp_,
-                 const tMsgId& msgId_);
+                 const int& idx_ );
 
     /**
      * @brief operator < - fake. No actually used as of now.
@@ -356,10 +352,7 @@ struct tFoundMatch
 
     tQStringPtr pMatchStr;
     tIntRange range;
-    int idx;
-    unsigned int msgSizeBytes;
-    unsigned int timeStamp;
-    tMsgId msgId;
+    std::int16_t idx;
 };
 
 Q_DECLARE_METATYPE( const tFoundMatch* )
@@ -392,7 +385,19 @@ QVariant toQVariant(const tDataItem& item);
 tDataItem toRegexDataItem(const QVariant& variant, const eRegexFiltersColumn& column);
 /////////////////////////////////////////////
 
-typedef std::vector<tFoundMatch> tFoundMatches;
+typedef std::vector<tFoundMatch> tFoundMatchesVec;
+
+struct tFoundMatches
+{
+    tFoundMatches();
+    tFoundMatches(const std::uint32_t& msgSizeBytes_,
+                  const unsigned int& timeStamp_,
+                  const tMsgId& msgId_);
+    tFoundMatchesVec foundMatchesVec;
+    unsigned int timeStamp;
+    tMsgId msgId;
+    std::uint32_t msgSizeBytes;
+};
 
 typedef QVector<QColor> QColorVec;
 
@@ -482,7 +487,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
 
 struct tCalcRangesCoverageMulticolorResult
 {
-    tHighlightingRangeSet highlightingRangeSet;
+    tHighlightingRangeVec highlightingRangeVec;
 };
 
 typedef std::map<int /*group id*/, int /*gradient color id*/> tGroupIdToColorMap;
@@ -536,9 +541,9 @@ typedef std::vector<tUMLDataItem> tUMLDataItemsVec;
 typedef std::map<eUML_ID, tUMLDataItemsVec> tUMLDataMap;
 struct tUMLInfo
 {
+    tUMLDataMap UMLDataMap;
     bool bUMLConstraintsFulfilled = false;
     bool bApplyForUMLCreation = false;
-    tUMLDataMap UMLDataMap;
     bool bContains_Req_Resp_Ev = false;
 };
 
@@ -557,19 +562,21 @@ typedef std::vector<tPlotViewDataItem> tPlotViewDataItemVec;
 typedef std::map<ePlotViewID, tPlotViewDataItemVec> tPlotViewDataMap;
 struct tPlotViewInfo
 {
+    tPlotViewDataMap plotViewDataMap;
     bool bPlotViewConstraintsFulfilled = false;
     bool bApplyForPlotCreation = false;
-    tPlotViewDataMap plotViewDataMap;
 };
 
 struct tItemMetadata
 {
     tItemMetadata();
+    tItemMetadata(const tItemMetadata& rhs);
+    tItemMetadata& operator= (const tItemMetadata& rhs);
     tItemMetadata( const tMsgId& msgId_,
                    const tMsgId& msgIdFiltered_,
                    const tFieldRanges& fieldRanges_,
                    const int& strSize_,
-                   const unsigned int& msgSize_,
+                   const std::uint32_t& msgSize_,
                    const unsigned int& timeStamp_);
     tTreeItemSharedPtr updateHighlightingInfo( const tFoundMatches& foundMatches,
                                  const QVector<QColor>& gradientColors,
@@ -595,15 +602,15 @@ struct tItemMetadata
                                        const tRegexScriptingMetadata& regexScriptingMetadata,
                                        tTreeItemSharedPtr pTree = nullptr);
 
-    tMsgId msgId;
-    tMsgId msgIdFiltered;
     tHighlightingInfoMulticolor highlightingInfoMultiColor;
     tFieldRanges fieldRanges;
+    std::unique_ptr<tUMLInfo> pUMLInfo = nullptr;
+    std::unique_ptr<tPlotViewInfo> pPlotViewInfo = nullptr;
+    tMsgId msgId;
+    tMsgId msgIdFiltered;
     int strSize;
-    unsigned int msgSize;
     unsigned int timeStamp;
-    tUMLInfo UMLInfo;
-    tPlotViewInfo plotViewInfo;
+    std::uint32_t msgSize;
 };
 
 typedef QPair<tItemMetadata, tQStringPtr> tProcessingStringItem;
@@ -623,7 +630,9 @@ private:
     tItemMetadata mItemMetadata;
     tFoundMatches mFoundMatches;
 };
-typedef std::vector<tFoundMatchesPackItem> tFoundMatchesPackItemVec;
+
+typedef std::shared_ptr<tFoundMatchesPackItem> tFoundMatchesPackItemPtr;
+typedef std::vector<tFoundMatchesPackItemPtr> tFoundMatchesPackItemVec;
 
 struct tFoundMatchesPack
 {

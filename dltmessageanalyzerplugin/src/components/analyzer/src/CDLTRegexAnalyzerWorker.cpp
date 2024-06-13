@@ -102,7 +102,11 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
 
             if (true == match.hasMatch())
             {
-                tFoundMatches foundMatches;
+                tFoundMatches foundMatches(processingString.first.msgSize,
+                                           processingString.first.timeStamp,
+                                           processingString.first.msgId);
+
+                int foundMatchesVecCapacity = 0;
 
                 for (int i = 0; i <= match.lastCapturedIndex(); ++i)
                 {
@@ -112,12 +116,24 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
                     {
                         if(0 != matchItem.size())
                         {
-                            foundMatches.push_back( tFoundMatch( std::make_shared<QString>(matchItem),
+                            ++foundMatchesVecCapacity;
+                        }
+                    }
+                }
+
+                foundMatches.foundMatchesVec.reserve(foundMatchesVecCapacity);
+
+                for (int i = 0; i <= match.lastCapturedIndex(); ++i)
+                {
+                    const auto& matchItem = match.captured(i);
+
+                    if(i>0)
+                    {
+                        if(0 != matchItem.size())
+                        {
+                            foundMatches.foundMatchesVec.push_back( tFoundMatch( std::make_shared<QString>(matchItem),
                                                                  tIntRange( match.capturedStart(i), match.capturedEnd(i) - 1 ),
-                                                                 i,
-                                                                 processingString.first.msgSize,
-                                                                 processingString.first.timeStamp,
-                                                                 processingString.first.msgId)  );
+                                                                 i)  );
                         }
                     }
                 }
@@ -146,7 +162,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
                                                                           pTree);
                 }
 
-                foundMatchesPack.matchedItemVec.push_back( tFoundMatchesPackItem( std::move(itemMetadata), std::move(foundMatches) ) );
+                foundMatchesPack.matchedItemVec.push_back( std::make_shared<tFoundMatchesPackItem>( std::move(itemMetadata), std::move(foundMatches) ) );
             }
         }
 

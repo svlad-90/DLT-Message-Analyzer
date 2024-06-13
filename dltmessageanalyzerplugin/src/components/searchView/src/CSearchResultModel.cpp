@@ -19,7 +19,6 @@ CSettingsManagerClient(pSettingsManager),
 mFoundMatchesPack(),
 mpFile(nullptr)
 {
-
 }
 
 void CSearchResultModel::setFile(const tFileWrapperPtr& pFile)
@@ -56,11 +55,11 @@ const tFoundMatchesPackItem& CSearchResultModel::getFoundMatchesItemPack( const 
     if ( ( modelIndex.row() < 0 || modelIndex.row() >= static_cast<int>(mFoundMatchesPack.matchedItemVec.size()) ) ||
          ( modelIndex.column() < 0 || modelIndex.column() >= static_cast<int>(eSearchResultColumn::Last) ) )
     {
-        static const tFoundMatchesPackItem sDummyValue;
-        return sDummyValue;
+        static const tFoundMatchesPackItemPtr spDummyValue = std::make_shared<tFoundMatchesPackItem>();
+        return *spDummyValue;
     }
 
-    return mFoundMatchesPack.matchedItemVec[ static_cast<std::size_t>(modelIndex.row()) ];
+    return *mFoundMatchesPack.matchedItemVec[ static_cast<std::size_t>(modelIndex.row()) ];
 }
 
 QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
@@ -103,44 +102,53 @@ QVariant CSearchResultModel::data(const QModelIndex &index, int role) const
               ( column != eSearchResultColumn::UML_Applicability &&
                 column != eSearchResultColumn::PlotView_Applicability ) )
     {
-        auto msgId = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().msgId;
-        const auto& pMsg = mpFile->getMsg(msgId);
-        auto pStrValue = getDataStrFromMsg(msgId, pMsg, column);
-
-        if(nullptr != pStrValue)
+        if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
         {
-            result = std::move(*pStrValue);
+            auto msgId = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadata().msgId;
+            const auto& pMsg = mpFile->getMsg(msgId);
+            auto pStrValue = getDataStrFromMsg(msgId, pMsg, column);
+
+            if(nullptr != pStrValue)
+            {
+                result = std::move(*pStrValue);
+            }
         }
     }
     else if( role == Qt::CheckStateRole &&( index.column() == static_cast<int>(eSearchResultColumn::UML_Applicability) ) )
     {
-        const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
-
-        if(true == UMLInfo.bUMLConstraintsFulfilled)
+        if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
         {
-            if(true == UMLInfo.bApplyForUMLCreation)
+            const auto& pUMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadata().pUMLInfo;
+
+            if(nullptr != pUMLInfo && true == pUMLInfo->bUMLConstraintsFulfilled)
             {
-                result = Qt::CheckState::Checked;
-            }
-            else
-            {
-                result = Qt::CheckState::Unchecked;
+                if(true == pUMLInfo->bApplyForUMLCreation)
+                {
+                    result = Qt::CheckState::Checked;
+                }
+                else
+                {
+                    result = Qt::CheckState::Unchecked;
+                }
             }
         }
     }
     else if( role == Qt::CheckStateRole &&( index.column() == static_cast<int>(eSearchResultColumn::PlotView_Applicability) ) )
     {
-        const auto& plotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().plotViewInfo;
-
-        if(true == plotViewInfo.bPlotViewConstraintsFulfilled)
+        if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
         {
-            if(true == plotViewInfo.bApplyForPlotCreation)
+            const auto& pPlotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadata().pPlotViewInfo;
+
+            if(nullptr != pPlotViewInfo && true == pPlotViewInfo->bPlotViewConstraintsFulfilled)
             {
-                result = Qt::CheckState::Checked;
-            }
-            else
-            {
-                result = Qt::CheckState::Unchecked;
+                if(true == pPlotViewInfo->bApplyForPlotCreation)
+                {
+                    result = Qt::CheckState::Checked;
+                }
+                else
+                {
+                    result = Qt::CheckState::Unchecked;
+                }
             }
         }
     }
@@ -180,28 +188,34 @@ Qt::ItemFlags CSearchResultModel::flags(const QModelIndex &index) const
     {
         if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::UML_Applicability)
         {
-            const auto& UMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().UMLInfo;
+            if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
+            {
+                const auto& pUMLInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadata().pUMLInfo;
 
-            if(true == UMLInfo.bUMLConstraintsFulfilled)
-            {
-                result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-            }
-            else
-            {
-                result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+                if(nullptr != pUMLInfo && true == pUMLInfo->bUMLConstraintsFulfilled)
+                {
+                    result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+                }
+                else
+                {
+                    result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+                }
             }
         }
         else if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::PlotView_Applicability)
         {
-            const auto& plotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadata().plotViewInfo;
+            if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
+            {
+                const auto& pPlotViewInfo = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadata().pPlotViewInfo;
 
-            if(true == plotViewInfo.bPlotViewConstraintsFulfilled)
-            {
-                result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-            }
-            else
-            {
-                result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+                if(nullptr != pPlotViewInfo && true == pPlotViewInfo->bPlotViewConstraintsFulfilled)
+                {
+                    result = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+                }
+                else
+                {
+                    result = QAbstractItemModel::flags(index) & (~Qt::ItemIsEditable);
+                }
             }
         }
         else
@@ -245,7 +259,10 @@ int CSearchResultModel::getFileIdx( const QModelIndex& idx ) const
 
     if(row >= 0 && static_cast<size_t>(row) < mFoundMatchesPack.matchedItemVec.size())
     {
-        result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)].getItemMetadata().msgIdFiltered;
+        if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)])
+        {
+            result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)]->getItemMetadata().msgIdFiltered;
+        }
     }
 
     return result;
@@ -298,269 +315,272 @@ std::pair<int /*rowNumber*/, QString /*diagramContent*/> CSearchResultModel::get
 
     for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
     {
-        QString subStr;
-
-        const auto& itemMetadata = foundMatchPack.getItemMetadata();
-
-        if(true == itemMetadata.UMLInfo.bUMLConstraintsFulfilled
-           && true == itemMetadata.UMLInfo.bApplyForUMLCreation)
+        if(nullptr != foundMatchPack)
         {
-            // Result string - <UCL> <URT|URS|UE> <US> : [timestamp] <USID><UM>(<UA>)
+            QString subStr;
 
-            tIntRange insertMethodFormattingRange;
-            tIntRange insertMethodFormattingOffset;
+            const auto& itemMetadata = foundMatchPack->getItemMetadata();
 
-            auto getUMLItemRepresentation = [this, &itemMetadata, &row](const eUML_ID& UML_ID)->std::pair<bool, QString>
+            if(nullptr != itemMetadata.pUMLInfo && true == itemMetadata.pUMLInfo->bUMLConstraintsFulfilled
+               && true == itemMetadata.pUMLInfo->bApplyForUMLCreation)
             {
-                std::pair<bool, QString> UMLRepresentationResult;
-                UMLRepresentationResult.first = false;
+                // Result string - <UCL> <URT|URS|UE> <US> : [timestamp] <USID><UM>(<UA>)
 
-                auto foundUMLDataItem = itemMetadata.UMLInfo.UMLDataMap.find(UML_ID);
+                tIntRange insertMethodFormattingRange;
+                tIntRange insertMethodFormattingOffset;
 
-                if(foundUMLDataItem != itemMetadata.UMLInfo.UMLDataMap.end())
+                auto getUMLItemRepresentation = [this, &itemMetadata, &row](const eUML_ID& UML_ID)->std::pair<bool, QString>
                 {
-                    for(const auto& item : foundUMLDataItem->second)
+                    std::pair<bool, QString> UMLRepresentationResult;
+                    UMLRepresentationResult.first = false;
+
+                    auto foundUMLDataItem = itemMetadata.pUMLInfo->UMLDataMap.find(UML_ID);
+
+                    if(foundUMLDataItem != itemMetadata.pUMLInfo->UMLDataMap.end())
                     {
-                        if(item.pUML_Custom_Value == nullptr ||
-                           true == item.pUML_Custom_Value->isEmpty()) // if there is no client-defined value
+                        for(const auto& item : foundUMLDataItem->second)
                         {
-                            // let's use value from the corresponding group
-                            for(const auto& stringCoverageMapItem : item.stringCoverageMap)
+                            if(item.pUML_Custom_Value == nullptr ||
+                               true == item.pUML_Custom_Value->isEmpty()) // if there is no client-defined value
                             {
-                                auto column = stringCoverageMapItem.first;
-
-                                QString message = getStrValue(row, column);
-
-                                auto messageSize = message.size();
-                                const auto& range = stringCoverageMapItem.second.range;
-
-                                if(range.from >= 0 && range.from < messageSize &&
-                                   range.to >= 0 && range.to < messageSize )
+                                // let's use value from the corresponding group
+                                for(const auto& stringCoverageMapItem : item.stringCoverageMap)
                                 {
-                                    switch(UML_ID)
+                                    auto column = stringCoverageMapItem.first;
+
+                                    QString message = getStrValue(row, column);
+
+                                    auto messageSize = message.size();
+                                    const auto& range = stringCoverageMapItem.second.range;
+
+                                    if(range.from >= 0 && range.from < messageSize &&
+                                       range.to >= 0 && range.to < messageSize )
                                     {
-                                        case eUML_ID::UML_REQUEST:
-                                            UMLRepresentationResult.second.append("->");
-                                            break;
-                                        case eUML_ID::UML_RESPONSE:
-                                        case eUML_ID::UML_EVENT:
-                                            UMLRepresentationResult.second.append("<-");
-                                            break;
-                                        case eUML_ID::UML_ARGUMENTS:
+                                        switch(UML_ID)
                                         {
-                                            int numberOfCharacters = range.to - range.from + 1;
-                                            QString argString = message.mid(range.from, numberOfCharacters);
-                                            argString.replace("[[", "[ [");
-                                            argString.replace("]]", "] ]");
-                                            UMLRepresentationResult.second.append(argString);
-
-                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                            case eUML_ID::UML_REQUEST:
+                                                UMLRepresentationResult.second.append("->");
+                                                break;
+                                            case eUML_ID::UML_RESPONSE:
+                                            case eUML_ID::UML_EVENT:
+                                                UMLRepresentationResult.second.append("<-");
+                                                break;
+                                            case eUML_ID::UML_ARGUMENTS:
                                             {
-                                                UMLRepresentationResult.second.append(" ");
-                                            }
-                                        }
-                                            break;
-                                        case eUML_ID::UML_CLIENT:
-                                        case eUML_ID::UML_SERVICE:
-                                        {
-                                            QString str;
-                                            str.append("\"");
-                                            str.append(message.mid(range.from, range.to - range.from + 1));
+                                                int numberOfCharacters = range.to - range.from + 1;
+                                                QString argString = message.mid(range.from, numberOfCharacters);
+                                                argString.replace("[[", "[ [");
+                                                argString.replace("]]", "] ]");
+                                                UMLRepresentationResult.second.append(argString);
 
-                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                                if(true == stringCoverageMapItem.second.bAddSeparator)
+                                                {
+                                                    UMLRepresentationResult.second.append(" ");
+                                                }
+                                            }
+                                                break;
+                                            case eUML_ID::UML_CLIENT:
+                                            case eUML_ID::UML_SERVICE:
                                             {
-                                                str.append(" ");
+                                                QString str;
+                                                str.append("\"");
+                                                str.append(message.mid(range.from, range.to - range.from + 1));
+
+                                                if(true == stringCoverageMapItem.second.bAddSeparator)
+                                                {
+                                                    str.append(" ");
+                                                }
+
+                                                str.append("\"");
+
+                                                UMLRepresentationResult.second.append(str);
                                             }
-
-                                            str.append("\"");
-
-                                            UMLRepresentationResult.second.append(str);
-                                        }
-                                            break;
-                                        case eUML_ID::UML_TIMESTAMP:
-                                        {
-                                            QString str;
-                                            str.append("[");
-                                            str.append( message.mid(range.from, range.to - range.from + 1) );
-                                            str.append("] ");
-
-                                            UMLRepresentationResult.second.append(str);
-                                        }
-                                        break;
-                                        default:
-                                        {
-                                            UMLRepresentationResult.second.append(message.mid(range.from, range.to - range.from + 1));
-
-                                            if(true == stringCoverageMapItem.second.bAddSeparator)
+                                                break;
+                                            case eUML_ID::UML_TIMESTAMP:
                                             {
-                                                UMLRepresentationResult.second.append(" ");
+                                                QString str;
+                                                str.append("[");
+                                                str.append( message.mid(range.from, range.to - range.from + 1) );
+                                                str.append("] ");
+
+                                                UMLRepresentationResult.second.append(str);
                                             }
-                                        }
                                             break;
+                                            default:
+                                            {
+                                                UMLRepresentationResult.second.append(message.mid(range.from, range.to - range.from + 1));
+
+                                                if(true == stringCoverageMapItem.second.bAddSeparator)
+                                                {
+                                                    UMLRepresentationResult.second.append(" ");
+                                                }
+                                            }
+                                                break;
+                                        }
                                     }
+
+                                    UMLRepresentationResult.first = true;
+                                }
+                            }
+                            else // otherwise
+                            {
+                                switch(UML_ID)
+                                {
+                                    case eUML_ID::UML_CLIENT:
+                                    case eUML_ID::UML_SERVICE:
+                                    {
+                                        QString str;
+                                        str.reserve(item.pUML_Custom_Value->size() + 2);
+                                        str.append("\"");
+                                        str.append(*item.pUML_Custom_Value);
+                                        str.append("\"");
+
+                                        // let's directly use client-defined value, ignoring value from the group
+                                        UMLRepresentationResult.second.append(str);
+                                    }
+                                        break;
+                                    case eUML_ID::UML_TIMESTAMP:
+                                    {
+                                        const auto column = eSearchResultColumn::Timestamp;
+                                        QString timestampVal = getStrValue(row, column);
+                                        QString str;
+                                        str.reserve(timestampVal.size() + 3);
+                                        str.append("[");
+                                        str.append( timestampVal );
+                                        str.append("] ");
+
+                                        // let's use dlt's native timestamp
+                                        UMLRepresentationResult.second.append(str);
+                                    }
+                                        break;
+                                    default:
+                                    {
+                                        // let's directly use client-defined value, ignoring value from the group
+                                        UMLRepresentationResult.second.append(*item.pUML_Custom_Value);
+                                    }
+                                        break;
                                 }
 
                                 UMLRepresentationResult.first = true;
                             }
                         }
-                        else // otherwise
+                    }
+                    else
+                    {
+                        if(UML_ID == eUML_ID::UML_TIMESTAMP)
                         {
-                            switch(UML_ID)
-                            {
-                                case eUML_ID::UML_CLIENT:
-                                case eUML_ID::UML_SERVICE:
-                                {
-                                    QString str;
-                                    str.reserve(item.pUML_Custom_Value->size() + 2);
-                                    str.append("\"");
-                                    str.append(*item.pUML_Custom_Value);
-                                    str.append("\"");
+                            const auto column = eSearchResultColumn::Timestamp;
+                            QString timestampVal = getStrValue(row, column);
+                            QString str;
+                            str.reserve(timestampVal.size() + 3);
+                            str.append("[");
+                            str.append( timestampVal );
+                            str.append("] ");
 
-                                    // let's directly use client-defined value, ignoring value from the group
-                                    UMLRepresentationResult.second.append(str);
-                                }
-                                    break;
-                                case eUML_ID::UML_TIMESTAMP:
-                                {
-                                    const auto column = eSearchResultColumn::Timestamp;
-                                    QString timestampVal = getStrValue(row, column);
-                                    QString str;
-                                    str.reserve(timestampVal.size() + 3);
-                                    str.append("[");
-                                    str.append( timestampVal );
-                                    str.append("] ");
-
-                                    // let's use dlt's native timestamp
-                                    UMLRepresentationResult.second.append(str);
-                                }
-                                    break;
-                                default:
-                                {
-                                    // let's directly use client-defined value, ignoring value from the group
-                                    UMLRepresentationResult.second.append(*item.pUML_Custom_Value);
-                                }
-                                    break;
-                            }
-
+                            // let's use dlt's native timestamp
+                            UMLRepresentationResult.second.append(str);
                             UMLRepresentationResult.first = true;
                         }
                     }
-                }
-                else
-                {
-                    if(UML_ID == eUML_ID::UML_TIMESTAMP)
-                    {
-                        const auto column = eSearchResultColumn::Timestamp;
-                        QString timestampVal = getStrValue(row, column);
-                        QString str;
-                        str.reserve(timestampVal.size() + 3);
-                        str.append("[");
-                        str.append( timestampVal );
-                        str.append("] ");
 
-                        // let's use dlt's native timestamp
-                        UMLRepresentationResult.second.append(str);
-                        UMLRepresentationResult.first = true;
+                    return UMLRepresentationResult;
+                };
+
+                auto appendUMLData = [&getUMLItemRepresentation, &subStr](const eUML_ID& UML_ID)
+                {
+                    auto umlRepresentationResult = getUMLItemRepresentation(UML_ID);
+
+                    if(true == umlRepresentationResult.first)
+                    {
+                        subStr.append(umlRepresentationResult.second);
                     }
-                }
+                    else
+                    {
+                        //SEND_ERR(QString("Was not able to find \"%1\" field!").arg(getUMLIDAsString(UML_ID)));
+                    }
+                };
 
-                return UMLRepresentationResult;
-            };
+                appendUMLData(eUML_ID::UML_CLIENT);
+                subStr.append(" ");
+                appendUMLData(eUML_ID::UML_REQUEST);
+                appendUMLData(eUML_ID::UML_RESPONSE);
+                appendUMLData(eUML_ID::UML_EVENT);
+                subStr.append(" ");
+                appendUMLData(eUML_ID::UML_SERVICE);
+                subStr.append(" : ");
+                int wrappingStartingPoint = subStr.size();
+                appendUMLData(eUML_ID::UML_TIMESTAMP);
+                appendUMLData(eUML_ID::UML_SEQUENCE_ID);
+                subStr.append(" ");
+                insertMethodFormattingRange.from = subStr.size();
+                appendUMLData(eUML_ID::UML_METHOD);
+                insertMethodFormattingRange.to = subStr.size();
+                subStr.append("(");
 
-            auto appendUMLData = [&getUMLItemRepresentation, &subStr](const eUML_ID& UML_ID)
-            {
-                auto umlRepresentationResult = getUMLItemRepresentation(UML_ID);
-
-                if(true == umlRepresentationResult.first)
+                if(true == getSettingsManager()->getUML_ShowArguments())
                 {
-                    subStr.append(umlRepresentationResult.second);
+                    appendUMLData(eUML_ID::UML_ARGUMENTS);
                 }
                 else
                 {
-                    //SEND_ERR(QString("Was not able to find \"%1\" field!").arg(getUMLIDAsString(UML_ID)));
+                    subStr.append(" ... ");
                 }
-            };
 
-            appendUMLData(eUML_ID::UML_CLIENT);
-            subStr.append(" ");
-            appendUMLData(eUML_ID::UML_REQUEST);
-            appendUMLData(eUML_ID::UML_RESPONSE);
-            appendUMLData(eUML_ID::UML_EVENT);
-            subStr.append(" ");
-            appendUMLData(eUML_ID::UML_SERVICE);
-            subStr.append(" : ");
-            int wrappingStartingPoint = subStr.size();
-            appendUMLData(eUML_ID::UML_TIMESTAMP);
-            appendUMLData(eUML_ID::UML_SEQUENCE_ID);
-            subStr.append(" ");
-            insertMethodFormattingRange.from = subStr.size();
-            appendUMLData(eUML_ID::UML_METHOD);
-            insertMethodFormattingRange.to = subStr.size();
-            subStr.append("(");
+                subStr.append(")");
 
-            if(true == getSettingsManager()->getUML_ShowArguments())
-            {
-                appendUMLData(eUML_ID::UML_ARGUMENTS);
-            }
-            else
-            {
-                subStr.append(" ... ");
-            }
+                subStr.append("\n");
 
-            subStr.append(")");
-
-            subStr.append("\n");
-
-            // wrapping logic
-            {
-                if(true == getSettingsManager()->getUML_WrapOutput())
+                // wrapping logic
                 {
-                    const int insertNewLineRange = 100;
-
-                    if(subStr.size() > insertNewLineRange)
+                    if(true == getSettingsManager()->getUML_WrapOutput())
                     {
-                        const QString insertStr = "\\n";
+                        const int insertNewLineRange = 100;
 
-                        subStr.reserve(subStr.size() + ( insertStr.size() * ( (subStr.size() / insertNewLineRange) + 1 ) ) );
-
-                        int currentIndex = wrappingStartingPoint + insertNewLineRange;
-                        int currentOffset = 0;
-
-                        while( (currentIndex + currentOffset) < subStr.size())
+                        if(subStr.size() > insertNewLineRange)
                         {
-                            if(currentIndex + currentOffset < insertMethodFormattingRange.from)
-                            {
-                                insertMethodFormattingOffset.from += insertStr.size();
-                            }
+                            const QString insertStr = "\\n";
 
-                            if(currentIndex + currentOffset < insertMethodFormattingRange.to)
-                            {
-                                insertMethodFormattingOffset.to += insertStr.size();
-                            }
+                            subStr.reserve(subStr.size() + ( insertStr.size() * ( (subStr.size() / insertNewLineRange) + 1 ) ) );
 
-                            subStr.insert( currentIndex + currentOffset, insertStr );
-                            currentIndex += insertNewLineRange;
-                            currentOffset += insertStr.size();
+                            int currentIndex = wrappingStartingPoint + insertNewLineRange;
+                            int currentOffset = 0;
+
+                            while( (currentIndex + currentOffset) < subStr.size())
+                            {
+                                if(currentIndex + currentOffset < insertMethodFormattingRange.from)
+                                {
+                                    insertMethodFormattingOffset.from += insertStr.size();
+                                }
+
+                                if(currentIndex + currentOffset < insertMethodFormattingRange.to)
+                                {
+                                    insertMethodFormattingOffset.to += insertStr.size();
+                                }
+
+                                subStr.insert( currentIndex + currentOffset, insertStr );
+                                currentIndex += insertNewLineRange;
+                                currentOffset += insertStr.size();
+                            }
                         }
                     }
                 }
-            }
 
-            subStr.insert(insertMethodFormattingRange.from + insertMethodFormattingOffset.from, "__**");
-            subStr.insert(insertMethodFormattingRange.to + insertMethodFormattingOffset.to + 4, "**__");
+                subStr.insert(insertMethodFormattingRange.from + insertMethodFormattingOffset.from, "__**");
+                subStr.insert(insertMethodFormattingRange.to + insertMethodFormattingOffset.to + 4, "**__");
 
-            outputString.append(subStr);
+                outputString.append(subStr);
 
-            ++numberOfRows;
+                ++numberOfRows;
 
-            const auto& maxRowsNumber = getSettingsManager()->getUML_MaxNumberOfRowsInDiagram();
+                const auto& maxRowsNumber = getSettingsManager()->getUML_MaxNumberOfRowsInDiagram();
 
-            // if we've reached the limit
-            if(numberOfRows >= maxRowsNumber)
-            {
-                // stop addition of new rows
-                SEND_WRN(QString("Not all UML content will be rendered. Number of rows in diagram was limited to %1 rows due to specified settings").arg(maxRowsNumber));
-                break;
+                // if we've reached the limit
+                if(numberOfRows >= maxRowsNumber)
+                {
+                    // stop addition of new rows
+                    SEND_WRN(QString("Not all UML content will be rendered. Number of rows in diagram was limited to %1 rows due to specified settings").arg(maxRowsNumber));
+                    break;
+                }
             }
         }
 
@@ -1475,45 +1495,49 @@ ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
 
     for(const auto& foundMatchPack : mFoundMatchesPack.matchedItemVec)
     {
-        const auto& itemMetadata = foundMatchPack.getItemMetadata();
-
-        if(true == itemMetadata.plotViewInfo.bPlotViewConstraintsFulfilled
-            && true == itemMetadata.plotViewInfo.bApplyForPlotCreation)
+        if(nullptr != foundMatchPack)
         {
-            detail::tMetadataItem metadataItem;
+            const auto& itemMetadata = foundMatchPack->getItemMetadata();
 
-            bool bXDataPresented = itemMetadata.plotViewInfo.plotViewDataMap.find(ePlotViewID::PLOT_X_DATA) !=
-                    itemMetadata.plotViewInfo.plotViewDataMap.end();
-            bool skipRowFlag = false;
-
-            for(auto it = itemMetadata.plotViewInfo.plotViewDataMap.begin();
-                it != itemMetadata.plotViewInfo.plotViewDataMap.end() && false == skipRowFlag;
-                ++it)
+            if(nullptr != itemMetadata.pPlotViewInfo
+               && true == itemMetadata.pPlotViewInfo->bPlotViewConstraintsFulfilled
+               && true == itemMetadata.pPlotViewInfo->bApplyForPlotCreation)
             {
-                const auto& plotViewDataMap = *it;
-                const auto& plotViewID = plotViewDataMap.first;
-                const auto& plotViewDataItemVec = plotViewDataMap.second;
+                detail::tMetadataItem metadataItem;
 
-                skipRowFlag = !detail::processPlotViewDataItemVec(*this,
-                                           plotViewID,
-                                           plotViewDataItemVec,
-                                           result,
-                                           itemMetadata.msgIdFiltered,
-                                           axisNameMetadataMap,
-                                           row,
-                                           bXDataPresented,
-                                           metadataItem);
+                bool bXDataPresented = itemMetadata.pPlotViewInfo->plotViewDataMap.find(ePlotViewID::PLOT_X_DATA) !=
+                        itemMetadata.pPlotViewInfo->plotViewDataMap.end();
+                bool skipRowFlag = false;
+
+                for(auto it = itemMetadata.pPlotViewInfo->plotViewDataMap.begin();
+                    it != itemMetadata.pPlotViewInfo->plotViewDataMap.end() && false == skipRowFlag;
+                    ++it)
+                {
+                    const auto& plotViewDataMap = *it;
+                    const auto& plotViewID = plotViewDataMap.first;
+                    const auto& plotViewDataItemVec = plotViewDataMap.second;
+
+                    skipRowFlag = !detail::processPlotViewDataItemVec(*this,
+                                               plotViewID,
+                                               plotViewDataItemVec,
+                                               result,
+                                               itemMetadata.msgIdFiltered,
+                                               axisNameMetadataMap,
+                                               row,
+                                               bXDataPresented,
+                                               metadataItem);
+                }
             }
-        }
-        ++row;
+            ++row;
 
-        // Lock labels parsing for axis rects where they were already parsed,
-        // cause we do not expect new content for those in other found lines.
-        for(auto& axisNameMetadataMapPair : axisNameMetadataMap)
-        {
-            if(true == axisNameMetadataMapPair.second.bLabelParsed)
+            // Lock labels parsing for axis rects where they were already parsed,
+            // cause we do not expect new content for those in other found lines.
+            for(auto& axisNameMetadataMapPair : axisNameMetadataMap)
             {
-                axisNameMetadataMapPair.second.bLabelParsingLocked = true;
+                if(true == axisNameMetadataMapPair.second.bLabelParsed)
+                {
+                    axisNameMetadataMapPair.second.bLabelParsingLocked = true;
+                }
             }
         }
     }
@@ -1533,12 +1557,15 @@ void CSearchResultModel::setUML_Applicability( const QModelIndex& index, bool ch
 {
     if(true == index.isValid())
     {
-        auto& UML_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadataWriteable().UMLInfo;
-
-        if(true == UML_Info.bUMLConstraintsFulfilled)
+        if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())])
         {
-            UML_Info.bApplyForUMLCreation = checked;
-            dataChanged(index, index);
+            auto& pUML_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadataWriteable().pUMLInfo;
+
+            if(nullptr != pUML_Info && true == pUML_Info->bUMLConstraintsFulfilled)
+            {
+                pUML_Info->bApplyForUMLCreation = checked;
+                dataChanged(index, index);
+            }
         }
     }
 }
@@ -1547,11 +1574,11 @@ void CSearchResultModel::setPlotView_Applicability( const QModelIndex& index, bo
 {
     if(true == index.isValid())
     {
-        auto& plotView_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())].getItemMetadataWriteable().plotViewInfo;
+        auto& pPlotView_Info = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(index.row())]->getItemMetadataWriteable().pPlotViewInfo;
 
-        if(true == plotView_Info.bPlotViewConstraintsFulfilled)
+        if(nullptr != pPlotView_Info && true == pPlotView_Info->bPlotViewConstraintsFulfilled)
         {
-            plotView_Info.bApplyForPlotCreation = checked;
+            pPlotView_Info->bApplyForPlotCreation = checked;
             dataChanged(index, index);
         }
     }

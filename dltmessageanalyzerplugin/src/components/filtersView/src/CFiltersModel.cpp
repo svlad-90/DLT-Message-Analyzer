@@ -742,13 +742,16 @@ void CFiltersModel::filterRegexTokensInternal()
 
 void CFiltersModel::addCompletionData( const tFoundMatches& foundMatches )
 {
-    for(const auto& foundMatch : foundMatches)
+    if(false == mVarGroupsMap.empty())
     {
-        auto foundVarGroup = mVarGroupsMap.find(foundMatch.idx);
-
-        if(foundVarGroup != mVarGroupsMap.end())
+        for(const auto& foundMatch : foundMatches.foundMatchesVec)
         {
-            mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+            auto foundVarGroup = mVarGroupsMap.find(foundMatch.idx);
+
+            if(foundVarGroup != mVarGroupsMap.end())
+            {
+                mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+            }
         }
     }
 }

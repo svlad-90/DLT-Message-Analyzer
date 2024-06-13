@@ -1137,13 +1137,16 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                 for(auto foundMatchesIt = progressNotificationData.processedMatches.matchedItemVec.begin(); foundMatchesIt !=
                     progressNotificationData.processedMatches.matchedItemVec.end(); ++foundMatchesIt)
                 {
-                    auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
-                    if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                    if(nullptr != *foundMatchesIt)
                     {
-                        mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
-                    }
+                        auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
+                        if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                        {
+                            mpGroupedViewModel->addMatches((*foundMatchesIt)->getFoundMatches(), foundMatchesIt == --(endIt));
+                        }
 
-                    mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
+                        mpFiltersModel->addCompletionData((*foundMatchesIt)->getFoundMatches());
+                    }
                 }
 
                 updateProgress(progressNotificationData.progress,
@@ -1183,14 +1186,17 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                     foundMatchesIt != progressNotificationData.processedMatches.matchedItemVec.end();
                     ++foundMatchesIt)
                 {
-                    auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
-
-                    if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                    if(nullptr != *foundMatchesIt)
                     {
-                        mpGroupedViewModel->addMatches(foundMatchesIt->getFoundMatches(), foundMatchesIt == --(endIt));
-                    }
+                        auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
 
-                    mpFiltersModel->addCompletionData(foundMatchesIt->getFoundMatches());
+                        if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
+                        {
+                            mpGroupedViewModel->addMatches((*foundMatchesIt)->getFoundMatches(), foundMatchesIt == --(endIt));
+                        }
+
+                        mpFiltersModel->addCompletionData((*foundMatchesIt)->getFoundMatches());
+                    }
                 }
 
                 updateProgress(progressNotificationData.progress,
@@ -1226,11 +1232,14 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
 
                 for(const auto& match : progressNotificationData.processedMatches.matchedItemVec)
                 {
-                    CTableMemoryJumper::tCheckItem checkItem;
-                    checkItem.first = static_cast<CTableMemoryJumper::tRowID>( match.getItemMetadata().msgId );
-                    checkItem.second = additionResult.second.from + counter;
-                    checkSet.insert(checkItem);
-                    ++counter;
+                    if(nullptr != match)
+                    {
+                        CTableMemoryJumper::tCheckItem checkItem;
+                        checkItem.first = static_cast<CTableMemoryJumper::tRowID>( match->getItemMetadata().msgId );
+                        checkItem.second = additionResult.second.from + counter;
+                        checkSet.insert(checkItem);
+                        ++counter;
+                    }
                 }
 
                 mpSearchViewTableJumper->checkRows(checkSet);

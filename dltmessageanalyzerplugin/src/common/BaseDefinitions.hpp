@@ -40,7 +40,7 @@ Q_DECLARE_METATYPE(tQStringPtrWrapper)
 struct QOptionalColor
 {
     bool isSet = false;
-    QColor color;
+    QRgb color_code;
     bool operator== ( const QOptionalColor& rhs ) const;
 };
 typedef QVector<QOptionalColor> QOptionalColorVec;

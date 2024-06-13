@@ -8,5 +8,5 @@
 
 bool QOptionalColor::operator== ( const QOptionalColor& rhs ) const
 {
-    return color == rhs.color && isSet == rhs.isSet;
+    return color_code == rhs.color_code && isSet == rhs.isSet;
 }
