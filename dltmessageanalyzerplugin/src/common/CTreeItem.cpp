@@ -423,18 +423,18 @@ CTreeItem::CTreeItem(CTreeItem *pParent,
                      const tHandleDuplicateFunc& handleDuplicateFunc,
                      const tFindItemFunc& findFunc)
     :
-      mData(),
-      mHandleDuplicateFunc(handleDuplicateFunc),
       mChildItems(),
-      mpParentItem(pParent),
-      mSortedChildren(),
-      mbFirstLevelSorted(true),
-      mbWholeSorted(true),
-      mSortingColumn(defaultSortingColumn),
-      mSortOrder(Qt::SortOrder::DescendingOrder),
       mSortingFunction(sortingFunction),
       mFindFunc(findFunc),
-      mpGuard(std::make_shared<int>(0))
+      mHandleDuplicateFunc(handleDuplicateFunc),
+      mData(),
+      mSortedChildren(),
+      mpGuard(std::make_shared<int>(0)),
+      mpParentItem(pParent),
+      mSortOrder(Qt::SortOrder::DescendingOrder),
+      mSortingColumn(defaultSortingColumn),
+      mbFirstLevelSorted(true),
+      mbWholeSorted(true)
 {}
 
 tTreeItemPtr CTreeItem::appendChild(const tDataItem& key, const tData& additionItems)

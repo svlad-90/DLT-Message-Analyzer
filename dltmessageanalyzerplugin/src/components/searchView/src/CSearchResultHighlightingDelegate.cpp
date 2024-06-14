@@ -153,7 +153,7 @@ static void collectDrawData(const QString& inputStr,
 
             if(true == isExplicitColor)
             {
-                drawData.color = range.color;
+                drawData.color = range.color_code;
             }
             else
             {
@@ -163,7 +163,7 @@ static void collectDrawData(const QString& inputStr,
                 }
                 else
                 {
-                    drawData.color = range.color;
+                    drawData.color = range.color_code;
                 }
             }
 
@@ -273,7 +273,7 @@ static void drawText( const tDrawDataPack& drawDataPack,
 }
 
 static void collectDrawDataPack(const QString& inputStr,
-                                const tHighlightingRangeSet& highlightingData,
+                                const tHighlightingRangeVec& highlightingData,
                                 tDrawDataPack& drawDataPack,
                                 const QStyleOptionViewItem& option,
                                 bool isMonoColorHighlighting,
@@ -284,8 +284,10 @@ static void collectDrawDataPack(const QString& inputStr,
         drawDataPack.isSelected = true;
     }
 
+    tHighlightingRangeSet highlightingRangeSet(highlightingData.begin(), highlightingData.end());
+
     int i = 0;
-    for(auto it = highlightingData.begin(); it != highlightingData.end(); ++it)
+    for(auto it = highlightingRangeSet.begin(); it != highlightingRangeSet.end(); ++it)
     {
         const auto& range = *it;
 
@@ -296,7 +298,7 @@ static void collectDrawDataPack(const QString& inputStr,
                 collectDrawData( inputStr,
                                  drawDataPack,
                                  option,
-                                 tHighlightingRange(0, range.from - 1, range.color, range.explicitColor),
+                                 tHighlightingRange(0, range.from - 1, range.color_code, range.explicitColor),
                                  false,
                                  isMonoColorHighlighting,
                                  regexMonoHighlightingColor);
@@ -305,7 +307,7 @@ static void collectDrawDataPack(const QString& inputStr,
             collectDrawData( inputStr,
                              drawDataPack,
                              option,
-                             tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
+                             tHighlightingRange( range.from, range.to, range.color_code, range.explicitColor ),
                              true,
                              isMonoColorHighlighting,
                              regexMonoHighlightingColor );
@@ -321,7 +323,7 @@ static void collectDrawDataPack(const QString& inputStr,
                 collectDrawData( inputStr,
                                  drawDataPack,
                                  option,
-                                 tHighlightingRange(prevRange.to + 1, range.from - 1, range.color, range.explicitColor),
+                                 tHighlightingRange(prevRange.to + 1, range.from - 1, range.color_code, range.explicitColor),
                                  false,
                                  isMonoColorHighlighting,
                                  regexMonoHighlightingColor );
@@ -330,20 +332,20 @@ static void collectDrawDataPack(const QString& inputStr,
             collectDrawData( inputStr,
                              drawDataPack,
                              option,
-                             tHighlightingRange( range.from, range.to, range.color, range.explicitColor ),
+                             tHighlightingRange( range.from, range.to, range.color_code, range.explicitColor ),
                              true,
                              isMonoColorHighlighting,
                              regexMonoHighlightingColor );
         }
 
-        if(i == static_cast<int>(highlightingData.size() - 1)) // last element
+        if(i == static_cast<int>(highlightingRangeSet.size() - 1)) // last element
         {
             if( range.to < inputStr.size() - 1 )
             {
                 collectDrawData( inputStr,
                                  drawDataPack,
                                  option,
-                                 tHighlightingRange(range.to + 1, inputStr.size() - 1, range.color, range.explicitColor),
+                                 tHighlightingRange(range.to + 1, inputStr.size() - 1, range.color_code, range.explicitColor),
                                  false,
                                  isMonoColorHighlighting,
                                  regexMonoHighlightingColor );

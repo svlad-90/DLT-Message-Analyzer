@@ -347,10 +347,10 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
 
                 if(true == plotGraphSubItem.xOptColor.isSet &&
                     true == prevUsedColor.isSet &&
-                    plotGraphSubItem.xOptColor.color == prevUsedColor.color)
+                    plotGraphSubItem.xOptColor.color_code == prevUsedColor.color_code)
                 {
                     usedXColor.isSet = true;
-                    usedXColor.color = getChartColor();
+                    usedXColor.color_code = getChartColor().rgb();
                 }
                 else
                 {
@@ -359,10 +359,10 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
 
                 if(true == plotGraphSubItem.yOptColor.isSet &&
                     true == prevUsedColor.isSet &&
-                    plotGraphSubItem.yOptColor.color == prevUsedColor.color)
+                    plotGraphSubItem.yOptColor.color_code == prevUsedColor.color_code)
                 {
                     usedYColor.isSet = true;
-                    usedYColor.color = getChartColor();
+                    usedYColor.color_code = getChartColor().rgb();
                 }
                 else
                 {
@@ -385,17 +385,17 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
                 }
                 else
                 {
-                    usedColor.color = getChartColor();
+                    usedColor.color_code = getChartColor().rgb();
                     usedColor.isSet = true;
                 }
 
-                pGraph->setBrush(usedColor.color);
-                pGraph->setPen(usedColor.color);
+                pGraph->setBrush(QColor(usedColor.color_code));
+                pGraph->setPen(QColor(usedColor.color_code));
 
                 auto getAxisTypeResult = pPlot->getAxisRectType(pAxisRect);
                 if(true == getAxisTypeResult.first && getAxisTypeResult.second == ePlotViewAxisType::e_POINT)
                 {
-                    pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QColor(0,0,0), usedColor.color, 6));
+                    pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QColor(0,0,0), QColor(usedColor.color_code), 6));
                 }
                 else
                 {
