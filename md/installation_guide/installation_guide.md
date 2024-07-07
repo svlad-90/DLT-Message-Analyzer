@@ -16,6 +16,8 @@ Table of contents
     - [Build dependencies](#build-dependencies)
     - [Build settings](#build-settings)
   - [dlt-viewer-docker](#dlt-viewer-docker)
+  - [Troubleshooting](#troubleshooting)
+    - [CMake 3.28.1](#cmake-3281)
 
 ----
 
@@ -228,6 +230,22 @@ The usage is quite simple:
 - cd to qt5, or qt6, depending on which version of QT you want to use
 - Run ./build.sh in order to build the Docker image
 - Run ./run.sh in order to start the corresponding Docker container and start the dlt-viewer with preinstalled DMA
+
+----
+
+## Troubleshooting
+
+### CMake 3.28.1
+
+It was identified that with version 3.28.1 of the CMake tool, you will get the following error during the DLT Message Analyzer build:
+
+> make[2]: *** No rule to make target 'plugin/DLT-Message-Analyzer/dltmessageanalyzerplugin/src/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/dist/libantlr4-runtime.a', needed by 'plugin/DLT-Message-Analyzer/dltmessageanalyzerplugin/src/CMakeFiles/antlr4_PCRE_static_autogen_timestamp_deps'.  Stop. make[1]: *** [CMakeFiles/Makefile2:1716: plugin/DLT-Message-Analyzer/dltmessageanalyzerplugin/src/CMakeFiles/antlr4_PCRE_static_autogen_timestamp_deps.dir/all] Error 2 make: *** [Makefile:156: all] Error 2
+
+It is likely caused by the bug in that specific version of CMake, combined with the old-style CMake scripting used by the Antlr4 C++ runtime.
+
+As a reliable solution, please switch to the other CMake version. E.g., 3.22.1 and 3.29.6 worked just fine.
+
+You can find more details regarding this issue [here](https://github.com/svlad-90/DLT-Message-Analyzer/issues/203).
 
 ----
 
