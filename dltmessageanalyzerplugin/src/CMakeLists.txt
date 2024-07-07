@@ -83,7 +83,14 @@ DMA_sync_g_test_framework()
 DMA_sync_plantuml()
 DMA_sync_framework()
 DMA_sync_q_custom_plot()
-install(TARGETS qcustomplot LIBRARY DESTINATION ${DLT_LIBRARY_INSTALLATION_PATH} )
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    install(TARGETS qcustomplot LIBRARY DESTINATION ${DLT_LIBRARY_INSTALLATION_PATH} )
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    install(TARGETS qcustomplot RUNTIME DESTINATION ${DLT_EXECUTABLE_INSTALLATION_PATH} )
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    install(TARGETS qcustomplot LIBRARY DESTINATION ${DLT_LIBRARY_INSTALLATION_PATH} )
+endif()
+
 ################### DEPENDENCIES ( END )###################
 
 ################### COMPATIBILITY #########################
@@ -190,5 +197,25 @@ add_custom_command(TARGET DLT-Message-Analyzer POST_BUILD
 ################### QT ####################################
 target_link_libraries(DLT-Message-Analyzer qdlt ${QT_PREFIX}::Widgets )
 ################### QT ( END ) ############################
+
+########## ENSURE INSTALLATION OF QT DEPENDENCIES #########
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    # used by the DLT Message Analyzer itself
+    find_package(${QT_PREFIX} REQUIRED COMPONENTS Svg)
+    # used by qcustomplot
+    find_package(${QT_PREFIX} REQUIRED COMPONENTS PrintSupport)
+    set(QT_LIBS
+      ${QT_PREFIX}::Svg
+      ${QT_PREFIX}::PrintSupport)
+
+    foreach(QT_LIB IN ITEMS ${QT_LIBS})
+      get_target_property(LIBRARY_PATH ${QT_LIB} LOCATION)
+      install(FILES
+          "${LIBRARY_PATH}"
+          DESTINATION "${DLT_EXECUTABLE_INSTALLATION_PATH}"
+          COMPONENT qt_libraries)
+    endforeach()
+endif()
+####### ENSURE INSTALLATION OF QT DEPENDENCIES ( END ) ####
 
 add_plugin(DLT-Message-Analyzer)
