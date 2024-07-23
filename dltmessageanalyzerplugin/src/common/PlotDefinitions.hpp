@@ -23,6 +23,8 @@
 typedef double tPlotData;
 typedef std::vector<tPlotData> tPlotDataVec;
 
+typedef int tEventId;
+
 typedef tQStringPtrWrapper tPlotGraphMetadataKey;
 typedef tQStringPtrWrapper tPlotGraphMetadataValue;
 typedef std::unordered_map<tPlotGraphMetadataKey, tPlotGraphMetadataValue> tPlotGraphMetadataMap;
@@ -45,6 +47,7 @@ enum class ePlotViewID
     PLOT_X_DATA,
     PLOT_Y_TIMESTAMP, // this enum entry should have less value than PLOT_Y_DATA
     PLOT_Y_DATA,
+    PLOT_GANTT_EVENT_ID,
     PLOT_GANTT_EVENT
 };
 
@@ -548,7 +551,7 @@ struct tPlotParametersParser<ePlotViewID::PLOT_X_DATA>
                 {
                     assert(splitParameters[2] != nullptr);
 
-                    result.value.setValue(splitParameters[1]->toDouble(&result.bParsingSuccessful));
+                    result.value.setValue(splitParameters[2]->toDouble(&result.bParsingSuccessful));
 
                     if(false == result.bParsingSuccessful)
                     {
@@ -898,5 +901,45 @@ struct tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT>
     }
 };
 
+template<>
+struct tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT_ID>
+{
+    ePlotViewID plotViewId = ePlotViewID::PLOT_GANTT_EVENT_ID;
+
+    struct tParsingResult
+    {
+        bool bParsingSuccessful = false;
+        QString errors;
+        QString axisRectName;
+        tGraphId graphId;
+    };
+
+    tParsingResult parse(bool fillInStringMsg,
+                         const tQStringPtr& pPlotViewGroupName,
+                         const tQStringPtrVec& splitParameters)
+    {
+        tParsingResult result;
+
+        if(checkPlotViewParameter(result.errors,
+                                   fillInStringMsg,
+                                   plotViewId,
+                                   pPlotViewGroupName,
+                                   splitParameters))
+        {
+            assert(splitParameters[0] != nullptr);
+            result.axisRectName = *splitParameters[0];
+
+            assert(splitParameters[1] != nullptr);
+            result.graphId = splitParameters[1]->toInt(&result.bParsingSuccessful);
+
+            if(false == result.bParsingSuccessful)
+            {
+                result.errors.append(QString(" <Failed to convert graphId '%1' to integer>").arg(*splitParameters[1]));
+            }
+        }
+
+        return result;
+    }
+};
 
 #endif // PLOT_DEFINITIONS_HPP

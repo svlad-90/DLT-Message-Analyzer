@@ -27,6 +27,11 @@ void ISearchResultModel::tPlotGraphDataItem::setX(const tMsgId& msgIdVal, tPlotD
     }
 }
 
+const tPlotData& ISearchResultModel::tPlotGraphDataItem::getX() const
+{
+    return x.getValue();
+}
+
 void ISearchResultModel::tPlotGraphDataItem::setY(const tMsgId& msgIdVal, tPlotData xVal)
 {
     if(false == msgId.isSet())
@@ -40,14 +45,27 @@ void ISearchResultModel::tPlotGraphDataItem::setY(const tMsgId& msgIdVal, tPlotD
     }
 }
 
-const tPlotData& ISearchResultModel::tPlotGraphDataItem::getX() const
-{
-    return x.getValue();
-}
-
 const tPlotData& ISearchResultModel::tPlotGraphDataItem::getY() const
 {
     return y.getValue();
+}
+
+void ISearchResultModel::tPlotGraphDataItem::setEventId(const tMsgId& msgIdVal, tEventId eventIdVal)
+{
+    if(false == msgId.isSet())
+    {
+        msgId.setValue(msgIdVal);
+    }
+
+    if(false == eventId.isSet())
+    {
+        eventId.setValue(eventIdVal);
+    }
+}
+
+const TOptional<tEventId>& ISearchResultModel::tPlotGraphDataItem::getEventId() const
+{
+    return eventId;
 }
 
 void ISearchResultModel::tPlotGraphDataItem::setGanttDataItemType(const tMsgId& msgIdVal, eGanttDataItemType ganttDataItemTypeVal)

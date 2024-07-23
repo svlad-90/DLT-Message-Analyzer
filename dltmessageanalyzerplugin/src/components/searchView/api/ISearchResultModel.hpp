@@ -21,16 +21,6 @@ public:
     virtual std::pair<bool, tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0;
     virtual int getFileIdx( const QModelIndex& idx ) const = 0;
 
-    struct tGanttEvent
-    {
-        TOptional<tPlotData> start;
-        TOptional<tPlotData> end;
-    };
-
-    typedef std::vector<tGanttEvent> tGanttEventVec;
-    typedef QString tGanttEventId;
-    typedef std::map<tGanttEventId, tGanttEventVec> tGanttEventMap;
-
     enum eGanttDataItemType
     {
         START = 0,
@@ -51,6 +41,8 @@ public:
                             const QString& value);
         const tPlotGraphMetadataMap& getPlotGraphMetadataMap() const;
         const tMsgId& getMsgId() const;
+        void setEventId(const tMsgId& msgIdVal, tEventId eventIdVal);
+        const TOptional<tEventId>& getEventId() const;
 
     private:
         TOptional<tPlotData> x;
@@ -58,6 +50,7 @@ public:
         TOptional<tMsgId> msgId;
         tPlotGraphMetadataMap plotGraphMetadataMap;
         TOptional<eGanttDataItemType> ganttDataItemType;
+        TOptional<tEventId> eventId;
     };
 
     typedef std::vector<tPlotGraphDataItem> tPlotGraphDataItemVec;
@@ -67,7 +60,6 @@ public:
         tPlotGraphDataItemVec dataItems;
         QOptionalColor xOptColor;
         QOptionalColor yOptColor;
-        tGanttEventMap ganttEventMap;
     };
 
     typedef QString tPlotGraphSubItemName;

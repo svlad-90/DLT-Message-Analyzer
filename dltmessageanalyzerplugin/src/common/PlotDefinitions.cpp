@@ -28,6 +28,7 @@ const QString s_PLOT_Y_TIMESTAMP = "PYT";
 const QString s_PLOT_GRAPH_NAME = "PGN";
 const QString s_PLOT_GRAPH_METADATA = "PGMD";
 const QString s_PLOT_GANTT_EVENT = "PGE";
+const QString s_PLOT_GANTT_EVENT_ID = "PGEID";
 const QString s_PLOT_PARAMETER_DELIMITER = "_";
 
 QString tPlotViewIDItem::getParametersDescription()
@@ -728,7 +729,7 @@ static tPlotViewIDsMap createPlotIDsMap()
                 bool bResult = true;
                 QString lowerValue = value.toLower();
                 if(lowerValue.compare( "start", Qt::CaseInsensitive ) != 0 &&
-                   lowerValue.compare( "stop", Qt::CaseInsensitive ) != 0)
+                   lowerValue.compare( "end", Qt::CaseInsensitive ) != 0)
                 {
                     if(fillInStringMsg)
                     {
@@ -753,6 +754,54 @@ static tPlotViewIDsMap createPlotIDsMap()
                                    "be represented on the Gantt chart. "
                                    "Mandatory. One or more.").arg(item.getParametersDescription());
         result.insert(std::make_pair(ePlotViewID::PLOT_GANTT_EVENT, item));
+    }
+
+    auto formGanttEventIdParameters = [](tPlotViewIDItem& item)
+    {
+        {
+            tPlotViewIDParameterPtr pParameter = std::make_shared<tPlotViewIDparameter>();
+            pParameter->name = "axisRectName";
+            pParameter->type = ePlotViewParameterType::e_Mandatory;
+            item.addParameter(pParameter);
+        }
+
+        {
+            tPlotViewIDParameterPtr pParameter = std::make_shared<tPlotViewIDparameter>();
+            pParameter->name = "graphId";
+            pParameter->type = ePlotViewParameterType::e_Mandatory;
+            pParameter->validationFunction = [](const QString&,
+                                                ePlotViewParameterType,
+                                                const QString& value,
+                                                QString& msg,
+                                                bool fillInStringMsg)
+            {
+                bool bResult = true;
+                static_cast<void>(value.toInt(&bResult));
+                if(false == bResult)
+                {
+                    if(true == fillInStringMsg)
+                    {
+                        msg.append(QString("Wrong literal '%1' provided. It is not convertible to integer.").arg(value));
+                    }
+                }
+                return bResult;
+            };
+            item.addParameter(pParameter);
+        }
+    };
+
+    {
+        tPlotViewIDItem item;
+        item.id_type = ePlotViewIDType::e_Optional;
+        item.id_str = s_PLOT_GANTT_EVENT_ID;
+        formGanttEventIdParameters(item);
+        item.description = QString("This parameter specifies an event identifier. "
+                                   "If specified, the analysis process will connect each event type's "
+                                   "start and end points ONLY if they have the same event identifier. "
+                                   "Non-consistent events will be ignored, e.g., with start ID - 5, end ID - 8. %1."
+                                   "Optional. If multiple values appear - the 'last win' strategy is applied. "
+                                   "Applicable only for Gantt charts.").arg(item.getParametersDescription());
+        result.insert(std::make_pair(ePlotViewID::PLOT_GANTT_EVENT_ID, item));
     }
 
     return result;

@@ -1282,11 +1282,11 @@ namespace detail
                                         }
                                     }
 
-                                    if(false == graphSubItem.xOptColor.isSet)
+                                    if(false == graphSubItem.yOptColor.isSet)
                                     {
                                         if(true == optColor.isSet)
                                         {
-                                            graphSubItem.xOptColor = optColor;
+                                            graphSubItem.yOptColor = optColor;
                                         }
                                     }
                                 }
@@ -1465,6 +1465,86 @@ namespace detail
                                 }
 
                                 dataItem.setGanttDataItemType(msgId, eventType);
+
+                                if(false == bXDataPresented)
+                                {
+                                    QString timestampStr = searchResultModel.getStrValue(rowId, eSearchResultColumn::Timestamp);
+                                    bool conversionOk = false;
+                                    auto timestampDouble = timestampStr.toDouble(&conversionOk);
+
+                                    if(true == conversionOk)
+                                    {
+                                        dataItem.setX(msgId, timestampDouble);
+                                    }
+                                    else
+                                    {
+                                        SEND_ERR(QString("Was not able to assign timestamp '%1' for string #%2")
+                                                     .arg(timestampStr, msgId));
+                                    }
+
+                                    if(false == graphSubItem.xOptColor.isSet)
+                                    {
+                                        if(true == optColor.isSet)
+                                        {
+                                            graphSubItem.xOptColor = optColor;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SEND_WRN(QString("Skip line #%1 due to the following error: '%2'")
+                                     .arg(msgId).arg(parsingResult.errors));
+                        bResult = false;
+                        continue;
+                    }
+                }
+            }
+            break;
+            case ePlotViewID::PLOT_GANTT_EVENT_ID:
+            {
+                if(false == splitParameters.empty())
+                {
+                    auto parser = tPlotParametersParser<ePlotViewID::PLOT_GANTT_EVENT_ID>();
+                    auto parsingResult = parser.parse(true, pGroupName, splitParameters);
+
+                    if(true == parsingResult.bParsingSuccessful)
+                    {
+                        auto foundAxisNameMetadata = axisNameMetadataMap.find(parsingResult.axisRectName);
+
+                        if(foundAxisNameMetadata != axisNameMetadataMap.end())
+                        {
+                            auto foundGraphIdMetadata = foundAxisNameMetadata->second.graphIdMetadataMap.find(parsingResult.graphId);
+
+                            if(foundGraphIdMetadata != foundAxisNameMetadata->second.graphIdMetadataMap.end())
+                            {
+                                assert(true == foundGraphIdMetadata->second.graphName.isSet());
+                                auto& graphSubItem = plotContent.plotAxisMap[parsingResult.axisRectName].plotGraphItemMap[parsingResult.graphId]
+                                                           .plotGraphSubItemMap[foundGraphIdMetadata->second.graphName.getValue()];
+
+                                if(true == graphSubItem.dataItems.empty() || msgId != graphSubItem.dataItems.back().getMsgId())
+                                {
+                                    graphSubItem.dataItems.push_back(ISearchResultModel::tPlotGraphDataItem());
+                                }
+
+                                auto& dataItem = graphSubItem.dataItems.back();
+
+                                auto valueStr = getValueFromStringCoverageMap();
+
+                                bool bValueResolved = false;
+                                auto valueInt = valueStr.toInt(&bValueResolved);
+
+                                if(false == bValueResolved)
+                                {
+                                    SEND_WRN(QString("Skip line #%1 due to the following error: '<Was not able to convert data '%2' to integer>'")
+                                                 .arg(msgId).arg(valueStr));
+                                }
+                                else
+                                {
+                                    dataItem.setEventId(msgId, valueInt);
+                                }
                             }
                         }
                     }

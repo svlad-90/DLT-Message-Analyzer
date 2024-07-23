@@ -1,11 +1,13 @@
 set(WRAP_SRC ../api/CPlotViewComponent.hpp
-             ../api/CCustomPlotExtended.hpp)
+             ../api/CCustomPlotExtended.hpp
+             QCPGantt.hpp)
 
 DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 
 add_library(DMA_plotView STATIC
     CPlotViewComponent.cpp
     CCustomPlotExtended.cpp
+    QCPGantt.cpp
     ${PROCESSED_MOCS})
 
 find_package(${QT_PREFIX} REQUIRED COMPONENTS Svg)
