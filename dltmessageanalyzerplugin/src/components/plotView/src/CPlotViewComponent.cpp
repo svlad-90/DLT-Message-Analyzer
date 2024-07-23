@@ -8,6 +8,7 @@
 #include "components/log/api/CLog.hpp"
 
 #include "../api/CPlotViewComponent.hpp"
+#include "QCPGantt.hpp"
 #include "components/searchView/api/ISearchResultModel.hpp"
 #include "components/plotView/api/CCustomPlotExtended.hpp"
 
@@ -128,12 +129,13 @@ void stackData(QCPGraph* previousGraph, QVector<double>& xData, QVector<double>&
 void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, ISearchResultModel::tPlotAxisItem> plotAxisPair,
                       CCustomPlotExtended* pPlot,
                       const uint32_t& rowCounter,
-                      CPlotViewComponent*)
+                      CPlotViewComponent* pPlotViewComponent)
 {
-    // TBD
     const auto& plotAxis = plotAxisPair.second;
     QCPAxisRect *pAxisRect = new QCPAxisRect(pPlot);
-    pAxisRect->setMinimumSize(QSize(0, 400));
+    pAxisRect->setMinimumSize(QSize(0, 200));
+
+    // Set up legend
     QCPLegend *pLegend = new QCPLegend;
     pLegend->setVisible(true);
     pLegend->setBorderPen(QPen(QColor(0,0,0,230)));
@@ -142,6 +144,7 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
     pAxisRect->insetLayout()->addElement(pLegend, Qt::AlignRight|Qt::AlignTop);  // Adjust position as needed
     pLegend->setLayer(QLatin1String("legend"));
 
+    // Set up axes
     pAxisRect->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignRight);  // Position of legend
     auto* pLeftAxis = pAxisRect->axis(QCPAxis::atLeft);
     auto* pBottomAxis = pAxisRect->axis(QCPAxis::atBottom);
@@ -149,64 +152,404 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
     pPlot->plotLayout()->addElement(rowCounter, 0, pAxisRect);
     pAxisRect->axis(QCPAxis::atBottom)->setLayer("axes");
     pAxisRect->axis(QCPAxis::atBottom)->grid()->setLayer("grid");
-    // bring bottom and main axis rect closer together:
-    pAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
+
+    // Set axis labels if available
+    if (plotAxis.axisLabel.isSet())
+    {
+        auto* pTopAxis = pAxisRect->axis(QCPAxis::atTop);
+        pTopAxis->setVisible(true);
+        pTopAxis->setLabel(plotAxis.axisLabel.getValue());
+        pTopAxis->setTickLabels(false);
+    }
+
+    // Adjust margins
+    pAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom|QCP::msTop);
     pAxisRect->setMargins(QMargins(0, 0, 0, 0));
 
+    // Set X axis label (time axis)
+    if(plotAxis.xName.isSet())
     {
-        QString xLabel;
-
-        if(true == plotAxis.xName.isSet())
+        QString xLabel = plotAxis.xName.getValue();
+        if(plotAxis.xUnit.isSet())
         {
-            xLabel.append(plotAxis.xName.getValue());
+            xLabel.append(", ").append(plotAxis.xUnit.getValue());
         }
+        pBottomAxis->setLabel(xLabel);
+    }
 
-        if(true == plotAxis.xUnit.isSet())
+    // Set Y axis label (task names axis)
+    if(plotAxis.yName.isSet())
+    {
+        QString yLabel = plotAxis.yName.getValue();
+        if(plotAxis.yUnit.isSet())
         {
-            if(false == xLabel.isEmpty())
+            yLabel.append(", ").append(plotAxis.yUnit.getValue());
+        }
+        pLeftAxis->setLabel(yLabel);
+    }
+
+    // Set axis types
+    pPlot->setAxisRectType(pAxisRect, plotAxis.axisType.isSet() ? plotAxis.axisType.getValue() : ePlotViewAxisType::e_GANTT);
+
+    QVector<double> ticks = QVector<double>();
+    QVector<QString> labels = QVector<QString>();
+
+    int yVal = 0;
+
+    for(const auto& plotGraphItemPair : plotAxis.plotGraphItemMap)
+    {
+        const auto& plotGraphItem = plotGraphItemPair.second;
+
+        for(const auto& plotGraphSubItemPair : plotGraphItem.plotGraphSubItemMap)
+        {
+            (void)(plotGraphSubItemPair);
+            ++yVal;
+        }
+    }
+
+    --yVal;
+
+    // collect the data
+    for(const auto& plotGraphItemPair : plotAxis.plotGraphItemMap)
+    {
+        enum class eGanttDataParsingState
+        {
+            SEARCHING_START = 0,
+            SEARCHING_END
+        };
+
+        struct tGanttDataParsingState
+        {
+            tPlotData xStart = -5.0;
+            tPlotData xEnd = -5.0;
+            eGanttDataParsingState ganttDataParsingState = eGanttDataParsingState::SEARCHING_START;
+            tMsgId msgIdStart = INVALID_MSG_ID;
+            tMsgId msgIdEnd = INVALID_MSG_ID;
+            QString name;
+            TOptional<tEventId> eventId;
+
+            void reset()
             {
-                xLabel.append(", ");
+                xStart = -5.0;
+                xEnd = -5.0;
+                ganttDataParsingState = eGanttDataParsingState::SEARCHING_START;
+                msgIdStart = INVALID_MSG_ID;
+                msgIdEnd = INVALID_MSG_ID;
+                eventId.reset();
             }
-            xLabel.append(plotAxis.xUnit.getValue());
-        }
+        };
 
-        if(false == xLabel.isEmpty())
+        std::map<tPlotData, tGanttDataParsingState> ganttParsingStateMap;
+
+        const auto& plotGraphItem = plotGraphItemPair.second;
+
+        for(const auto& plotGraphSubItemPair : plotGraphItem.plotGraphSubItemMap)
         {
-            pBottomAxis->setLabel(xLabel);
-        }
-    }
+            const auto& plotGraphSubItem = plotGraphSubItemPair.second;
 
-    {
-        QString yLabel;
+            tGanttDataParsingState parsingState;
 
-        if(true == plotAxis.yName.isSet())
-        {
-            yLabel.append(plotAxis.yName.getValue());
-        }
+            QCPGanttRow* pGanttRow = new QCPGanttRow(pLeftAxis, pBottomAxis);
+            pGanttRow->addToLegend(pLegend);
+            pGanttRow->setName(plotGraphSubItemPair.first);
+            pGanttRow->setKeyAxis(pAxisRect->axis(QCPAxis::atLeft));
+            pGanttRow->setValueAxis(pAxisRect->axis(QCPAxis::atBottom));
+            parsingState.name = plotGraphSubItemPair.first;
 
-        if(true == plotAxis.yUnit.isSet())
-        {
-            if(false == yLabel.isEmpty())
+            std::shared_ptr< std::map<std::pair<tPlotData, tPlotData>, tMsgId> > pxToMsgIdMap =
+                std::make_shared<std::map<std::pair<tPlotData, tPlotData>, tMsgId>>();
+
+            for(const auto& dataItem : plotGraphSubItem.dataItems)
             {
-                yLabel.append(", ");
+                switch(dataItem.getGanttDataItemType())
+                {
+                    case ISearchResultModel::eGanttDataItemType::START:
+                        if(parsingState.ganttDataParsingState == eGanttDataParsingState::SEARCHING_START)
+                        {
+                            parsingState.xStart = dataItem.getX();
+                            parsingState.msgIdStart = dataItem.getMsgId();
+                            parsingState.eventId = dataItem.getEventId();
+                            parsingState.ganttDataParsingState = eGanttDataParsingState::SEARCHING_END;
+                        }
+                        else
+                        {
+                            SEND_WRN(QString("[generateAxisRectGantt] Inconsistent event. The event registered by message with id '%1' "
+                                             "was ignored. Reason: <Event end not found. The start of the next event was parsed in the "
+                                             "message with id '%2'>").arg(parsingState.msgIdStart).arg(dataItem.getMsgId()));
+
+                            parsingState.reset();
+                            parsingState.xStart = dataItem.getX();
+                            parsingState.msgIdStart = dataItem.getMsgId();
+                            parsingState.eventId = dataItem.getEventId();
+                            parsingState.ganttDataParsingState = eGanttDataParsingState::SEARCHING_END;
+                        }
+                    break;
+                    case ISearchResultModel::eGanttDataItemType::END:
+                        if(parsingState.ganttDataParsingState == eGanttDataParsingState::SEARCHING_END)
+                        {
+                            parsingState.xEnd = dataItem.getX();
+                            parsingState.msgIdEnd = dataItem.getMsgId();
+
+                            auto addData = [&]()
+                            {
+                                pGanttRow->addData(yVal,
+                                                   parsingState.xStart,
+                                                   parsingState.xEnd);
+
+                                pxToMsgIdMap->insert(std::make_pair(std::make_pair(parsingState.xStart, yVal), dataItem.getMsgId()));
+                                pPlot->appendMetadata(pAxisRect,
+                                                       pGanttRow,
+                                                       parsingState.xStart,
+                                                       yVal,
+                                                       dataItem.getPlotGraphMetadataMap());
+                            };
+
+                            if(false == parsingState.eventId.isSet() && false == dataItem.getEventId().isSet())
+                            {
+                                addData();
+                            }
+                            else
+                            {
+                                if(true == parsingState.eventId.isSet() && true == dataItem.getEventId().isSet())
+                                {
+                                    if(parsingState.eventId.getValue() == dataItem.getEventId().getValue())
+                                    {
+                                        addData();
+                                    }
+                                    else
+                                    {
+                                        SEND_WRN(QString("[generateAxisRectGantt] Inconsistent event. The message id '%1' "
+                                                         "was ignored. Reason: <Start of event has the event id '%2', while end "
+                                                         "of the event has the event id '%3'.>").arg(dataItem.getMsgId()).
+                                                 arg(parsingState.eventId.getValue()).
+                                                 arg(dataItem.getEventId().getValue()));
+                                    }
+                                }
+                                else
+                                {
+                                    SEND_WRN(QString("[generateAxisRectGantt] Inconsistent event. The message id '%1' "
+                                                     "was ignored. Reason: <One event point ( start or end ) has the "
+                                                     "assigned event id, while the other doesn't have it.>").arg(dataItem.getMsgId()));
+                                }
+                            }
+
+                            parsingState.ganttDataParsingState = eGanttDataParsingState::SEARCHING_START;
+                        }
+                        else
+                        {
+                            SEND_WRN(QString("[generateAxisRectGantt] Inconsistent event. The message id '%1' "
+                                             "was ignored. Reason: <Not expected event end found.>").arg(dataItem.getMsgId()));
+                        }
+                    break;
+                default:
+                    break;
+                }
             }
-            yLabel.append(plotAxis.yUnit.getValue());
+
+            QOptionalColor usedXColor;
+            QOptionalColor usedYColor;
+
+            if(true == plotGraphSubItem.xOptColor.isSet)
+            {
+                usedXColor = plotGraphSubItem.xOptColor;
+            }
+            else
+            {
+                usedXColor.isSet = true;
+                usedXColor.color_code = getChartColor().rgb();
+            }
+
+            if(true == plotGraphSubItem.yOptColor.isSet)
+            {
+                usedYColor = plotGraphSubItem.yOptColor;
+            }
+            else
+            {
+                usedYColor.isSet = true;
+                usedYColor.color_code = getChartColor().rgb();
+            }
+
+            QOptionalColor usedColor;
+
+            if( ( true == usedXColor.isSet &&
+                 false == usedYColor.isSet ) ||
+                ( true == usedXColor.isSet &&
+                 true == usedYColor.isSet ) )
+            {
+                usedColor = usedXColor;
+            }
+            else if(false == usedXColor.isSet &&
+                     true == usedYColor.isSet)
+            {
+                usedColor = usedYColor;
+            }
+            else
+            {
+                usedColor.color_code = getChartColor().rgb();
+                usedColor.isSet = true;
+            }
+
+            pGanttRow->setBrush(QColor(usedColor.color_code));
+            pGanttRow->setPen(QColor(usedColor.color_code));
+
+            pGanttRow->setSelectable(QCP::SelectionType::stSingleData);
+
+            auto* pSelectionDecorator = new QCPSelectionDecorator();
+            pSelectionDecorator->setPen(QPen(QColor(0,0,0)));
+            pSelectionDecorator->setBrush(QBrush(QColor(255,0,0)));
+            pGanttRow->setSelectionDecorator(pSelectionDecorator);
+
+            QCPItemTracer* pItemTracer = new QCPItemTracer(pPlot);
+            pItemTracer->setSize(0);
+            pItemTracer->setStyle(QCPItemTracer::tsCircle); // set style to circle
+            pItemTracer->setLayer("overlay");
+            pItemTracer->setPen(QPen(Qt::red));
+            pItemTracer->setBrush(Qt::red);
+            pItemTracer->setClipAxisRect(pAxisRect);
+            pItemTracer->position->setAxisRect(pAxisRect);
+            pItemTracer->position->setAxes(pGanttRow->valueAxis(), pGanttRow->keyAxis());
+            QCPItemText* pTextLabel = new QCPItemText(pPlot);
+            pTextLabel->setVisible(false);
+            pTextLabel->setLayer("overlay");
+            pTextLabel->setBrush(QColor(240,240,240));
+            pTextLabel->setPen(QColor(0,0,0));
+            pTextLabel->setColor(QColor(0,0,0));
+            pTextLabel->setClipAxisRect(pAxisRect);
+            pTextLabel->position->setParentAnchor(pItemTracer->position);
+            pTextLabel->position->setAxisRect(pAxisRect);
+            pTextLabel->position->setAxes(pGanttRow->valueAxis(), pGanttRow->keyAxis());
+
+            pPlotViewComponent->connect(pGanttRow, static_cast<void (QCPAbstractPlottable::*)(const QCPDataSelection &)>(&QCPAbstractPlottable::selectionChanged),
+            pPlotViewComponent, [pPlotViewComponent, pPlot, pAxisRect, pGanttRow, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)
+            {
+                if(false == selection.isEmpty())
+                {
+                    QCPDataRange dataRange = selection.dataRange();
+
+                    // For simplicity, let's just handle the beginning of the range (you might want to handle the entire range if you allow multi-selection)
+                    int index = dataRange.begin();
+
+                    if (index >= 0 && index < pGanttRow->data()->size()) // Check if index is valid
+                    {
+                        QCPGanttBarsDataContainer::const_iterator it = pGanttRow->data()->at(index);
+                        double xStart = it->valueRange().lower;
+                        double xEnd = it->valueRange().upper;
+                        double y = it->sortKey();
+
+                        pItemTracer->position->setCoords((xStart + xEnd) / 2.0, y);
+                        pTextLabel->setVisible(true);
+
+                        QString labelText;
+
+                        labelText.append("Ev. name: " + pGanttRow->name() + "\n");
+                        labelText.append("Ev. start: " + QString::number(xStart, 'f', 4) + "\n");
+                        labelText.append("Ev. end: " + QString::number(xEnd, 'f', 4) + "\n");
+                        labelText.append("Ev. duration: " + QString::number(xEnd - xStart, 'f', 4));
+
+                        auto metadata = pPlot->getMetadata(pAxisRect,
+                                                           pGanttRow,
+                                                           xStart,
+                                                           y);
+
+                        int numberOfLines = 1;
+
+                        if(true == metadata.first)
+                        {
+                            assert(nullptr != metadata.second);
+
+                            for(const auto& metadataPair : *metadata.second)
+                            {
+                                if(nullptr != metadataPair.first.pString &&
+                                    nullptr != metadataPair.second.pString)
+                                {
+                                    labelText.append("\n");
+
+                                    if(false == metadataPair.first.pString->isEmpty())
+                                    {
+                                        labelText.append(*metadataPair.first.pString + ": ");
+                                    }
+
+                                    labelText.append(*metadataPair.second.pString);
+                                    ++numberOfLines;
+                                }
+                            }
+                        }
+
+                        pTextLabel->setText(labelText);
+                        pTextLabel->position->setCoords(0, ( numberOfLines + 1 ) * -10);
+
+                        {
+                            // Get top and bottom pixel positions
+                            auto topPixelPos = pTextLabel->top->pixelPosition();
+                            auto bottomPixelPos = pTextLabel->bottom->pixelPosition();
+
+                            // Convert pixel positions to coordinate values
+                            double topCoord = pLeftAxis->pixelToCoord(topPixelPos.y());
+                            double bottomCoord = pLeftAxis->pixelToCoord(bottomPixelPos.y());
+
+                            // Get y-axis range
+                            double yAxisLower = pLeftAxis->range().lower;
+                            double yAxisUpper = pLeftAxis->range().upper;
+
+                            bool isTextFullyVisible = (topCoord <= yAxisUpper) && (bottomCoord >= yAxisLower);
+
+                            if(false == isTextFullyVisible)
+                            {
+                                pTextLabel->position->setCoords(0, ( numberOfLines + 1 ) * 10);
+                            }
+                        }
+
+                        auto foundMsgId = pxToMsgIdMap->find(std::make_pair(xStart, y));
+
+                        if(foundMsgId != pxToMsgIdMap->end())
+                        {
+                            emit pPlotViewComponent->messageIdSelected(foundMsgId->second);
+
+                            pPlot->setFocus();
+                        }
+                    }
+                }
+                else
+                {
+                    if(nullptr != pTextLabel)
+                    {
+                        pTextLabel->setVisible(false);
+                    }
+                }
+            });
+
+            ganttParsingStateMap.insert(std::make_pair(yVal, parsingState));
+
+            --yVal;
         }
 
-        if(false == yLabel.isEmpty())
+        for( const auto& pair : ganttParsingStateMap )
         {
-            pLeftAxis->setLabel(yLabel);
+            ticks.push_back(pair.first);
+            labels.push_back(pair.second.name);
         }
     }
 
-    if(true == plotAxis.axisType.isSet())
-    {
-        pPlot->setAxisRectType(pAxisRect, plotAxis.axisType.getValue());
-    }
-    else
-    {
-        pPlot->setAxisRectType(pAxisRect, ePlotViewAxisType::e_LINEAR);
-    }
+    pBottomAxis->setNumberFormat("f");
+    pBottomAxis->setNumberPrecision(6);
+
+    // Setup y axis
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->addTicks(ticks, labels);
+    pLeftAxis->setTicker(textTicker);
+
+    pPlot->setAxisRectRescaleData(pAxisRect,
+                                   0.05,
+                                   0.1,
+                                   plotAxis.xMin,
+                                   plotAxis.xMax,
+                                   plotAxis.yMin,
+                                   plotAxis.yMax);
+
+    pAxisRect->setRangeDrag(Qt::Orientation::Horizontal);
+    pAxisRect->setRangeZoom(Qt::Orientation::Horizontal);
+
+    pPlot->setLegendExtended(pAxisRect, pLegend);
 }
 
 void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearchResultModel::tPlotAxisItem> plotAxisPair,
@@ -235,16 +578,15 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
     {
         if (plotAxis.axisLabel.isSet())
         {
-            QCPTextElement *pTitleLabel = new QCPTextElement(pPlot, plotAxis.axisLabel.getValue(), QFont("sans", 12, QFont::Bold));
-            pTitleLabel->setVisible(true);
-            pAxisRect->insetLayout()->addElement(pTitleLabel, QRectF(0.005, 0.0, 0.0, 0.0));
-            pTitleLabel->setLayer(QLatin1String("axis_rect_label"));
-            pTitleLabel->setSelectable(false);
+            auto* pTopAxis = pAxisRect->axis(QCPAxis::atTop);
+            pTopAxis->setVisible(true);
+            pTopAxis->setLabel(plotAxis.axisLabel.getValue());
+            pTopAxis->setTickLabels(false);
         }
     }
 
     // bring bottom and main axis rect closer together:
-    pAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
+    pAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom|QCP::msTop);
     pAxisRect->setMargins(QMargins(0, 0, 0, 0));
 
     {
@@ -303,7 +645,6 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
     }
 
     QList<QCPGraph*> graphOrder;
-    QOptionalColor prevUsedColor;
 
     for(const auto& plotGraphItemPair : plotAxis.plotGraphItemMap)
     {
@@ -341,68 +682,60 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
 
             pGraph->setData(xData, yData);
 
+            QOptionalColor usedXColor;
+            QOptionalColor usedYColor;
+
+            if(true == plotGraphSubItem.xOptColor.isSet)
             {
-                QOptionalColor usedXColor;
-                QOptionalColor usedYColor;
+                usedXColor = plotGraphSubItem.xOptColor;
+            }
+            else
+            {
+                usedXColor.isSet = true;
+                usedXColor.color_code = getChartColor().rgb();
+            }
 
-                if(true == plotGraphSubItem.xOptColor.isSet &&
-                    true == prevUsedColor.isSet &&
-                    plotGraphSubItem.xOptColor.color_code == prevUsedColor.color_code)
-                {
-                    usedXColor.isSet = true;
-                    usedXColor.color_code = getChartColor().rgb();
-                }
-                else
-                {
-                    usedXColor = plotGraphSubItem.xOptColor;
-                }
+            if(true == plotGraphSubItem.yOptColor.isSet)
+            {
+                usedYColor = plotGraphSubItem.yOptColor;
+            }
+            else
+            {
+                usedYColor.isSet = true;
+                usedYColor.color_code = getChartColor().rgb();
+            }
 
-                if(true == plotGraphSubItem.yOptColor.isSet &&
-                    true == prevUsedColor.isSet &&
-                    plotGraphSubItem.yOptColor.color_code == prevUsedColor.color_code)
-                {
-                    usedYColor.isSet = true;
-                    usedYColor.color_code = getChartColor().rgb();
-                }
-                else
-                {
-                    usedYColor = plotGraphSubItem.yOptColor;
-                }
+            QOptionalColor usedColor;
 
-                QOptionalColor usedColor;
+            if( ( true == usedXColor.isSet &&
+                 false == usedYColor.isSet ) ||
+                ( true == usedXColor.isSet &&
+                 true == usedYColor.isSet ) )
+            {
+                usedColor = usedXColor;
+            }
+            else if(false == usedXColor.isSet &&
+                     true == usedYColor.isSet)
+            {
+                usedColor = usedYColor;
+            }
+            else
+            {
+                usedColor.color_code = getChartColor().rgb();
+                usedColor.isSet = true;
+            }
 
-                if( ( true == usedXColor.isSet &&
-                     false == usedYColor.isSet ) ||
-                    ( true == usedXColor.isSet &&
-                     true == usedYColor.isSet ) )
-                {
-                    usedColor = usedXColor;
-                }
-                else if(false == usedXColor.isSet &&
-                         true == usedYColor.isSet)
-                {
-                    usedColor = usedYColor;
-                }
-                else
-                {
-                    usedColor.color_code = getChartColor().rgb();
-                    usedColor.isSet = true;
-                }
+            pGraph->setBrush(QColor(usedColor.color_code));
+            pGraph->setPen(QColor(usedColor.color_code));
 
-                pGraph->setBrush(QColor(usedColor.color_code));
-                pGraph->setPen(QColor(usedColor.color_code));
-
-                auto getAxisTypeResult = pPlot->getAxisRectType(pAxisRect);
-                if(true == getAxisTypeResult.first && getAxisTypeResult.second == ePlotViewAxisType::e_POINT)
-                {
-                    pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QColor(0,0,0), QColor(usedColor.color_code), 6));
-                }
-                else
-                {
-                    pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, Qt::white, Qt::black, 6));
-                }
-
-                prevUsedColor = usedColor;
+            auto getAxisTypeResult = pPlot->getAxisRectType(pAxisRect);
+            if(true == getAxisTypeResult.first && getAxisTypeResult.second == ePlotViewAxisType::e_POINT)
+            {
+                pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QColor(0,0,0), QColor(usedColor.color_code), 6));
+            }
+            else
+            {
+                pGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, Qt::white, Qt::black, 6));
             }
 
             pGraph->setSelectable(QCP::SelectionType::stSingleData);
@@ -545,8 +878,6 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
                                    plotAxis.yMin,
                                    plotAxis.yMax);
 
-    pPlot->rescaleExtended();
-
     pAxisRect->setRangeDrag(Qt::Orientation::Horizontal);
     pAxisRect->setRangeZoom(Qt::Orientation::Horizontal);
 
@@ -593,6 +924,7 @@ void CPlotViewComponent::generatePlot()
 
         mpPlot->plotLayout()->setRowSpacing(0);
         mpPlot->updateOpactity();
+        mpPlot->rescaleExtended();
         mpPlot->replot();
 
         QSize currentSize = mpPlot->size();

@@ -8,6 +8,8 @@
 
 #include "common/Definitions.hpp"
 
+#include "components/log/api/CLog.hpp"
+
 #include "../api/CCustomPlotExtended.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -30,6 +32,8 @@ CCustomPlotExtended::CCustomPlotExtended(QWidget *pParent):
 {
     setInteraction(QCP::iRangeDrag, true);
     setInteraction(QCP::iRangeZoom, true);
+
+    addLayer("axis_rect_label", nullptr);
 
     connect(this, &QCustomPlot::legendClick, this, [&](QCPLegend*, QCPAbstractLegendItem* item, QMouseEvent* event)
     {
@@ -128,9 +132,9 @@ void CCustomPlotExtended::changeLegendItemVisibility(QCPPlottableLegendItem* pIt
         uint32_t visiblePlotsNumber = 0u;
         bool bIsSingleVisiblePlot = true;
 
-        for(const auto pGraph : pAxisRect->graphs())
+        for(const auto pPlottable : pAxisRect->plottables())
         {
-            if(true == pGraph->visible())
+            if(true == pPlottable->visible())
             {
                 ++visiblePlotsNumber;
 
@@ -170,29 +174,29 @@ void CCustomPlotExtended::updateOpactity()
         auto* pAxisRect = axisRectPair.first;
         const auto& axisRectType = axisRectPair.second.plotViewAxisType;
 
-        for(auto* pGraph : pAxisRect->graphs())
+        for(auto* pPlottable : pAxisRect->plottables())
         {
-            if(axisRectType == ePlotViewAxisType::e_LINEAR)
+            if(axisRectType == ePlotViewAxisType::e_LINEAR || axisRectType == ePlotViewAxisType::e_GANTT)
             {
                 // Adjusting the pen (line) opacity
-                QPen pen = pGraph->pen();
+                QPen pen = pPlottable->pen();
                 QColor penColor = pen.color();
                 penColor.setAlpha(mUsedOpacity ? mUsedOpacity : sMaxOpacity);
                 pen.setColor(penColor);
-                pGraph->setPen(pen);
+                pPlottable->setPen(pen);
 
                 // If you also want to adjust the brush (fill) opacity
-                QBrush brush = pGraph->brush();
+                QBrush brush = pPlottable->brush();
                 QColor brushColor = brush.color();
                 brushColor.setAlpha(mUsedOpacity);
                 brush.setColor(brushColor);
-                pGraph->setBrush(brush);
+                pPlottable->setBrush(brush);
             }
             else if(axisRectType == ePlotViewAxisType::e_POINT)
             {
                 // turn off lines and filling
-                pGraph->setPen(Qt::NoPen);
-                pGraph->setBrush(Qt::NoBrush);
+                pPlottable->setPen(Qt::NoPen);
+                pPlottable->setBrush(Qt::NoBrush);
             }
         }
     }
@@ -234,6 +238,48 @@ bool CCustomPlotExtended::setAxisRectRescaleData(QCPAxisRect* pAxisRect,
 
 void CCustomPlotExtended::rescaleExtended()
 {
+    auto maxLeftMargin = 0;
+
+    for(const auto& data_pair : mPlotAxisRectDataMap)
+    {
+        auto* pAxisRect = data_pair.first;
+        if(nullptr != pAxisRect)
+        {
+            auto* pLeftAxis = pAxisRect->axis(QCPAxis::atLeft);
+
+            if(nullptr != pLeftAxis)
+            {
+                pAxisRect->update(QCPLayoutElement::upPreparation);
+                pAxisRect->update(QCPLayoutElement::upMargins);
+                auto leftMargin = pAxisRect->margins().left();
+
+                if(maxLeftMargin < leftMargin)
+                {
+                    maxLeftMargin = leftMargin;
+                }
+            }
+        }
+    }
+
+    for(const auto& data_pair : mPlotAxisRectDataMap)
+    {
+        auto* pAxisRect = data_pair.first;
+        if(nullptr != pAxisRect)
+        {
+            auto* pLeftAxis = pAxisRect->axis(QCPAxis::atLeft);
+
+            if(nullptr != pLeftAxis)
+            {
+                auto leftMargin = pAxisRect->margins().left();
+                pLeftAxis->setPadding(maxLeftMargin - leftMargin);
+            }
+
+            auto margins = pAxisRect->margins();
+            margins.setTop(20);
+            pAxisRect->setMargins(margins);
+        }
+    }
+
     rescaleXExtended();
     rescaleYExtended();
 }
@@ -409,7 +455,7 @@ void CCustomPlotExtended::resizeEvent(QResizeEvent* event)
 }
 
 void CCustomPlotExtended::appendMetadata(QCPAxisRect* pAxisRect,
-                                         QCPGraph* pGraph,
+                                         QCPAbstractPlottable* pGraph,
                                          const tPlotData& x,
                                          const tPlotData& y,
                                          const tPlotGraphMetadataMap& plotGraphMetadataMap)
@@ -418,7 +464,7 @@ void CCustomPlotExtended::appendMetadata(QCPAxisRect* pAxisRect,
 }
 
 std::pair< bool, const tPlotGraphMetadataMap* > CCustomPlotExtended::getMetadata(QCPAxisRect* pAxisRect,
-                                         QCPGraph* pGraph,
+                                         QCPAbstractPlottable* pGraph,
                                          const tPlotData& x,
                                          const tPlotData& y)
 {
@@ -545,7 +591,7 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
 
             if(numberOfGraphs != numberOfVisibleGraphs && numberOfVisibleGraphs > 1 && nullptr == pSelectedLegendItem)
                 action = eAction::eDoNothing;
-            else if(numberOfVisibleGraphs > 1 && numberOfVisibleGraphs > 1 && nullptr != pSelectedLegendItem)
+            else if(numberOfVisibleGraphs > 1 && nullptr != pSelectedLegendItem)
                 action = eAction::eApplyFiltrer;
             else if(numberOfGraphs > 1 && numberOfVisibleGraphs == 1 && nullptr != pSelectedLegendItem)
                 action = eAction::eRemoveFiltrer;

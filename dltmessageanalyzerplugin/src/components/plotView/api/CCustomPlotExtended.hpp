@@ -30,7 +30,7 @@ public:
     void rescaleYExtended();
 
     void appendMetadata(QCPAxisRect* pAxisRect,
-                        QCPGraph* pGraph,
+                        QCPAbstractPlottable* pGraph,
                         const tPlotData& x,
                         const tPlotData& y,
                         const tPlotGraphMetadataMap& plotGraphMetadataMap);
@@ -39,7 +39,7 @@ public:
                            QCPLegend* pLegend);
 
     std::pair< bool, const tPlotGraphMetadataMap* > getMetadata(QCPAxisRect* pAxisRect,
-                                                               QCPGraph* pGraph,
+                                                               QCPAbstractPlottable* pGraph,
                                                                const tPlotData& x,
                                                                const tPlotData& y);
 
@@ -73,7 +73,7 @@ private:
     };
 
     typedef std::map<std::pair<tPlotData, tPlotData>, tPlotGraphMetadataMap> tPlotPointMetadataMap;
-    typedef std::map<QCPGraph*, tPlotPointMetadataMap> tPlotGraphsMetadataMap;
+    typedef std::map<QCPAbstractPlottable*, tPlotPointMetadataMap> tPlotGraphsMetadataMap;
 
     struct tAxisRectData
     {

@@ -2464,11 +2464,11 @@ tRegexScriptingMetadata::doesContainConsistentPlotViewData(bool fillInStringMsg,
             if(true == checkParameters)
             {
                 bool bCheckParameters = checkAllParameters(result.second);
-                result.first = bMandatoryGanttParametersCheck && bMandatoryNonGanttParametersCheck && bCheckParameters;
+                result.first = ( bMandatoryGanttParametersCheck && bCheckParameters ) || ( bMandatoryNonGanttParametersCheck && bCheckParameters );
             }
             else
             {
-                result.first = bMandatoryGanttParametersCheck && bMandatoryNonGanttParametersCheck;
+                result.first = bMandatoryGanttParametersCheck || bMandatoryNonGanttParametersCheck;
             }
         }
         else if(false == uniqueAvailableAxisTypes.empty())
@@ -3522,27 +3522,27 @@ QColor getChartColor()
 {
     static const std::vector<QColor> sColors
     {
-        QColor(230, 25, 75),
-        QColor(60, 180, 75),
-        QColor(255, 255, 25),
-        QColor(67, 99, 216),
-        QColor(245, 130, 49),
-        QColor(145, 30, 180),
-        QColor(70, 240, 240),
-        QColor(240, 50, 230),
-        QColor(188, 246, 12),
-        QColor(250, 190, 190),
-        QColor(0, 128, 128),
-        QColor(230, 190, 255),
-        QColor(154, 99, 36),
-        QColor(255, 250, 200),
-        QColor(128, 0, 0),
-        QColor(170, 255, 195),
-        QColor(255, 216, 177),
-        QColor(0, 0, 117),
-        QColor(128, 128, 128),
-        QColor(99, 243, 163),
-        QColor(25, 64, 163),
+        QColor(255, 0, 0),     // Bright Red
+        QColor(0, 128, 0),     // Dark Green
+        QColor(0, 0, 255),     // Bright Blue
+        QColor(255, 165, 0),   // Orange
+        QColor(128, 0, 128),   // Purple
+        QColor(0, 255, 255),   // Cyan
+        QColor(139, 69, 19),   // Saddle Brown
+        QColor(255, 20, 147),  // Deep Pink
+        QColor(255, 140, 0),   // Dark Orange
+        QColor(75, 0, 130),    // Indigo
+        QColor(0, 206, 209),   // Dark Turquoise
+        QColor(34, 139, 34),   // Forest Green
+        QColor(210, 105, 30),  // Chocolate
+        QColor(148, 0, 211),   // Dark Violet
+        QColor(0, 0, 139),     // Dark Blue
+        QColor(255, 69, 0),    // Red-Orange
+        QColor(0, 255, 127),   // Spring Green
+        QColor(112, 128, 144), // Slate Gray
+        QColor(0, 191, 255),   // Deep Sky Blue
+        QColor(220, 20, 60),   // Crimson
+        QColor(0, 128, 128),   // Teal
     };
     static const int sColorsSize = sColors.size();
     static std::atomic<int> sColorsCounter(0);
