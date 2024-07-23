@@ -4,9 +4,9 @@
 
 ----
 
-## v.1.0.27 released!
+## v.1.0.28 released!
 
-<span style="color:red">Checkout the ['plot view'](./md/plot_view/plot_view.md#plot-view) feature!</span>
+<span style="color:red">Checkout the ['Gantt chart'](./md/plot_view/plot_view.md#gantt-charts) support!</span>
 
 ----
 
