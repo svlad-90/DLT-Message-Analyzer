@@ -7,7 +7,9 @@ numberOfMessages(0),
 regex(),
 numberOfThreads(0),
 isContinuous(false),
-searchColumns()
+searchColumns(),
+regexStr(),
+selectedAliases()
 {
 }
 
@@ -18,14 +20,18 @@ const int& numberOfMessages_,
 const QRegularExpression& regex_,
 const int& numberOfThreads_,
 bool isContinuous_,
-const tSearchResultColumnsVisibilityMap& searchColumns_):
+const tSearchResultColumnsVisibilityMap& searchColumns_,
+const QString& regexStr_,
+const QStringList& selectedAliases_):
 pFile(pFile_),
 fromMessage(fromMessage_),
 numberOfMessages(numberOfMessages_),
 regex(regex_),
 numberOfThreads(numberOfThreads_),
 isContinuous(isContinuous_),
-searchColumns(searchColumns_)
+searchColumns(searchColumns_),
+regexStr(regexStr_),
+selectedAliases(selectedAliases_)
 {
 }
 

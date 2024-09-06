@@ -1,0 +1,25 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_PlotView" #DDDDDD
+{
+
+class "QCPGanttBarsData"
+{
+}
+
+class "QCPGanttRow"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QCPAbstractPlottable1D_QCPGanttBarsData_ <|-- QCPGanttRow : extends
+
+'====================Dependencies section====================
+QCPGanttRow "1" *-- "many" QCPGanttBarsData : contains
+
+@enduml

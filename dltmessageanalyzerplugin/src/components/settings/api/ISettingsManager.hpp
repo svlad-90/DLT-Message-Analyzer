@@ -6,6 +6,8 @@
 #include "QVector"
 #include "QColor"
 #include "QFont"
+#include "QDateTime"
+#include "QMap"
 
 #include "common/Definitions.hpp"
 #include "common/cpp_extensions.hpp"
@@ -54,7 +56,26 @@ public:
         QString alias;
         QString regex;
     };
-    typedef QVector<tAliasItem> tAliasItemVec;
+    typedef QMap<QString, tAliasItem> tAliasItemMap;
+
+    enum class eRegexUsageStatisticsItemType
+    {
+        TEXT = 0,
+        STORED_REGEX_PATTERN
+    };
+
+    typedef QString tRegexUsageStatisticsKey;
+
+    struct tRegexUsageStatisticsItem
+    {
+        tRegexUsageStatisticsItem();
+        tRegexUsageStatisticsItem(const uint32_t& usageCounter_, const QDateTime& updateDateTime_);
+        bool operator==(const tRegexUsageStatisticsItem&) const;
+        int usageCounter;
+        QDateTime updateDateTime;
+    };
+    typedef QMap<tRegexUsageStatisticsKey, tRegexUsageStatisticsItem> tRegexUsageStatisticsItemData;
+    typedef QMap<eRegexUsageStatisticsItemType, tRegexUsageStatisticsItemData> tRegexUsageStatisticsItemMap;
 
     //helpers
     virtual bool areAnyDefaultAliasesAvailable() const = 0;
@@ -67,7 +88,7 @@ public:
     virtual void resetGroupedViewColumnsVisibilityMap() = 0;
     virtual void resetGroupedViewColumnsCopyPasteMap() = 0;
     virtual QString getRegexDirectory() const = 0;
-    virtual QString getRegexDirectoryFull() const = 0;
+    virtual QString getRegexUsageStatisticsDirectory() const = 0;
     virtual QString getSettingsFilepath() const = 0;
     virtual QString getUserSettingsFilepath() const = 0;
     virtual QString getRootSettingsFilepath() const = 0;
@@ -81,8 +102,11 @@ public:
     virtual void setSettingsManagerVersion(const tSettingsManagerVersion& val) = 0;
 
     // regex settings
-    virtual void setAliases(const tAliasItemVec& val) = 0;
+    virtual void setAliases(const tAliasItemMap& val) = 0;
     virtual void setAliasIsDefault(const QString& alias, bool isDefault) = 0;
+
+    // regex usage statistics
+    virtual void setRegexUsageStatistics(const tRegexUsageStatisticsItemMap& val) = 0;
 
     // general settings
     virtual void setNumberOfThreads(const int& val) = 0;
@@ -132,6 +156,8 @@ public:
     virtual void setJavaPathEnvVar(const QString& val) = 0;
     virtual void setJavaCustomPath(const QString& val) = 0;
     virtual void setGroupedViewFeatureActive(bool val) = 0;
+    virtual void setRegexCompletion_CaseSensitive(const bool& val) = 0;
+    virtual void setRegexCompletion_SearchPolicy(const bool& val) = 0;
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -146,7 +172,10 @@ public:
     virtual const tSettingsManagerVersion& getSettingsManagerVersion() const = 0;
 
     // regex settings
-    virtual const tAliasItemVec& getAliases() const = 0;
+    virtual const tAliasItemMap& getAliases() const = 0;
+
+    // regex usage statistics
+    virtual const tRegexUsageStatisticsItemMap& getRegexUsageStatistics() const = 0;
 
     // general settings
     virtual const int& getNumberOfThreads() const = 0;
@@ -197,6 +226,8 @@ public:
     virtual const QString& getJavaPathEnvVar() const = 0;
     virtual const QString& getJavaCustomPath() const = 0;
     virtual const bool& getGroupedViewFeatureActive() const = 0;
+    virtual const bool& getRegexCompletion_CaseSensitive() const = 0;
+    virtual const bool& getRegexCompletion_SearchPolicy() const = 0;
 
     // allowed ranges
     virtual const TOptional<tRange<int>>& getSetting_NumberOfThreads_AllowedRange() const = 0;
@@ -213,7 +244,10 @@ signals:
     void settingsManagerVersionChanged( const tSettingsManagerVersion& settingsManagerVersion ) const;
 
     // regex settings
-    void aliasesChanged( const tAliasItemVec& aliases );
+    void aliasesChanged( const tAliasItemMap& aliases );
+
+    // regex usage statistics
+    void regexUsageStatisticsChanged( const tRegexUsageStatisticsItemMap& regexUsageStatistics );
 
     // general settings
     void numberOfThreadsChanged( int numberOfThreads );
@@ -262,4 +296,7 @@ signals:
     void javaPathEnvVarChanged(const QString& plantumlPathEnvVar);
     void javaCustomPathChanged(const QString& plantumlPathEnvVar);
     void groupedViewFeatureActiveChanged(const bool& groupedViewFeatureActive);
+    void regexCompletion_CaseSensitiveChanged(const bool& regexCompletion_CaseSensitive);
+    void regexCompletion_MaxNumberOfSuggestionsChanged(const int& regexCompletion_MaxNumberOfSuggestions);
+    void regexCompletion_SearchPolicyChanged(const bool& regexCompletion_SearchPolicy);
 };

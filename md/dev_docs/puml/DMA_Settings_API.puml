@@ -139,6 +139,24 @@ class "Form"
 
 }
 
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+}
+
 package "DMA_SearchView" #DDDDDD
 {
 
@@ -215,6 +233,7 @@ CSettingsManagerClient <|-- CUMLViewComponent : extends
 CSettingsManagerClient <|-- CPlotViewComponent : extends
 CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 CSettingsManagerClient <|-- Form : extends
+CSettingsManagerClient <|-- CRegexHistoryProvider : extends
 CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
 CSettingsManagerClient <|-- CSearchResultModel : extends
 CSettingsManagerClient <|-- CSearchViewComponent : extends
@@ -224,6 +243,8 @@ QObject <|-- ISettingsManager : extends
 
 '====================Dependencies section====================
 CDLTMessageAnalyzer "1" o-- "1" ISettingsManager : gets and uses
+CRegexHistoryProvider "1" o-- "1" ISettingsManager : uses
+CRegexHistoryComponent "1" --> "1" ISettingsManager : passes
 CSettingsComponent "1" --> "1" CSettingsManager : creates
 CSettingsComponent "1" *-- "1" ISettingsManager : provides
 CSettingsManagerClient "1" o-- "1" ISettingsManager : uses

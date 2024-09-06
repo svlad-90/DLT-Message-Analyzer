@@ -282,7 +282,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
     if(nullptr != mpUI->patternsTreeView)
     {
-        connect(mpUI->patternsTreeView, &CPatternsView::patternSelected, this, [this]( const QString& )
+        connect(mpUI->patternsTreeView, &CPatternsView::patternSelected, this, [this]( const QString&, const QStringList& )
         {
             if(nullptr != mpDLTMessageAnalyzerPlugin)
             {
@@ -332,7 +332,8 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
                 enableGroupedViewWidget(getSettingsManager()->getGroupedViewFeatureActive());
 
-                connect(getSettingsManager().get(), &ISettingsManager::groupedViewFeatureActiveChanged, [enableGroupedViewWidget](bool val)
+                connect(getSettingsManager().get(), &ISettingsManager::groupedViewFeatureActiveChanged,
+                        this, [enableGroupedViewWidget](bool val)
                 {
                     enableGroupedViewWidget(val);
                 });
@@ -364,7 +365,8 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
                 enableUMLWidget(getSettingsManager()->getUML_FeatureActive());
 
-                connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged, [enableUMLWidget](bool val)
+                connect(getSettingsManager().get(), &ISettingsManager::UML_FeatureActiveChanged,
+                        this, [enableUMLWidget](bool val)
                 {
                     enableUMLWidget(val);
                 });
@@ -417,7 +419,8 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
 
                 enablePlotViewWidget(getSettingsManager()->getPlotViewFeatureActive());
 
-                connect(getSettingsManager().get(), &ISettingsManager::plotViewFeatureActiveChanged, [enablePlotViewWidget](bool val)
+                connect(getSettingsManager().get(), &ISettingsManager::plotViewFeatureActiveChanged,
+                        this, [enablePlotViewWidget](bool val)
                 {
                     enablePlotViewWidget(val);
                 });
@@ -509,9 +512,9 @@ QLabel* Form::getProgresBarLabel()
     return pResult;
 }
 
-QLineEdit* Form::getRegexLineEdit()
+CRegexHistoryLineEdit* Form::getRegexLineEdit()
 {
-    QLineEdit* pResult = nullptr;
+    CRegexHistoryLineEdit* pResult = nullptr;
 
     if(mpUI)
     {
@@ -827,14 +830,6 @@ QPlainTextEdit* Form::getUMLTextEditor()
     return pResult;
 }
 
-void Form::on_regex_returnPressed()
-{
-    if(nullptr != mpDLTMessageAnalyzerPlugin)
-    {
-        mpDLTMessageAnalyzerPlugin->analyze();
-    }
-}
-
 void Form::on_pushButton_clicked()
 {
     if(nullptr != mpDLTMessageAnalyzerPlugin)
@@ -988,5 +983,6 @@ PUML_PACKAGE_BEGIN(DMA_Plugin_API)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogo, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

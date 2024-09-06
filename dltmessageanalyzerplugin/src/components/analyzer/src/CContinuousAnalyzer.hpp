@@ -81,7 +81,9 @@ private:// fields
                      const QRegularExpression& regex_,
                      const int& numberOfThreads_,
                      const tRegexScriptingMetadata& regexScriptingMetadata_,
-                     const tSearchResultColumnsVisibilityMap& searchColumns_);
+                     const tSearchResultColumnsVisibilityMap& searchColumns_,
+                     const QString& regexStr_,
+                     const QStringList& selectedAlises_);
         tRequestId requestId;
         std::weak_ptr<IDLTMessageAnalyzerControllerConsumer> pClient;
         tRequestId subRequestId;
@@ -94,6 +96,8 @@ private:// fields
         int numberOfThreads;
         bool bContinuousModeActive;
         tSearchResultColumnsVisibilityMap searchColumns;
+        QString regexStr;
+        QStringList selectedAlises;
     };
 
     tRequestDataMap mRequestDataMap;

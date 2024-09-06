@@ -62,7 +62,12 @@ DMA::tSyncInitOperationResult CSettingsComponent::shutdown()
 
     try
     {
-        mpSettingsManager.reset();
+        if(nullptr != mpSettingsManager)
+        {
+            mpSettingsManager->storeConfigs();
+            mpSettingsManager.reset();
+        }
+
         result.bIsOperationSuccessful = true;
         result.returnCode = 0;
     }

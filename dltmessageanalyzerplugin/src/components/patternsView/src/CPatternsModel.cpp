@@ -838,9 +838,9 @@ void CPatternsModel::updatePatternsInPersistency()
 {
     if(nullptr != mpRootItem)
     {
-        ISettingsManager::tAliasItemVec aliasVec;
+        ISettingsManager::tAliasItemMap aliasMap;
 
-        auto preVisitFunction = [&aliasVec](const tTreeItem* pItem)
+        auto preVisitFunction = [&aliasMap](const tTreeItem* pItem)
         {
             if(nullptr != pItem)
             {
@@ -858,7 +858,7 @@ void CPatternsModel::updatePatternsInPersistency()
                         const QString& alias = pItem->data(static_cast<int>(ePatternsColumn::Alias)).get<QString>();
 
                         ISettingsManager::tAliasItem aliasItem(isDefault == Qt::Checked, alias, regex);
-                        aliasVec.push_back(aliasItem);
+                        aliasMap.insert(alias, aliasItem);
                     }
                 }
             }
@@ -869,10 +869,10 @@ void CPatternsModel::updatePatternsInPersistency()
         mpRootItem->visit(preVisitFunction, CTreeItem::tVisitFunction(), false);
 
         // if something has changed
-        if(aliasVec != getSettingsManager()->getAliases())
+        if(aliasMap != getSettingsManager()->getAliases())
         {
             // let's update them in the persistency
-            getSettingsManager()->setAliases( aliasVec );
+            getSettingsManager()->setAliases( aliasMap );
         }
     }
 }

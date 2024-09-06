@@ -60,7 +60,7 @@ public slots:
     void applyPatternsCombination();
 
 signals:
-    void patternSelected( const QString& regexCandidate );
+    void patternSelected( const QString& regexCandidate, const QStringList& selectedAliases );
     void deletePatternTriggered();
     void editPatternTriggered();
     void overwriteFromInputFieldTriggered();
@@ -71,7 +71,7 @@ protected:
 
 private: // methods
     void setModel(QAbstractItemModel *model) override;
-    QString createCombinedRegex();
+    QString createCombinedRegex(QStringList& selectedAliases);
     void updateColumnsVisibility();
     void copySelectedRow();
     void pasteSelectedRow();

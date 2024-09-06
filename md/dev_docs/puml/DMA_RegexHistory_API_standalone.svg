@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="535px" preserveAspectRatio="none" style="width:533px;height:535px;background:#FEFEFE;" version="1.1" viewBox="0 0 533 535" width="533px" zoomAndPan="magnify"><defs><filter height="300%" id="fdzry36475v12" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[590bf1d7591cd8b5390464ec03f4b15b]
+cluster DMA_Framework_Component--><polygon fill="#DDDDDD" filter="url(#fdzry36475v12)" points="35,24,270,24,277,46.2969,280,46.2969,280,123,35,123,35,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="35" x2="277" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="229" x="39" y="38.9951">DMA_Framework_Component</text><!--MD5=[6d3e3d050e166c227b9337da9ac6a55e]
+cluster DMA_RegexHistory_API--><polygon fill="#DDDDDD" filter="url(#fdzry36475v12)" points="22,172,207,172,214,194.2969,248,194.2969,248,523,22,523,22,172" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="22" x2="214" y1="194.2969" y2="194.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="179" x="26" y="186.9951">DMA_RegexHistory_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fdzry36475v12)" points="272,172,296,172,303,194.2969,511,194.2969,511,271,272,271,272,172" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="272" x2="303" y1="194.2969" y2="194.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="18" x="276" y="186.9951">Qt</text><!--MD5=[537ae4750537bce13a2ca5c74a8b8105]
+class DMA::IComponent--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="DMA::IComponent" style="stroke: #A80036; stroke-width: 1.5;" width="142" x="64" y="59"/><ellipse cx="79" cy="75" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M81.9688,80.6406 Q81.3906,80.9375 80.75,81.0781 Q80.1094,81.2344 79.4063,81.2344 Q76.9063,81.2344 75.5781,79.5938 Q74.2656,77.9375 74.2656,74.8125 Q74.2656,71.6875 75.5781,70.0313 Q76.9063,68.375 79.4063,68.375 Q80.1094,68.375 80.75,68.5313 Q81.4063,68.6875 81.9688,68.9844 L81.9688,71.7031 Q81.3438,71.125 80.75,70.8594 Q80.1563,70.5781 79.5313,70.5781 Q78.1875,70.5781 77.5,71.6563 Q76.8125,72.7188 76.8125,74.8125 Q76.8125,76.9063 77.5,77.9844 Q78.1875,79.0469 79.5313,79.0469 Q80.1563,79.0469 80.75,78.7813 Q81.3438,78.5 81.9688,77.9219 L81.9688,80.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="110" x="93" y="79.1543">DMA::IComponent</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="65" x2="205" y1="91" y2="91"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="65" x2="205" y1="99" y2="99"/><!--MD5=[b249e666b488df1cf64958964db4bc32]
+class CRegexHistoryComponent--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="CRegexHistoryComponent" style="stroke: #A80036; stroke-width: 1.5;" width="193" x="38.5" y="207"/><ellipse cx="53.5" cy="223" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M56.4688,228.6406 Q55.8906,228.9375 55.25,229.0781 Q54.6094,229.2344 53.9063,229.2344 Q51.4063,229.2344 50.0781,227.5938 Q48.7656,225.9375 48.7656,222.8125 Q48.7656,219.6875 50.0781,218.0313 Q51.4063,216.375 53.9063,216.375 Q54.6094,216.375 55.25,216.5313 Q55.9063,216.6875 56.4688,216.9844 L56.4688,219.7031 Q55.8438,219.125 55.25,218.8594 Q54.6563,218.5781 54.0313,218.5781 Q52.6875,218.5781 52,219.6563 Q51.3125,220.7188 51.3125,222.8125 Q51.3125,224.9063 52,225.9844 Q52.6875,227.0469 54.0313,227.0469 Q54.6563,227.0469 55.25,226.7813 Q55.8438,226.5 56.4688,225.9219 L56.4688,228.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="161" x="67.5" y="227.1543">CRegexHistoryComponent</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="39.5" x2="230.5" y1="239" y2="239"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="39.5" x2="230.5" y1="247" y2="247"/><!--MD5=[bc4f524233720e85769fd1cdd0e2086d]
+class CRegexHistoryLineEdit--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="CRegexHistoryLineEdit" style="stroke: #A80036; stroke-width: 1.5;" width="170" x="62" y="334"/><ellipse cx="77" cy="350" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M79.9688,355.6406 Q79.3906,355.9375 78.75,356.0781 Q78.1094,356.2344 77.4063,356.2344 Q74.9063,356.2344 73.5781,354.5938 Q72.2656,352.9375 72.2656,349.8125 Q72.2656,346.6875 73.5781,345.0313 Q74.9063,343.375 77.4063,343.375 Q78.1094,343.375 78.75,343.5313 Q79.4063,343.6875 79.9688,343.9844 L79.9688,346.7031 Q79.3438,346.125 78.75,345.8594 Q78.1563,345.5781 77.5313,345.5781 Q76.1875,345.5781 75.5,346.6563 Q74.8125,347.7188 74.8125,349.8125 Q74.8125,351.9063 75.5,352.9844 Q76.1875,354.0469 77.5313,354.0469 Q78.1563,354.0469 78.75,353.7813 Q79.3438,353.5 79.9688,352.9219 L79.9688,355.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="138" x="91" y="354.1543">CRegexHistoryLineEdit</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="63" x2="231" y1="366" y2="366"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="63" x2="231" y1="374" y2="374"/><!--MD5=[2e365ec30687e3f7473aacead993a6b2]
+class IRegexHistoryProvider--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="IRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.5;" width="167" x="64.5" y="459"/><ellipse cx="79.5" cy="475" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M82.4688,480.6406 Q81.8906,480.9375 81.25,481.0781 Q80.6094,481.2344 79.9063,481.2344 Q77.4063,481.2344 76.0781,479.5938 Q74.7656,477.9375 74.7656,474.8125 Q74.7656,471.6875 76.0781,470.0313 Q77.4063,468.375 79.9063,468.375 Q80.6094,468.375 81.25,468.5313 Q81.9063,468.6875 82.4688,468.9844 L82.4688,471.7031 Q81.8438,471.125 81.25,470.8594 Q80.6563,470.5781 80.0313,470.5781 Q78.6875,470.5781 78,471.6563 Q77.3125,472.7188 77.3125,474.8125 Q77.3125,476.9063 78,477.9844 Q78.6875,479.0469 80.0313,479.0469 Q80.6563,479.0469 81.25,478.7813 Q81.8438,478.5 82.4688,477.9219 L82.4688,480.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="135" x="93.5" y="479.1543">IRegexHistoryProvider</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="65.5" x2="230.5" y1="491" y2="491"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="65.5" x2="230.5" y1="499" y2="499"/><!--MD5=[f36ae8ea345a4117941f01c437b97e47]
+class QLineEdit--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="QLineEdit" style="stroke: #A80036; stroke-width: 1.5;" width="90" x="288" y="207"/><ellipse cx="303" cy="223" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M305.9688,228.6406 Q305.3906,228.9375 304.75,229.0781 Q304.1094,229.2344 303.4063,229.2344 Q300.9063,229.2344 299.5781,227.5938 Q298.2656,225.9375 298.2656,222.8125 Q298.2656,219.6875 299.5781,218.0313 Q300.9063,216.375 303.4063,216.375 Q304.1094,216.375 304.75,216.5313 Q305.4063,216.6875 305.9688,216.9844 L305.9688,219.7031 Q305.3438,219.125 304.75,218.8594 Q304.1563,218.5781 303.5313,218.5781 Q302.1875,218.5781 301.5,219.6563 Q300.8125,220.7188 300.8125,222.8125 Q300.8125,224.9063 301.5,225.9844 Q302.1875,227.0469 303.5313,227.0469 Q304.1563,227.0469 304.75,226.7813 Q305.3438,226.5 305.9688,225.9219 L305.9688,228.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="58" x="317" y="227.1543">QLineEdit</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="289" x2="377" y1="239" y2="239"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="289" x2="377" y1="247" y2="247"/><!--MD5=[8dd17ccd1ae0e0e4eb0a7117370c35f4]
+class QObject--><rect fill="#FEFECE" filter="url(#fdzry36475v12)" height="48" id="QObject" style="stroke: #A80036; stroke-width: 1.5;" width="81" x="413.5" y="207"/><ellipse cx="428.5" cy="223" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M431.4688,228.6406 Q430.8906,228.9375 430.25,229.0781 Q429.6094,229.2344 428.9063,229.2344 Q426.4063,229.2344 425.0781,227.5938 Q423.7656,225.9375 423.7656,222.8125 Q423.7656,219.6875 425.0781,218.0313 Q426.4063,216.375 428.9063,216.375 Q429.6094,216.375 430.25,216.5313 Q430.9063,216.6875 431.4688,216.9844 L431.4688,219.7031 Q430.8438,219.125 430.25,218.8594 Q429.6563,218.5781 429.0313,218.5781 Q427.6875,218.5781 427,219.6563 Q426.3125,220.7188 426.3125,222.8125 Q426.3125,224.9063 427,225.9844 Q427.6875,227.0469 429.0313,227.0469 Q429.6563,227.0469 430.25,226.7813 Q430.8438,226.5 431.4688,225.9219 L431.4688,228.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="49" x="442.5" y="227.1543">QObject</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="414.5" x2="493.5" y1="239" y2="239"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="414.5" x2="493.5" y1="247" y2="247"/><!--MD5=[a86038058ae1906fe2813e8845b69fa7]
+reverse link DMA::IComponent to CRegexHistoryComponent--><path d="M135,127.27 C135,153.39 135,185.65 135,206.97 " fill="none" id="DMA::IComponent&lt;-CRegexHistoryComponent" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="128,127.13,135,107.13,142,127.13,128,127.13" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="136" y="152.0669">implements</text><!--MD5=[38b5b71154ced298feff4d28f876353d]
+reverse link QLineEdit to CRegexHistoryLineEdit--><path d="M281.68,266.49 C249.73,287.96 209.5,315 181.36,333.91 " fill="none" id="QLineEdit&lt;-CRegexHistoryLineEdit" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="277.95,260.56,298.45,255.22,285.76,272.18,277.95,260.56" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="252" y="300.0669">extends</text><!--MD5=[30bf1c996cf3ab36d4905262652caa49]
+reverse link QObject to IRegexHistoryProvider--><path d="M409.99,267.96 C346.14,320.12 229.63,415.31 176.17,458.98 " fill="none" id="QObject&lt;-IRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="405.84,262.3,425.76,255.07,414.7,273.15,405.84,262.3" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="327" y="362.5669">extends</text><!--MD5=[ecc0afe013e5c7290f82f6e41141eda5]
+link CRegexHistoryComponent to CRegexHistoryLineEdit--><path d="M137.23,255.22 C139.22,276 142.16,306.54 144.29,328.74 " fill="none" id="CRegexHistoryComponent-&gt;CRegexHistoryLineEdit" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="144.78,333.91,147.8885,324.5646,144.2952,328.9336,139.9262,325.3403,144.78,333.91" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="45" x="142" y="300.0669">passes</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="128.7986" y="275.0348">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="135.1861" y="322.899">1</text><!--MD5=[d813bb3884725bc5344112c9ac4bd622]
+reverse link CRegexHistoryLineEdit to IRegexHistoryProvider--><path d="M147.29,395.21 C147.46,415.83 147.67,441.04 147.81,458.97 " fill="none" id="CRegexHistoryLineEdit&lt;-IRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#FEFEFE" points="147.19,382.14,143.2363,388.1706,147.2823,394.1396,151.236,388.1091,147.19,382.14" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="30" x="148" y="425.0669">uses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="138.2613" y="401.9353">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="138.7363" y="447.9743">1</text><!--MD5=[88fc9ce8a2409e83b3d986172c1e02f1]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+class "CRegexHistoryLineEdit"
+{
+}
+
+class "IRegexHistoryProvider"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QLineEdit"
+{
+}
+
+class "QObject"
+{
+}
+
+}
+
+DMA::IComponent <|- - CRegexHistoryComponent : implements
+QLineEdit <|- - CRegexHistoryLineEdit : extends
+QObject <|- - IRegexHistoryProvider : extends
+
+CRegexHistoryComponent "1" - -> "1" CRegexHistoryLineEdit : passes
+CRegexHistoryLineEdit "1" o- - "1" IRegexHistoryProvider : uses
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

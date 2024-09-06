@@ -66,6 +66,14 @@ signals:
      * Client might not remember about this fact, so we provide this information back to the client, to simplify the client's logic.
      */
     void progressNotification( const tProgressNotificationData& progressNotificationData );
+
+    /**
+     * @brief analysisStarted - signal, which notifies client about the start of the analysis.
+     * @param requestId - the request id of the search
+     * @param usedRegex - the regex with which the anlysis was started
+     * @oaram selectedAliases - the selected regex alises that were used to form the search query
+     */
+    void analysisStarted( const tRequestId& requestId, const QString& usedRegex, const QStringList& selectedAliases );
 };
 
 typedef std::shared_ptr<IDLTMessageAnalyzerController> tDLTMessageAnalyzerControllerPtr;

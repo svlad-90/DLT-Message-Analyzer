@@ -44,6 +44,7 @@ class CSearchResultView;
 class ISearchResultModel;
 class CTableMemoryJumper;
 class CCustomPlotExtended;
+class CRegexHistoryLineEdit;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -58,7 +59,7 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
 
         CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                             const tGroupedViewModelPtr& pGroupedViewModel,
-                            QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
+                            QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryLineEdit* pRegexLineEdit,
                             QLabel* pLabel, CPatternsView* pPatternsTableView, const tPatternsModelPtr& pPatternsModel,
                             QComboBox* pNumberOfThreadsCombobBox,
                             QCheckBox* pContinuousSearchCheckBox,
@@ -101,11 +102,12 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
 
         /**
          * @brief analyze - starts analysis
-         * @return - trye in case of successful start of analysis.
+         * @param pSelectedAliases - collection of aliases that were selected for search.
+         * @return - true in case of successful start of analysis.
          * False otherwise.
          * Note! This call will stop previous search, is one is already running.
          */
-        bool analyze();
+        bool analyze(const QStringList* pSelectedAliases = nullptr);
 
         /**
          * @brief cancel - cancels analysis, if one is running.
@@ -269,7 +271,7 @@ signals:
         // default widgets
         QLabel* mpProgressBarLabel;
         QProgressBar* mpProgressBar;
-        QLineEdit* mpRegexLineEdit;
+        CRegexHistoryLineEdit* mpRegexLineEdit;
         QLabel* mpLabel;
         QComboBox* mpNumberOfThreadsCombobBox;
         QTableView* mpMainTableView;

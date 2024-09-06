@@ -34,6 +34,10 @@ interface "QDltPluginViewerInterface"
 {
 }
 
+class "QListView"
+{
+}
+
 }
 
 package "DMA_LogsWrapper" #DDDDDD
@@ -74,6 +78,15 @@ class "DLTMessageAnalyzerPlugin"
 
 }
 
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
 '====================Inheritance section====================
 QDLTPluginInterface <|-- DLTMessageAnalyzerPlugin : implements
 QDltPluginControlInterface <|-- DLTMessageAnalyzerPlugin : implements
@@ -85,5 +98,6 @@ CDLTMsgDecoder "1" o-- "1" QDltMsg : uses
 CDLTMsgWrapper "1" --> "1" QDltMsg : uses
 IDLTLogsWrapperCreator "1" --> "*" QDltFile : uses
 IDLTLogsWrapperCreator "1" --> "*" QDltMsg : uses
+CRegexHistoryProvider "1" *-- "1" QListView : creates
 
 @enduml

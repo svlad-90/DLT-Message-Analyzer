@@ -37,6 +37,7 @@
 #include "components/logsWrapper/api/IMsgWrapper.hpp"
 
 #include "components/filtersView/api/CFiltersView.hpp"
+#include "components/regexHistory/api/CRegexHistoryComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -58,7 +59,9 @@ mpFiltersViewComponent(nullptr),
 mpUMLViewComponent(nullptr),
 mpLogoComponent(nullptr),
 mpLogsWrapperComponent(nullptr),
+mpRegexHistoryComponent(nullptr),
 mpSettingsComponent(nullptr),
+mpAnalyzerComponent(nullptr),
 mDisconnectionTimer()
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 ,mpMainTableView(nullptr)
@@ -157,6 +160,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     {
         auto pAnalyzerComponent = std::make_shared<CAnalyzerComponent>(mpSettingsComponent->getSettingsManager());
+
+        mpAnalyzerComponent = pAnalyzerComponent;
 
         auto initResult = pAnalyzerComponent->startInit();
 
@@ -321,13 +326,25 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pLogsWrapperComponent);
     }
 
-    connect( qApp, &QApplication::aboutToQuit, [this]()
     {
-        if(nullptr != mpSettingsComponent->getSettingsManager())
+        auto pRegexHistoryComponent = std::make_shared<CRegexHistoryComponent>(mpSettingsComponent->getSettingsManager(),
+                                                                               mpForm->getRegexLineEdit(),
+                                                                               mpPatternsViewComponent->getPatternsView(),
+                                                                               mpAnalyzerComponent->getAnalyzerController());
+        mpRegexHistoryComponent = pRegexHistoryComponent;
+
+        auto initResult = pRegexHistoryComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
         {
-            mpSettingsComponent->getSettingsManager()->storeConfigs();
+            SEND_ERR(QString("Failed to initialize %1").arg(pRegexHistoryComponent->getName()));
         }
 
+        mComponents.push_back(pRegexHistoryComponent);
+    }
+
+    connect( qApp, &QApplication::aboutToQuit, [this]()
+    {
         for(auto& pComponent : mComponents)
         {
             if(nullptr != pComponent)
@@ -388,6 +405,22 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpLogsWrapperComponent,
                                                                                                       mpSettingsComponent->getSettingsManager(),
                                                                                                       mpPlotViewComponent->getPlot());
+
+    connect(mpForm->getRegexLineEdit(), &QLineEdit::returnPressed,
+            this, [this]()
+    {
+        if(nullptr != mpDLTMessageAnalyzer)
+        {
+            if(nullptr != mpForm)
+            {
+                auto pRegexLineEdit = mpForm->getRegexLineEdit();
+                if(nullptr != pRegexLineEdit && false == pRegexLineEdit->getIgnoreReturnKeyEvent() )
+                {
+                    mpDLTMessageAnalyzer->analyze();
+                }
+            }
+        }
+    });
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     if(nullptr != mpDLTMessageAnalyzer)
@@ -824,6 +857,7 @@ PUML_PACKAGE_BEGIN(DMA_Plugin)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogoComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogsWrapperComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPlotViewComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QTimer, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -22,14 +22,19 @@
 
 static const QString sSettingsManager_Directory = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + QDir::separator() + ".DLT-Message-Analyzer";
 static const QString sSettingsManager_Regex_SubDirectory = "regexes";
+static const QString sSettingsManager_RegexUsageStatistics_SubDirectory = "regex_usage_statistics";
 static const QString sSettingsManager_User_SettingsFile = "user_settings.json";
 static const QString sSettingsManager_Root_SettingsFile = "root_settings.json";
 
 static const QString sSettingsManagerVersionKey = "settingsManagerVersion";
 static const QString sAliasesKey = "aliases";
+static const QString sRegexUsageStatisticsKey = "regexUsageStatistics";
 static const QString sAliasKey = "alias";
 static const QString sRegexKey = "regex";
 static const QString sIsDefaultKey = "isDefault";
+static const QString sUsageCounterKey = "usageCounter";
+static const QString sUpdateDateTimeKey = "updateDateTimeKey";
+static const QString sRegexUsageStatisticsItemTypeKey = "regexUsageStatisticsItemType";
 static const QString sNumberOfThreadsKey = "numberOfThreads";
 static const QString sIsContinuousSearchKey = "isContinuousSearch";
 static const QString sCopySearchResultAsHTMLKey = "copySearchResultAsHTML";
@@ -86,8 +91,11 @@ static const QString sJavaCustomPath = "JavaCustomPath";
 
 static const QString sGroupedViewFeatureActive = "GroupedViewFeatureActive";
 
+static const QString sRegexCompletion_CaseSensitiveKey = "RegexCompletion_CaseSensitive";
+static const QString sRegexCompletion_SearchPolicyKey = "RegexCompletion_SearchPolicy";
+
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
-static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 1u; // current version of settings manager used by SW.
+static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 2u; // current version of settings manager used by SW.
 
 static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultColumnsVisibilityMap()
 {
@@ -252,14 +260,14 @@ CSettingsManager::CSettingsManager():
         [this](const tSettingsManagerVersion& data){settingsManagerVersionChanged(data);},
         [this](){tryStoreRootConfig();},
         sDefaultSettingsManagerVersion)),
-    mSetting_Aliases(createAliasItemVecSettingsItem(sAliasesKey,
-        [this](const tAliasItemVec& data){ aliasesChanged(data); },
+    mSetting_Aliases(createAliasItemMapSettingsItem(sAliasesKey,
+        [this](const tAliasItemMap& data){ aliasesChanged(data); },
         [this]()
         {
             QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
             storeRegexConfigCustomPath(regexSettingsFilePath);
         },
-                                                   tAliasItemVec())),
+                                                   tAliasItemMap())),
     mSetting_NumberOfThreads(createRangedArithmeticSettingsItem<int>(sNumberOfThreadsKey,
         [this](const int& data){numberOfThreadsChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -354,10 +362,14 @@ CSettingsManager::CSettingsManager():
     mSetting_SelectedRegexFile(createStringSettingsItem(sSelectedRegexFile,
         [this](const QString& data)
         {
-            clearRegexConfig();
-
             QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + data;
+
+            clearRegexConfig();
             loadRegexConfigCustomPath(regexSettingsFilePath);
+
+            clearRegexUsageStatisticsData();
+            QString regexUsageStatisticsFilePath = getRegexUsageStatisticsDirectory() + QDir::separator() + data;
+            loadRegexUsageStatisticsDataCustomPath(regexUsageStatisticsFilePath);
 
             selectedRegexFileChanged(data);
         },
@@ -428,6 +440,14 @@ CSettingsManager::CSettingsManager():
        [this](const bool& data){filtersCompletion_SearchPolicyChanged(data);},
        [this](){tryStoreSettingsConfig();},
        false)),
+    mSetting_RegexCompletion_CaseSensitive(createBooleanSettingsItem(sRegexCompletion_CaseSensitiveKey,
+       [this](const bool& data){regexCompletion_CaseSensitiveChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       false)),
+    mSetting_RegexCompletion_SearchPolicy(createBooleanSettingsItem(sRegexCompletion_SearchPolicyKey,
+       [this](const bool& data){regexCompletion_SearchPolicyChanged(data);},
+       [this](){tryStoreSettingsConfig();},
+       false)),
     mSetting_SearchViewLastColumnWidthStrategy(createRangedArithmeticSettingsItem<int>(sSearchViewLastColumnWidthStrategyKey,
         [this](const int& data){searchViewLastColumnWidthStrategyChanged(data);},
         [this](){tryStoreSettingsConfig();},
@@ -466,9 +486,17 @@ CSettingsManager::CSettingsManager():
         [this](const bool& data){groupedViewFeatureActiveChanged(data);},
         [this](){tryStoreSettingsConfig();},
         true)),
+    mSetting_RegexUsageStatistics(createRegexUsageStatisticsItemMapSettingsItem(sRegexUsageStatisticsKey,
+        [this](const tRegexUsageStatisticsItemMap& data){ regexUsageStatisticsChanged(data); },
+        []()
+        {
+            // this data is not critical and is stored to file ONLY during exit.
+        },
+        tRegexUsageStatisticsItemMap())),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
+    mRegexUsageStatisticsDataItemPtrVec(),
     mbRootConfigInitialised(false)
 {
     /////////////// ROOT SETTINGS ///////////////
@@ -513,6 +541,8 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_MaxCharactersInSuggestion);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_CompletionPopUpWidth);
     mUserSettingItemPtrVec.push_back(&mSetting_FiltersCompletion_SearchPolicy);
+    mUserSettingItemPtrVec.push_back(&mSetting_RegexCompletion_CaseSensitive);
+    mUserSettingItemPtrVec.push_back(&mSetting_RegexCompletion_SearchPolicy);
     mUserSettingItemPtrVec.push_back(&mSetting_SearchViewLastColumnWidthStrategy);
     mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathMode);
     mUserSettingItemPtrVec.push_back(&mSetting_PlantumlPathEnvVar);
@@ -524,6 +554,9 @@ CSettingsManager::CSettingsManager():
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
+
+    /////////////// REGEX USAGE STATISTICS //////////
+    mRegexUsageStatisticsDataItemPtrVec.push_back(&mSetting_RegexUsageStatistics);
 }
 
 void CSettingsManager::tryStoreSettingsConfig()
@@ -544,7 +577,7 @@ void CSettingsManager::tryStoreRootConfig()
 
 CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility()
 {
-    SEND_MSG(QString("[CSettingsManager] Performing backward compatibility check."));
+    SEND_MSG(QString("[CSettingsManager] Performing setting manager update."));
 
     auto result = backwardCompatibility_V0_V1();
 
@@ -552,11 +585,21 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility()
     {
         result = loadRootConfig(); // load root config. It should be available starting version 0
 
+        auto cachedSettingsMangerVersion = getSettingsManagerVersion();
+
+        SEND_MSG(QString("[CSettingsManager] Persisted settings manager verison - %1.").arg(getSettingsManagerVersion()));
+        SEND_MSG(QString("[CSettingsManager] Target settings manager verison - %1.").arg(sCurrentSettingsManagerVersion));
+
+        if(sCurrentSettingsManagerVersion != cachedSettingsMangerVersion)
+        {
+            if(cachedSettingsMangerVersion == 1u && sCurrentSettingsManagerVersion == 2)
+            {
+                result = backwardCompatibility_V1_V2();
+            }
+        }
+
         if(true == result.bResult)
         {
-            SEND_MSG(QString("[CSettingsManager] Persisted settings manager verison - %1.").arg(getSettingsManagerVersion()));
-            SEND_MSG(QString("[CSettingsManager] Target settings manager verison - %1.").arg(sCurrentSettingsManagerVersion));
-
             setSettingsManagerVersion( sCurrentSettingsManagerVersion ); // if backward compatibility was successful, we need to update the settings manager version
         }
     }
@@ -725,12 +768,12 @@ TSettingItem<tHighlightingGradient> CSettingsManager::createHighlightingGradient
                              updateFileFunc);
 }
 
-TSettingItem<CSettingsManager::tAliasItemVec> CSettingsManager::createAliasItemVecSettingsItem(const QString& key,
-                                             const TSettingItem<tAliasItemVec>::tUpdateDataFunc& updateDataFunc,
-                                             const TSettingItem<tAliasItemVec>::tUpdateSettingsFileFunc& updateFileFunc,
-                                             const tAliasItemVec& defaultValue) const
+TSettingItem<CSettingsManager::tAliasItemMap> CSettingsManager::createAliasItemMapSettingsItem(const QString& key,
+                                             const TSettingItem<tAliasItemMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tAliasItemMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tAliasItemMap& defaultValue) const
 {
-    auto writeFunc = [&key](const tAliasItemVec& value)->QJsonObject
+    auto writeFunc = [&key](const tAliasItemMap& value)->QJsonObject
     {
         QJsonObject aliases;
         QJsonArray arrayAliases;
@@ -750,8 +793,8 @@ TSettingItem<CSettingsManager::tAliasItemVec> CSettingsManager::createAliasItemV
     };
 
     auto readFunc = [](const QJsonValueRef& JSONItem,
-                       tAliasItemVec& data,
-                       const tAliasItemVec&)->bool
+                       tAliasItemMap& data,
+                       const tAliasItemMap&)->bool
     {
         bool bResult = false;
 
@@ -784,7 +827,8 @@ TSettingItem<CSettingsManager::tAliasItemVec> CSettingsManager::createAliasItemV
                                 bIsDefault = isDefault->toBool();
                             }
 
-                            data.push_back(tAliasItem(bIsDefault, alias->toString(), regex->toString()));
+                            QString aliasStr = alias->toString();
+                            data.insert(aliasStr, tAliasItem(bIsDefault, aliasStr, regex->toString()));
                         }
                     }
                 }
@@ -796,7 +840,103 @@ TSettingItem<CSettingsManager::tAliasItemVec> CSettingsManager::createAliasItemV
         return bResult;
     };
 
-    return TSettingItem<tAliasItemVec>(key,
+    return TSettingItem<tAliasItemMap>(key,
+                             defaultValue,
+                             writeFunc,
+                             readFunc,
+                             updateDataFunc,
+                             updateFileFunc);
+}
+
+TSettingItem<CSettingsManager::tRegexUsageStatisticsItemMap> CSettingsManager::createRegexUsageStatisticsItemMapSettingsItem(const QString& key,
+                                             const TSettingItem<tRegexUsageStatisticsItemMap>::tUpdateDataFunc& updateDataFunc,
+                                             const TSettingItem<tRegexUsageStatisticsItemMap>::tUpdateSettingsFileFunc& updateFileFunc,
+                                             const tRegexUsageStatisticsItemMap& defaultValue) const
+{
+    auto writeFunc = [&key](const tRegexUsageStatisticsItemMap& value)->QJsonObject
+    {
+        QJsonObject aliases;
+        QJsonArray arrayRegexUsageSttistics;
+
+        for (auto it = value.keyValueBegin(); it != value.keyValueEnd(); ++it)
+        {
+            for(auto jt = it->second.keyValueBegin(); jt != it->second.keyValueEnd(); ++jt)
+            {
+                QJsonObject obj;
+                obj.insert( sRegexUsageStatisticsItemTypeKey, static_cast<int>(it->first) );
+                obj.insert( sRegexKey, QJsonValue( jt->first ) );
+                obj.insert( sUsageCounterKey, jt->second.usageCounter );
+                obj.insert( sUpdateDateTimeKey, jt->second.updateDateTime.toString("yyyy-MM-dd HH:mm:ss.zzz") );
+                arrayRegexUsageSttistics.append( obj );
+            }
+        }
+
+        QJsonObject result;
+        result.insert( key, QJsonValue( arrayRegexUsageSttistics ) );
+
+        return result;
+    };
+
+    auto readFunc = [](const QJsonValueRef& JSONItem,
+                       tRegexUsageStatisticsItemMap& data,
+                       const tRegexUsageStatisticsItemMap&)->bool
+    {
+        bool bResult = false;
+
+        if(true == JSONItem.isArray())
+        {
+            data.clear();
+
+            auto aliasesArray = JSONItem.toArray();
+
+            for( const auto aliasObj : aliasesArray)
+            {
+                if(true == aliasObj.isObject())
+                {
+                    QJsonObject obj = aliasObj.toObject();
+
+                    auto regexObj = obj.find(sRegexKey);
+
+                    if(regexObj != obj.end() && regexObj->isString())
+                    {
+                        auto usageCounterObj = obj.find(sUsageCounterKey);
+
+                        if(usageCounterObj != obj.end() && usageCounterObj->isDouble())
+                        {
+                            int usageCounter = static_cast<int>(usageCounterObj->toDouble());
+
+                            auto itemTypeObj = obj.find(sRegexUsageStatisticsItemTypeKey);
+                            if(itemTypeObj != obj.end() && itemTypeObj->isDouble())
+                            {
+                                eRegexUsageStatisticsItemType itemType =
+                                        static_cast<eRegexUsageStatisticsItemType>(itemTypeObj->toDouble());
+
+                                auto updateDateTimeObj = obj.find(sUpdateDateTimeKey);
+
+                                if(updateDateTimeObj != obj.end() && updateDateTimeObj->isString())
+                                {
+                                    auto updateDateTime = QDateTime::fromString(updateDateTimeObj->toString(), "yyyy-MM-dd HH:mm:ss.zzz");
+
+                                    if(true == updateDateTime.isValid())
+                                    {
+                                        auto& updteItem = data[itemType][regexObj->toString()];
+                                        updteItem.usageCounter = usageCounter;
+                                        updteItem.updateDateTime = updateDateTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                bResult = true;
+            }
+        }
+
+        return bResult;
+    };
+
+    return TSettingItem<tRegexUsageStatisticsItemMap>(key,
                              defaultValue,
                              writeFunc,
                              readFunc,
@@ -1220,7 +1360,7 @@ CSettingsManager::tOperationResult CSettingsManager::loadRootConfig()
     QString rootConfigPath = getRootSettingsFilepath();
 
     QFile jsonFile(rootConfigPath);
-    if(jsonFile.open(QFile::ReadOnly))
+    if(jsonFile.open(QFile::ReadWrite))
     {
         auto jsonDoc =  QJsonDocument().fromJson(jsonFile.readAll());
 
@@ -1287,6 +1427,12 @@ CSettingsManager::tOperationResult CSettingsManager::storeConfigs()
         {
             QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
             result = storeRegexConfigCustomPath(regexSettingsFilePath);
+
+            if(true == result.bResult)
+            {
+                QString regexUsageStatisticsFilePath = getRegexUsageStatisticsDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
+                result = storeRegexUsageStatisticsDataCustomPath(regexUsageStatisticsFilePath);
+            }
         }
     }
 
@@ -1307,6 +1453,12 @@ CSettingsManager::tOperationResult CSettingsManager::loadConfigs()
             {
                 QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
                 result = loadRegexConfigCustomPath(regexSettingsFilePath); // load regexes
+
+                if( true == result.bResult )
+                {
+                    QString regexUsageStatisticsFilePath = getRegexUsageStatisticsDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
+                    result = loadRegexUsageStatisticsDataCustomPath(regexUsageStatisticsFilePath); // load regex usage statistics
+                }
             }
         }
     }
@@ -1343,7 +1495,7 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
     // That can be checked only indirectly, based on file-system-based conclusions
     if(false == regexDir.exists()) // regex dir does not exist. Most probably we've faced old system
     {
-        SEND_MSG(QString("[CSettingsManager] Performing backward compatibility iteration from V0 to V1"));
+        SEND_MSG(QString("[CSettingsManager] Performing setting manager update from V0 to V1"));
 
         QDir dir;
         QString configDirPath = sSettingsManager_Directory;
@@ -1421,12 +1573,34 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
             result.err = QString( "[%1] Was not able to create directory \"%2\"" ).arg(__FUNCTION__).arg(configDirPath);
         }
 
-        SEND_MSG(QString("[CSettingsManager] BackwardCompatibility_V0_V1 finished with result - %1").arg(true == result.bResult ? "SUCCESSFUL" : "FAILED"));
+        SEND_MSG(QString("[CSettingsManager] Setting manager update from V0 to V1 finished with result - %1").arg(true == result.bResult ? "SUCCESSFUL" : "FAILED"));
     }
     else
     {
-        SEND_MSG(QString("[CSettingsManager] Backward compatibility iteration from V0 to V1 not needed"));
+        SEND_MSG(QString("[CSettingsManager] Setting manager update from V0 to V1 is not needed"));
     }
+
+    return result;
+}
+
+CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V1_V2()
+{
+    CSettingsManager::tOperationResult result;
+    result.bResult = true;
+
+    QString regexUsageStatisticsDirPath = getRegexUsageStatisticsDirectory();
+    QDir dir;
+
+    SEND_MSG(QString("[CSettingsManager] Performing setting manager update from V1 to V2"));
+
+    // let's create regex usage statistics directory
+    if(false == dir.mkpath(regexUsageStatisticsDirPath))
+    {
+        result.bResult = false;
+        result.err = QString( "[%1] Was not able to create directory \"%2\"" ).arg(__FUNCTION__).arg(regexUsageStatisticsDirPath);
+    }
+
+    SEND_MSG(QString("[CSettingsManager] Setting manager update from V1 to V2 finished with result - %1").arg(true == result.bResult ? "SUCCESSFUL" : "FAILED"));
 
     return result;
 }
@@ -1436,7 +1610,7 @@ void CSettingsManager::setSettingsManagerVersion(const tSettingsManagerVersion& 
     mSetting_SettingsManagerVersion.setData(val);
 }
 
-void CSettingsManager::setAliases(const tAliasItemVec& val)
+void CSettingsManager::setAliases(const tAliasItemMap& val)
 {
     mSetting_Aliases.setData(val);
 }
@@ -1456,6 +1630,11 @@ void CSettingsManager::setAliasIsDefault(const QString& alias, bool isDefault)
     }
 
     mSetting_Aliases.setData(aliases);
+}
+
+void CSettingsManager::setRegexUsageStatistics(const tRegexUsageStatisticsItemMap& val)
+{
+    mSetting_RegexUsageStatistics.setData(val);
 }
 
 void CSettingsManager::setNumberOfThreads(const int& val)
@@ -1646,6 +1825,16 @@ void CSettingsManager::setFiltersCompletion_SearchPolicy(const bool& val)
     mSetting_FiltersCompletion_SearchPolicy.setData(val);
 }
 
+void CSettingsManager::setRegexCompletion_CaseSensitive(const bool& val)
+{
+    mSetting_RegexCompletion_CaseSensitive.setData(val);
+}
+
+void CSettingsManager::setRegexCompletion_SearchPolicy(const bool& val)
+{
+    mSetting_RegexCompletion_SearchPolicy.setData(val);
+}
+
 void CSettingsManager::setSearchViewLastColumnWidthStrategy(const int& val)
 {
     mSetting_SearchViewLastColumnWidthStrategy.setData(val);
@@ -1696,9 +1885,14 @@ const tSettingsManagerVersion& CSettingsManager::getSettingsManagerVersion() con
     return mSetting_SettingsManagerVersion.getData();
 }
 
-const CSettingsManager::tAliasItemVec& CSettingsManager::getAliases() const
+const CSettingsManager::tAliasItemMap& CSettingsManager::getAliases() const
 {
     return mSetting_Aliases.getData();
+}
+
+const CSettingsManager::tRegexUsageStatisticsItemMap& CSettingsManager::getRegexUsageStatistics() const
+{
+    return mSetting_RegexUsageStatistics.getData();
 }
 
 const int& CSettingsManager::getNumberOfThreads() const
@@ -1894,6 +2088,16 @@ const bool& CSettingsManager::getFiltersCompletion_SearchPolicy() const
     return mSetting_FiltersCompletion_SearchPolicy.getData();
 }
 
+const bool& CSettingsManager::getRegexCompletion_CaseSensitive() const
+{
+    return mSetting_RegexCompletion_CaseSensitive.getData();
+}
+
+const bool& CSettingsManager::getRegexCompletion_SearchPolicy() const
+{
+    return mSetting_RegexCompletion_SearchPolicy.getData();
+}
+
 const int& CSettingsManager::getSearchViewLastColumnWidthStrategy() const
 {
     return mSetting_SearchViewLastColumnWidthStrategy.getData();
@@ -1940,10 +2144,10 @@ QString CSettingsManager::getRegexDirectory() const
            sSettingsManager_Regex_SubDirectory;
 }
 
-QString CSettingsManager::getRegexDirectoryFull() const
+QString CSettingsManager::getRegexUsageStatisticsDirectory() const
 {
     return sSettingsManager_Directory + QDir::separator() +
-           sSettingsManager_Regex_SubDirectory;
+           sSettingsManager_RegexUsageStatistics_SubDirectory;
 }
 
 QString CSettingsManager::getSettingsFilepath() const
@@ -1978,43 +2182,6 @@ void CSettingsManager::refreshRegexConfiguration()
     mSetting_SelectedRegexFile.setData(mSetting_SelectedRegexFile.getData(), true);
 }
 
-void CSettingsManager::clearRegexConfig()
-{
-    mSetting_Aliases.setDataSilent(tAliasItemVec());
-    aliasesChanged(mSetting_Aliases.getData());
-}
-
-CSettingsManager::tOperationResult CSettingsManager::loadRegexConfigCustomPath(const QString &filePath)
-{
-    CSettingsManager::tOperationResult result;
-    result.bResult = false;
-
-    QFile jsonFile(filePath);
-    if(jsonFile.open(QFile::ReadOnly))
-    {
-        auto jsonDoc =  QJsonDocument().fromJson(jsonFile.readAll());
-
-        if( true == jsonDoc.isArray() )
-        {
-            QJsonArray arrayRows = jsonDoc.array();
-
-            for(auto* pSettingItem : mPatternsSettingItemPtrVec)
-            {
-                pSettingItem->readDataFromArray(arrayRows);
-            }
-        }
-
-        result.bResult = true;
-    }
-    else
-    {
-        result.bResult = false;
-        result.err = QString("[%1] Failed to open file - \"%2\"").arg(__FUNCTION__).arg(filePath);
-    }
-
-    return result;
-}
-
 CSettingsManager::tOperationResult CSettingsManager::storeRegexConfigCustomPath(const QString &filePath) const
 {
     CSettingsManager::tOperationResult result;
@@ -2045,7 +2212,115 @@ CSettingsManager::tOperationResult CSettingsManager::storeRegexConfigCustomPath(
     return result;
 }
 
-CSettingsManager::tOperationResult  CSettingsManager::loadSettingsConfig()
+CSettingsManager::tOperationResult CSettingsManager::loadRegexConfigCustomPath(const QString &filePath)
+{
+    CSettingsManager::tOperationResult result;
+    result.bResult = false;
+
+    QFile jsonFile(filePath);
+    if(jsonFile.open(QFile::ReadWrite))
+    {
+        auto jsonDoc =  QJsonDocument().fromJson(jsonFile.readAll());
+
+        if( true == jsonDoc.isArray() )
+        {
+            QJsonArray arrayRows = jsonDoc.array();
+
+            for(auto* pSettingItem : mPatternsSettingItemPtrVec)
+            {
+                pSettingItem->readDataFromArray(arrayRows);
+            }
+        }
+
+        result.bResult = true;
+    }
+    else
+    {
+        result.bResult = false;
+        result.err = QString("[%1] Failed to open file - \"%2\"").arg(__FUNCTION__).arg(filePath);
+    }
+
+    return result;
+}
+
+void CSettingsManager::clearRegexConfig()
+{
+    mSetting_Aliases.setDataSilent(tAliasItemMap());
+    aliasesChanged(mSetting_Aliases.getData());
+}
+
+CSettingsManager::tOperationResult
+CSettingsManager::storeRegexUsageStatisticsDataCustomPath( const QString& filePath ) const
+{
+    CSettingsManager::tOperationResult result;
+    result.bResult = false;
+
+    QFile jsonFile(filePath);
+
+    if(jsonFile.open(QFile::WriteOnly))
+    {
+        QJsonArray settingsArray;
+
+        for(auto* pSettingItem : mRegexUsageStatisticsDataItemPtrVec)
+        {
+            settingsArray.append(pSettingItem->writeData());
+        }
+
+        QJsonDocument jsonDoc( settingsArray );
+        jsonFile.write( jsonDoc.toJson() );
+
+        result.bResult = true;
+    }
+    else
+    {
+        result.bResult = false;
+        result.err = QString("[%1] Failed to open file - \"%2\"").arg(__FUNCTION__).arg(filePath);
+    }
+
+    return result;
+}
+
+
+CSettingsManager::tOperationResult
+CSettingsManager::loadRegexUsageStatisticsDataCustomPath( const QString& filePath )
+{
+    CSettingsManager::tOperationResult result;
+    result.bResult = false;
+
+    QFile jsonFile(filePath);
+
+    if(jsonFile.open(QFile::ReadWrite))
+    {
+        auto jsonDoc =  QJsonDocument().fromJson(jsonFile.readAll());
+
+        if( true == jsonDoc.isArray() )
+        {
+            QJsonArray arrayRows = jsonDoc.array();
+
+            for(auto* pSettingItem : mRegexUsageStatisticsDataItemPtrVec)
+            {
+                pSettingItem->readDataFromArray(arrayRows);
+            }
+        }
+
+        result.bResult = true;
+    }
+    else
+    {
+        result.bResult = false;
+        result.err = QString("[%1] Failed to open file - \"%2\"").arg(__FUNCTION__).arg(filePath);
+    }
+
+    return result;
+}
+
+void CSettingsManager::clearRegexUsageStatisticsData()
+{
+    mSetting_RegexUsageStatistics.setDataSilent(tRegexUsageStatisticsItemMap());
+    regexUsageStatisticsChanged(mSetting_RegexUsageStatistics.getData());
+}
+
+CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfig()
 {
     return loadSettingsConfigCustomPath(getUserSettingsFilepath());
 }
@@ -2101,7 +2376,7 @@ CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfigCustomPat
     result.bResult = false;
 
     QFile jsonFile(filepath);
-    if(jsonFile.open(QFile::ReadOnly))
+    if(jsonFile.open(QFile::ReadWrite))
     {
         auto jsonDoc =  QJsonDocument().fromJson(jsonFile.readAll());
 
@@ -2132,27 +2407,6 @@ CSettingsManager::tOperationResult CSettingsManager::loadSettingsConfigCustomPat
     }
 
     return result;
-}
-
-// tAliasItem
-CSettingsManager::tAliasItem::tAliasItem():
-    isDefault(false),
-    alias(),
-    regex()
-{}
-
-CSettingsManager::tAliasItem::tAliasItem(bool isDefault_, const QString& alias_, const QString& regex_):
-    isDefault(isDefault_),
-    alias(alias_),
-    regex(regex_)
-{}
-
-// tAliasItem
-bool CSettingsManager::tAliasItem::operator==(const tAliasItem& val) const
-{
-    return isDefault == val.isDefault &&
-            alias == val.alias &&
-            regex == val.regex;
 }
 
 bool CSettingsManager::areAnyDefaultAliasesAvailable() const
