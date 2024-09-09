@@ -76,6 +76,24 @@ class "Ui::Form"
 
 }
 
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+}
+
 package "DMA_Settings_API" #DDDDDD
 {
 
@@ -126,5 +144,7 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" o-- "1" IPatternsModel : uses
 Ui::Form "1" *-- "1" CPatternsView : contains
+CRegexHistoryProvider "1" o-- "1" CPatternsView : uses
+CRegexHistoryComponent "1" o-- "1" CPatternsView : uses
 
 @enduml

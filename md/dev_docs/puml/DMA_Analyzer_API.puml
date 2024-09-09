@@ -110,6 +110,24 @@ class "CDLTMessageAnalyzer"
 
 }
 
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+}
+
 package "DMA_Settings_API" #DDDDDD
 {
 
@@ -149,5 +167,7 @@ IDLTMessageAnalyzerControllerConsumer "1" o-- "1" IDLTMessageAnalyzerController 
 IDLTMessageAnalyzerControllerConsumer "1" --> "1" IFileWrapper : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
+CRegexHistoryProvider "1" o-- "1" IDLTMessageAnalyzerController : uses
+CRegexHistoryComponent "1" --> "1" IDLTMessageAnalyzerController : passes
 
 @enduml

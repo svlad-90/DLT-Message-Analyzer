@@ -123,6 +123,15 @@ class "Form"
 
 }
 
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+}
+
 package "DMA_SearchView_API" #DDDDDD
 {
 
@@ -161,6 +170,7 @@ DLTMessageAnalyzerPlugin "1" *-- "1" CLogoComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CLogsWrapperComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPatternsViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CPlotViewComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CRegexHistoryComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CSearchViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CUMLViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" Form : contains

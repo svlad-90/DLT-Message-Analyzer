@@ -18,6 +18,7 @@
   </property>
   <property name="font">
    <font>
+    <weight>50</weight>
     <bold>false</bold>
    </font>
   </property>
@@ -137,6 +138,7 @@
              </property>
              <property name="font">
               <font>
+               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -245,6 +247,7 @@
                <font>
                 <family>Courier 10 Pitch</family>
                 <pointsize>8</pointsize>
+                <weight>50</weight>
                 <bold>false</bold>
                </font>
               </property>
@@ -305,6 +308,7 @@
                <font>
                 <family>Courier 10 Pitch</family>
                 <pointsize>8</pointsize>
+                <weight>50</weight>
                 <bold>false</bold>
                </font>
               </property>
@@ -341,6 +345,7 @@
               </property>
               <property name="font">
                <font>
+                <weight>75</weight>
                 <bold>true</bold>
                </font>
               </property>
@@ -606,6 +611,7 @@ QPushButton:hover:!pressed{
                <font>
                 <family>Times New Roman</family>
                 <pointsize>8</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
                </font>
@@ -633,6 +639,7 @@ QPushButton:hover:!pressed{
                <widget class="QLabel" name="consoleViewInputLabel">
                 <property name="font">
                  <font>
+                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -687,6 +694,7 @@ QPushButton:hover:!pressed{
              </property>
              <property name="font">
               <font>
+               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -731,6 +739,7 @@ QPushButton:hover:!pressed{
                </property>
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -796,6 +805,7 @@ QPushButton:hover:!pressed{
            </property>
            <property name="font">
             <font>
+             <weight>75</weight>
              <italic>false</italic>
              <bold>true</bold>
              <underline>false</underline>
@@ -845,6 +855,7 @@ QPushButton:hover:!pressed{
            </property>
            <property name="font">
             <font>
+             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -878,7 +889,7 @@ QPushButton:hover:!pressed{
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="regex">
+          <widget class="CRegexHistoryLineEdit" name="regex">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>190</horstretch>
@@ -907,6 +918,7 @@ QPushButton:hover:!pressed{
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>75</weight>
              <bold>true</bold>
             </font>
            </property>
@@ -926,6 +938,7 @@ QPushButton:hover:!pressed{
            <property name="font">
             <font>
              <pointsize>8</pointsize>
+             <weight>50</weight>
              <bold>false</bold>
             </font>
            </property>
@@ -1005,6 +1018,7 @@ QPushButton:hover:!pressed{
        </property>
        <property name="font">
         <font>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -1035,6 +1049,7 @@ QPushButton:hover:!pressed{
        </property>
        <property name="font">
         <font>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -1056,6 +1071,7 @@ QPushButton:hover:!pressed{
        </property>
        <property name="font">
         <font>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -1074,6 +1090,7 @@ QPushButton:hover:!pressed{
        </property>
        <property name="font">
         <font>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -1092,6 +1109,7 @@ QPushButton:hover:!pressed{
        </property>
        <property name="font">
         <font>
+         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -1145,6 +1163,11 @@ QPushButton:hover:!pressed{
    <extends>QWidget</extends>
    <header>components/plotView/api/CCustomPlotExtended.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CRegexHistoryLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>components/regexHistory/api/CRegexHistoryLineEdit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

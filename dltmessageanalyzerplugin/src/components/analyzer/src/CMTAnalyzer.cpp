@@ -102,7 +102,9 @@ tRequestId CMTAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerC
                                       requestParameters.regex,
                                       regexScriptingMetadata,
                                       requestParameters.numberOfThreads,
-                                      requestParameters.searchColumns);
+                                      requestParameters.searchColumns,
+                                      requestParameters.regexStr,
+                                      requestParameters.selectedAliases);
 
             if(0 != requestData.numberOfMessagesToBeAnalyzed)
             {
@@ -470,7 +472,9 @@ CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzer
                                          const QRegularExpression& regex_,
                                          const tRegexScriptingMetadata& regexScriptingMetadata_,
                                          const int& numberOfThreads_,
-                                         const tSearchResultColumnsVisibilityMap& searchColumns_):
+                                         const tSearchResultColumnsVisibilityMap& searchColumns_,
+                                         const QString& regexStr_,
+                                         const QStringList& selectedLiases_):
     pClient(pClient_),
     pFile(pFile_),
     requestedRegexMatches(0),
@@ -480,6 +484,8 @@ CMTAnalyzer::tRequestData::tRequestData( const std::weak_ptr<IDLTMessageAnalyzer
     regexScriptingMetadata(regexScriptingMetadata_),
     numberOfThreads(numberOfThreads_),
     searchColumns(searchColumns_),
+    regexStr(regexStr_),
+    selectedLiases(selectedLiases_),
     fromMessage(fromMessage_),
     workerThreadCookieCounter(0),
     bUML_Req_Res_Ev_DuplicateFound(false),

@@ -238,6 +238,28 @@ class "Form"
 
 }
 
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CExtendedCompleter"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryLineEdit"
+{
+}
+
+class "IRegexHistoryProvider"
+{
+}
+
+}
+
 package "DMA_SearchView" #DDDDDD
 {
 
@@ -361,6 +383,10 @@ class "QCPGraph"
 {
 }
 
+class "QCPLayerable"
+{
+}
+
 class "QCPLegend"
 {
 }
@@ -394,6 +420,9 @@ QWidget <|-- CImageViewer : extends
 QWidget <|-- CUMLView : extends
 QObject <|-- DLTMessageAnalyzerPlugin : extends
 QWidget <|-- Form : extends
+QCompleter <|-- CExtendedCompleter : extends
+QLineEdit <|-- CRegexHistoryLineEdit : extends
+QObject <|-- IRegexHistoryProvider : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
@@ -401,6 +430,7 @@ QObject <|-- CSearchViewComponent : extends
 QObject <|-- ISettingsManager : extends
 QObject <|-- QCPAxisRect : extends
 QObject <|-- QCPGraph : extends
+QObject <|-- QCPLayerable : extends
 QObject <|-- QCPLegend : extends
 QWidget <|-- QCustomPlot : extends
 

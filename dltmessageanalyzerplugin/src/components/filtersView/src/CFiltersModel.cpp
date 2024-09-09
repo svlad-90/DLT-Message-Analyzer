@@ -127,7 +127,7 @@ CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
     };
 
     connect(getSettingsManager().get(), &ISettingsManager::filterVariablesChanged,
-    [this](bool)
+    this, [this](bool)
     {
         filterRegexTokensInternal();
     });
@@ -774,12 +774,12 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
     {
         int numberOfSuggestions = 0;
 
+        auto caseSensitiveOption = getSettingsManager()->getFiltersCompletion_CaseSensitive() ?
+                    Qt::CaseSensitive :
+                    Qt::CaseInsensitive;
+
         for(const auto& completionItem : foundCompletionSet->second)
         {
-            auto caseSensitiveOption = getSettingsManager()->getFiltersCompletion_CaseSensitive() ?
-                        Qt::CaseSensitive :
-                        Qt::CaseInsensitive;
-
             bool bStringFound = false;
 
             if(false == getSettingsManager()->getFiltersCompletion_SearchPolicy())

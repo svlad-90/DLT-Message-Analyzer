@@ -101,6 +101,7 @@ CCustomPlotExtended::CCustomPlotExtended(QWidget *pParent):
                 }
             });
 
+            pAction->setEnabled(!mPlotAxisRectDataMap.empty());
             contextMenu.addAction(pAction);
         }
 

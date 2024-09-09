@@ -381,7 +381,7 @@ bool CPatternsView::eventFilter(QObject* pObj, QEvent* pEvent)
     return bResult;
 }
 
-QString CPatternsView::createCombinedRegex()
+QString CPatternsView::createCombinedRegex(QStringList& selectedAliases)
 {
     QString finalRegex;
 
@@ -391,7 +391,11 @@ QString CPatternsView::createCombinedRegex()
 
     QSet<QString> usedPatterns;
 
-    auto fillInPatterns = [this, &firstInjection, &finalRegex, &usedPatterns](const tComparator comparator, bool animate, const QColor& initialColor)
+    auto fillInPatterns = [this,
+                           &firstInjection,
+                           &finalRegex,
+                           &usedPatterns,
+                           &selectedAliases](const tComparator comparator, bool animate, const QColor& initialColor)
     {
         QVector<QModelIndex> highlightedRows;
 
@@ -401,7 +405,8 @@ QString CPatternsView::createCombinedRegex()
                 &usedPatterns,
                 &comparator,
                 &animate,
-                &highlightedRows](const QModelIndex& idx)
+                &highlightedRows,
+                &selectedAliases](const QModelIndex& idx)
         {
             auto alias = idx.sibling(idx.row(), static_cast<int>(ePatternsColumn::Alias)).data().value<QString>();
 
@@ -411,6 +416,8 @@ QString CPatternsView::createCombinedRegex()
 
                 if(foundUsedPattern == usedPatterns.end())
                 {
+                    selectedAliases.append(alias);
+
                     if( false == firstInjection )
                     {
                         finalRegex.append("|");
@@ -507,8 +514,9 @@ void CPatternsView::applyPatternsCombination()
 {
     if( true == mpModel->areAnyCombinedPatternsAvailable() )
     {
-        QString finalRegex = createCombinedRegex();
-        patternSelected( finalRegex );
+        QStringList selectedAliases;
+        QString finalRegex = createCombinedRegex(selectedAliases);
+        patternSelected( finalRegex, selectedAliases );
     }
 }
 
@@ -518,8 +526,9 @@ void CPatternsView::keyPressEvent ( QKeyEvent * pEvent )
     {
         if( true == mpModel->areAnyCombinedPatternsAvailable() )
         {
-            QString finalRegex = createCombinedRegex();
-            patternSelected( finalRegex );
+            QStringList selectedAliases;
+            QString finalRegex = createCombinedRegex(selectedAliases);
+            patternSelected( finalRegex, selectedAliases );
         }
     }
     else if(NShortcuts::isSetCombineShortcut(pEvent))
@@ -800,12 +809,18 @@ void CPatternsView::handleSettingsManagerChange()
 
                 if(ePatternsRowType::ePatternsRowType_Alias == rowType)
                 {
+                    auto aliasName = selectedRows[0].sibling(selectedRows[0].row(),
+                            static_cast<int>(ePatternsColumn::Alias))
+                            .data().value<QString>();
+                    QStringList selectedAliases;
+                    selectedAliases.append(aliasName);
+
                     const QString regex = selectedRows[0].data().value<QString>();
 
                     // we are applying selection only to those elements which have non-empty regex value
                     if(false == regex.isEmpty())
                     {
-                        patternSelected( regex );
+                        patternSelected( regex, selectedAliases );
                     }
                 }
             }
@@ -977,8 +992,9 @@ void CPatternsView::handleSettingsManagerChange()
                     pAction->setShortcut(QKeySequence(Qt::Key_Enter));
                     connect(pAction, &QAction::triggered, [this]()
                     {
-                        QString finalRegex = createCombinedRegex();
-                        patternSelected( finalRegex );
+                        QStringList selectedAliases;
+                        QString finalRegex = createCombinedRegex(selectedAliases);
+                        patternSelected( finalRegex, selectedAliases );
                     });
                     pSubMenu->addAction(pAction);
                 }
@@ -991,7 +1007,13 @@ void CPatternsView::handleSettingsManagerChange()
                     QAction* pAction = new QAction("Run selected item ( double click )", this);
                     connect(pAction, &QAction::triggered, [this, selectedRows]()
                     {
-                        patternSelected( selectedRows[0].data().value<QString>() );
+                        auto aliasName = selectedRows[0].sibling(selectedRows[0].row(),
+                                static_cast<int>(ePatternsColumn::Alias))
+                                .data().value<QString>();
+                        QStringList selectedAliases;
+                        selectedAliases.append(aliasName);
+
+                        patternSelected( selectedRows[0].data().value<QString>(), selectedAliases );
                     });
                     pSubMenu->addAction(pAction);
                 }
@@ -1174,9 +1196,9 @@ void CPatternsView::handleSettingsManagerChange()
             connect(pAction, &QAction::triggered, [this]()
             {
                 SEND_MSG(QString("[CPatternsView]: Attempt to open path - \"%1\"")
-                         .arg(getSettingsManager()->getRegexDirectoryFull()));
+                         .arg(getSettingsManager()->getRegexDirectory()));
 
-                QDesktopServices::openUrl( QUrl::fromLocalFile( getSettingsManager()->getRegexDirectoryFull() ) );
+                QDesktopServices::openUrl( QUrl::fromLocalFile( getSettingsManager()->getRegexDirectory() ) );
             });
             contextMenu.addAction(pAction);
         }
@@ -1201,7 +1223,7 @@ void CPatternsView::handleSettingsManagerChange()
 
     connect( getSettingsManager().get(),
              &ISettingsManager::patternsColumnsVisibilityMapChanged,
-             [this](const tPatternsColumnsVisibilityMap&)
+             this, [this](const tPatternsColumnsVisibilityMap&)
     {
         updateColumnsVisibility();
     });

@@ -42,7 +42,7 @@ mColors()
     qRegisterMetaType<tAnalyzePortionData>("tAnalyzePortionData");
 
     connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged,
-             [this]( const tHighlightingGradient& gradient )
+             this, [this]( const tHighlightingGradient& gradient )
     {
         mColors = generateColors(gradient);
     });

@@ -2,5 +2,7 @@
     <qresource prefix="/dltmessageanalyzer">
         <file>png/bug.png</file>
         <file>png/manuscript.png</file>
+        <file>png/alias_sug.png</file>
+        <file>png/regex_sug.png</file>
     </qresource>
 </RCC>

@@ -189,6 +189,15 @@ class "Ui::Form"
 
 }
 
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryLineEdit"
+{
+}
+
+}
+
 package "DMA_SearchView_API" #DDDDDD
 {
 
@@ -244,6 +253,7 @@ CDLTMessageAnalyzer "1" --> "1" CBGColorAnimation : uses
 CDLTMessageAnalyzer "1" o-- "1" CFiltersView : uses
 CDLTMessageAnalyzer "1" o-- "1" CPatternsView : uses
 CDLTMessageAnalyzer "1" *-- "1" CRegexDirectoryMonitor : contains
+CDLTMessageAnalyzer "1" --> "1" CRegexHistoryLineEdit : uses and passes
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
@@ -262,6 +272,7 @@ Ui::Form "1" *-- "1" CFiltersView : contains
 Ui::Form "1" *-- "1" CGroupedView : contains
 Ui::Form "1" *-- "1" CLogo : contains
 Ui::Form "1" *-- "1" CPatternsView : contains
+Ui::Form "1" *-- "1" CRegexHistoryLineEdit : contains
 Ui::Form "1" *-- "1" CSearchResultView : contains
 Ui::Form "1" *-- "1" CUMLView : contains
 

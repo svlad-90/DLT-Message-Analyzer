@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="410px" preserveAspectRatio="none" style="width:480px;height:410px;background:#FEFEFE;" version="1.1" viewBox="0 0 480 410" width="480px" zoomAndPan="magnify"><defs><filter height="300%" id="fay43og5jegdv" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[c0ecea0d22b2270691b4374314839270]
+cluster DMA_RegexHistory--><polygon fill="#DDDDDD" filter="url(#fay43og5jegdv)" points="56,172,209,172,216,194.2969,260,194.2969,260,398,56,398,56,172" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="56" x2="216" y1="194.2969" y2="194.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="147" x="60" y="186.9951">DMA_RegexHistory</text><!--MD5=[6d3e3d050e166c227b9337da9ac6a55e]
+cluster DMA_RegexHistory_API--><polygon fill="#DDDDDD" filter="url(#fay43og5jegdv)" points="22,24,207,24,214,46.2969,220,46.2969,220,123,22,123,22,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="22" x2="214" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="179" x="26" y="38.9951">DMA_RegexHistory_API</text><!--MD5=[90b388b6a0087e5650eef9c205d35863]
+cluster DMA_Settings_API--><polygon fill="#DDDDDD" filter="url(#fay43og5jegdv)" points="244,24,389,24,396,46.2969,458,46.2969,458,123,244,123,244,24" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="244" x2="396" y1="46.2969" y2="46.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="139" x="248" y="38.9951">DMA_Settings_API</text><!--MD5=[0aca3eaa01c17ff0039911bbeeabf854]
+cluster Qt--><polygon fill="#DDDDDD" filter="url(#fay43og5jegdv)" points="284,172,308,172,315,194.2969,422,194.2969,422,271,284,271,284,172" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="284" x2="315" y1="194.2969" y2="194.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="18" x="288" y="186.9951">Qt</text><!--MD5=[8884b25c6e46fa11e94ee0f27588360c]
+class CExtendedCompleter--><rect fill="#FEFECE" filter="url(#fay43og5jegdv)" height="48" id="CExtendedCompleter" style="stroke: #A80036; stroke-width: 1.5;" width="163" x="79.5" y="334"/><ellipse cx="94.5" cy="350" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M97.4688,355.6406 Q96.8906,355.9375 96.25,356.0781 Q95.6094,356.2344 94.9063,356.2344 Q92.4063,356.2344 91.0781,354.5938 Q89.7656,352.9375 89.7656,349.8125 Q89.7656,346.6875 91.0781,345.0313 Q92.4063,343.375 94.9063,343.375 Q95.6094,343.375 96.25,343.5313 Q96.9063,343.6875 97.4688,343.9844 L97.4688,346.7031 Q96.8438,346.125 96.25,345.8594 Q95.6563,345.5781 95.0313,345.5781 Q93.6875,345.5781 93,346.6563 Q92.3125,347.7188 92.3125,349.8125 Q92.3125,351.9063 93,352.9844 Q93.6875,354.0469 95.0313,354.0469 Q95.6563,354.0469 96.25,353.7813 Q96.8438,353.5 97.4688,352.9219 L97.4688,355.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="131" x="108.5" y="354.1543">CExtendedCompleter</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="80.5" x2="241.5" y1="366" y2="366"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="80.5" x2="241.5" y1="374" y2="374"/><!--MD5=[870c9811cac02112205c08487b8018c4]
+class CRegexHistoryProvider--><rect fill="#FEFECE" filter="url(#fay43og5jegdv)" height="48" id="CRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.5;" width="172" x="72" y="207"/><ellipse cx="87" cy="223" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M89.9688,228.6406 Q89.3906,228.9375 88.75,229.0781 Q88.1094,229.2344 87.4063,229.2344 Q84.9063,229.2344 83.5781,227.5938 Q82.2656,225.9375 82.2656,222.8125 Q82.2656,219.6875 83.5781,218.0313 Q84.9063,216.375 87.4063,216.375 Q88.1094,216.375 88.75,216.5313 Q89.4063,216.6875 89.9688,216.9844 L89.9688,219.7031 Q89.3438,219.125 88.75,218.8594 Q88.1563,218.5781 87.5313,218.5781 Q86.1875,218.5781 85.5,219.6563 Q84.8125,220.7188 84.8125,222.8125 Q84.8125,224.9063 85.5,225.9844 Q86.1875,227.0469 87.5313,227.0469 Q88.1563,227.0469 88.75,226.7813 Q89.3438,226.5 89.9688,225.9219 L89.9688,228.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="140" x="101" y="227.1543">CRegexHistoryProvider</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="73" x2="243" y1="239" y2="239"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="73" x2="243" y1="247" y2="247"/><!--MD5=[2e365ec30687e3f7473aacead993a6b2]
+class IRegexHistoryProvider--><rect fill="#FEFECE" filter="url(#fay43og5jegdv)" height="48" id="IRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.5;" width="167" x="37.5" y="59"/><ellipse cx="52.5" cy="75" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M55.4688,80.6406 Q54.8906,80.9375 54.25,81.0781 Q53.6094,81.2344 52.9063,81.2344 Q50.4063,81.2344 49.0781,79.5938 Q47.7656,77.9375 47.7656,74.8125 Q47.7656,71.6875 49.0781,70.0313 Q50.4063,68.375 52.9063,68.375 Q53.6094,68.375 54.25,68.5313 Q54.9063,68.6875 55.4688,68.9844 L55.4688,71.7031 Q54.8438,71.125 54.25,70.8594 Q53.6563,70.5781 53.0313,70.5781 Q51.6875,70.5781 51,71.6563 Q50.3125,72.7188 50.3125,74.8125 Q50.3125,76.9063 51,77.9844 Q51.6875,79.0469 53.0313,79.0469 Q53.6563,79.0469 54.25,78.7813 Q54.8438,78.5 55.4688,77.9219 L55.4688,80.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="135" x="66.5" y="79.1543">IRegexHistoryProvider</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="38.5" x2="203.5" y1="91" y2="91"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="38.5" x2="203.5" y1="99" y2="99"/><!--MD5=[3c22b63222d561e58bf3b43e4b8ac797]
+class CSettingsManagerClient--><rect fill="#FEFECE" filter="url(#fay43og5jegdv)" height="48" id="CSettingsManagerClient" style="stroke: #A80036; stroke-width: 1.5;" width="182" x="260" y="59"/><ellipse cx="275" cy="75" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M277.9688,80.6406 Q277.3906,80.9375 276.75,81.0781 Q276.1094,81.2344 275.4063,81.2344 Q272.9063,81.2344 271.5781,79.5938 Q270.2656,77.9375 270.2656,74.8125 Q270.2656,71.6875 271.5781,70.0313 Q272.9063,68.375 275.4063,68.375 Q276.1094,68.375 276.75,68.5313 Q277.4063,68.6875 277.9688,68.9844 L277.9688,71.7031 Q277.3438,71.125 276.75,70.8594 Q276.1563,70.5781 275.5313,70.5781 Q274.1875,70.5781 273.5,71.6563 Q272.8125,72.7188 272.8125,74.8125 Q272.8125,76.9063 273.5,77.9844 Q274.1875,79.0469 275.5313,79.0469 Q276.1563,79.0469 276.75,78.7813 Q277.3438,78.5 277.9688,77.9219 L277.9688,80.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="150" x="289" y="79.1543">CSettingsManagerClient</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="261" x2="441" y1="91" y2="91"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="261" x2="441" y1="99" y2="99"/><!--MD5=[ebb47ba14337e5862b0d47cf7066966a]
+class QCompleter--><rect fill="#FEFECE" filter="url(#fay43og5jegdv)" height="48" id="QCompleter" style="stroke: #A80036; stroke-width: 1.5;" width="105" x="300.5" y="207"/><ellipse cx="315.5" cy="223" fill="#ADD1B2" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M318.4688,228.6406 Q317.8906,228.9375 317.25,229.0781 Q316.6094,229.2344 315.9063,229.2344 Q313.4063,229.2344 312.0781,227.5938 Q310.7656,225.9375 310.7656,222.8125 Q310.7656,219.6875 312.0781,218.0313 Q313.4063,216.375 315.9063,216.375 Q316.6094,216.375 317.25,216.5313 Q317.9063,216.6875 318.4688,216.9844 L318.4688,219.7031 Q317.8438,219.125 317.25,218.8594 Q316.6563,218.5781 316.0313,218.5781 Q314.6875,218.5781 314,219.6563 Q313.3125,220.7188 313.3125,222.8125 Q313.3125,224.9063 314,225.9844 Q314.6875,227.0469 316.0313,227.0469 Q316.6563,227.0469 317.25,226.7813 Q317.8438,226.5 318.4688,225.9219 L318.4688,228.6406 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="73" x="329.5" y="227.1543">QCompleter</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="301.5" x2="404.5" y1="239" y2="239"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="301.5" x2="404.5" y1="247" y2="247"/><!--MD5=[60538147f04be8d38a1d05141ae662ad]
+reverse link QCompleter to CExtendedCompleter--><path d="M300.48,266.19 C267.43,287.71 225.65,314.91 196.47,333.91 " fill="none" id="QCompleter&lt;-CExtendedCompleter" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="296.76,260.26,317.34,255.22,304.39,272,296.76,260.26" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="269" y="300.0669">extends</text><!--MD5=[eb66df7d77a9dff22058bd3537427145]
+reverse link CSettingsManagerClient to CRegexHistoryProvider--><path d="M304.39,119.26 C268.38,146.5 219.58,183.41 188.44,206.97 " fill="none" id="CSettingsManagerClient&lt;-CRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="300.25,113.62,320.42,107.13,308.69,124.78,300.25,113.62" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="278" y="152.0669">extends</text><!--MD5=[55b7fcd1c7a97f9b603a663eba2d581d]
+reverse link IRegexHistoryProvider to CRegexHistoryProvider--><path d="M131.87,126.87 C138.5,153.07 146.73,185.55 152.16,206.97 " fill="none" id="IRegexHistoryProvider&lt;-CRegexHistoryProvider" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="124.99,128.24,126.86,107.13,138.56,124.8,124.99,128.24" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="139" y="152.0669">implements</text><!--MD5=[c2045d4ab40d937cf04fe1bf0f8ec279]
+reverse link CRegexHistoryProvider to CExtendedCompleter--><path d="M158.87,268.29 C159.38,289.46 160,315.52 160.45,333.91 " fill="none" id="CRegexHistoryProvider&lt;-CExtendedCompleter" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="158.56,255.22,154.6995,261.3107,158.8368,267.2168,162.6974,261.1261,158.56,255.22" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="48" x="160" y="300.0669">creates</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="149.7215" y="275.0348">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="151.2841" y="322.899">1</text><!--MD5=[f2e6f23da318944104716df91453e068]
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CExtendedCompleter"
+{
+}
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "IRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QCompleter"
+{
+}
+
+}
+
+QCompleter <|- - CExtendedCompleter : extends
+CSettingsManagerClient <|- - CRegexHistoryProvider : extends
+IRegexHistoryProvider <|- - CRegexHistoryProvider : implements
+
+CRegexHistoryProvider "1" *- - "1" CExtendedCompleter : creates
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

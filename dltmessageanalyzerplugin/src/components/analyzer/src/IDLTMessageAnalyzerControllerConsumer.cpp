@@ -75,6 +75,7 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
         }
 
         requestId = mpController.lock()->requestAnalyze(shared_from_this(), requestParameters, regexMetadata);
+        mpController.lock()->analysisStarted(requestId, requestParameters.regexStr, requestParameters.selectedAliases);
         mbGroupedViewFeatureActiveForCurrentAnalysis = bGroupedViewFeatureActive;
     }
 

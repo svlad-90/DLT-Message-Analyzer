@@ -1,0 +1,125 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_Analyzer_API" #DDDDDD
+{
+
+abstract class "IDLTMessageAnalyzerController"
+{
+    + {abstract} virtual int getMaximumNumberOfThreads() const = 0
+    + signal void progressNotification( const tProgressNotificationData& progressNotificationData )
+    + {abstract} virtual tRequestId requestAnalyze( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestParameters& requestParameters ) = 0
+    + {abstract} virtual void cancelRequest( const std::weak_ptr<IDLTMessageAnalyzerControllerConsumer>& pClient, const tRequestId& requestId ) = 0
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_PatternsView_API" #DDDDDD
+{
+
+class "CPatternsView"
+{
+}
+
+}
+
+package "DMA_Plugin" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+class "Ui::Form"
+{
+}
+
+}
+
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryComponent"
+{
+}
+
+class "CRegexHistoryLineEdit"
+{
+}
+
+class "IRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "ISettingsManager"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QLineEdit"
+{
+}
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+IRegexHistoryProvider <|-- CRegexHistoryProvider : implements
+DMA::IComponent <|-- CRegexHistoryComponent : implements
+QLineEdit <|-- CRegexHistoryLineEdit : extends
+QObject <|-- IRegexHistoryProvider : extends
+
+'====================Dependencies section====================
+DLTMessageAnalyzerPlugin "1" *-- "1" CRegexHistoryComponent : contains
+CDLTMessageAnalyzer "1" --> "1" CRegexHistoryLineEdit : uses and passes
+Ui::Form "1" *-- "1" CRegexHistoryLineEdit : contains
+CRegexHistoryProvider "1" o-- "1" CRegexHistoryLineEdit : uses
+CRegexHistoryComponent "1" o-- "1" CPatternsView : uses
+CRegexHistoryComponent "1" --> "1" CRegexHistoryLineEdit : passes
+CRegexHistoryComponent "1" *-- "1" CRegexHistoryProvider : creates
+CRegexHistoryComponent "1" --> "1" IDLTMessageAnalyzerController : passes
+CRegexHistoryComponent "1" --> "1" ISettingsManager : passes
+CRegexHistoryLineEdit "1" o-- "1" IRegexHistoryProvider : uses
+
+@enduml

@@ -1,0 +1,54 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_RegexHistory" #DDDDDD
+{
+
+class "CExtendedCompleter"
+{
+}
+
+class "CRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "IRegexHistoryProvider"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "CSettingsManagerClient"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QCompleter"
+{
+}
+
+}
+
+'====================Inheritance section====================
+QCompleter <|-- CExtendedCompleter : extends
+CSettingsManagerClient <|-- CRegexHistoryProvider : extends
+IRegexHistoryProvider <|-- CRegexHistoryProvider : implements
+
+'====================Dependencies section====================
+CRegexHistoryProvider "1" *-- "1" CExtendedCompleter : creates
+
+@enduml

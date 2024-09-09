@@ -603,7 +603,7 @@ void CSearchResultHighlightingDelegate::handleSettingsManagerChange()
 
     connect( getSettingsManager().get(),
              &ISettingsManager::markTimeStampWithBoldChanged,
-             [this](bool val)
+             this, [this](bool val)
     {
         mbMarkTimestampWithBold = val;
     });
@@ -612,7 +612,7 @@ void CSearchResultHighlightingDelegate::handleSettingsManagerChange()
 
     connect( getSettingsManager().get(),
             &ISettingsManager::searchResultColumnsSearchMapChanged,
-            [this](tSearchResultColumnsVisibilityMap val)
+            this, [this](tSearchResultColumnsVisibilityMap val)
             {
                 mSearchResultColumnsSearchMap = val;
             });

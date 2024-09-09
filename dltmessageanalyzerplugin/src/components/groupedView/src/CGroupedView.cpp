@@ -223,7 +223,7 @@ void CGroupedView::handleSettingsManagerChange()
 {
     connect( getSettingsManager().get(),
              &ISettingsManager::groupedViewColumnsVisibilityMapChanged,
-             [this](const tGroupedViewColumnsVisibilityMap&)
+             this, [this](const tGroupedViewColumnsVisibilityMap&)
     {
         updateColumnsVisibility();
         updateWidth();

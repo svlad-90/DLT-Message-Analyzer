@@ -6,6 +6,8 @@
 
 #include "QCPGantt.hpp"
 
+#include "DMA_Plantuml.hpp"
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPGanttBarsData
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -590,3 +592,13 @@ void QCPGanttRow::getPixelWidth(double key, double &lower, double &upper) const
     }
 }
 /* end of 'src/plottables/plottable-bars.cpp' */
+
+PUML_PACKAGE_BEGIN(DMA_PlotView)
+    PUML_CLASS_BEGIN(QCPGanttBarsData)
+    PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QCPGanttRow)
+    PUML_INHERITANCE_CHECKED(QCPAbstractPlottable1D<QCPGanttBarsData>, extends)
+    PUML_COMPOSITION_DEPENDENCY_CHECKED(QCPGanttBarsData, 1, many, contains)
+    PUML_AGGREGATION_DEPENDENCY_CHECKED(QCPAxis, 1, 2, uses)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()

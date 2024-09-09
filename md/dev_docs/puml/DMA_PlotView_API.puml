@@ -12,6 +12,15 @@ class "DMA::IComponent"
 
 }
 
+package "DMA_PlotView" #DDDDDD
+{
+
+class "QCPGanttRow"
+{
+}
+
+}
+
 package "DMA_PlotView_API" #DDDDDD
 {
 
@@ -100,6 +109,7 @@ CCustomPlotExtended "1" *-- "*" QCPGraph : uses
 CCustomPlotExtended "1" o-- "*" QCPLegend : uses
 CPlotViewComponent "1" o-- "1" CCustomPlotExtended : uses
 CPlotViewComponent "1" o-- "1" ISearchResultModel : uses
+CPlotViewComponent "1" o-- "many" QCPGanttRow : uses
 CPlotViewComponent "1" o-- "1" QPushButton : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" CPlotViewComponent : contains
 

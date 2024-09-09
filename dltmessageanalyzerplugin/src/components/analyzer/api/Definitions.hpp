@@ -13,14 +13,16 @@ struct tRequestParameters
     tRequestParameters();
 
     /**
-     * @param pClient - client, which should be notified about the progress
      * @param pFile - file, which is used for analysis
      * @param fromMessage - from which message to analyze
      * @param numberOfMessages - until which message to analyze
      * @param regex - regex, to be used for analysis
      * @param numberOfThreads - number of threads to be used for analysis
-     * @param regexScriptingMetadata - scripting metadata
-     * @param isContinuous - whether search is continuous. This parameter can be ignored by one-shot implementations
+     * @param isContinuous - whether search is continuous. This parameter
+     * can be ignored by one-shot implementations
+     * @param searchColumns - the seaarch columns visibility map
+     * @param regexStr - regex string that was queried for the search
+     * @param selectedAliases - the selected alises that were used to form a regex
      */
     tRequestParameters(
     const tFileWrapperPtr& pFile_,
@@ -29,7 +31,9 @@ struct tRequestParameters
     const QRegularExpression& regex_,
     const int& numberOfThreads_,
     bool isContinuous_,
-    const tSearchResultColumnsVisibilityMap& searchColumns_);
+    const tSearchResultColumnsVisibilityMap& searchColumns_,
+    const QString& regexStr_,
+    const QStringList& selectedAliases_);
 
     tFileWrapperPtr pFile;
     int fromMessage;
@@ -38,6 +42,8 @@ struct tRequestParameters
     int numberOfThreads;
     bool isContinuous;
     tSearchResultColumnsVisibilityMap searchColumns;
+    QString regexStr;
+    QStringList selectedAliases;
 };
 
 Q_DECLARE_METATYPE(tRequestParameters)

@@ -47,9 +47,12 @@
 #include "components/log/api/CLog.hpp"
 #include "components/plant_uml/api/CUMLView.hpp"
 #include "common/CTableMemoryJumper.hpp"
+#include "common/CQtHelper.hpp"
 #include "components/plotView/api/CCustomPlotExtended.hpp"
 
 #include "components/logsWrapper/api/IDLTLogsWrapperCreator.hpp"
+
+#include "components/regexHistory/api/CRegexHistoryLineEdit.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -64,7 +67,7 @@ namespace NShortcuts
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                                          const tGroupedViewModelPtr& pGroupedViewModel,
-                                         QLabel* pProgressBarLabel, QProgressBar* pProgressBar, QLineEdit* regexLineEdit,
+                                         QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryLineEdit* pRegexLineEdit,
                                          QLabel* pLabel, CPatternsView* pPatternsTableView,  const tPatternsModelPtr& pPatternsModel,
                                          QComboBox* pNumberOfThreadsCombobBox,
                                          QCheckBox* pContinuousSearchCheckBox,
@@ -84,7 +87,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
     mpProgressBar(pProgressBar),
-    mpRegexLineEdit(regexLineEdit),
+    mpRegexLineEdit(pRegexLineEdit),
     mpLabel(pLabel),
     mpNumberOfThreadsCombobBox(pNumberOfThreadsCombobBox),
     mpMainTableView(nullptr),
@@ -183,11 +186,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
         mpPatternsTreeView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-        connect ( mpPatternsTreeView, &CPatternsView::patternSelected, [this](const QString& regexCandidate)
+        connect ( mpPatternsTreeView, &CPatternsView::patternSelected, [this](const QString& regexCandidate, const QStringList& selectedAliases )
         {
             mpRegexLineEdit->selectAll();
             mpRegexLineEdit->insert( regexCandidate );
-            static_cast<void>(analyze());
+            static_cast<void>(analyze(&selectedAliases));
 
             if(nullptr != mpFiltersSearchInput)
             {
@@ -255,7 +258,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             pContextMenu->addSeparator();
 
             {
-                QAction* pAction = new QAction("Case sensitive search", this);
+                QAction* pAction = new QAction("Case sensitive search", mpRegexLineEdit);
                 connect(pAction, &QAction::triggered, [this](bool checked)
                 {
                     getSettingsManager()->setCaseSensitiveRegex(checked);
@@ -280,6 +283,73 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 });
 
                 pContextMenu->addAction(pAction);
+            }
+
+            {
+                QAction* pAction = new QAction("Activate regex history", mpRegexLineEdit);
+                #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                pAction->setShortcut(Qt::CTRL + Qt::Key_Space);
+                #else
+                pAction->setShortcut(Qt::CTRL | Qt::Key_Space);
+                #endif
+                connect(pAction, &QAction::triggered, [this]()
+                {
+                    mpRegexLineEdit->activateRegexHistory();
+                });
+
+                pContextMenu->addAction(pAction);
+            }
+
+            {
+                QMenu* pSubMenu = new QMenu("Completion settings", mpRegexLineEdit);
+
+                {
+                    QAction* pAction = new QAction("Case sensitive", mpRegexLineEdit);
+                    connect(pAction, &QAction::triggered, [this](bool checked)
+                    {
+                        getSettingsManager()->setRegexCompletion_CaseSensitive(checked);
+                    });
+                    pAction->setCheckable(true);
+                    pAction->setChecked(getSettingsManager()->getRegexCompletion_CaseSensitive());
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Search policy", mpRegexLineEdit);
+
+                    QActionGroup* pActionGroup = new QActionGroup(mpRegexLineEdit);
+                    pActionGroup->setExclusive(true);
+
+                    {
+                        QAction* pAction = new QAction("\"Starts with\"", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            getSettingsManager()->setRegexCompletion_SearchPolicy(false);
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(!getSettingsManager()->getRegexCompletion_SearchPolicy());
+
+                        pSubSubMenu->addAction(pAction);
+                        pActionGroup->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("\"Contains\"", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            getSettingsManager()->setRegexCompletion_SearchPolicy(true);
+                        });
+                        pAction->setCheckable(true);
+                        pAction->setChecked(getSettingsManager()->getRegexCompletion_SearchPolicy());
+
+                        pSubSubMenu->addAction(pAction);
+                        pActionGroup->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                pContextMenu->addMenu(pSubMenu);
             }
 
             pContextMenu->exec(mpRegexLineEdit->mapToGlobal(pos));
@@ -342,7 +412,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     }
 #endif
 
-    connect( getSettingsManager().get(), &ISettingsManager::cacheEnabledChanged, [this](bool val)
+    connect( getSettingsManager().get(), &ISettingsManager::cacheEnabledChanged,
+             this, [this](bool val)
     {
         if(nullptr != mpFile)
         {
@@ -351,7 +422,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( getSettingsManager().get(), &ISettingsManager::cacheMaxSizeMBChanged, [this](const tCacheSizeMB& val)
+    connect( getSettingsManager().get(), &ISettingsManager::cacheMaxSizeMBChanged,
+             this, [this](const tCacheSizeMB& val)
     {
         if(nullptr != mpFile)
         {
@@ -360,7 +432,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( getSettingsManager().get(), &ISettingsManager::RDPModeChanged, [this](bool val)
+    connect( getSettingsManager().get(), &ISettingsManager::RDPModeChanged,
+             this, [this](bool val)
     {
         if(nullptr != mpProgressBar &&
                 nullptr != mpProgressBarLabel)
@@ -408,7 +481,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         });
     }
 
-    connect( getSettingsManager().get(), &ISettingsManager::regexMonoHighlightingColorChanged, [this](const QColor&)
+    connect( getSettingsManager().get(), &ISettingsManager::regexMonoHighlightingColorChanged,
+             this, [this](const QColor&)
     {
         if(nullptr != mpSearchResultModel)
         {
@@ -416,7 +490,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged, [this](const tHighlightingGradient&)
+    connect( getSettingsManager().get(), &ISettingsManager::searchResultHighlightingGradientChanged,
+             this, [this](const tHighlightingGradient&)
     {
         if(false == getSettingsManager()->getSearchResultMonoColorHighlighting())
         {
@@ -482,7 +557,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     }
 
     connect(getSettingsManager().get(), &ISettingsManager::selectedRegexFileChanged,
-    [this](const QString& /*regexDirectory*/)
+    this, [this](const QString& /*regexDirectory*/)
     {
         if(nullptr != mpPatternsModel)
         {
@@ -490,22 +565,26 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         }
     });
 
-    connect(getSettingsManager().get(), &ISettingsManager::UML_MaxNumberOfRowsInDiagramChanged, [this](int)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_MaxNumberOfRowsInDiagramChanged,
+            this, [this](int)
     {
         createSequenceDiagram();
     });
 
-    connect(getSettingsManager().get(), &ISettingsManager::UML_ShowArgumentsChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_ShowArgumentsChanged,
+            this, [this](bool)
     {
         createSequenceDiagram();
     });
 
-    connect(getSettingsManager().get(), &ISettingsManager::UML_WrapOutputChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_WrapOutputChanged,
+            this, [this](bool)
     {
         createSequenceDiagram();
     });
 
-    connect(getSettingsManager().get(), &ISettingsManager::UML_AutonumberChanged, [this](bool)
+    connect(getSettingsManager().get(), &ISettingsManager::UML_AutonumberChanged,
+            this, [this](bool)
     {
         createSequenceDiagram();
     });
@@ -735,7 +814,8 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
         mpFile->setSubFilesHandlingStatus(getSettingsManager()->getSubFilesHandlingStatus());
         mpFile->resetCache();
 
-        connect( getSettingsManager().get(), &ISettingsManager::subFilesHandlingStatusChanged, [this](bool val)
+        connect( getSettingsManager().get(), &ISettingsManager::subFilesHandlingStatusChanged,
+                 this, [this](bool val)
         {
             if(nullptr != mpFile)
             {
@@ -821,7 +901,7 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
     });
 }
 
-bool CDLTMessageAnalyzer::analyze()
+bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
 {
     if(!mpFile)
     {
@@ -935,7 +1015,9 @@ bool CDLTMessageAnalyzer::analyze()
             *pRegex,
             mpNumberOfThreadsCombobBox->currentData().value<int>(),
             isContinuousAnalysis(),
-            getSettingsManager()->getSearchResultColumnsSearchMap()
+            getSettingsManager()->getSearchResultColumnsSearchMap(),
+            regex,
+            nullptr != pSelectedAliases ? *pSelectedAliases : QStringList()
         );
 
         auto requestId = requestAnalyze( requestParameters,
@@ -1869,5 +1951,6 @@ PUML_PACKAGE_BEGIN(DMA_Plugin_API)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, gets and uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, gets and uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
+        PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, uses and passes)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -1,5 +1,15 @@
 [**Go to the previous page**](../../README.md)
 
+## Table of Contents
+
+1. [Search](#search)
+2. [How the search string is formed?](#how-the-search-string-is-formed)
+3. [Continuous search](#continuous-search)
+4. [Case sensitive search](#case-sensitive-search)
+5. [Regex errors handling](#regex-errors-handling)
+6. [Regex history](#regex-history)
+7. [Used regex engine](#used-regex-engine)
+
 ----
 
 # Search
@@ -78,6 +88,40 @@ Notification message contains the col number, at which an error has occurred. In
 The same kind of error handling is also supported in the other menus, where user can enter the regexes, e.g. during the edit operation of the previously saved pattern: 
 
 ![Screenshot of the attempt to save the regex which contains the error](./regex_with_error_in_edit_mode.png)
+
+----
+
+## Regex history
+
+The DLT Message Analyzer plugin supports the regex history functionality:
+
+![Screenshot of the regex history feature](./regex_history.png)
+
+The history is filled in from two sources:
+
+- Regular expressions typed in by the user
+- Selected pre-saved regex aliases
+
+The main aspects of this feature are:
+
+- The history is limited to 100 elements for each data source
+- Selected pre-saved regex aliases are resolved into the text they contain once selected
+- When there are no empty slots in the history, the newly added elements will remove the less relevant ones. Relevancy is calculated as a cumulative ranking based on each element's usage count and update time
+- Use the 'Ctrl+Space' shortcut when the text input field is in focus to activate the feature. Also, you can activate it in the following context menu:
+  
+  ![Screenshot of the regex history feature activation from the context menu](./activate_regex_history.png)
+- Use the 'Esc' key to deactivate the feature
+
+  **Note!** Alternatively, you can click past the suggestions pop-up to turn off the feature
+- Use the '|' pipe character to add multiple regex history elements on top of each other
+- You can search for suggestions using case-sensitive and case-insensitive types of search. You can select this option in the following context menu:
+  
+  ![Screenshot of the regex history case sensitive search option](./regex_history_case_sensitive_option.png)
+- You can search for suggestions using "Start with" or "Contains" search strategies. You can select this option in the following context menu:
+
+  ![Screenshot of the regex history search strategy option](./regex_history_search_strategy.png)
+- The history is accounted for and stored per the regex patterns file. Activation of the other file will load the corresponding regex history
+- The JSON with regex usage statistics is stored within the '~/.DLT-Message-Analyzer/regex_usage_statistics/' folder 
 
 ----
 

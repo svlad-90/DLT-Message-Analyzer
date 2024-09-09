@@ -29,6 +29,7 @@ target_link_libraries( DMA_plugin PUBLIC
                       qcustomplot
                       DMA_plotView
                       DMA_PCRE
+                      DMA_regexHistory
                       qdlt
                       ${QT_PREFIX}::Widgets 
                       DMA_framework_base 

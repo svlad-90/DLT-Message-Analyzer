@@ -394,8 +394,6 @@ void CFiltersView::handleSettingsManagerChange()
         {
             QMenu* pSubMenu = new QMenu("Completion settings", this);
 
-//            TSettingItem<bool> mSetting_FiltersCompletion_SearchPolicy; // 0 - startWith; 1 - contains
-
             {
                 QAction* pAction = new QAction("Case sensitive", this);
                 connect(pAction, &QAction::triggered, [this](bool checked)
@@ -545,7 +543,7 @@ void CFiltersView::handleSettingsManagerChange()
 
     connect( getSettingsManager().get(),
              &ISettingsManager::regexFiltersColumnsVisibilityMapChanged,
-             [this](const tRegexFiltersColumnsVisibilityMap&)
+             this, [this](const tRegexFiltersColumnsVisibilityMap&)
     {
         updateColumnsVisibility();
         updateWidth();

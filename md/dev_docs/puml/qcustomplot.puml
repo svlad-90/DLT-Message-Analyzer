@@ -3,6 +3,15 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
+package "DMA_PlotView" #DDDDDD
+{
+
+class "QCPGanttRow"
+{
+}
+
+}
+
 package "DMA_PlotView_API" #DDDDDD
 {
 
@@ -28,11 +37,19 @@ class "QWidget"
 package "qcustomplot" #DDDDDD
 {
 
+class "QCPAxis"
+{
+}
+
 class "QCPAxisRect"
 {
 }
 
 class "QCPGraph"
+{
+}
+
+class "QCPLayerable"
 {
 }
 
@@ -48,12 +65,15 @@ class "QCustomPlot"
 
 '====================Inheritance section====================
 QCustomPlot <|-- CCustomPlotExtended : extends
+QCPLayerable <|-- QCPAxis : extends
 QObject <|-- QCPAxisRect : extends
 QObject <|-- QCPGraph : extends
+QObject <|-- QCPLayerable : extends
 QObject <|-- QCPLegend : extends
 QWidget <|-- QCustomPlot : extends
 
 '====================Dependencies section====================
+QCPGanttRow "1" o-- "2" QCPAxis : uses
 CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
 CCustomPlotExtended "1" *-- "*" QCPGraph : uses
 CCustomPlotExtended "1" o-- "*" QCPLegend : uses

@@ -26,7 +26,7 @@ public:
         QModelIndex foundIdx;
     };
     /**
-     * @brief search - searches pattern by irs alias
+     * @brief search - searches pattern by its alias
      * @param alias - alias to be searched
      * @return - instance of tSearchResult, which provides result status of the search
      */

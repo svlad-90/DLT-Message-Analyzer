@@ -40,6 +40,7 @@ class CFiltersView;
 class CUMLView;
 class CLogo;
 class CCustomPlotExtended;
+class CRegexHistoryLineEdit;
 
 namespace Ui {
     class Form;
@@ -59,7 +60,7 @@ public:
     CGroupedView* getGroupedResultView();
     QProgressBar* getProgresBar();
     QLabel* getProgresBarLabel();
-    QLineEdit* getRegexLineEdit();
+    CRegexHistoryLineEdit* getRegexLineEdit();
     QLabel* getErrorLabel();
     CPatternsView* getPatternsTableView();
     QComboBox* getNumberOfThreadsComboBox();
@@ -89,7 +90,6 @@ public:
 
 private slots:
     void on_analyze_clicked();
-    void on_regex_returnPressed();
     void on_pushButton_clicked();
     void on_hidePatterns_clicked();
     void on_splitter_patterns_results_splitterMoved(int pos, int index);

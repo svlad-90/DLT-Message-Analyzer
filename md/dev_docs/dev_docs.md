@@ -28,6 +28,7 @@ It's main purposes is to:
 #### [DMA_PatternsView](../../dltmessageanalyzerplugin/src/components/patternsView/doc/doc.md)
 #### [DMA_PlantumlView](../../dltmessageanalyzerplugin/src/components/plant_uml/doc/doc.md)
 #### [DMA_PlotView](../../dltmessageanalyzerplugin/src/components/plotView/doc/doc.md)
+#### [DMA_RegexHistory](../../dltmessageanalyzerplugin/src/components/regexHistory/doc/doc.md)
 #### [DMA_SearchView](../../dltmessageanalyzerplugin/src/components/searchView/doc/doc.md)
 #### [DMA_Settings](../../dltmessageanalyzerplugin/src/components/settings/doc/doc.md)
 ----
