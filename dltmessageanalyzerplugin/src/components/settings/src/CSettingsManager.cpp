@@ -367,8 +367,20 @@ CSettingsManager::CSettingsManager():
             clearRegexConfig();
             loadRegexConfigCustomPath(regexSettingsFilePath);
 
+            QString regexUsageStatisticsFilePath = getRegexUsageStatisticsDirectory() + QDir::separator() + mSetting_SelectedRegexFile.getData();
+
+            if(true == mbInitialised)
+            {
+                auto result = storeRegexUsageStatisticsDataCustomPath(regexUsageStatisticsFilePath);
+
+                if(false == result.bResult)
+                {
+                    SEND_ERR(QString("Was not able to store regex usage statistics due "
+                                     "to the following error: %1").arg(result.err));
+                }
+            }
+
             clearRegexUsageStatisticsData();
-            QString regexUsageStatisticsFilePath = getRegexUsageStatisticsDirectory() + QDir::separator() + data;
             loadRegexUsageStatisticsDataCustomPath(regexUsageStatisticsFilePath);
 
             selectedRegexFileChanged(data);
@@ -497,7 +509,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
     mRegexUsageStatisticsDataItemPtrVec(),
-    mbRootConfigInitialised(false)
+    mbInitialised(false)
 {
     /////////////// ROOT SETTINGS ///////////////
     mRootSettingItemPtrVec.push_back(&mSetting_SettingsManagerVersion);
@@ -1473,6 +1485,7 @@ CSettingsManager::tOperationResult CSettingsManager::setUp()
     if(true == result.bResult)
     {
         result = loadConfigs();
+        mbInitialised = true;
     }
 
     return result;

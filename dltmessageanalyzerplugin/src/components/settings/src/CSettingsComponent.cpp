@@ -64,7 +64,13 @@ DMA::tSyncInitOperationResult CSettingsComponent::shutdown()
     {
         if(nullptr != mpSettingsManager)
         {
-            mpSettingsManager->storeConfigs();
+            auto result = mpSettingsManager->storeConfigs();
+
+            if(false == result.bResult)
+            {
+                SEND_ERR(QString("Was not able to store configs due to the following error: %1").arg(result.err));
+            }
+
             mpSettingsManager.reset();
         }
 
