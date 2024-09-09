@@ -521,5 +521,5 @@ private: // fields
     tSettingItemsPtrVec mPatternsSettingItemPtrVec;
     tSettingItemsPtrVec mRegexUsageStatisticsDataItemPtrVec;
 
-    bool mbRootConfigInitialised;
+    bool mbInitialised;
 };
