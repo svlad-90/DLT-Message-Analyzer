@@ -149,21 +149,21 @@ QString CDLTFileWrapper::getFileName(int num)
     return result;
 }
 
-int CDLTFileWrapper::getMsgRealPos(int msgId) const
+int CDLTFileWrapper::getMsgIdFromIndexInMainTable(int msgIdxInMainTable) const
 {
     int result = INVALID_MSG_ID;
 
     if(nullptr != mpFile)
     {
-        if(msgId >= 0 && msgId < size())
+        if(msgIdxInMainTable >= 0 && msgIdxInMainTable < size())
         {
             if(true == mpFile->isFilter())
             {
-                result = mpFile->getMsgFilterPos(msgId);
+                result = mpFile->getMsgFilterPos(msgIdxInMainTable);
             }
             else
             {
-                result = msgId;
+                result = msgIdxInMainTable;
             }
         }
     }
@@ -443,12 +443,12 @@ int CDLTFileWrapper::binarySearch(bool isFrom, const int& fromIdx, const int& to
 
         // If the element is present at the middle
         // itself
-        if (getMsgRealPos(mid) == targetIdx)
+        if (getMsgIdFromIndexInMainTable(mid) == targetIdx)
             return mid;
 
         // If element is smaller than mid, then
         // it can only be present in left subarray
-        if (getMsgRealPos(mid) > targetIdx)
+        if (getMsgIdFromIndexInMainTable(mid) > targetIdx)
             return binarySearch(isFrom, fromIdx, mid - 1, targetIdx);
 
         // Else the element can only be present

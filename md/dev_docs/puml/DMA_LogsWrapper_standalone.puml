@@ -33,7 +33,7 @@ class "IFileWrapper"
     + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
     + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
     + {abstract} virtual bool isFiltered() const = 0
-    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getMsgIdFromIndexInMainTable(int msgIdxInMainTable) const = 0
     + {abstract} virtual int getNumberOfFiles() const = 0
     + {abstract} virtual int size() const = 0
     + {abstract} virtual int sizeNonFiltered() const = 0

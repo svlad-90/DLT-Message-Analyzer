@@ -920,7 +920,7 @@ fieldRanges(rhs.fieldRanges),
 pUMLInfo(rhs.pUMLInfo == nullptr ? nullptr : std::make_unique<tUMLInfo>(*rhs.pUMLInfo)),
 pPlotViewInfo(rhs.pPlotViewInfo == nullptr ? nullptr : std::make_unique<tPlotViewInfo>(*rhs.pPlotViewInfo)),
 msgId(rhs.msgId),
-msgIdFiltered(rhs.msgIdFiltered),
+msgIdxInMainTable(rhs.msgIdxInMainTable),
 strSize(rhs.strSize),
 timeStamp(rhs.timeStamp),
 msgSize(rhs.msgSize)
@@ -938,7 +938,7 @@ tItemMetadata& tItemMetadata::operator= (const tItemMetadata& rhs)
     pUMLInfo = rhs.pUMLInfo == nullptr ? nullptr : std::make_unique<tUMLInfo>(*rhs.pUMLInfo);
     pPlotViewInfo = rhs.pPlotViewInfo == nullptr ? nullptr : std::make_unique<tPlotViewInfo>(*rhs.pPlotViewInfo);
     msgId = rhs.msgId;
-    msgIdFiltered = rhs.msgIdFiltered;
+    msgIdxInMainTable = rhs.msgIdxInMainTable;
     strSize = rhs.strSize;
     timeStamp = rhs.timeStamp;
     msgSize = rhs.msgSize;
@@ -947,14 +947,14 @@ tItemMetadata& tItemMetadata::operator= (const tItemMetadata& rhs)
 }
 
 tItemMetadata::tItemMetadata( const tMsgId& msgId_,
-                              const tMsgId& msgIdFiltered_,
+                              const tMsgId& msgIdxInMainTable_,
                               const tFieldRanges& fieldRanges_,
                               const int& strSize_,
                               const std::uint32_t& msgSize_,
                               const unsigned int& timeStamp_):
     fieldRanges(fieldRanges_),
     msgId(msgId_),
-    msgIdFiltered(msgIdFiltered_),
+    msgIdxInMainTable(msgIdxInMainTable_),
     strSize(strSize_),
     timeStamp(timeStamp_),
     msgSize(msgSize_)
@@ -1407,6 +1407,34 @@ matchedItemVec(matchedItemVec_)
 
 }
 
+int tFoundMatchesPack::findRowByMsgId(const tMsgId& msgIdToFind) const
+{
+    int left = 0;
+    int right = static_cast<int>(matchedItemVec.size()) - 1;
+
+    while (left <= right)
+    {
+        int mid = left + (right - left) / 2;
+        tMsgId midMsgId = matchedItemVec[mid]->getItemMetadata().msgId;
+
+        if (midMsgId == msgIdToFind)
+        {
+            return mid;
+        }
+        else if (midMsgId < msgIdToFind)
+        {
+            left = mid + 1;
+        }
+        else
+        {
+            right = mid - 1;
+        }
+    }
+
+    // Item not found
+    return -1;
+}
+
 QString getName(eSearchResultColumn val)
 {
     QString result;
@@ -1579,8 +1607,7 @@ bool tGroupedViewMetadata::operator== (const tGroupedViewMetadata& rhs) const
 tGroupedViewMetadata::tGroupedViewMetadata( const unsigned int timeStamp_, const tMsgId& msgId_ ):
 timeStamp(timeStamp_),
 msgId(msgId_)
-{
-}
+{}
 
 QString getName(eGroupedViewColumn val)
 {

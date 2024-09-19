@@ -39,6 +39,11 @@
 #include "components/filtersView/api/CFiltersView.hpp"
 #include "components/regexHistory/api/CRegexHistoryComponent.hpp"
 
+#include "components/searchView/api/ISearchResultModel.hpp"
+#include "components/groupedView/api/CGroupedView.hpp"
+#include "components/searchView/api/CSearchResultView.hpp"
+#include "components/groupedView/api/IGroupedViewModel.hpp"
+
 #include "DMA_Plantuml.hpp"
 
 Q_DECLARE_METATYPE(tMsgWrapperPtr)
@@ -343,6 +348,46 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
         mComponents.push_back(pRegexHistoryComponent);
     }
 
+    connect(mpGroupedViewComponent->getGroupedView(), &CGroupedView::searchViewHighlightingRequested,
+            this, [this](const tMsgIdSet& msgs)
+    {
+        auto pSearchModel = mpSearchViewComponent->getSearchResultModel();
+        auto* pSearchView = mpSearchViewComponent->getSearchResultView();
+
+        if(false == msgs.empty() &&
+           nullptr != mpSearchViewComponent->getSearchResultModel() &&
+           nullptr != mpSearchViewComponent->getSearchResultView() &&
+           nullptr != mpGroupedViewComponent->getGroupedView())
+        {
+            pSearchModel->setHighlightedRows(msgs);
+            auto jumpRow = pSearchModel->getRowByMsgId(*msgs.begin());
+
+            if(jumpRow >= 0)
+            {
+                pSearchView->clearSelection();
+                pSearchView->selectRow(jumpRow);
+
+                auto selectedRows = pSearchView->selectionModel()->selectedRows();
+
+                if(false == selectedRows.empty())
+                {
+                    pSearchView->scrollTo(selectedRows[0]);
+                }
+
+                if(nullptr != mpForm)
+                {
+                    auto* pMainWidget = mpForm->getMainTabWidget();
+
+                    if(nullptr != pMainWidget)
+                    {
+                        // switch to search view.
+                        pMainWidget->setCurrentIndex(0);
+                    }
+                }
+            }
+        }
+    });
+
     connect( qApp, &QApplication::aboutToQuit, [this]()
     {
         for(auto& pComponent : mComponents)
@@ -460,6 +505,23 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
             if( true == analysisRunning && mpDLTMessageAnalyzer && mpFile )
             {
                 switchFromFileView();
+            }
+
+            if( false == analysisRunning )
+            {
+                auto* pMainWidget = mpForm->getMainTabWidget();
+
+                if(nullptr != pMainWidget)
+                {
+                    const auto currentIndex = pMainWidget->currentIndex();
+                    if(2 == currentIndex)
+                    {
+                        if(mpGroupedViewComponent->getGroupedViewModel())
+                        {
+                            mpGroupedViewComponent->getGroupedViewModel()->sortByCurrentSortingColumn();
+                        }
+                    }
+                }
             }
         });
     }

@@ -5,6 +5,8 @@
 
 #include "DMA_Plantuml.hpp"
 
+#include "dma/base/ForceLink.hpp"
+
 CRegexHistoryComponent::CRegexHistoryComponent( const tSettingsManagerPtr& pSettingsManager,
                                                 CRegexHistoryLineEdit* pRegexHistoryLineEdit, CPatternsView* pPatternsView,
                                                 const tDLTMessageAnalyzerControllerPtr& pDLTMessageAnalyzerController ):
@@ -13,6 +15,9 @@ mpRegexHistoryProvider(std::make_shared<CRegexHistoryProvider>(pSettingsManager,
                                                                pPatternsView,
                                                                pDLTMessageAnalyzerController))
 {
+    // force linkage references in order to have consistent diagrams
+    DMA_FORCE_LINK_REFERENCE(IRegexHistoryProvider)
+
     if(nullptr != pRegexHistoryLineEdit)
     {
         pRegexHistoryLineEdit->setRegexHistoryProvider(mpRegexHistoryProvider);

@@ -1,4 +1,5 @@
-set(WRAP_SRC ../api/CGroupedView.hpp)
+set(WRAP_SRC ../api/CGroupedView.hpp
+    ../api/IGroupedViewModel.hpp)
 
 DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 

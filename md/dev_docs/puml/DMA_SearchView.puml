@@ -16,7 +16,7 @@ class "IFileWrapper"
     + {abstract} virtual bool cacheMsgWrapper( const int& msgId, const tMsgWrapperPtr& pMsgWrapper ) = 0
     + {abstract} virtual bool getSubFilesHandlingStatus() const = 0
     + {abstract} virtual bool isFiltered() const = 0
-    + {abstract} virtual int getMsgRealPos(int msgId) const = 0
+    + {abstract} virtual int getMsgIdFromIndexInMainTable(int msgIdxInMainTable) const = 0
     + {abstract} virtual int getNumberOfFiles() const = 0
     + {abstract} virtual int size() const = 0
     + {abstract} virtual int sizeNonFiltered() const = 0
@@ -106,7 +106,7 @@ ISearchResultModel <|-- CSearchResultModel : implements
 QAbstractTableModel <|-- CSearchResultModel : implements
 
 '====================Dependencies section====================
-CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
+CSearchResultHighlightingDelegate "1" *-- "1" ISearchResultModel : uses
 CSearchResultModel "1" o-- "1" IFileWrapper : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
 CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel

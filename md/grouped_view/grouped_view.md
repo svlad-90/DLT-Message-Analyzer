@@ -2,6 +2,16 @@
 
 ----
 
+# Table of Contents
+
+- [Grouped view](#grouped-view)
+- [How does it look like?](#how-does-it-look-like)
+- [How does it work?](#how-does-it-work)
+- [Highlighting the group in the search view](#highlighting-the-group-in-the-search-view)
+- [Trace spam use-case](#trace-spam-use-case)
+
+----
+
 # Grouped view
 
 The intention of the "grouped view" is to allow to split messages into the groups, based on the "regex groups" syntax. 
@@ -23,11 +33,11 @@ The view provides the following information regarding each tree level:
 
 The above screenshot contains an example of a "grouped view" for a system journal's messages.
 
-### Used regex is:
+Used regex is:
 
 <pre>^(SYS) ([A-Z0-9]{1,4}) [0-9]+/[0-9]+/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+ (?&lt;VAR_SYS_MES_APP&gt;[\w_-]+).*: (?&lt;VAR_SYS_MES_TYPE&gt;[A-Za-z_-]+): \[[\d]+\.[\d]+\](.*)</pre>
 
-### The grouped view will form the following set of the tree-view groups:
+The grouped view will form the following set of the tree-view groups:
 
 - (SYS) - group for the specific dlt app-id SYS
 - ([A-Z0-9]{1,4}) - sub-group for the ANY dlt context
@@ -35,7 +45,7 @@ The above screenshot contains an example of a "grouped view" for a system journa
 - (?&lt;VAR_SYS_MES_TYPE&gt;[A-Za-z_-]+) - sub-group for ANY message type
 - (.*) - sub-group for ANY message
 
-### The result will be something like this:
+The result will be something like this:
 
 <pre>Root | Msg-s : 110 | Msg-s, % : 100.000 | Msg-s/sec, av. : 0 | Payload : 27590 | Payload, % : 100.000 | Payload, b/sec, av. : 135
 |-SYS | Msg-s : 110 | Msg-s, % : 100.000 | Msg-s/sec, av. : 0 | Payload : 27590 | Payload, % : 100.000 | Payload, b/sec, av. : 135
@@ -71,24 +81,42 @@ That is quite important in case if you work within a system, which has trace-spa
 
 ----
 
+# Highlighting the group in the search view
+
+This feature allows you to select a found group in the 'grouped view' and highlight all messages that it represents in the 'search view'.
+
+1. Select one item from the grouped view. It can be a node at any level of the tree.
+  ![Screenshot of the "grouped view" item selection](./grouped_view_item_selection.png)
+2. Press Ctrl+H or open the context menu and select the 'Highlight in search view' option.
+  ![Screenshot of the grouped view "highlight in search view" context menu option](./highlight_in_search_view_option.png)
+3. The plugin will jump to the 'Search view' tab, and the table will scroll to the first message from the selected group. You will see that the background of all impacted messages is changed.
+  ![Screenshot of the activated highlighting](./highlighting_activated.png)
+4. Use Ctrl+ArrowDown and Ctrl+ArrowUp to switch between the highlighted messages. Or use the corresponding context menu items.
+  ![Screenshot of the context menu items to jump between the highlighted messages](./jump_between_highlighted_messages.png)
+5. Use the Esc button or the corresponding context menu item to turn off the highlighting of the selected group.
+  ![Screenshot of the context menu item to jump remove the highlighting](./remove_highlighting.png)
+6. The feature in action:
+  ![Feature in action GIF animation](./highlighting_feature_in_action.gif)
+----
+
 # Trace spam use-case
 
-### How it looks like?
+How it looks like?
 
 ![Screenshot of the "trace-spam use-case"](./grouped_view_trace_spam.png)
 
-### Used regex is:
+Used regex is:
 
 <pre>^(?&lt;VAR_TRACE_SPAM_APP&gt;[A-Z0-9]{1,4}) (?&lt;VAR_TRACE_SPAM_CONTEXT&gt;[A-Z0-9]{1,4})(?&lt;VAR_TRACE_SPAM_50_CHARS&gt;.{0,50})(?&lt;VAR_TRACE_SPAM_REST_MSG&gt;.*)</pre>
 
-### The grouped view will form the following set of the tree-view nodes:
+The grouped view will form the following set of the tree-view nodes:
 
 - ^(?&lt;VAR_TRACE_SPAM_APP&gt;[A-Z0-9]{1,4}) - group for ANY dlt app-id
 - (?&lt;VAR_TRACE_SPAM_CONTEXT&gt;[A-Z0-9]{1,4}) - sub-group for ANY dlt context
 - (?&lt;VAR_TRACE_SPAM_50_CHARS&gt;.{0,50}) - sub-group for first 50 characters of ANY message
 - (?&lt;VAR_TRACE_SPAM_REST_MSG&gt;.*) - sub-group for rest of the message
 
-### The result will be something like this:
+The result will be something like this:
 
 <pre>Root | Msg-s : 258 | Msg-s, % : 100.000 | Msg-s/sec, av. : 0 | Payload : 49917 | Payload, % : 100.000 | Payload, b/sec, av. : 0
 |-SYS | Msg-s : 110 | Msg-s, % : 42.636 | Msg-s/sec, av. : 0 | Payload : 27590 | Payload, % : 55.272 | Payload, b/sec, av. : 0

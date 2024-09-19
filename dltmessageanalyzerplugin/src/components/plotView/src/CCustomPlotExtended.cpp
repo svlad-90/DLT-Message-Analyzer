@@ -133,7 +133,7 @@ void CCustomPlotExtended::changeLegendItemVisibility(QCPPlottableLegendItem* pIt
         uint32_t visiblePlotsNumber = 0u;
         bool bIsSingleVisiblePlot = true;
 
-        for(const auto pPlottable : pAxisRect->plottables())
+        for(const auto* pPlottable : pAxisRect->plottables())
         {
             if(true == pPlottable->visible())
             {

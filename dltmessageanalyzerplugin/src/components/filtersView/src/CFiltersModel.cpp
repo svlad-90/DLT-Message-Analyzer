@@ -31,9 +31,9 @@ CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
       mCompletionCache(),
       mVarGroupsMap()
 {
-    mSortingHandler = [](const QVector<tTreeItemPtr>& children,
-                            const int& sortingColumn,
-                            Qt::SortOrder sortingOrder) -> QVector<tTreeItemPtr>
+    mSortingHandler = [](QVector<tTreeItemPtr>& children,
+                         const int& sortingColumn,
+                         Qt::SortOrder sortingOrder)
     {
         tTreeItem::tChildrenVector result;
 
@@ -123,7 +123,7 @@ CFiltersModel::CFiltersModel(const tSettingsManagerPtr& pSettingsManager,
                 break;
         }
 
-        return result;
+        children = result;
     };
 
     connect(getSettingsManager().get(), &ISettingsManager::filterVariablesChanged,

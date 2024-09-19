@@ -16,7 +16,7 @@ class TSettingItem : public CSettingItem
     public:
 
     typedef T tData;
-    typedef std::function<void(const tData&)> tUpdateDataFunc;
+    typedef std::function<void(const tData& /*old data*/, const tData& /*new data*/)> tUpdateDataFunc;
 
     typedef std::function<QJsonObject(const tData&)> tWriteDataFunction;
     typedef std::function<bool(const QJsonValueRef&, tData&, const tData& /*def value*/)> tReadDataFunction;
@@ -82,7 +82,9 @@ class TSettingItem : public CSettingItem
     }
 
     /**
-     * @brief getUpdateDataFunc - ( implementation of ISettingItem ) - reference to the update data function, to trigger update
+     * @brief getUpdateDataFunc - ( implementation of ISettingItem ) - reference
+     * to the update data function, to trigger update
+     * Note! Does not pass the 'old data' to an update.
      * @return - reference to the update data function
      */
     tGeneralUpdateDataFunc getGeneralUpdateDataFunc() override
@@ -91,7 +93,7 @@ class TSettingItem : public CSettingItem
         {
             if(mUpdateDataFunc)
             {
-                mUpdateDataFunc.operator()(mData);
+                mUpdateDataFunc.operator()(tData(), mData);
             }
         };
         return result;
@@ -109,11 +111,12 @@ class TSettingItem : public CSettingItem
 
         if(true == bUpdate)
         {
+            tData oldData = mData;
             mData = data;
 
             if(mUpdateDataFunc)
             {
-                mUpdateDataFunc(mData);
+                mUpdateDataFunc(oldData, data);
             }
         }
 
@@ -232,11 +235,12 @@ public:
         {
             const auto& normalizedValue = normalizeData(data);
 
+            tData oldData = tParent::mData;
             tParent::mData = normalizedValue;
 
             if(tParent::mUpdateDataFunc)
             {
-                tParent::mUpdateDataFunc(tParent::mData);
+                tParent::mUpdateDataFunc(oldData, tParent::mData);
             }
         }
 
