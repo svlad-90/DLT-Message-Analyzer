@@ -4,7 +4,8 @@
 
 #include "DMA_Plantuml.hpp"
 
-IGroupedViewModel::IGroupedViewModel()
+IGroupedViewModel::IGroupedViewModel(QObject* pParent):
+    QAbstractItemModel(pParent)
 {
 
 }

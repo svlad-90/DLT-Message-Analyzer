@@ -10,6 +10,15 @@
 
 ----
 
+## Implemented features targeted for release v1.0.29:
+
+<span style="color:red">Use the HEAD revision to try out the following features:</span>
+
+- [Grouped view highlighting](./md/grouped_view/grouped_view.md#highlighting-the-group-in-the-search-view)
+- [Regex history](.//md/search/search.md#regex-history)
+
+----
+
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)
 
 ![Build linux](https://github.com/svlad-90/DLT-Message-Analyzer/workflows/Build%20linux%20Qt5/badge.svg)

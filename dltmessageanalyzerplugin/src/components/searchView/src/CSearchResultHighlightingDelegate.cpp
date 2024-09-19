@@ -10,7 +10,7 @@
 
 #include "CSearchResultHighlightingDelegate.hpp"
 #include "common/Definitions.hpp"
-#include "CSearchResultModel.hpp"
+#include "../api/ISearchResultModel.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
 
 #include "DMA_Plantuml.hpp"
@@ -21,6 +21,8 @@
 #include "../log/CLog.hpp"
 #include <QElapsedTimer>
 #endif
+
+const QColor sCustomHighlightingColor(237,235,178);
 
 CSearchResultHighlightingDelegate::CSearchResultHighlightingDelegate(QObject *parent):
 QStyledItemDelegate(parent),
@@ -37,7 +39,8 @@ CSearchResultHighlightingDelegate::~CSearchResultHighlightingDelegate()
 void drawText(const QString& inputStr,
               QPainter *painter,
               const QStyleOptionViewItem &option,
-              bool bold)
+              bool bold,
+              bool bCustomBackgroundHighlighting)
 {
     int baseShift = 0;
 
@@ -58,13 +61,20 @@ void drawText(const QString& inputStr,
     }
     else
     {
-        if(isDarkMode())
+        if(false == bCustomBackgroundHighlighting)
         {
-            painter->fillRect(option.rect, option.palette.window());
+            if(isDarkMode())
+            {
+                painter->fillRect(option.rect, option.palette.window());
+            }
+            else
+            {
+               painter->fillRect(option.rect, QColor(255,255,255));
+            }
         }
         else
         {
-           painter->fillRect(option.rect, QColor(255,255,255));
+            painter->fillRect(option.rect, sCustomHighlightingColor);
         }
 
         QPalette::ColorGroup cg = QPalette::Normal;
@@ -226,7 +236,8 @@ shift += fm.horizontalAdvance(drawDataItem.subStr);
 
 static void drawText( const tDrawDataPack& drawDataPack,
                       QPainter *painter,
-                      const QStyleOptionViewItem& option )
+                      const QStyleOptionViewItem& option,
+                      bool bCustomBackgroundHighlighting )
 {
     if(true == drawDataPack.isSelected)
     {
@@ -234,13 +245,20 @@ static void drawText( const tDrawDataPack& drawDataPack,
     }
     else
     {
-        if(isDarkMode())
+        if(false == bCustomBackgroundHighlighting)
         {
-            painter->fillRect(option.rect, option.palette.window());
+            if(isDarkMode())
+            {
+                painter->fillRect(option.rect, option.palette.window());
+            }
+            else
+            {
+               painter->fillRect(option.rect, QColor(255,255,255));
+            }
         }
         else
         {
-           painter->fillRect(option.rect, QColor(255,255,255));
+            painter->fillRect(option.rect, sCustomHighlightingColor);
         }
     }
 
@@ -362,7 +380,8 @@ static void drawHighlightedText(eSearchResultColumn field,
                     QPainter *painter,
                     const QStyleOptionViewItem& option,
                     bool isMonoColorHighlighting,
-                    const QColor& regexMonoHighlightingColor)
+                    const QColor& regexMonoHighlightingColor,
+                    bool bCustomBackgroundHighlighting)
 {
     tDrawDataPack drawDataPack;
 
@@ -398,7 +417,7 @@ static void drawHighlightedText(eSearchResultColumn field,
             SEND_MSG(QString("calculateShifts - %1").arg(timer.elapsed()));
             timer.restart();
 #endif
-            drawText(drawDataPack, painter, option);
+            drawText(drawDataPack, painter, option, bCustomBackgroundHighlighting);
 #ifdef DEBUG_CSearchResultHighlightingDelegate
             SEND_MSG(QString("drawText - %1").arg(timer.elapsed()));
             timer.invalidate();
@@ -406,12 +425,12 @@ static void drawHighlightedText(eSearchResultColumn field,
         }
         else
         {
-            drawText(inputStr,painter,option,false);
+            drawText(inputStr, painter, option, false, bCustomBackgroundHighlighting);
         }
     }
     else
     {
-        drawText(inputStr,painter,option,false);
+        drawText(inputStr, painter, option, false, bCustomBackgroundHighlighting);
     }
 
     {
@@ -436,11 +455,23 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
 
     //SEND_MSG(QString("CSearchResultHighlightingDelegate::paint: row %1").arg(index.row()));
 
-    const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
+    const auto* pModel = dynamic_cast<const ISearchResultModel*>(index.model());
 
     if(nullptr != pModel)
     {
         auto stringData = pModel->data(index, Qt::DisplayRole).value<QString>();
+
+        bool bCustomBackgroundHighlighting = false;
+
+        const auto& customHighlightingRows = pModel->getHighlightedRows();
+
+        const auto& matchData = pModel->getFoundMatchesItemPack(index);
+        const auto& msgId = matchData.getItemMetadata().msgId;
+
+        if(customHighlightingRows.find(msgId) != customHighlightingRows.end())
+        {
+            bCustomBackgroundHighlighting = true;
+        }
 
         QStyleOptionViewItem opt = option;
 
@@ -457,13 +488,20 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
         }
         else
         {
-            if(isDarkMode())
+            if(false == bCustomBackgroundHighlighting)
             {
-                painter->fillRect(option.rect, option.palette.window());
+                if(isDarkMode())
+                {
+                    painter->fillRect(option.rect, option.palette.window());
+                }
+                else
+                {
+                   painter->fillRect(option.rect, QColor(255,255,255));
+                }
             }
             else
             {
-               painter->fillRect(option.rect, QColor(255,255,255));
+                painter->fillRect(option.rect, sCustomHighlightingColor);
             }
         }
 
@@ -484,7 +522,7 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
         else if(static_cast<eSearchResultColumn>(index.column()) == eSearchResultColumn::Timestamp &&
                 true == mbMarkTimestampWithBold)
         {
-            drawText( stringData, painter, opt, mbMarkTimestampWithBold );
+            drawText( stringData, painter, opt, mbMarkTimestampWithBold, bCustomBackgroundHighlighting );
         }
         else
         {
@@ -497,7 +535,6 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
                             .arg(index.row())
                             .arg(index.column()));
 #endif
-               const auto& matchData = pModel->getFoundMatchesItemPack(index);
 
                bool isMonoColorHighlighting = getSettingsManager()->getSearchResultMonoColorHighlighting();
                const QColor& regexMonoHighlightingColor = getSettingsManager()->getRegexMonoHighlightingColor();
@@ -507,7 +544,8 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
                                    stringData,
                                    painter, opt,
                                    isMonoColorHighlighting,
-                                   regexMonoHighlightingColor);
+                                   regexMonoHighlightingColor,
+                                   bCustomBackgroundHighlighting);
 #ifdef DEBUG_CSearchResultHighlightingDelegate
                SEND_MSG(QString("CSearchResultHighlightingDelegate::drawHighlightedText(end:<index:row-%2:col-%3>): took %1 ms")
                             .arg(elapsedTimer.elapsed())
@@ -517,7 +555,7 @@ void CSearchResultHighlightingDelegate::paint(QPainter *painter,
             }
             else
             {
-               drawText( stringData, painter, opt, false );
+               drawText( stringData, painter, opt, false, bCustomBackgroundHighlighting );
             }
         }
     }
@@ -542,7 +580,7 @@ QSize CSearchResultHighlightingDelegate::sizeHint(const QStyleOptionViewItem &op
 
     if(foundSearchColumn != mSearchResultColumnsSearchMap.end() && true == foundSearchColumn.value())
     {
-        const auto* pModel = dynamic_cast<const CSearchResultModel*>(index.model());
+        const auto* pModel = dynamic_cast<const ISearchResultModel*>(index.model());
 
         if(nullptr != pModel)
         {
@@ -622,6 +660,6 @@ PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultHighlightingDelegate)
         PUML_INHERITANCE_CHECKED(QStyledItemDelegate, extends)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

@@ -78,16 +78,17 @@ public:
     virtual bool isFiltered() const = 0;
 
     /**
-     * @brief getMsgRealPos - takes logical index to the file and returnes the real one.
+     * @brief getMsgIdFromIndexInMainTable - takes index from main table and returnes the message id.
      * When to use? If your file is filtered, and you need a mapping from filtered to non-filtered id - you can use this method.
-     * E.g. if filtered message has idx = 1000, and that message without filtering has idx 101010, then this method will take 1000
+     * E.g. if filtered message has idx = 1000, and that message without filtering has id 101010, then this method will take 1000
      * and provide back 101010.
      * In case if file is not filtered, and provided idx is within the file's range - method will return input parameter.
      * In case if provided idx is outside of file's range - INVALID_MSG_ID value will be returned.
-     * @param msgId - logical index of the message.
-     * @return - in bast case - the mapped "from filtered to non-filtered" id. Other variants of returned value - referenced in above part of this comment.
+     * @param msgId - index of the message in the main table.
+     * @return - in the basic case - the mapped "from filtered to non-filtered" id.
+     * Other variants of returned value - referenced in above part of this comment.
      */
-    virtual int getMsgRealPos(int msgId) const = 0;
+    virtual int getMsgIdFromIndexInMainTable(int msgId) const = 0;
 
     //////////////////////// CACHING_FUNCTIONALITY ////////////////////////
 

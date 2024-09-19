@@ -10,6 +10,7 @@
 #include <set>
 
 #include "QMap"
+#include "QSet"
 #include "QString"
 #include "QVector"
 #include "QMetaType"
@@ -88,6 +89,7 @@ extern const QString sDefaultRegexFileName;
 
 typedef int tMsgId;
 extern const tMsgId INVALID_MSG_ID;
+typedef std::set<tMsgId> tMsgIdSet;
 
 typedef std::int32_t tHighlightingRangeItem;
 
@@ -244,6 +246,7 @@ struct tGroupedViewMetadata
     tGroupedViewMetadata( const unsigned int timeStamp_, const tMsgId& msgId_ );
     tTimeStamp timeStamp;
     tMsgId msgId;
+    nonstd::variant<int, tMsgIdSet> relatedMsgIds = 0;
 };
 Q_DECLARE_METATYPE(tGroupedViewMetadata)
 
@@ -573,7 +576,7 @@ struct tItemMetadata
     tItemMetadata(const tItemMetadata& rhs);
     tItemMetadata& operator= (const tItemMetadata& rhs);
     tItemMetadata( const tMsgId& msgId_,
-                   const tMsgId& msgIdFiltered_,
+                   const tMsgId& msgIdxInMainTable_,
                    const tFieldRanges& fieldRanges_,
                    const int& strSize_,
                    const std::uint32_t& msgSize_,
@@ -607,7 +610,7 @@ struct tItemMetadata
     std::unique_ptr<tUMLInfo> pUMLInfo = nullptr;
     std::unique_ptr<tPlotViewInfo> pPlotViewInfo = nullptr;
     tMsgId msgId;
-    tMsgId msgIdFiltered;
+    tMsgId msgIdxInMainTable;
     int strSize;
     unsigned int timeStamp;
     std::uint32_t msgSize;
@@ -638,6 +641,7 @@ struct tFoundMatchesPack
 {
     tFoundMatchesPack();
     tFoundMatchesPack( const tFoundMatchesPackItemVec& matchedItemVec_ );
+    int findRowByMsgId(const tMsgId& msgIdToFind) const;
     tFoundMatchesPackItemVec matchedItemVec;
 };
 

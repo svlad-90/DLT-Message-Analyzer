@@ -24,7 +24,9 @@ public:
     typedef std::function<void(CTreeItem* oldItem, const tData& newData)> tHandleDuplicateFunc;
 
     typedef QVector<tTreeItemPtr> tChildrenVector;
-    typedef std::function< tChildrenVector(const tChildrenVector&, const int& /*sortingColumn*/, Qt::SortOrder) > tSortingFunction;
+    typedef std::function< void(tChildrenVector&, const int& /*sortingColumn*/, Qt::SortOrder) > tSortingFunction;
+
+    typedef std::function<void(CTreeItem*)> tAfterAppendHandleLeafFunc;
 
     /**
      * @brief tFindItemResult - result of search of the element.
@@ -202,10 +204,13 @@ public:
     /**
      * @brief addData - adds data to the tree
      * @param dataVec - data to ba added
+     * @param afterAppendHandleLeafFunc - optional functionl object. It will be called
+     * with the 'leaf' tree item of the append operation when it is over
      * @return - returns tTreeItemPtrVec, which represents all added elements.
      * Note! Elements are sorted from most bottom-level to most top-level
      */
-    tTreeItemPtrVec addData( const tDataVec& dataVec );
+    tTreeItemPtrVec addData( const tDataVec& dataVec,
+                             tAfterAppendHandleLeafFunc afterAppendHandleLeafFunc = tAfterAppendHandleLeafFunc() );
 
     /**
      * @brief data - get's data of this node by specified column
@@ -236,7 +241,10 @@ public:
 
 private:
 
-    void addDataInternal( const tDataVec& dataVec, tTreeItemPtrVec& res, int dataVecItemIdx );
+    void addDataInternal( const tDataVec& dataVec,
+                          tTreeItemPtrVec& res,
+                          int dataVecItemIdx,
+                          tAfterAppendHandleLeafFunc afterAppendHandleLeafFunc );
 
     CTreeItem(const CTreeItem&) = delete;
     CTreeItem& operator=(const CTreeItem&) = delete;
@@ -259,7 +267,7 @@ private:
     tFindItemFunc mFindFunc;
     tHandleDuplicateFunc mHandleDuplicateFunc;
     tData mData;
-    QVector<tTreeItemPtr> mSortedChildren;
+    QVector<tTreeItemPtr> mChildrenVec;
     tGuarded mpGuard;
     tTreeItemPtr mpParentItem;
     Qt::SortOrder mSortOrder;

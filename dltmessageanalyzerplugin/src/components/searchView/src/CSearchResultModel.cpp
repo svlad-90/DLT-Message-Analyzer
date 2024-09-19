@@ -17,7 +17,8 @@
 CSearchResultModel::CSearchResultModel(const tSettingsManagerPtr& pSettingsManager, QObject *):
 CSettingsManagerClient(pSettingsManager),
 mFoundMatchesPack(),
-mpFile(nullptr)
+mpFile(nullptr),
+mHighlightMessages()
 {
 }
 
@@ -36,6 +37,7 @@ void CSearchResultModel::resetData()
 {
     beginResetModel();
     mFoundMatchesPack.matchedItemVec.clear();
+    mHighlightMessages.clear();
     endResetModel();
     updateView();
 }
@@ -261,11 +263,16 @@ int CSearchResultModel::getFileIdx( const QModelIndex& idx ) const
     {
         if(nullptr != mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)])
         {
-            result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)]->getItemMetadata().msgIdFiltered;
+            result = mFoundMatchesPack.matchedItemVec[static_cast<std::size_t>(row)]->getItemMetadata().msgIdxInMainTable;
         }
     }
 
     return result;
+}
+
+int CSearchResultModel::getRowByMsgId( const tMsgId& id ) const
+{
+    return mFoundMatchesPack.findRowByMsgId(id);
 }
 
 QString CSearchResultModel::getStrValue(const int& row, const eSearchResultColumn& column) const
@@ -1601,7 +1608,7 @@ ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
                                                plotViewID,
                                                plotViewDataItemVec,
                                                result,
-                                               itemMetadata.msgIdFiltered,
+                                               itemMetadata.msgIdxInMainTable,
                                                axisNameMetadataMap,
                                                row,
                                                bXDataPresented,
@@ -1662,6 +1669,17 @@ void CSearchResultModel::setPlotView_Applicability( const QModelIndex& index, bo
             dataChanged(index, index);
         }
     }
+}
+
+void CSearchResultModel::setHighlightedRows(const tMsgIdSet& msgs)
+{
+    // SEND_ERR(QString("I need to highlight \"%1\" messages!").arg(msgs.size()));
+    mHighlightMessages = msgs;
+}
+
+const tMsgIdSet& CSearchResultModel::getHighlightedRows() const
+{
+    return mHighlightMessages;
 }
 
 PUML_PACKAGE_BEGIN(DMA_SearchView)

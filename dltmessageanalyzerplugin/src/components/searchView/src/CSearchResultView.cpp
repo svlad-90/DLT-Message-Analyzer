@@ -871,6 +871,20 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     {
         switchToNextCheckboxItem(false, static_cast<int>(eSearchResultColumn::UML_Applicability));
     }
+    else if((event->modifiers() & Qt::ControlModifier) != 0
+            && (event->key() == Qt::Key::Key_Down))
+    {
+        jumpToGroupedViewHighlightingMessage(eDirection::Next);
+    }
+    else if((event->modifiers() & Qt::ControlModifier) != 0
+            && (event->key() == Qt::Key::Key_Up))
+    {
+        jumpToGroupedViewHighlightingMessage(eDirection::Previous);
+    }
+    else if(event->key() == Qt::Key::Key_Escape)
+    {
+        clearGroupedViewHighlighting();
+    }
     else
     {
        tParent::keyPressEvent(event);
@@ -1154,6 +1168,53 @@ void CSearchResultView::handleSettingsManagerChange()
         }
 
         contextMenu.addSeparator();
+
+        {
+            if(nullptr != mpSpecificModel &&
+               false == mpSpecificModel->getHighlightedRows().empty())
+            {
+                contextMenu.addSeparator();
+
+                QMenu* pSubMenu = new QMenu("'Grouped view' highlighting settings", this);
+
+                {
+                    QAction* pAction = new QAction("Jump to previous msg", this);
+                    pAction->setShortcut(QKeySequence(tr("Ctrl+Up")));
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        jumpToGroupedViewHighlightingMessage(eDirection::Previous);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Jump to next msg", this);
+                    pAction->setShortcut(QKeySequence(tr("Ctrl+Down")));
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        jumpToGroupedViewHighlightingMessage(eDirection::Next);
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Remove 'grouped view' highlighting", this);
+                    pAction->setShortcut(QKeySequence(tr("Esc")));
+                    connect(pAction, &QAction::triggered, this, [this]()
+                    {
+                        clearGroupedViewHighlighting();
+                    });
+
+                    pSubMenu->addAction(pAction);
+                }
+
+                contextMenu.addMenu(pSubMenu);
+            }
+
+            contextMenu.addSeparator();
+        }
 
         {
             if(nullptr != mpFile)
@@ -1821,6 +1882,103 @@ void CSearchResultView::handleSettingsManagerChange()
     {
         forceUpdateWidthAndResetContentMap();
     });
+}
+
+void CSearchResultView::clearGroupedViewHighlighting()
+{
+    if(nullptr != mpSpecificModel)
+    {
+        mpSpecificModel->setHighlightedRows(tMsgIdSet());
+        viewport()->update();
+    }
+}
+
+void CSearchResultView::jumpToGroupedViewHighlightingMessage(eDirection direction)
+{
+    if(nullptr != mpSpecificModel)
+    {
+        const auto& highlightedRows = mpSpecificModel->getHighlightedRows();
+
+        if(false == highlightedRows.empty())
+        {
+            auto selectedRows = selectionModel()->selectedRows();
+
+            auto jumpToElement = [this](const tMsgId& msgId)
+            {
+                if(nullptr != mpSpecificModel)
+                {
+                    auto jumpRow = mpSpecificModel->getRowByMsgId(msgId);
+
+                    if(jumpRow >= 0)
+                    {
+                        clearSelection();
+                        selectRow(jumpRow);
+
+                        auto selectedRows = selectionModel()->selectedRows();
+                        if(false == selectedRows.empty())
+                        {
+                            scrollTo(selectedRows[0]);
+                        }
+                    }
+                }
+            };
+
+            auto jumpToFirstHighlightedElement = [&highlightedRows, &jumpToElement]()
+            {
+                jumpToElement(*highlightedRows.begin());
+            };
+
+            auto jumpToLastHighlightedElement = [&highlightedRows, &jumpToElement]()
+            {
+                jumpToElement(* --highlightedRows.end());
+            };
+
+            if(false == selectedRows.empty())
+            {
+                const auto& selectedRow = selectedRows[0];
+                auto msgIdCell = selectedRow.sibling(selectedRow.row(), static_cast<int>(eSearchResultColumn::Index));
+                const auto msgId = msgIdCell.data().value<tMsgId>();
+
+                switch(direction)
+                {
+                    case eDirection::Next:
+                    {
+                        auto upper = std::upper_bound(highlightedRows.begin(), highlightedRows.end(), msgId);
+
+                        if (upper != highlightedRows.end())
+                        {
+                            auto nextElementId = *upper;
+                            jumpToElement(nextElementId);
+                        }
+                        else
+                        {
+                            jumpToFirstHighlightedElement();
+                        }
+                    }
+                    break;
+                    case eDirection::Previous:
+                    {
+                        auto lower = std::lower_bound(highlightedRows.begin(), highlightedRows.end(), msgId);
+
+                        if (lower != highlightedRows.begin())
+                        {
+                            auto previousElementId = *(--lower);
+                            jumpToElement(previousElementId);
+                        }
+                        else
+                        {
+                            jumpToLastHighlightedElement();
+                        }
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                jumpToFirstHighlightedElement();
+            }
+        }
+    }
 }
 
 PUML_PACKAGE_BEGIN(DMA_SearchView_API)

@@ -47,7 +47,7 @@ public:
     tMsgWrapperPtr getMsg(const tMsgId& msgId) override;
     QString getFileName(int num = 0) override;
     bool isFiltered() const override;
-    int getMsgRealPos(int msgId) const override;
+    int getMsgIdFromIndexInMainTable(int msgIdxInMainTable) const override;
 
     //////////////////////// CACHING_FUNCTIONALITY ////////////////////////
 

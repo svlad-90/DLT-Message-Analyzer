@@ -71,9 +71,15 @@ signals:
      * @brief analysisStarted - signal, which notifies client about the start of the analysis.
      * @param requestId - the request id of the search
      * @param usedRegex - the regex with which the anlysis was started
-     * @oaram selectedAliases - the selected regex alises that were used to form the search query
+     * @param selectedAliases - the selected regex alises that were used to form the search query
      */
     void analysisStarted( const tRequestId& requestId, const QString& usedRegex, const QStringList& selectedAliases );
+
+    /**
+     * @brief analysisFinished - signal, which notifies client about the finish of the analysis.
+     * @param requestId - the request id of the search
+     */
+    void analysisFinished( const tRequestId& requestId );
 };
 
 typedef std::shared_ptr<IDLTMessageAnalyzerController> tDLTMessageAnalyzerControllerPtr;

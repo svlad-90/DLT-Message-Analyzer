@@ -183,8 +183,8 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
 
             for(int j= 0; j < chunkSize; ++j)
             {
-                auto msgIdxFiltered = startRange + j;
-                auto msgIdx = pFile->getMsgRealPos( msgIdxFiltered );
+                auto msgIdxInMainTable = startRange + j;
+                auto msgIdx = pFile->getMsgIdFromIndexInMainTable( msgIdxInMainTable );
                 auto pMsg = pFile->getMsg(msgIdx);
 
                 if(nullptr != pMsg)
@@ -219,7 +219,7 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
                     }
 
                     tItemMetadata itemMetadata( msgIdx,
-                                                msgIdxFiltered,
+                                                msgIdxInMainTable,
                                                 fieldRanges,
                                                 pStr->size(),
                                                 pMsg->getSize(),
@@ -231,7 +231,7 @@ bool CMTAnalyzer::regexAnalysisIteration(tRequestMap::iterator& inputIt, const t
                 {
                     qDebug() << "Failed to get msg with idx - " << startRange + j;
                     tItemMetadata itemMetadata( msgIdx,
-                                                msgIdxFiltered,
+                                                msgIdxInMainTable,
                                                 tFieldRanges(),
                                                 0,
                                                 0u,

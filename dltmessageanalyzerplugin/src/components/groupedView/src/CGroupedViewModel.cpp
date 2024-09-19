@@ -19,7 +19,7 @@ static const tQStringPtr sRootItemName = std::make_shared<QString>("Root");
 
 CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager,
                                      QObject *parent)
-    : QAbstractItemModel(parent),
+    : IGroupedViewModel(parent),
       CSettingsManagerClient(pSettingsManager),
       mRegex(),
       mSortingColumn(eGroupedViewColumn::Messages),
@@ -29,18 +29,15 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
       mFindHandler(),
       mAnalyzedValues()
 {   
-    mSortingHandler = [this](const QVector<tTreeItemPtr>& children,
+    mSortingHandler = [this](QVector<tTreeItemPtr>& children,
                             const int& sortingColumn,
-                            Qt::SortOrder sortingOrder) -> QVector<tTreeItemPtr>
+                            Qt::SortOrder sortingOrder)
     {
-        auto result = children;
-
         switch(static_cast<eGroupedViewColumn>(sortingColumn))
         {
             case eGroupedViewColumn::SubString:
             {
-                result = children;
-                std::sort(result.begin(), result.end(),
+                std::sort(children.begin(), children.end(),
                     [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
                     const tQStringPtrWrapper& lValSubString = lVal->data(sortingColumn).get<tQStringPtrWrapper>();
@@ -74,8 +71,7 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                     }
                 }
 
-                result = children;
-                std::sort(result.begin(), result.end(),
+                std::sort(children.begin(), children.end(),
                 [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
                     const auto& lValInt = lVal->data(sortingColumn).get<int>();
@@ -102,8 +98,7 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                     }
                 }
 
-                result = children;
-                std::sort(result.begin(), result.end(),
+                std::sort(children.begin(), children.end(),
                 [&sortingColumn](const tTreeItemPtr& lVal, const tTreeItemPtr& rVal)
                 {
                     const auto& lValInt = lVal->data(sortingColumn).get<double>();
@@ -120,10 +115,8 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
 
         if( sortingOrder == Qt::SortOrder::DescendingOrder)
         {
-            std::reverse(result.begin(), result.end());
+            std::reverse(children.begin(), children.end());
         }
-
-        return result;
     };
 
     mDuplicatesHandler =
@@ -140,14 +133,19 @@ CGroupedViewModel::CGroupedViewModel(const tSettingsManagerPtr& pSettingsManager
                 pItem->getWriteableData(payloadColumn) = pItem->getWriteableData(payloadColumn).get<int>() + dataItems[payloadColumn].get<int>();
             }
 
-            auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
+            const auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
 
             //Important to update metadata in item before further usage.
-            pItem->getWriteableData(metadataColumn) = dataItems[metadataColumn];
+            {
+                auto& existingMetadata = pItem->getWriteableData(metadataColumn).get<tGroupedViewMetadata>();
+                const auto& incomingMetadata = dataItems[metadataColumn].get<tGroupedViewMetadata>();
+                existingMetadata.msgId = incomingMetadata.msgId; // it should be the same, actually, as they are duplicated
+                existingMetadata.timeStamp = incomingMetadata.timeStamp;
+            }
 
-            auto metadataVariant = pItem->data(metadataColumn);
+            const auto& metadataVariant = pItem->data(metadataColumn);
 
-            auto metadata = metadataVariant.get<tGroupedViewMetadata>();
+            const auto& metadata = metadataVariant.get<tGroupedViewMetadata>();
             const auto& timeStamp = metadata.timeStamp;
             const auto& msgId = metadata.msgId;
 
@@ -286,7 +284,6 @@ void CGroupedViewModel::updateAverageValues(CTreeItem* pItem, bool updatePayload
 
         if(true == updateMessages)
         {
-
             pItem->getWriteableData(static_cast<int>(eGroupedViewColumn::PayloadPerSecondAverage)) = 0;
         }
     }
@@ -379,7 +376,6 @@ int CGroupedViewModel::rowCount(const QModelIndex &parent) const
 
     if(nullptr != parentItem)
     {
-        parentItem->sort(static_cast<int>(mSortingColumn), mSortOrder, false);
         result = parentItem->childCount();
     }
 
@@ -506,7 +502,29 @@ void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
                 dataVec.push_back( data );
             }
 
-            mpRootItem->addData( dataVec );
+            auto afterAppendFunction = [](CTreeItem* pItem)
+            {
+                // if it is a leaf node
+                if(nullptr != pItem && 0 == pItem->childCount())
+                {
+                    // we should overtake its msgId into the relatedMsgIds.
+                    const auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
+                    auto& existingMetadata = pItem->getWriteableData(metadataColumn).get<tGroupedViewMetadata>();
+
+                    if(existingMetadata.relatedMsgIds.index() == existingMetadata.relatedMsgIds.index_of<tMsgIdSet>())
+                    {
+                        existingMetadata.relatedMsgIds.get<tMsgIdSet>().insert(existingMetadata.msgId);
+                    }
+                    else
+                    {
+                        tMsgIdSet msgIdSet;
+                        msgIdSet.insert(existingMetadata.msgId);
+                        existingMetadata.relatedMsgIds = msgIdSet;
+                    }
+                }
+            };
+
+            mpRootItem->addData( dataVec, afterAppendFunction );
 
             if(true == update)
             {
@@ -779,6 +797,47 @@ void CGroupedViewModel::sort(int column, Qt::SortOrder order)
     }
 
     updateView();
+}
+
+tMsgIdSet CGroupedViewModel::getAllMessageIds(const QModelIndex& index)
+{
+    tMsgIdSet result;
+
+    if(false == index.isValid())
+        return result;
+
+    tTreeItem *pItem = static_cast<tTreeItemPtr>(index.internalPointer());
+
+    if(nullptr != pItem)
+    {
+        pItem->visit([&result](tTreeItemPtr pItem)
+        {
+            if(nullptr != pItem)
+            {
+                const auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
+                const auto& itemMetadata = pItem->getWriteableData(metadataColumn).get<tGroupedViewMetadata>();
+
+                if(itemMetadata.relatedMsgIds.index() == itemMetadata.relatedMsgIds.index_of<tMsgIdSet>())
+                {
+                    auto& insertSet = itemMetadata.relatedMsgIds.get<tMsgIdSet>();
+                    result.insert(insertSet.begin(), insertSet.end());
+                }
+            }
+
+            return true;
+        },
+        [](const tTreeItemPtr)
+        {
+            return true;
+        });
+    }
+
+    return result;
+}
+
+void CGroupedViewModel::sortByCurrentSortingColumn()
+{
+    sort(static_cast<int>(mSortingColumn), mSortOrder);
 }
 
 PUML_PACKAGE_BEGIN(DMA_GroupedView)

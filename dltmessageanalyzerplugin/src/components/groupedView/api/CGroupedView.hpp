@@ -21,6 +21,9 @@ public:
     void copyGroupedViewSelection() const;
     void setModel(QAbstractItemModel *model) override;
 
+signals:
+    void searchViewHighlightingRequested(const tMsgIdSet& msgIDs);
+
 protected:
     virtual void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>()) override;
     void keyPressEvent ( QKeyEvent * event ) override;
@@ -32,6 +35,7 @@ private:
     void changeLevelExpansion(const QModelIndex& expandIdx, bool bExpand);
     void updateColumnsVisibility();
     void updateWidth();
+    void highlightLines();
 
 private:
     enum class eUpdateRequired

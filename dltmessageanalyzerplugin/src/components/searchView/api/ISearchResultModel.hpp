@@ -7,8 +7,9 @@
 
 #include "common/Definitions.hpp"
 
-class ISearchResultModel
+class ISearchResultModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
 
     ISearchResultModel();
@@ -20,6 +21,10 @@ public:
     virtual void setFile(const tFileWrapperPtr& pFile) = 0;
     virtual std::pair<bool, tIntRange> addNextMessageIdxVec(const tFoundMatchesPack& foundMatchesPack) = 0;
     virtual int getFileIdx( const QModelIndex& idx ) const = 0;
+    virtual int getRowByMsgId( const tMsgId& id ) const = 0;
+    virtual void setHighlightedRows( const tMsgIdSet& msgs ) = 0;
+    virtual const tMsgIdSet& getHighlightedRows() const = 0;
+    virtual const tFoundMatchesPackItem& getFoundMatchesItemPack( const QModelIndex& modelIndex ) const = 0;
 
     enum eGanttDataItemType
     {

@@ -1070,6 +1070,13 @@ void CDLTMessageAnalyzer::cancel()
 
     mpGroupedViewModel->resetData();
     mpSearchResultModel->resetData();
+
+    if(nullptr != mpCustomPlotExtended)
+    {
+        mpCustomPlotExtended->reset();
+        mpCustomPlotExtended->replot();
+    }
+
     mpFiltersModel->resetCompletionData();
 
     updateProgress(0, eRequestState::SUCCESSFUL, true);

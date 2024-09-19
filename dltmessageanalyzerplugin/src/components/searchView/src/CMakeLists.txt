@@ -1,5 +1,6 @@
 set(WRAP_SRC ../api/CSearchResultView.hpp
-             ../api/CSearchViewComponent.hpp)
+             ../api/CSearchViewComponent.hpp
+             ../api/ISearchResultModel.hpp)
 
 DMA_qt_wrap_cpp(PROCESSED_MOCS WRAP_SRC)
 

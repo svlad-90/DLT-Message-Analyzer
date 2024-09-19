@@ -57,6 +57,15 @@ private:
     void forceUpdateWidthAndResetContentMap();
 
     eSearchResultColumn getLastVisibleColumn() const;
+    void clearGroupedViewHighlighting();
+
+    enum class eDirection
+    {
+        Next = 0,
+        Previous
+    };
+
+    void jumpToGroupedViewHighlightingMessage(eDirection direction);
 
 private:
 

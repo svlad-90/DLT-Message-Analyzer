@@ -80,6 +80,7 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
                     if(eRequestState::ERROR_STATE == progressNotificationDataCopy.requestState ||
                             eRequestState::SUCCESSFUL == progressNotificationDataCopy.requestState)
                     {
+                        analysisFinished(foundRequest.key());
                         mRequestDataMap.erase(foundRequest);
                         mSubRequestDataMap.erase(foundSubRequest);
                     }
@@ -89,6 +90,7 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
                     if(eRequestState::ERROR_STATE == progressNotificationData.requestState ||
                             eRequestState::SUCCESSFUL == progressNotificationData.requestState)
                     {
+                        analysisFinished(foundRequest.key());
                         mRequestDataMap.erase(foundRequest);
                         mSubRequestDataMap.erase(foundSubRequest);
                     }
@@ -200,6 +202,8 @@ tRequestId CContinuousAnalyzer::requestAnalyze( const std::weak_ptr<IDLTMessageA
 
             mRequestDataMap.insert(resultRequestId, requestData);
             mSubRequestDataMap.insert( subRequestId, resultRequestId );
+
+            analysisStarted(resultRequestId, requestParameters.regexStr, requestParameters.selectedAliases);
         }
     }
 
@@ -226,7 +230,8 @@ void CContinuousAnalyzer::cancelRequest( const std::weak_ptr<IDLTMessageAnalyzer
                 }
             }
 
-             mRequestDataMap.erase(foundRequest);
+            mRequestDataMap.erase(foundRequest);
+            analysisFinished(foundRequest.key());
         }
     }
 }

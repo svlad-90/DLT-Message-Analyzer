@@ -20,6 +20,8 @@
 #include "components/log/api/CLog.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
 
+#include "../api/IGroupedViewModel.hpp"
+
 #include "DMA_Plantuml.hpp"
 
 class CDoubleDelegate: public QStyledItemDelegate
@@ -58,6 +60,11 @@ namespace NShortcuts
     static bool isCollapseOneLevelShortcut( QKeyEvent * pEvent )
     {
         return pEvent && pEvent->modifiers() & Qt::ControlModifier && pEvent->modifiers() & Qt::ShiftModifier && pEvent->key() == Qt::Key_E;
+    }
+
+    static bool isHighlightLinesShortcut( QKeyEvent * pEvent )
+    {
+        return pEvent && pEvent->modifiers() & Qt::ControlModifier && pEvent->key() == Qt::Key_H;
     }
 }
 
@@ -217,6 +224,8 @@ CGroupedView::CGroupedView(QWidget *parent):
             isExpanded(index)? collapse(index) : expand(index);
         }
     });
+
+    setUniformRowHeights(true);
 }
 
 void CGroupedView::handleSettingsManagerChange()
@@ -424,10 +433,47 @@ void CGroupedView::handleSettingsManagerChange()
             }
         }
 
+        contextMenu.addSeparator();
+
+        {
+            auto selectedRows = selectionModel()->selectedRows();
+
+            if(1 == selectedRows.size()) // if one row is selected
+            {
+                {
+                    QAction* pAction = new QAction("Highlight in search view", this);
+                    pAction->setShortcut(QKeySequence(tr("Ctrl+H")));
+                    connect(pAction, &QAction::triggered, [this]()
+                    {
+                        highlightLines();
+                    });
+
+                    contextMenu.addAction(pAction);
+                }
+            }
+        }
+
         contextMenu.exec(mapToGlobal(pos));
     };
 
     connect( this, &QWidget::customContextMenuRequested, showContextMenu );
+}
+
+void CGroupedView::highlightLines()
+{
+    auto selectedRows = selectionModel()->selectedRows();
+
+    if(1 == selectedRows.size()) // if one row is selected
+    {
+        auto& selectedRow = selectedRows[0];
+        auto* pModel = model();
+
+        if(nullptr != pModel)
+        {
+            auto* pSpecificModel = static_cast<IGroupedViewModel*>(pModel);
+            searchViewHighlightingRequested(pSpecificModel->getAllMessageIds(selectedRow));
+        }
+    }
 }
 
 void CGroupedView::setModel(QAbstractItemModel *model)
@@ -671,6 +717,10 @@ void CGroupedView::keyPressEvent ( QKeyEvent * event )
             auto selectedRow = selectedRows[0];
             changeLevelExpansion(selectedRow, true);
         }
+    }
+    else if(true == NShortcuts::isHighlightLinesShortcut(event))
+    {
+        highlightLines();
     }
     else
     {

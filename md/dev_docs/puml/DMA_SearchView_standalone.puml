@@ -61,7 +61,4 @@ CSettingsManagerClient <|-- CSearchResultModel : extends
 ISearchResultModel <|-- CSearchResultModel : implements
 QAbstractTableModel <|-- CSearchResultModel : implements
 
-'====================Dependencies section====================
-CSearchResultHighlightingDelegate "1" *-- "1" CSearchResultModel : uses
-
 @enduml

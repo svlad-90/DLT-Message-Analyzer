@@ -16,8 +16,7 @@
 #include "../api/IGroupedViewModel.hpp"
 #include "components/settings/api/CSettingsManagerClient.hpp"
 
-class CGroupedViewModel : public QAbstractItemModel,
-                          public IGroupedViewModel,
+class CGroupedViewModel : public IGroupedViewModel,
                           public CSettingsManagerClient
 {
 public:
@@ -31,6 +30,8 @@ public:
     void addMatches( const tFoundMatches& matches, bool update ) override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     std::pair<bool /*result*/, QString /*error*/> exportToHTML(QString& resultHTML) override;
+    tMsgIdSet getAllMessageIds(const QModelIndex& index) override;
+    void sortByCurrentSortingColumn() override;
     // Implementation of the IGroupedViewModel ( end )
 
     QVariant data(const QModelIndex &index, int role) const override;

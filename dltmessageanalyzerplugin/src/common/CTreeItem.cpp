@@ -11,6 +11,8 @@
 
 #include "DMA_Plantuml.hpp"
 
+const int sInvalidIdx = -1;
+
 //CTreeItem
 void CTreeItem::visit( const tVisitFunction& preVisitFunction,
                        const tVisitFunction& postVisitFunction,
@@ -178,7 +180,7 @@ bool CTreeItem::visitInternal( const tVisitFunction& preVisitFunction,
 
         if(true == visitSorted)
         {
-            for( auto pChild : mSortedChildren )
+            for( auto pChild : mChildrenVec )
             {
                 if(nullptr != pChild)
                 {
@@ -262,20 +264,13 @@ void CTreeItem::sort(int column, Qt::SortOrder order, bool recursive)
 
     if(false == mbFirstLevelSorted)
     {
-        QVector<tTreeItemPtr> children;
-
-        for(const auto& pChild : mChildItems)
-        {
-            children.push_back(pChild);
-        }
-
         if(mSortingFunction)
         {
-            mSortedChildren = mSortingFunction(children, mSortingColumn, mSortOrder);
+            mSortingFunction(mChildrenVec, mSortingColumn, mSortOrder);
 
             int counter = 0;
 
-            for(auto& sortedChild : mSortedChildren)
+            for(auto& sortedChild : mChildrenVec)
             {
                 sortedChild->setIdx(counter++);
             }
@@ -288,7 +283,7 @@ void CTreeItem::sort(int column, Qt::SortOrder order, bool recursive)
     {
         if( false == mbWholeSorted )
         {
-            for( auto& child : mSortedChildren )
+            for( auto& child : mChildrenVec )
             {
                 child->sort(mSortingColumn, mSortOrder, recursive);
             }
@@ -361,10 +356,10 @@ bool CTreeItem::isFirstLevelSorted() const
 
 tTreeItemPtr CTreeItem::child(int row)
 {
-    if (row < 0 || row >= mSortedChildren.size())
+    if (row < 0 || row >= mChildrenVec.size())
         return nullptr;
 
-    return mSortedChildren[row];
+    return mChildrenVec[row];
 }
 
 
@@ -392,11 +387,11 @@ void CTreeItem::removeChild( const QString& key )
     {
         if(true == mbFirstLevelSorted)
         {
-            mSortedChildren.erase(mSortedChildren.begin() + foundChild.value()->getIdx());
+            mChildrenVec.erase(mChildrenVec.begin() + foundChild.value()->getIdx());
 
             auto counter = 0;
 
-            for( auto& pChild : mSortedChildren )
+            for( auto& pChild : mChildrenVec )
             {
                 if(nullptr != pChild)
                 {
@@ -412,7 +407,7 @@ void CTreeItem::removeChild( const QString& key )
 
 CTreeItem::~CTreeItem()
 {
-    mSortedChildren.clear();
+    mChildrenVec.clear();
     qDeleteAll(mChildItems);
 }
 
@@ -428,10 +423,11 @@ CTreeItem::CTreeItem(CTreeItem *pParent,
       mFindFunc(findFunc),
       mHandleDuplicateFunc(handleDuplicateFunc),
       mData(),
-      mSortedChildren(),
+      mChildrenVec(),
       mpGuard(std::make_shared<int>(0)),
       mpParentItem(pParent),
       mSortOrder(Qt::SortOrder::DescendingOrder),
+      mIdx(sInvalidIdx),
       mSortingColumn(defaultSortingColumn),
       mbFirstLevelSorted(true),
       mbWholeSorted(true)
@@ -445,7 +441,14 @@ tTreeItemPtr CTreeItem::appendChild(const tDataItem& key, const tData& additionI
                                          mHandleDuplicateFunc,
                                          mFindFunc);
 
-    mChildItems.insert(key, pTreeItem);
+    auto it = mChildItems.insert(key, pTreeItem);
+
+    if(it.value()->getIdx() == sInvalidIdx)
+    {
+        mChildrenVec.push_back(pTreeItem);
+        pTreeItem->setIdx(mChildItems.size());
+    }
+
     mbFirstLevelSorted = false;
     mbWholeSorted = false;
 
@@ -488,10 +491,12 @@ tDataItem& CTreeItem::getWriteableData( int column )
 
 void CTreeItem::addDataInternal( const tDataVec& dataVec,
                                  tTreeItemPtrVec& res,
-                                 int dataVecItemIdx )
+                                 int dataVecItemIdx,
+                                 tAfterAppendHandleLeafFunc afterAppendHandleLeafFunc )
 {
     if(false == dataVec.empty() )
     {
+        tTreeItemPtr pLeafChild = nullptr;
         const tData& additionItems = dataVec[static_cast<std::size_t>(dataVecItemIdx)];
 
         if(false == additionItems.empty())
@@ -504,6 +509,8 @@ void CTreeItem::addDataInternal( const tDataVec& dataVec,
                 {
                     auto foundChild = findRes.pItem;
 
+                    pLeafChild = foundChild;
+
                     if(mHandleDuplicateFunc)
                     {
                         mHandleDuplicateFunc( foundChild, *dataVec.begin() );
@@ -512,7 +519,7 @@ void CTreeItem::addDataInternal( const tDataVec& dataVec,
                     auto newDataVecItemIdx = ++dataVecItemIdx;
                     if(static_cast<std::size_t>(newDataVecItemIdx) < dataVec.size() )
                     {
-                        foundChild->addDataInternal( dataVec, res, newDataVecItemIdx );
+                        foundChild->addDataInternal( dataVec, res, newDataVecItemIdx, afterAppendHandleLeafFunc );
                     }
                 }
             }
@@ -522,10 +529,12 @@ void CTreeItem::addDataInternal( const tDataVec& dataVec,
 
                 if(pChild)
                 {
+                    pLeafChild = pChild;
+
                     auto newDataVecItemIdx = ++dataVecItemIdx;
                     if( static_cast<std::size_t>(newDataVecItemIdx) < dataVec.size() )
                     {
-                        pChild->addDataInternal( dataVec, res, newDataVecItemIdx );
+                        pChild->addDataInternal( dataVec, res, newDataVecItemIdx, afterAppendHandleLeafFunc );
                     }
 
                     res.push_back( pChild );
@@ -535,15 +544,23 @@ void CTreeItem::addDataInternal( const tDataVec& dataVec,
             mbFirstLevelSorted = false;
             mbWholeSorted = false;
         }
+
+        if(nullptr != pLeafChild &&
+           0 == pLeafChild->childCount() &&
+           afterAppendHandleLeafFunc)
+        {
+            afterAppendHandleLeafFunc(pLeafChild);
+        }
     }
 }
 
-tTreeItemPtrVec CTreeItem::addData( const tDataVec& dataVec  )
+tTreeItemPtrVec CTreeItem::addData( const tDataVec& dataVec,
+                                    tAfterAppendHandleLeafFunc afterAppendHandleLeafFunc  )
 {
     tTreeItemPtrVec result;
     result.reserve( static_cast<int>(dataVec.size()) );
 
-    addDataInternal(dataVec, result, 0);
+    addDataInternal(dataVec, result, 0, afterAppendHandleLeafFunc);
 
     tTreeItemPtrVec reversedResult;
     reversedResult.reserve(result.size());
