@@ -43,7 +43,9 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     mpFile(nullptr),
     mSearchRange(),
     mpSpecificModel(nullptr),
-    mContentSizeMap()
+    mContentSizeMap(),
+    mpCoverageNoteProvider(nullptr),
+    mpMainTabWidget(nullptr)
 {
     connect(this, &QTableView::clicked, [this](const QModelIndex &index)
     {
@@ -71,8 +73,9 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     });
 }
 
-void CSearchResultView::newSearchStarted()
+void CSearchResultView::newSearchStarted(const QString& regex)
 {
+    mUsedRegex = regex;
     mContentSizeMap.clear();
     mbIsViewFull = false;
     mbUserManuallyAdjustedLastVisibleColumnWidth = false;
@@ -517,8 +520,10 @@ bool CSearchResultView::isVerticalScrollBarVisible() const
     return IsVisible;
 }
 
-void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnlyPayload ) const
+QString CSearchResultView::getSelectionAsString( bool copyAsHTML, bool copyOnlyPayload ) const
 {
+    QString result;
+
     const QColor nonHighlightedColor(0,0,0);
 
     auto selectedRows = selectionModel()->selectedRows();
@@ -560,8 +565,8 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
         }
     }
 
-    typedef QPair<QString /*usual*/, QString /*rich*/> tClipboardItem;
-    QVector<tClipboardItem> clipboardItems;
+    typedef QPair<QString /*usual*/, QString /*rich*/> tCopyItem;
+    QVector<tCopyItem> copyItems;
     int finalRichStringSize = 0;
     int finalStringSize = 0;
 
@@ -610,7 +615,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [this, &clipboardItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [this, &copyItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field
@@ -650,7 +655,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                     subStr.append(" ");
                 }
 
-                clipboardItems.push_back(tClipboardItem(subStr, str));
+                copyItems.push_back(tCopyItem(subStr, str));
 
                 finalRichStringSize += str.size();
                 finalStringSize += columnStr.size();
@@ -666,7 +671,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
                 auto foundHighlightingItem = highlightingInfoMultiColor.find(field);
 
                 if(highlightingInfoMultiColor.end() != foundHighlightingItem)
-                {   
+                {
                     const auto& fieldRanges = matchesItemPack.getItemMetadata().fieldRanges;
                     const auto& foundfieldRange = fieldRanges.find(field);
 
@@ -729,7 +734,7 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
         }
 
         static const QString newLine("<br>");
-        clipboardItems.push_back(tClipboardItem("\n",newLine));
+        copyItems.push_back(tCopyItem("\n",newLine));
         finalStringSize+=newLine.size();
     }
 
@@ -739,21 +744,29 @@ void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnly
     QString finalText;
     finalText.reserve(finalStringSize);
 
-    for(const auto& clipboardItem : clipboardItems)
+    for(const auto& copyItem : copyItems)
     {
-        finalText.append(clipboardItem.first);
-        finalRichText.append(clipboardItem.second);
+        finalText.append(copyItem.first);
+        finalRichText.append(copyItem.second);
     }
 
+    if(copyAsHTML)
+    {
+        result = finalRichText;
+    }
+    else
+    {
+        result = finalText;
+    }
+
+    return result;
+}
+
+void CSearchResultView::copySelectionToClipboard( bool copyAsHTML, bool copyOnlyPayload ) const
+{
     QClipboard *pClipboard = QApplication::clipboard();
     QMimeData *rich_text = new QMimeData();
-
-    if(true == copyAsHTML)
-    {
-        rich_text->setHtml(finalRichText);
-    }
-
-    rich_text->setText(finalText);
+    rich_text->setText(getSelectionAsString(copyAsHTML, copyOnlyPayload));
     pClipboard->setMimeData(rich_text);
 }
 
@@ -884,6 +897,12 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
     else if(event->key() == Qt::Key::Key_Escape)
     {
         clearGroupedViewHighlighting();
+    }
+    else if((event->modifiers() & Qt::ControlModifier) != 0 &&
+            (event->modifiers() & Qt::AltModifier) != 0 &&
+            (event->key() == Qt::Key::Key_A))
+    {
+        addComment();
     }
     else
     {
@@ -1045,6 +1064,36 @@ void CSearchResultView::scrollTo(const QModelIndex &index, ScrollHint hint)
     }
 }
 
+void CSearchResultView::setCoverageNoteProvider(const tCoverageNoteProviderPtr& pCoverageNoteProvider)
+{
+    mpCoverageNoteProvider = pCoverageNoteProvider;
+}
+
+void CSearchResultView::setMainTabWidget(QTabWidget* pTabWidget)
+{
+    mpMainTabWidget = pTabWidget;
+}
+
+void CSearchResultView::addComment()
+{
+    if(mpCoverageNoteProvider)
+    {
+        auto coverageNoteId = mpCoverageNoteProvider->addCoverageNoteItem();
+        mpCoverageNoteProvider->setCoverageNoteItemRegex(coverageNoteId, mUsedRegex);
+        mpCoverageNoteProvider->setCoverageNoteMessage(coverageNoteId, getSelectionAsString(true, false));
+
+        if(mpMainTabWidget)
+        {
+            auto bGroupedViewFeatureActive = getSettingsManager()->getGroupedViewFeatureActive();
+            auto bUML_FeatureActive = getSettingsManager()->getUML_FeatureActive();
+            mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::COVERAGE_NOTE_VIEW)
+                                             - !bGroupedViewFeatureActive - !bUML_FeatureActive);
+        }
+
+        mpCoverageNoteProvider->scrollToLastCoveageNoteItem();
+    }
+}
+
 void CSearchResultView::handleSettingsManagerChange()
 {
     auto pDelegate = new CSearchResultHighlightingDelegate(this);
@@ -1054,6 +1103,24 @@ void CSearchResultView::handleSettingsManagerChange()
     auto showContextMenu = [this](const QPoint &pos)
     {
         QMenu contextMenu("Context menu", this);
+
+        {
+            QAction* pAction = new QAction("Add comment", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+A")));
+            connect(pAction, &QAction::triggered, this, [this]()
+            {
+                addComment();
+            });
+
+            if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        contextMenu.addSeparator();
 
         {
             QAction* pAction = new QAction("Copy", this);
@@ -1986,5 +2053,6 @@ PUML_PACKAGE_BEGIN(DMA_SearchView_API)
         PUML_INHERITANCE_CHECKED(QTableView, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ICoverageNoteProvider, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

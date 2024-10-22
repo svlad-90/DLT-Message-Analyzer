@@ -35,6 +35,7 @@ class CLogsWrapperComponent;
 class CRegexHistoryComponent;
 class CSettingsComponent;
 class CAnalyzerComponent;
+class CCoverageNoteComponent;
 class Form;
 
 namespace DMA
@@ -153,6 +154,7 @@ private: // members
     std::shared_ptr<CLogoComponent> mpLogoComponent;
     std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
     std::shared_ptr<CRegexHistoryComponent> mpRegexHistoryComponent;
+    std::shared_ptr<CCoverageNoteComponent> mpCoverageNoteComponent;
     std::shared_ptr<CSettingsComponent> mpSettingsComponent;
     std::shared_ptr<CAnalyzerComponent> mpAnalyzerComponent;
 

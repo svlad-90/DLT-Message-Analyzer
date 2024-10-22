@@ -30,6 +30,7 @@ target_link_libraries( DMA_plugin PUBLIC
                       DMA_plotView
                       DMA_PCRE
                       DMA_regexHistory
+                      DMA_coverageNote
                       qdlt
                       ${QT_PREFIX}::Widgets 
                       DMA_framework_base 

@@ -107,6 +107,7 @@ public:
     void setGroupedViewFeatureActive(bool val) override;
     void setRegexCompletion_CaseSensitive(const bool& val) override;
     void setRegexCompletion_SearchPolicy(const bool& val) override;
+    void setUserName(const QString& val) override;
 
     void setSelectedRegexFile(const QString& val) override;
 
@@ -172,6 +173,7 @@ public:
     const bool& getGroupedViewFeatureActive() const override;
     const bool& getRegexCompletion_CaseSensitive() const override;
     const bool& getRegexCompletion_SearchPolicy() const override;
+    const QString& getUsername() const override;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
@@ -512,6 +514,8 @@ private: // fields
 
     // Regex usage statistics
     TSettingItem<tRegexUsageStatisticsItemMap> mSetting_RegexUsageStatistics;
+
+    TSettingItem<QString> mSetting_Username;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

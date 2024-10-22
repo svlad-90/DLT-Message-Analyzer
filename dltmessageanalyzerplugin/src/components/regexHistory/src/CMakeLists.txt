@@ -17,4 +17,3 @@ target_link_libraries( DMA_regexHistory PUBLIC
                        DMA_framework_base
                        DMA_framework_component
                        DMA_Plantuml )
-

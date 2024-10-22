@@ -20,6 +20,7 @@ It's main purposes is to:
 ----
 #### [DMA_Analyzer](../../dltmessageanalyzerplugin/src/components/analyzer/doc/doc.md)
 #### [DMA_Common](../../dltmessageanalyzerplugin/src/common/doc/doc.md)
+#### [DMA_CoverageNote](../../dltmessageanalyzerplugin/src/components/coverageNote/doc/doc.md)
 #### [DMA_FiltersView](../../dltmessageanalyzerplugin/src/components/filtersView/doc/doc.md)
 #### [DMA_GroupedView](../../dltmessageanalyzerplugin/src/components/groupedView/doc/doc.md)
 #### [DMA_Log](../../dltmessageanalyzerplugin/src/components/log/doc/doc.md)

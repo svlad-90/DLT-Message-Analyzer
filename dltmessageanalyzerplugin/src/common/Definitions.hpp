@@ -768,4 +768,15 @@ tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, e
  */
 QColor getChartColor();
 
+enum class eTabIndexes
+{
+    SEARCH_VIEW = 0,
+    GROUPED_VIEW = 1,
+    UML_VIEW = 2,
+    PLOT_VIEW = 3,
+    COVERAGE_NOTE_VIEW = 4,
+    FILES_VIEW = 5,
+    CONSOLE_VIEW = 6
+};
+
 #endif // DEFINITIONS_HPP

@@ -158,6 +158,7 @@ public:
     virtual void setGroupedViewFeatureActive(bool val) = 0;
     virtual void setRegexCompletion_CaseSensitive(const bool& val) = 0;
     virtual void setRegexCompletion_SearchPolicy(const bool& val) = 0;
+    virtual void setUserName(const QString& val) = 0;
 
     /**
      * @brief setSelectedRegexFile - updates selected regex file
@@ -228,6 +229,7 @@ public:
     virtual const bool& getGroupedViewFeatureActive() const = 0;
     virtual const bool& getRegexCompletion_CaseSensitive() const = 0;
     virtual const bool& getRegexCompletion_SearchPolicy() const = 0;
+    virtual const QString& getUsername() const = 0;
 
     // allowed ranges
     virtual const TOptional<tRange<int>>& getSetting_NumberOfThreads_AllowedRange() const = 0;
@@ -299,4 +301,5 @@ signals:
     void regexCompletion_CaseSensitiveChanged(const bool& regexCompletion_CaseSensitive);
     void regexCompletion_MaxNumberOfSuggestionsChanged(const int& regexCompletion_MaxNumberOfSuggestions);
     void regexCompletion_SearchPolicyChanged(const bool& regexCompletion_SearchPolicy);
+    void usernameChanged(const QString& username);
 };

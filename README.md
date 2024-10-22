@@ -99,6 +99,10 @@ There are the following schemas of deployment:
 
 - Plugin supports integration with the QCustomPlot library, which allows you to create plots out of the logs
 
+### [Coverage note](./md/coverage_note/coverage_note.md)
+
+- Plugin supports creation of the coverage note and export of it to the JSON and HTML formats
+
 ### [Files view](./md/files_view/files_view.md)
 
 - Extension, which lists the paths & names of all currently opened DLT files

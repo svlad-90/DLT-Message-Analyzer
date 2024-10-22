@@ -9,14 +9,19 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CSearchViewComponent::CSearchViewComponent( CSearchResultView* pSearchResultView,
-                                            const tSettingsManagerPtr& pSettingsManager ):
+CSearchViewComponent::CSearchViewComponent( QTabWidget* pMainTabWidget,
+                                            CSearchResultView* pSearchResultView,
+                                            const tSettingsManagerPtr& pSettingsManager,
+                                            const tCoverageNoteProviderPtr& pCoverageNoteProviderPtr ):
 CSettingsManagerClient(pSettingsManager),
 mpSearchResultModel(nullptr),
 mpSearchResultView(pSearchResultView),
-mpSearchViewTableJumper(nullptr)
+mpSearchViewTableJumper(nullptr),
+mpCoverageNoteProviderPtr(pCoverageNoteProviderPtr)
 {
     DMA_FORCE_LINK_REFERENCE(ISearchResultModel)
+    mpSearchResultView->setCoverageNoteProvider(mpCoverageNoteProviderPtr);
+    mpSearchResultView->setMainTabWidget(pMainTabWidget);
 }
 
 std::shared_ptr<ISearchResultModel> CSearchViewComponent::getSearchResultModel()
@@ -119,5 +124,7 @@ PUML_PACKAGE_BEGIN(DMA_SearchView_API)
         PUML_USE_DEPENDENCY_CHECKED(CSearchResultModel, 1, 1, using to create ISearchResultModel)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTableMemoryJumper, 1, 1, contains)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ICoverageNoteProvider, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTabWidget, 1, 1, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()
