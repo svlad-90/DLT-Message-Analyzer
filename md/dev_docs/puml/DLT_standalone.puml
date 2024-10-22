@@ -18,23 +18,11 @@ class "QDltMsg"
 {
 }
 
-class "QDltPlugin"
-{
-}
-
 interface "QDltPluginControlInterface"
 {
 }
 
-class "QDltPluginManager"
-{
-}
-
 interface "QDltPluginViewerInterface"
-{
-}
-
-class "QListView"
 {
 }
 

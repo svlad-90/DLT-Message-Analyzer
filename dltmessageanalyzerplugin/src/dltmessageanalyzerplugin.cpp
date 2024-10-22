@@ -43,6 +43,7 @@
 #include "components/groupedView/api/CGroupedView.hpp"
 #include "components/searchView/api/CSearchResultView.hpp"
 #include "components/groupedView/api/IGroupedViewModel.hpp"
+#include "components/coverageNote/api/CCoverageNoteComponent.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -65,6 +66,7 @@ mpUMLViewComponent(nullptr),
 mpLogoComponent(nullptr),
 mpLogsWrapperComponent(nullptr),
 mpRegexHistoryComponent(nullptr),
+mpCoverageNoteComponent(nullptr),
 mpSettingsComponent(nullptr),
 mpAnalyzerComponent(nullptr),
 mDisconnectionTimer()
@@ -200,8 +202,31 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pSearchViewComponent = std::make_shared<CSearchViewComponent>(mpForm->getSearchResultTableView(),
-                                                                           mpSettingsComponent->getSettingsManager());
+        auto pCoverageNoteComponent = std::make_shared<CCoverageNoteComponent>(mpSettingsComponent->getSettingsManager(),
+                                                                               mpForm->getCNCommentTextEdit(),
+                                                                               mpForm->getCNItemsTableView(),
+                                                                               mpForm->getCNMessageTextEdit(),
+                                                                               mpForm->getCNRegexTextEdit(),
+                                                                               mpForm->getCNUseRegexButton(),
+                                                                               mpForm->getCNCurrentFileLineEdit(),
+                                                                               mpForm->getFilesLineEdit());
+        mpCoverageNoteComponent = pCoverageNoteComponent;
+
+        auto initResult = pCoverageNoteComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            SEND_ERR(QString("Failed to initialize %1").arg(pCoverageNoteComponent->getName()));
+        }
+
+        mComponents.push_back(pCoverageNoteComponent);
+    }
+
+    {
+        auto pSearchViewComponent = std::make_shared<CSearchViewComponent>(mpForm->getMainTabWidget(),
+                                                                           mpForm->getSearchResultTableView(),
+                                                                           mpSettingsComponent->getSettingsManager(),
+                                                                           mpCoverageNoteComponent->getCoverageNoteProviderPtr());
         mpSearchViewComponent = pSearchViewComponent;
 
         auto initResult = pSearchViewComponent->startInit();
@@ -449,7 +474,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpSearchViewComponent->getSearchResultModel(),
                                                                                                       mpLogsWrapperComponent,
                                                                                                       mpSettingsComponent->getSettingsManager(),
-                                                                                                      mpPlotViewComponent->getPlot());
+                                                                                                      mpPlotViewComponent->getPlot(),
+                                                                                                      mpCoverageNoteComponent->getCoverageNoteProviderPtr());
 
     connect(mpForm->getRegexLineEdit(), &QLineEdit::returnPressed,
             this, [this]()
@@ -471,6 +497,16 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     if(nullptr != mpDLTMessageAnalyzer)
     {
         mpDLTMessageAnalyzer->setMainTableView(mpMainTableView);
+    }
+
+    if(nullptr != mpForm->getSearchResultTableView())
+    {
+        mpForm->getSearchResultTableView()->setMainTableView(mpMainTableView);
+    }
+
+    if(nullptr != mpCoverageNoteComponent)
+    {
+        mpCoverageNoteComponent->setMainTableView(mpMainTableView);
     }
 #endif
 
@@ -522,6 +558,20 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                         }
                     }
                 }
+            }
+        });
+    }
+
+    if(mpCoverageNoteComponent->getCoverageNoteProviderPtr() &&
+       mpSearchViewComponent->getSearchResultView())
+    {
+        connect(mpCoverageNoteComponent->getCoverageNoteProviderPtr().get(),
+                &ICoverageNoteProvider::addCommentFromMainTableRequested,
+                this, [this]()
+        {
+            if(mpSearchViewComponent)
+            {
+                mpSearchViewComponent->getSearchResultView()->addCommentFromMainTable();
             }
         });
     }
@@ -706,7 +756,7 @@ void DLTMessageAnalyzerPlugin::initMainTableView(QTableView* pMainTableView)
 
     if(nullptr != mpDLTMessageAnalyzer)
     {
-        mpDLTMessageAnalyzer->setMainTableView(pMainTableView);
+        mpDLTMessageAnalyzer->setMainTableView(mpMainTableView);
     }
 }
 
@@ -920,6 +970,7 @@ PUML_PACKAGE_BEGIN(DMA_Plugin)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogsWrapperComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CPlotViewComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryComponent, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CCoverageNoteComponent, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QTimer, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

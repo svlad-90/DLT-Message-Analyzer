@@ -20,6 +20,9 @@ package "DLT_Message_Analyzer Dependencies" {
     package "Qt" {
         [qt5]
         [qt6]
+    }
+
+    package "QCustomPlot" {
         [qcustomplot]
     }
 
@@ -47,6 +50,10 @@ package "DLT_Message_Analyzer Dependencies" {
 
     package "Variant_lite" {
         [variant_lite]
+    }
+
+    package "json"{
+        [nlohmann/json]
     }
 
     package "Github_actions"{
@@ -81,5 +88,7 @@ package "DLT_Message_Analyzer Dependencies" {
 [dlt_message_analyzer_github] --> [actions/checkout] : https://github.com/actions/checkout
 [dlt_message_analyzer_github] --> [jurplel/install_qt_action] : https://github.com/jurplel/install-qt-action
 [dlt_message_analyzer_github] --> [stefanzweifel/git_auto_commit_action] : https://github.com/stefanzweifel/git-auto-commit-action
+
+[dlt_message_analyzer_github] --> [nlohmann/json] : https://github.com/nlohmann/json
 
 @enduml

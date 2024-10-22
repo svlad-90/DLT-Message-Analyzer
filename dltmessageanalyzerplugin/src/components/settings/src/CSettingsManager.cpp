@@ -29,6 +29,7 @@ static const QString sSettingsManager_Root_SettingsFile = "root_settings.json";
 static const QString sSettingsManagerVersionKey = "settingsManagerVersion";
 static const QString sAliasesKey = "aliases";
 static const QString sRegexUsageStatisticsKey = "regexUsageStatistics";
+static const QString sUsernameKey = "username";
 static const QString sAliasKey = "alias";
 static const QString sRegexKey = "regex";
 static const QString sIsDefaultKey = "isDefault";
@@ -96,6 +97,25 @@ static const QString sRegexCompletion_SearchPolicyKey = "RegexCompletion_SearchP
 
 static const tSettingsManagerVersion sDefaultSettingsManagerVersion = static_cast<tSettingsManagerVersion>(-1);
 static const tSettingsManagerVersion sCurrentSettingsManagerVersion = 2u; // current version of settings manager used by SW.
+
+static QString getCurrentUserName()
+{
+#ifdef Q_OS_WIN
+    // On Windows, use USERNAME
+    QString username = QString::fromLocal8Bit(qgetenv("USERNAME"));
+#else
+    // On Linux/macOS, use USER
+    QString username = QString::fromLocal8Bit(qgetenv("USER"));
+#endif
+
+    // Handle empty username (in case the environment variable is missing)
+    if (username.isEmpty())
+    {
+        username = "UnknownUser";  // Fallback value
+    }
+
+    return username;
+}
 
 static tSearchResultColumnsVisibilityMap fillInDefaultSearchResultColumnsVisibilityMap()
 {
@@ -517,6 +537,14 @@ CSettingsManager::CSettingsManager():
             // this data is not critical and is stored to file ONLY during exit.
         },
         tRegexUsageStatisticsItemMap())),
+    mSetting_Username(createStringSettingsItem(sUsernameKey,
+        [this](const QString&,
+               const QString& data){ usernameChanged(data); },
+        []()
+        {
+            // this data is not critical and is stored to file ONLY during exit.
+        },
+        getCurrentUserName())),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -575,6 +603,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_JavaPathEnvVar);
     mUserSettingItemPtrVec.push_back(&mSetting_JavaCustomPath);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewFeatureActive);
+    mUserSettingItemPtrVec.push_back(&mSetting_Username);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1860,6 +1889,11 @@ void CSettingsManager::setRegexCompletion_SearchPolicy(const bool& val)
     mSetting_RegexCompletion_SearchPolicy.setData(val);
 }
 
+void CSettingsManager::setUserName(const QString& val)
+{
+    mSetting_Username.setData(val);
+}
+
 void CSettingsManager::setSearchViewLastColumnWidthStrategy(const int& val)
 {
     mSetting_SearchViewLastColumnWidthStrategy.setData(val);
@@ -2121,6 +2155,11 @@ const bool& CSettingsManager::getRegexCompletion_CaseSensitive() const
 const bool& CSettingsManager::getRegexCompletion_SearchPolicy() const
 {
     return mSetting_RegexCompletion_SearchPolicy.getData();
+}
+
+const QString& CSettingsManager::getUsername() const
+{
+    return mSetting_Username.getData();
 }
 
 const int& CSettingsManager::getSearchViewLastColumnWidthStrategy() const

@@ -555,6 +555,11 @@ bool tQStringPtrWrapper::operator== ( const tQStringPtrWrapper& rVal ) const
 
     return ( *pString == *rVal.pString );
 }
+
+bool tQStringPtrWrapper::operator!= ( const tQStringPtrWrapper& rVal ) const
+{
+    return !(*this == rVal);
+}
 //////////////////////////////////////////////////////////////////////////
 
 struct tAnalysisRange
@@ -3613,6 +3618,10 @@ PUML_PACKAGE_BEGIN(Qt)
     PUML_CLASS_END()
     PUML_CLASS_BEGIN(QFileSystemWatcher)
     PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QTextEdit)
+    PUML_CLASS_END()
+    PUML_CLASS_BEGIN(QListView)
+    PUML_CLASS_END()
 PUML_PACKAGE_END()
 
 PUML_PACKAGE_BEGIN(DLT)
@@ -3622,15 +3631,15 @@ PUML_PACKAGE_BEGIN(DLT)
     PUML_INTERFACE_END()
     PUML_INTERFACE_BEGIN(QDltPluginViewerInterface)
     PUML_INTERFACE_END()
+#ifdef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     PUML_CLASS_BEGIN(QDltPlugin)
     PUML_CLASS_END()
     PUML_CLASS_BEGIN(QDltPluginManager)
     PUML_CLASS_END()
+#endif
     PUML_CLASS_BEGIN(QDltFile)
     PUML_CLASS_END()
     PUML_CLASS_BEGIN(QDltMsg)
-    PUML_CLASS_END()
-    PUML_CLASS_BEGIN(QListView)
     PUML_CLASS_END()
 PUML_PACKAGE_END()
 
@@ -3652,5 +3661,10 @@ PUML_PACKAGE_BEGIN(qcustomplot)
 PUML_CLASS_END()
     PUML_CLASS_BEGIN(QCPGraph)
         PUML_INHERITANCE(QObject, extends)
+    PUML_CLASS_END()
+PUML_PACKAGE_END()
+
+PUML_PACKAGE_BEGIN(nlohmann_json)
+    PUML_CLASS_BEGIN(nlohmann::json)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

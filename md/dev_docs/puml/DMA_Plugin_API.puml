@@ -39,6 +39,15 @@ class "CTableMemoryJumper"
 
 }
 
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "ICoverageNoteProvider"
+{
+}
+
+}
+
 package "DMA_FiltersView_API" #DDDDDD
 {
 
@@ -257,6 +266,7 @@ CDLTMessageAnalyzer "1" --> "1" CRegexHistoryLineEdit : uses and passes
 CDLTMessageAnalyzer "1" o-- "1" CSearchResultView : uses
 CDLTMessageAnalyzer "1" o-- "1" CTableMemoryJumper : gets and uses
 CDLTMessageAnalyzer "1" o-- "1" CUMLView : uses
+CDLTMessageAnalyzer "1" o-- "1" ICoverageNoteProvider : uses
 CDLTMessageAnalyzer "1" --> "1" IDLTMessageAnalyzerController : gets and feeds to IDLTMessageAnalyzerControllerConsumer
 CDLTMessageAnalyzer "1" o-- "1" IFileWrapper : uses
 CDLTMessageAnalyzer "1" o-- "1" IFiltersModel : uses

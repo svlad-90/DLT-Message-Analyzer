@@ -1,0 +1,1 @@
+DMA_add_subdirectory_with_clang_tidy(src)

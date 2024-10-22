@@ -16,7 +16,7 @@
 #include "common/Definitions.hpp"
 
 #define DLT_MESSAGE_ANALYZER_NAME "DLT-Message-Analyzer"
-#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.28"
+#define DLT_MESSAGE_ANALYZER_PLUGIN_VERSION "1.0.29"
 #define DLT_MESSAGE_ANALYZER_PLUGIN_AUTHOR "Vladyslav Goncharuk <svlad1990@gmail.com>"
 
 class CDLTMessageAnalyzer;
@@ -35,6 +35,7 @@ class CLogsWrapperComponent;
 class CRegexHistoryComponent;
 class CSettingsComponent;
 class CAnalyzerComponent;
+class CCoverageNoteComponent;
 class Form;
 
 namespace DMA
@@ -153,6 +154,7 @@ private: // members
     std::shared_ptr<CLogoComponent> mpLogoComponent;
     std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
     std::shared_ptr<CRegexHistoryComponent> mpRegexHistoryComponent;
+    std::shared_ptr<CCoverageNoteComponent> mpCoverageNoteComponent;
     std::shared_ptr<CSettingsComponent> mpSettingsComponent;
     std::shared_ptr<CAnalyzerComponent> mpAnalyzerComponent;
 

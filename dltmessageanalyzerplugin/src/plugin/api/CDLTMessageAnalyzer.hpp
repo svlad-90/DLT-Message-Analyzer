@@ -24,6 +24,7 @@
 #include "common/Definitions.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerControllerConsumer.hpp"
 #include "components/settings/api/CSettingsManagerClient.hpp"
+#include "components/coverageNote/api/ICoverageNoteProvider.hpp"
 
 #include "QElapsedTimer"
 
@@ -73,7 +74,8 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
                             const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                             const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
                             const tSettingsManagerPtr& pSettingsManager,
-                            CCustomPlotExtended* pCustomPlotExtended);
+                            CCustomPlotExtended* pCustomPlotExtended,
+                            const tCoverageNoteProviderPtr& pCoverageNoteProvider);
 
         /**
          * @brief setFile - set's the file to be used for analysis
@@ -320,4 +322,5 @@ signals:
         std::weak_ptr<IDLTLogsWrapperCreator> mpDLTLogsWrapperCreator;
 
         CCustomPlotExtended* mpCustomPlotExtended;
+        tCoverageNoteProviderPtr mpCoverageNoteProvider;
 };

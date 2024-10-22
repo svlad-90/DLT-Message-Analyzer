@@ -25,6 +25,24 @@ class "CAnalyzerComponent"
 
 }
 
+package "DMA_CoverageNote" #DDDDDD
+{
+
+class "CCoverageNoteProvider"
+{
+}
+
+}
+
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "CCoverageNoteComponent"
+{
+}
+
+}
+
 package "DMA_FiltersView" #DDDDDD
 {
 
@@ -242,6 +260,8 @@ DMA::IComponent <|-- CSettingsComponent : implements
 QObject <|-- ISettingsManager : extends
 
 '====================Dependencies section====================
+CCoverageNoteProvider "1" --> "1" ISettingsManager : uses
+CCoverageNoteComponent "1" --> "1" ISettingsManager : passes to nested entities
 CDLTMessageAnalyzer "1" o-- "1" ISettingsManager : gets and uses
 CRegexHistoryProvider "1" o-- "1" ISettingsManager : uses
 CRegexHistoryComponent "1" --> "1" ISettingsManager : passes

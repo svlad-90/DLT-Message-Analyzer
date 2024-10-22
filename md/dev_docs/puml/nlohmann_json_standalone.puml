@@ -1,0 +1,15 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "nlohmann_json" #DDDDDD
+{
+
+class "nlohmann::json"
+{
+}
+
+}
+
+@enduml

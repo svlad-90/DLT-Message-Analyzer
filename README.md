@@ -4,16 +4,11 @@
 
 ----
 
-## v.1.0.28 released!
+## <span style="color:red">v.1.0.29 released!</span>
 
-<span style="color:red">Checkout the ['Gantt chart'](./md/plot_view/plot_view.md#gantt-charts) support!</span>
+New features in release v.1.0.29:
 
-----
-
-## Implemented features targeted for release v1.0.29:
-
-<span style="color:red">Use the HEAD revision to try out the following features:</span>
-
+- [Coverage note](./md/coverage_note/coverage_note.md)
 - [Grouped view highlighting](./md/grouped_view/grouped_view.md#highlighting-the-group-in-the-search-view)
 - [Regex history](.//md/search/search.md#regex-history)
 
@@ -98,6 +93,10 @@ There are the following schemas of deployment:
 ### [Plot view](./md/plot_view/plot_view.md)
 
 - Plugin supports integration with the QCustomPlot library, which allows you to create plots out of the logs
+
+### [Coverage note](./md/coverage_note/coverage_note.md)
+
+- Plugin supports creation of the coverage note and exporting it to JSON and HTML formats
 
 ### [Files view](./md/files_view/files_view.md)
 

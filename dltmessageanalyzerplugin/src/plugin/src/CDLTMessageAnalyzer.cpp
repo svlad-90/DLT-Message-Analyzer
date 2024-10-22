@@ -81,7 +81,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                                          const std::shared_ptr<ISearchResultModel>& pSearchResultModel,
                                          const std::weak_ptr<IDLTLogsWrapperCreator>& pDLTLogsWrapperCreator,
                                          const tSettingsManagerPtr& pSettingsManager,
-                                         CCustomPlotExtended* pCustomPlotExtended):
+                                         CCustomPlotExtended* pCustomPlotExtended,
+                                         const tCoverageNoteProviderPtr& pCoverageNoteProvider):
     IDLTMessageAnalyzerControllerConsumer (pController),
     CSettingsManagerClient(pSettingsManager),
     // default widgets
@@ -125,6 +126,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   , mpSearchViewTableJumper(pSearchViewTableJumper)
   , mpDLTLogsWrapperCreator(pDLTLogsWrapperCreator)
   , mpCustomPlotExtended(pCustomPlotExtended)
+  , mpCoverageNoteProvider(pCoverageNoteProvider)
 {
     //////////////METATYPES_REGISTRATION/////////////////////
     qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
@@ -158,7 +160,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     {
         if(nullptr != mpRegexLineEdit)
         {
-            connect( mpRegexLineEdit, &QLineEdit::textChanged, [this](const QString& regex)
+            connect( mpRegexLineEdit, &QLineEdit::textChanged, this, [this](const QString& regex)
             {
                 mpFiltersModel->setUsedRegex(regex);
             });
@@ -198,24 +200,34 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             }
         });
 
-        connect ( mpFiltersModel.get(), &IFiltersModel::regexUpdatedByUser, [this](const QString& regex)
+        connect ( mpFiltersModel.get(), &IFiltersModel::regexUpdatedByUser, this, [this](const QString& regex)
         {
             mpRegexLineEdit->selectAll();
             mpRegexLineEdit->insert( regex );
             static_cast<void>(analyze());
         });
 
-        connect( mpPatternsTreeView, &CPatternsView::editPatternTriggered, [this]()
+        if(mpCoverageNoteProvider)
+        {
+            connect ( mpCoverageNoteProvider.get(), &ICoverageNoteProvider::regexApplicationRequested, this, [this](const QString& regex)
+            {
+                mpRegexLineEdit->selectAll();
+                mpRegexLineEdit->insert( regex );
+                static_cast<void>(analyze());
+            });
+        }
+
+        connect( mpPatternsTreeView, &CPatternsView::editPatternTriggered, this, [this]()
         {
             editPattern();
         });
 
-        connect( mpPatternsTreeView, &CPatternsView::deletePatternTriggered, [this]()
+        connect( mpPatternsTreeView, &CPatternsView::deletePatternTriggered, this, [this]()
         {
             deletePattern();
         });
 
-        connect( mpPatternsTreeView, &CPatternsView::pastePatternTriggered, [this](const CPatternsView::tCopyPastePatternData& copyPastePatternData)
+        connect( mpPatternsTreeView, &CPatternsView::pastePatternTriggered, this, [this](const CPatternsView::tCopyPastePatternData& copyPastePatternData)
         {
             // if we paste form one file to another
             if(copyPastePatternData.file != getSettingsManager()->getSelectedRegexFile())
@@ -228,7 +240,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             }
         });
 
-        connect( mpPatternsTreeView, &CPatternsView::overwriteFromInputFieldTriggered, [this]()
+        connect( mpPatternsTreeView, &CPatternsView::overwriteFromInputFieldTriggered, this, [this]()
         {
             overwritePattern();
         });
@@ -259,7 +271,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
             {
                 QAction* pAction = new QAction("Case sensitive search", mpRegexLineEdit);
-                connect(pAction, &QAction::triggered, [this](bool checked)
+                connect(pAction, &QAction::triggered, this, [this](bool checked)
                 {
                     getSettingsManager()->setCaseSensitiveRegex(checked);
                 });
@@ -277,7 +289,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 #else
                 pAction->setShortcut(Qt::CTRL | Qt::Key_S);
                 #endif
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     addPattern( mpRegexLineEdit->text() );
                 });
@@ -292,7 +304,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 #else
                 pAction->setShortcut(Qt::CTRL | Qt::Key_Space);
                 #endif
-                connect(pAction, &QAction::triggered, [this]()
+                connect(pAction, &QAction::triggered, this, [this]()
                 {
                     mpRegexLineEdit->activateRegexHistory();
                 });
@@ -305,7 +317,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
                 {
                     QAction* pAction = new QAction("Case sensitive", mpRegexLineEdit);
-                    connect(pAction, &QAction::triggered, [this](bool checked)
+                    connect(pAction, &QAction::triggered, this, [this](bool checked)
                     {
                         getSettingsManager()->setRegexCompletion_CaseSensitive(checked);
                     });
@@ -322,7 +334,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
                     {
                         QAction* pAction = new QAction("\"Starts with\"", mpRegexLineEdit);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             getSettingsManager()->setRegexCompletion_SearchPolicy(false);
                         });
@@ -335,7 +347,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
                     {
                         QAction* pAction = new QAction("\"Contains\"", mpRegexLineEdit);
-                        connect(pAction, &QAction::triggered, [this]()
+                        connect(pAction, &QAction::triggered, this, [this]()
                         {
                             getSettingsManager()->setRegexCompletion_SearchPolicy(true);
                         });
@@ -355,7 +367,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             pContextMenu->exec(mpRegexLineEdit->mapToGlobal(pos));
         };
 
-        connect( mpRegexLineEdit, &QWidget::customContextMenuRequested, showContextMenu );
+        connect( mpRegexLineEdit, &QWidget::customContextMenuRequested, this, showContextMenu );
     }
 
     if(nullptr != mpNumberOfThreadsCombobBox &&
@@ -401,7 +413,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 if(nullptr != pFoundChild)
                 {
                     connect( pFoundChild, &QPushButton::pressed,
-                             [this]()
+                             this, [this]()
                     {
                         mSearchRange.isFiltered = false; // reset filtering of range
                         cancel();
@@ -453,12 +465,12 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpSearchResultView)
     {
-        connect( mpSearchResultView, &CSearchResultView::restartSearch, [this]()
+        connect( mpSearchResultView, &CSearchResultView::restartSearch, this, [this]()
         {
             static_cast<void>(analyze());
         });
 
-        connect( mpSearchResultView, &CSearchResultView::searchRangeChanged, [this](const tIntRangeProperty& searchRange, bool bReset)
+        connect( mpSearchResultView, &CSearchResultView::searchRangeChanged, this, [this](const tIntRangeProperty& searchRange, bool bReset)
         {
             if(false == bReset)
             {
@@ -501,7 +513,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpSearchResultView)
     {
-        connect(mpSearchResultView, &CSearchResultView::clearSearchResultsRequested, [this](){cancel();});
+        connect(mpSearchResultView, &CSearchResultView::clearSearchResultsRequested, this, [this](){cancel();});
     }
 
     mpRegexDirectoryMonitor = std::make_shared<CRegexDirectoryMonitor>();
@@ -509,7 +521,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     if(nullptr != mpRegexDirectoryMonitor)
     {
         connect(mpRegexDirectoryMonitor.get(), &CRegexDirectoryMonitor::regexItemSetChanged,
-        [this](const CRegexDirectoryMonitor::tFoundRegexItemSet& regexFiles)
+        this, [this](const CRegexDirectoryMonitor::tFoundRegexItemSet& regexFiles)
         {
             //SEND_MSG(QString("[CDLTMessageAnalyzer]: Fetched selected regex file is - \"%1\"").arg(getSettingsManager()->getSelectedRegexFile()));
 
@@ -598,7 +610,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpPatternsModel)
     {
-        connect(mpPatternsModel.get(), &IPatternsModel::patternsRefreshed, [this]()
+        connect(mpPatternsModel.get(), &IPatternsModel::patternsRefreshed, this, [this]()
         {
             updateStatusLabel("Patterns refreshed ...");
         });
@@ -875,27 +887,27 @@ void CDLTMessageAnalyzer::setFile(const tFileWrapperPtr& pFile)
         }
     };
 
-    connect( mpFile.get(), &IFileWrapper::isEnabledChanged, [updateCacheStatus](bool)
+    connect( mpFile.get(), &IFileWrapper::isEnabledChanged, this, [updateCacheStatus](bool)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &IFileWrapper::loadChanged, [updateCacheStatus](unsigned int)
+    connect( mpFile.get(), &IFileWrapper::loadChanged, this, [updateCacheStatus](unsigned int)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &IFileWrapper::currentSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
+    connect( mpFile.get(), &IFileWrapper::currentSizeMbChanged, this, [updateCacheStatus](tCacheSizeMB)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &IFileWrapper::maxSizeMbChanged, [updateCacheStatus](tCacheSizeMB)
+    connect( mpFile.get(), &IFileWrapper::maxSizeMbChanged, this, [updateCacheStatus](tCacheSizeMB)
     {
         updateCacheStatus();
     });
 
-    connect( mpFile.get(), &IFileWrapper::fullChanged, [updateCacheStatus](bool)
+    connect( mpFile.get(), &IFileWrapper::fullChanged, this, [updateCacheStatus](bool)
     {
         updateCacheStatus();
     });
@@ -907,11 +919,6 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
     {
         updateStatusLabel( "Initial enabling error! Please, visit the \"https://github.com/svlad-90/DLT-Message-Analyzer/blob/master/md/troubleshooting/troubleshooting.md\", which addresses this issue", true );
         return false;
-    }
-
-    if(nullptr != mpSearchResultView)
-    {
-        mpSearchResultView->newSearchStarted();
     }
 
     if(nullptr != mpUMLView)
@@ -945,6 +952,20 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
         return false;
     }
 
+    if(mpMainTabWidget)
+    {
+        bool jumpToSearchView = false;
+
+        if(mpMainTabWidget->currentIndex() > (static_cast<int>(eTabIndexes::GROUPED_VIEW) - !getSettingsManager()->getGroupedViewFeatureActive()))
+        {
+            jumpToSearchView = true;
+        }
+
+        if(jumpToSearchView)
+        {
+            mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::SEARCH_VIEW));
+        }
+    }
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         if(nullptr != mpMessageDecoder && false == mpDLTLogsWrapperCreator.expired())
@@ -976,6 +997,11 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
     if( nullptr != mpRegexLineEdit )
     {
         regex = mpRegexLineEdit->text();
+    }
+
+    if(nullptr != mpSearchResultView)
+    {
+        mpSearchResultView->newSearchStarted(regex);
     }
 
     if(0 != regex.size())
@@ -1957,6 +1983,7 @@ PUML_PACKAGE_BEGIN(DMA_Plugin_API)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, gets and uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, gets and uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(ICoverageNoteProvider, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
         PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, uses and passes)
     PUML_CLASS_END()
