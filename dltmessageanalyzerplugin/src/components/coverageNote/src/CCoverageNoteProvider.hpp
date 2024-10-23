@@ -44,49 +44,45 @@ class CCoverageNoteProvider : public ICoverageNoteProvider,
 {
     Q_OBJECT
 public:
-    CCoverageNoteProvider(QTabWidget* pMainTabWidget,
-                          const tSettingsManagerPtr& pSettingsManager,
+    CCoverageNoteProvider(const tSettingsManagerPtr& pSettingsManager,
                           QTextEdit* commentTextEdit,
                           QTableView* itemsTableView,
                           QTextEdit* messagesTextEdit,
-                          QPushButton* openButton,
                           QTextEdit* regexTextEdit,
                           QPushButton* useRegexButton,
                           QObject *parent = nullptr);
 
     // file level API
-    bool loadCoverageNoteFile(const QString& filePath) override;
-    bool saveCoverageNoteFile(const QString& filePath) override;
-    void clearCoverageNote() override;
     bool exportCoverageNoteAsHTML(const QString& targetPath) override;
 
     // coverage note item methods
     tCoverageNoteItemId addCoverageNoteItem() override;
-    void moveCoverageNoteItem(const tCoverageNoteItemId& from,
-                              const tCoverageNoteItemId& to,
-                              bool after = true) override;
 
     void setCoverageNoteItemRegex(const tCoverageNoteItemId& id, const QString& regex) override;
-    void setCoverageNoteMessage(const tCoverageNoteItemId& id,
-                                const QString& coverageNoteMessage) override;
+    void setCoverageNoteItemMessage(const tCoverageNoteItemId& id,
+                            const QString& comment) override;
     void scrollToLastCoveageNoteItem() override;
-
-    tCoverageNoteItemPtr getCoverageNoteItem(const tCoverageNoteItemId& id) const override;
 
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     void removeSelectedCoverageNote();
     void removeCoverageNoteItem(const tCoverageNoteItemId& id);
+    bool loadCoverageNoteFile(const QString& filePath);
+    bool saveCoverageNoteFile(const QString& filePath);
+    void saveCoverageNote(bool saveAsMode = false);
+    void loadCoverageNote();
+    void addGeneralComment();
+    void normalizeColumnsSize();
+    bool clearCoverageNote();
 
 private:
     tCoverageNote mCoverageNote;
     QTextEdit* mpCommentTextEdit;
     QTableView* mpItemsTableView;
     QTextEdit* mpMessagesTextEdit;
-    QPushButton* mpOpenButton;
     QTextEdit* mpRegexTextEdit;
     QPushButton* mpUseRegexButton;
     std::shared_ptr<CoverageNoteTableModel> mpCoverageNoteTableModel;
-    QTabWidget* mpMainTabWidget;
+    QString mLoadedJsonFilePath;
 };

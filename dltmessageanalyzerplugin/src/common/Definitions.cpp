@@ -555,6 +555,11 @@ bool tQStringPtrWrapper::operator== ( const tQStringPtrWrapper& rVal ) const
 
     return ( *pString == *rVal.pString );
 }
+
+bool tQStringPtrWrapper::operator!= ( const tQStringPtrWrapper& rVal ) const
+{
+    return !(*this == rVal);
+}
 //////////////////////////////////////////////////////////////////////////
 
 struct tAnalysisRange

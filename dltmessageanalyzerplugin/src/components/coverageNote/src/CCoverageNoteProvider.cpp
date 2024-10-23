@@ -4,16 +4,19 @@
 #include "QTextStream"
 #include "QKeyEvent"
 #include "QMessageBox"
+#include "QFileDialog"
+#include "QHeaderView"
 
 #include "components/log/api/CLog.hpp"
 
 CoverageNoteTableModel::CoverageNoteTableModel(tCoverageNote& coverageNote,QObject *parent)
-    : QAbstractTableModel(parent), mCoverageNote(coverageNote)
+    : QAbstractTableModel(parent),
+      mCoverageNote(coverageNote)
 {}
 
 int CoverageNoteTableModel::rowCount(const QModelIndex &) const
 {
-    return mCoverageNote.coverageNoteItemVec.size();
+    return mCoverageNote.size();
 }
 
 int CoverageNoteTableModel::columnCount(const QModelIndex &) const
@@ -29,25 +32,17 @@ QVariant CoverageNoteTableModel::data(const QModelIndex &index, int role) const
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-            auto pElement = mCoverageNote.coverageNoteItemVec[index.row()];
-
-            if(pElement)
+            if(static_cast<eColumn>(index.column()) == eColumn::INDEX)
             {
-                if(static_cast<eColumn>(index.column()) == eColumn::INDEX)
-                {
-                    result = index.row();
-                }
-                else if(static_cast<eColumn>(index.column()) == eColumn::TIME)
-                {
-                    result = pElement->time;
-                }
-                else if(static_cast<eColumn>(index.column()) == eColumn::USERNAME)
-                {
-                    if(pElement->userName.pString)
-                    {
-                        result = *pElement->userName.pString;
-                    }
-                }
+                result = index.row();
+            }
+            else if(static_cast<eColumn>(index.column()) == eColumn::TIME)
+            {
+                result = mCoverageNote.getDateTime(index.row());
+            }
+            else if(static_cast<eColumn>(index.column()) == eColumn::USERNAME)
+            {
+                result = *mCoverageNote.getUsername(index.row());
             }
         }
     }
@@ -59,18 +54,13 @@ bool CoverageNoteTableModel::setData(const QModelIndex &index, const QVariant &v
 {
     bool bResult = false;
 
-    auto pElement = mCoverageNote.coverageNoteItemVec[index.row()];
-
-    if(pElement)
+    if (role == Qt::EditRole)
     {
-        if (role == Qt::EditRole)
+        if(static_cast<eColumn>(index.column()) == eColumn::USERNAME)
         {
-            if(static_cast<eColumn>(index.column()) == eColumn::USERNAME)
-            {
-                pElement->userName.pString = std::make_shared<QString>(value.toString());
-                emit dataChanged(index, index);
-                bResult = true;
-            }
+            mCoverageNote.setUsername(index.row(), value.toString());
+            emit dataChanged(index, index);
+            bResult = true;
         }
     }
 
@@ -140,15 +130,12 @@ QVariant CoverageNoteTableModel::headerData(int section, Qt::Orientation orienta
 
 ////////////////////////////////////////////////////////////////////////////
 
-static const int FIRST_INDEX = 0;
 static const int INVALID_INDEX = -1;
 
-CCoverageNoteProvider::CCoverageNoteProvider(QTabWidget* pMainTabWidget,
-                                             const tSettingsManagerPtr& pSettingsManager,
+CCoverageNoteProvider::CCoverageNoteProvider(const tSettingsManagerPtr& pSettingsManager,
                                              QTextEdit* commentTextEdit,
                                              QTableView* itemsTableView,
                                              QTextEdit* messagesTextEdit,
-                                             QPushButton* openButton,
                                              QTextEdit* regexTextEdit,
                                              QPushButton* useRegexButton,
                                              QObject *parent):
@@ -157,12 +144,21 @@ CSettingsManagerClient(pSettingsManager),
 mpCommentTextEdit(commentTextEdit),
 mpItemsTableView(itemsTableView),
 mpMessagesTextEdit(messagesTextEdit),
-mpOpenButton(openButton),
 mpRegexTextEdit(regexTextEdit),
 mpUseRegexButton(useRegexButton),
 mpCoverageNoteTableModel(std::make_shared<CoverageNoteTableModel>(mCoverageNote)),
-mpMainTabWidget(pMainTabWidget)
+mLoadedJsonFilePath()
 {
+    if(mpMessagesTextEdit)
+    {
+        mpMessagesTextEdit->setReadOnly(true);
+    }
+
+    if(mpRegexTextEdit)
+    {
+        mpRegexTextEdit->setReadOnly(true);
+    }
+
     if(mpItemsTableView)
     {
         mpItemsTableView->setModel(mpCoverageNoteTableModel.get());
@@ -189,7 +185,7 @@ mpMainTabWidget(pMainTabWidget)
                     {
                         if(mpCoverageNoteTableModel)
                         {
-                            addCoverageNoteItem();
+                            addGeneralComment();
                         }
                     });
                     contextMenu.addAction(pAction);
@@ -202,18 +198,61 @@ mpMainTabWidget(pMainTabWidget)
                     {
                         auto selectedRows = pSelectionModel->selectedRows();
 
-                        if(selectedRows.size() == 1)
-                        {
-                            QAction* pAction = new QAction("Delete comment", mpItemsTableView);
-                            pAction->setShortcut(QKeySequence("Del"));
+                        QAction* pAction = new QAction("Delete comment", mpItemsTableView);
+                        pAction->setShortcut(QKeySequence("Del"));
 
-                            connect(pAction, &QAction::triggered, [this]()
-                            {
-                                removeSelectedCoverageNote();
-                            });
-                            contextMenu.addAction(pAction);
-                        }
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            removeSelectedCoverageNote();
+                        });
+                        pAction->setEnabled(selectedRows.size() == 1);
+                        contextMenu.addAction(pAction);
                     }
+                }
+
+                {
+                    QAction* pAction = new QAction("Save coverage note...", mpItemsTableView);
+                        pAction->setShortcut(QKeySequence("Ctrl+S"));
+
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            saveCoverageNote();
+                        });
+                        pAction->setEnabled(!mCoverageNote.empty());
+                        contextMenu.addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Save coverage note as...", mpItemsTableView);
+
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            saveCoverageNote(true);
+                        });
+                        pAction->setEnabled(!mCoverageNote.empty());
+                        contextMenu.addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Open coverage note...", mpItemsTableView);
+                        pAction->setShortcut(QKeySequence("Ctrl+O"));
+
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            loadCoverageNote();
+                        });
+                        contextMenu.addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Create new coverage note...", mpItemsTableView);
+                        pAction->setShortcut(QKeySequence("Ctrl+N"));
+
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            static_cast<void>(clearCoverageNote());
+                        });
+                        contextMenu.addAction(pAction);
                 }
             }
 
@@ -223,6 +262,21 @@ mpMainTabWidget(pMainTabWidget)
         connect( mpItemsTableView, &QWidget::customContextMenuRequested, showContextMenu );
 
         mpItemsTableView->installEventFilter(this);
+
+        if(mpCommentTextEdit)
+        {
+            mpCommentTextEdit->installEventFilter(this);
+        }
+
+        if(mpMessagesTextEdit)
+        {
+            mpMessagesTextEdit->installEventFilter(this);
+        }
+
+        if(mpRegexTextEdit)
+        {
+            mpRegexTextEdit->installEventFilter(this);
+        }
 
         auto pSelectionModel = mpItemsTableView->selectionModel();
         if(pSelectionModel)
@@ -237,49 +291,21 @@ mpMainTabWidget(pMainTabWidget)
                     if(index.isValid())
                     {
                         auto rowId = index.row();
-                        if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
+                        if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.size()))
                         {
-                            auto& pItem = mCoverageNote.coverageNoteItemVec[rowId];
-
-                            if(pItem)
+                            if(mpMessagesTextEdit)
                             {
-                                if(mpMessagesTextEdit)
-                                {
-                                    QString txt;
+                                mpMessagesTextEdit->setText(*mCoverageNote.getMessage(rowId));
+                            }
 
-                                    if(pItem->noteMessage.pString)
-                                    {
-                                        txt.append(*pItem->noteMessage.pString);
-                                    }
+                            if(mpCommentTextEdit)
+                            {
+                                mpCommentTextEdit->setText(*mCoverageNote.getComment(rowId));
+                            }
 
-                                    mpMessagesTextEdit->setText(txt);
-                                }
-
-                                if(mpCommentTextEdit)
-                                {
-                                    QString txt;
-
-
-                                    if(pItem->message.pString)
-                                    {
-                                        txt.append(*pItem->message.pString);
-                                    }
-
-                                    mpCommentTextEdit->setText(txt);
-                                }
-
-                                if(mpRegexTextEdit)
-                                {
-                                    QString txt;
-
-
-                                    if(pItem->regex.pString)
-                                    {
-                                        txt.append(*pItem->regex.pString);
-                                    }
-
-                                    mpRegexTextEdit->setText(txt);
-                                }
+                            if(mpRegexTextEdit)
+                            {
+                                mpRegexTextEdit->setText(*mCoverageNote.getRegex(rowId));
                             }
                         }
                     }
@@ -322,7 +348,7 @@ mpMainTabWidget(pMainTabWidget)
 
     if(mpUseRegexButton)
     {
-        connect( mpUseRegexButton, &QPushButton::pressed, [this]()
+        connect( mpUseRegexButton, &QPushButton::clicked, [this](bool)
         {
             if(mpRegexTextEdit)
             {
@@ -331,10 +357,6 @@ mpMainTabWidget(pMainTabWidget)
                 if(!txt.isEmpty())
                 {
                     regexApplicationRequested(txt);
-                    if(mpMainTabWidget)
-                    {
-                        mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::SEARCH_VIEW));
-                    }
                 }
             }
         });
@@ -369,119 +391,182 @@ void CCoverageNoteProvider::removeSelectedCoverageNote()
     }
 }
 
+void CCoverageNoteProvider::saveCoverageNote(bool saveAsMode)
+{
+    QString filePath;
+
+    if(mLoadedJsonFilePath.isEmpty() || saveAsMode)
+    {
+        filePath = QFileDialog::getSaveFileName(
+            nullptr,
+            "Save coverage note",         // Dialog title
+            QDir::homePath(),             // Default directory (home directory)
+            "JSON Files (*.json)"         // Filter to only show JSON files
+        );
+
+        if (filePath.isEmpty()) {
+            SEND_WRN(QString("No File Selected. Please select or specify a valid file."));
+            return;  // If no file is selected, exit the function
+        }
+
+        // Ensure the file name has the correct ".json" extension
+        if (!filePath.endsWith(".json", Qt::CaseInsensitive)) {
+            filePath += ".json";
+        }
+    }
+    else
+    {
+        filePath = mLoadedJsonFilePath;
+    }
+
+    if(saveCoverageNoteFile(filePath))
+    {
+        mCoverageNote.resetModified();
+    }
+}
+
+void CCoverageNoteProvider::loadCoverageNote()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        nullptr,
+        "Open coverage note",         // Dialog title
+        QDir::homePath(),             // Default directory (home directory)
+        "JSON Files (*.json)"         // Filter to only show JSON files
+    );
+
+    if (filePath.isEmpty()) {
+        SEND_WRN(QString("No File Selected. Please select or specify a valid file."));
+        return;  // If no file is selected, exit the function
+    }
+
+    // Ensure the file name has the correct ".json" extension
+    if (!filePath.endsWith(".json", Qt::CaseInsensitive)) {
+        filePath += ".json";
+    }
+
+    if(loadCoverageNoteFile(filePath))
+    {
+        mLoadedJsonFilePath = filePath;
+        mCoverageNote.resetModified();
+    }
+}
+
+#define HANDLE_FOCUS_OUT_EVENT(TEXT_EDIT, TABLE_VIEW, FIELD_NAME) \
+if(TEXT_EDIT && TABLE_VIEW) \
+{ \
+    auto pSelectionModel = TABLE_VIEW->selectionModel(); \
+ \
+    if(pSelectionModel) \
+    { \
+        auto selectedRows = pSelectionModel->selectedRows(); \
+ \
+        if(selectedRows.size() == 1) \
+        { \
+            auto rowId = selectedRows[0].row(); \
+ \
+            if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.size())) \
+            { \
+                mCoverageNote.set##FIELD_NAME(rowId, TEXT_EDIT->toHtml()); \
+            } \
+        } \
+    } \
+ \
+    bResult = true; \
+}
+
 bool CCoverageNoteProvider::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == mpItemsTableView)
+    if(!mpItemsTableView || !mpMessagesTextEdit || !mpRegexTextEdit || !mpCommentTextEdit)
+        return QObject::eventFilter(obj, event);
+
+    auto handleGenericShortcuts = [this, &event]() -> bool
     {
+        bool bResult = false;
+
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
         if (event->type() == QEvent::KeyPress)
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
             if (keyEvent->key() == Qt::Key_Delete)
             {
                 removeSelectedCoverageNote();
-                return true;  // Key event handled, stop propagation
+                bResult = true;  // Key event handled, stop propagation
+                event->accept();
             }
             else if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
             (keyEvent->modifiers() & Qt::AltModifier) != 0 &&
             (keyEvent->key() == Qt::Key::Key_A))
             {
-                if(mpCoverageNoteTableModel)
-                {
-                    addCoverageNoteItem();
-                }
-                return true;  // Key event handled, stop propagation
+                addGeneralComment();
+                event->accept();
+                bResult = true;  // Key event handled, stop propagation
             }
         }
-    }
-    else if(obj == mpCommentTextEdit)
-    {
-        if (event->type() == QEvent::FocusOut)
+        else if(event->type() == QEvent::ShortcutOverride)
         {
-            if(mpCommentTextEdit && mpItemsTableView)
+            if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
+            (keyEvent->key() == Qt::Key::Key_S))
             {
-                auto pSelectionModel = mpItemsTableView->selectionModel();
-
-                if(pSelectionModel)
-                {
-                    auto selectedRows = pSelectionModel->selectedRows();
-
-                    if(selectedRows.size() == 1)
-                    {
-                        auto rowId = selectedRows[0].row();
-
-                        if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
-                        {
-                            auto pItem = mCoverageNote.coverageNoteItemVec[rowId];
-                            if(pItem)
-                            {
-                                pItem->message.pString = std::make_shared<QString>(mpCommentTextEdit->toHtml());
-                            }
-                        }
-                    }
-                }
+                saveCoverageNote();
+                event->accept();
+                bResult = true;
+            }
+            else if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
+            (keyEvent->key() == Qt::Key::Key_O))
+            {
+                loadCoverageNote();
+                event->accept();
+                bResult = true;
+            }
+            else if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
+            (keyEvent->key() == Qt::Key::Key_N))
+            {
+                static_cast<void>(clearCoverageNote());
+                event->accept();
+                bResult = true;  // Key event handled, stop propagation
             }
         }
-    }
-    else if(obj == mpMessagesTextEdit)
+
+        return bResult;
+    };
+
+    bool bResult = false;
+
+    if (event->type() == QEvent::KeyPress ||
+        event->type() == QEvent::ShortcutOverride)
     {
-        if (event->type() == QEvent::FocusOut)
+        bResult = handleGenericShortcuts();
+
+        if(!bResult)
         {
-            if(mpMessagesTextEdit && mpItemsTableView)
-            {
-                auto pSelectionModel = mpItemsTableView->selectionModel();
-
-                if(pSelectionModel)
-                {
-                    auto selectedRows = pSelectionModel->selectedRows();
-
-                    if(selectedRows.size() == 1)
-                    {
-                        auto rowId = selectedRows[0].row();
-
-                        if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
-                        {
-                            auto pItem = mCoverageNote.coverageNoteItemVec[rowId];
-                            if(pItem)
-                            {
-                                pItem->noteMessage.pString = std::make_shared<QString>(mpMessagesTextEdit->toHtml());
-                            }
-                        }
-                    }
-                }
-            }
+            bResult = QObject::eventFilter(obj, event);
         }
     }
-    else if(obj == mpRegexTextEdit)
+    else if (event->type() == QEvent::FocusOut)
     {
-        if (event->type() == QEvent::FocusOut)
+        if(obj == mpCommentTextEdit)
         {
-            if(mpRegexTextEdit && mpItemsTableView)
-            {
-                auto pSelectionModel = mpItemsTableView->selectionModel();
-
-                if(pSelectionModel)
-                {
-                    auto selectedRows = pSelectionModel->selectedRows();
-
-                    if(selectedRows.size() == 1)
-                    {
-                        auto rowId = selectedRows[0].row();
-
-                        if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
-                        {
-                            auto pItem = mCoverageNote.coverageNoteItemVec[rowId];
-                            if(pItem)
-                            {
-                                pItem->regex.pString = std::make_shared<QString>(mpRegexTextEdit->toHtml());
-                            }
-                        }
-                    }
-                }
-            }
+            HANDLE_FOCUS_OUT_EVENT(mpCommentTextEdit, mpItemsTableView, Comment)
+        }
+        else if(obj == mpMessagesTextEdit)
+        {
+            HANDLE_FOCUS_OUT_EVENT(mpMessagesTextEdit, mpItemsTableView, Message)
+        }
+        else if(obj == mpRegexTextEdit)
+        {
+            HANDLE_FOCUS_OUT_EVENT(mpRegexTextEdit, mpItemsTableView, Regex)
+        }
+        else
+        {
+            bResult = QObject::eventFilter(obj, event);
         }
     }
+    else
+    {
+        bResult = QObject::eventFilter(obj, event);
+    }
 
-    return QObject::eventFilter(obj, event);  // Continue with default processing
+    return bResult;
 }
 
 bool CCoverageNoteProvider::loadCoverageNoteFile(const QString& filePath)
@@ -489,17 +574,32 @@ bool CCoverageNoteProvider::loadCoverageNoteFile(const QString& filePath)
     bool bResult = false;
 
     QFile jsonFile(filePath);
-    if(jsonFile.open(QFile::ReadWrite))
+    if(jsonFile.open(QFile::ReadOnly))
     {
         nlohmann::json jsonData;
         try
         {
-            jsonData = nlohmann::json::parse(jsonFile.readAll());
-            bResult = mCoverageNote.parseCoverageNote(jsonData);
+            bResult = clearCoverageNote();
 
-            if(!bResult)
+            if(bResult)
             {
-                SEND_ERR(QString("Error during the parsing of the coverage note json! File path - '%1'").arg(filePath));
+                jsonData = nlohmann::json::parse(jsonFile.readAll());
+    
+                bResult = mCoverageNote.parseCoverageNote(jsonData);
+    
+                mpCoverageNoteTableModel->beginInsertRows(QModelIndex(), 0, mCoverageNote.size() - 1);
+                if(!bResult)
+                {
+                    SEND_ERR(QString("Error during the parsing of the coverage note json! File path - '%1'").arg(filePath));
+                }
+                else
+                {
+                    SEND_MSG(QString("Successfully loaded the coverage note - '%1'").arg(filePath));
+                }
+
+                mpCoverageNoteTableModel->endInsertRows();
+
+                normalizeColumnsSize();
             }
         }
         catch (const std::exception & e)
@@ -515,18 +615,42 @@ bool CCoverageNoteProvider::loadCoverageNoteFile(const QString& filePath)
     return bResult;
 }
 
+void CCoverageNoteProvider::normalizeColumnsSize()
+{
+    if(mpItemsTableView)
+    {
+       mpItemsTableView->resizeColumnsToContents();
+
+       QHeaderView* pHeader = mpItemsTableView->horizontalHeader();
+
+       if(pHeader)
+       {
+           int lastColumnIndex = pHeader->count() - 1;
+
+           for (int i = 0; i < lastColumnIndex; ++i)
+           {
+               pHeader->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+           }
+
+           pHeader->setSectionResizeMode(lastColumnIndex, QHeaderView::Stretch);
+       }
+    }
+}
+
 bool CCoverageNoteProvider::saveCoverageNoteFile(const QString& filePath)
 {
     bool bResult = false;
 
     QFile jsonFile(filePath);
-    if(jsonFile.open(QFile::ReadWrite))
+    if(jsonFile.open(QFile::Truncate|QFile::WriteOnly))
     {
         try
         {
             auto jsonContent = mCoverageNote.serializeCoverageNote().dump();
             QTextStream out(&jsonFile);
             out << QString::fromStdString(jsonContent);
+            bResult = true;
+            SEND_MSG(QString("Successfully saved the coverage note - '%1'").arg(filePath));
         }
         catch (const std::exception & e)
         {
@@ -541,9 +665,42 @@ bool CCoverageNoteProvider::saveCoverageNoteFile(const QString& filePath)
     return bResult;
 }
 
-void CCoverageNoteProvider::clearCoverageNote()
+bool CCoverageNoteProvider::clearCoverageNote()
 {
-    mCoverageNote.coverageNoteItemVec.clear();
+    bool bResult = true;
+
+    auto handle_clear = [this]()
+    {
+        mpCoverageNoteTableModel->beginRemoveRows(QModelIndex(), 0, mCoverageNote.size() - 1);
+        mCoverageNote.clear();
+        mpCoverageNoteTableModel->endRemoveRows();
+        mLoadedJsonFilePath.clear();
+    };
+
+    if(mCoverageNote.isModified() && !mLoadedJsonFilePath.isEmpty())
+    {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(nullptr, "Save Confirmation",
+            QString("The '%1' coverage note was changed. Save it or abort the operation?").arg(mLoadedJsonFilePath),
+            QMessageBox::Abort | QMessageBox::Yes, QMessageBox::Abort);
+
+        // Check user response
+        if (reply == QMessageBox::Yes)
+        {
+            saveCoverageNote();
+            handle_clear();
+        }
+        else
+        {
+            bResult = false;
+        }
+    }
+    else
+    {
+        handle_clear();
+    }
+
+    return bResult;
 }
 
 bool CCoverageNoteProvider::exportCoverageNoteAsHTML(const QString& /*targetPath*/)
@@ -561,7 +718,7 @@ void CCoverageNoteProvider::scrollToLastCoveageNoteItem()
         if(pSelectionModel)
         {
             pSelectionModel->clearSelection();
-            pSelectionModel->select(mpCoverageNoteTableModel->index(mCoverageNote.coverageNoteItemVec.size() - 1,
+            pSelectionModel->select(mpCoverageNoteTableModel->index(mCoverageNote.size() - 1,
                 static_cast<int>(CoverageNoteTableModel::eColumn::USERNAME)), QItemSelectionModel::ClearAndSelect);
         }
     }
@@ -575,15 +732,16 @@ tCoverageNoteItemId CCoverageNoteProvider::addCoverageNoteItem()
     {
         mpCoverageNoteTableModel->beginInsertRows(QModelIndex(), mpCoverageNoteTableModel->rowCount(), mpCoverageNoteTableModel->rowCount());
 
-        result = mCoverageNote.coverageNoteItemVec.size();
+        result = mCoverageNote.size();
 
-        auto pItem = std::make_shared<tCoverageNoteItem>();
-        pItem->time = QDateTime::currentDateTime();
-        pItem->userName.pString = std::make_shared<QString>(getSettingsManager()->getUsername());
-        mCoverageNote.coverageNoteItemVec.push_back(pItem);
+        auto id = mCoverageNote.addCoverageNoteItem();
+        mCoverageNote.setDateTime(id, QDateTime::currentDateTime());
+        mCoverageNote.setUsername(id, getSettingsManager()->getUsername());
 
         mpCoverageNoteTableModel->endInsertRows();
     }
+
+    normalizeColumnsSize();
 
     return result;
 }
@@ -592,59 +750,37 @@ void CCoverageNoteProvider::removeCoverageNoteItem(const tCoverageNoteItemId& id
 {
     mpCoverageNoteTableModel->beginRemoveRows(QModelIndex(), id, id);
 
-    if(id >= 0 && id < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
+    if(id >= 0 && id < static_cast<int>(mCoverageNote.size()))
     {
-        mCoverageNote.coverageNoteItemVec.erase(mCoverageNote.coverageNoteItemVec.begin() + id);
+        mCoverageNote.removeCoverageNoteItem(id);
     }
 
     mpCoverageNoteTableModel->endRemoveRows();
-}
 
-void CCoverageNoteProvider::moveCoverageNoteItem(const tCoverageNoteItemId& from,
-                                                 const tCoverageNoteItemId& to,
-                                                 bool after)
-{
-    auto& vec = mCoverageNote.coverageNoteItemVec;
-    if(from >= 0 && from < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()) &&
-       to >= 0 && to < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
-    {
-        auto value = vec[from];
-        vec.erase(vec.begin() + from);
-
-        auto insert_pos = vec.begin() + to;
-
-        if(after)
-            ++insert_pos;
-
-        vec.insert(insert_pos, value);
-    }
+    normalizeColumnsSize();
 }
 
 void CCoverageNoteProvider::setCoverageNoteItemRegex(const tCoverageNoteItemId& id, const QString& regex)
 {
-    if(id >= 0 && id < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
+    if(id >= 0 && id < static_cast<int>(mCoverageNote.size()))
     {
-        mCoverageNote.coverageNoteItemVec[id]->regex.pString = std::make_shared<QString>(regex);
+        mCoverageNote.setRegex(id, regex);
     }
 }
 
-void CCoverageNoteProvider::setCoverageNoteMessage(const tCoverageNoteItemId& id,
-                                                   const QString& coverageNoteMessage)
+void CCoverageNoteProvider::setCoverageNoteItemMessage(const tCoverageNoteItemId& id,
+                                                   const QString& comment)
 {
-    if(id >= 0 && id < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
+    if(id >= 0 && id < static_cast<int>(mCoverageNote.size()))
     {
-        mCoverageNote.coverageNoteItemVec[id]->noteMessage = std::make_shared<QString>(coverageNoteMessage);
+        mCoverageNote.setMessage(id, comment);
     }
 }
 
-tCoverageNoteItemPtr CCoverageNoteProvider::getCoverageNoteItem(const tCoverageNoteItemId& id) const
+void CCoverageNoteProvider::addGeneralComment()
 {
-    tCoverageNoteItemPtr pResult = nullptr;
-
-    if(id >= 0 && id < static_cast<int>(mCoverageNote.coverageNoteItemVec.size()))
-    {
-        pResult = mCoverageNote.coverageNoteItemVec[id];
-    }
-
-    return pResult;
+    auto itemId = addCoverageNoteItem();
+    setCoverageNoteItemMessage(itemId, "General comment");
+    mCoverageNote.setRegex(itemId, "----");
+    scrollToLastCoveageNoteItem();
 }

@@ -202,12 +202,10 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     }
 
     {
-        auto pCoverageNoteComponent = std::make_shared<CCoverageNoteComponent>(mpForm->getMainTabWidget(),
-                                                                               mpSettingsComponent->getSettingsManager(),
+        auto pCoverageNoteComponent = std::make_shared<CCoverageNoteComponent>(mpSettingsComponent->getSettingsManager(),
                                                                                mpForm->getCNCommentTextEdit(),
                                                                                mpForm->getCNItemsTableView(),
-                                                                               mpForm->getCNMessagesTextEdit(),
-                                                                               mpForm->getCNOpenButton(),
+                                                                               mpForm->getCNMessageTextEdit(),
                                                                                mpForm->getCNRegexTextEdit(),
                                                                                mpForm->getCNUseRegexButton());
         mpCoverageNoteComponent = pCoverageNoteComponent;

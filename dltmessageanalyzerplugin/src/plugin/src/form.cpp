@@ -130,6 +130,28 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         mpUI->groupedView->header()->setVisible(true);
     }
 
+    if(mpUI->CNSplitter_1)
+    {
+        QList<int> sizes;
+        sizes.push_back(100);
+        sizes.push_back(300);
+        mpUI->CNSplitter_1->setSizes(sizes);
+    }
+
+    if(mpUI->CNSplitter_2)
+    {
+        QList<int> sizes;
+        sizes.push_back(300);
+        sizes.push_back(50);
+        sizes.push_back(50);
+        mpUI->CNSplitter_2->setSizes(sizes);
+    }
+
+    if(mpUI->CNItems)
+    {
+        mpUI->CNItems->resizeColumnsToContents();
+    }
+
     auto showContextMenu = [this](const QPoint &pos)
     {
         QMenu contextMenu("Context menu", this);
@@ -1019,7 +1041,7 @@ QTableView* Form::getCNItemsTableView()
     return pResult;
 }
 
-QTextEdit* Form::getCNMessagesTextEdit()
+QTextEdit* Form::getCNMessageTextEdit()
 {
     QTextEdit* pResult = nullptr;
 
@@ -1050,18 +1072,6 @@ QTextEdit* Form::getCNRegexTextEdit()
     if(mpUI)
     {
         pResult = mpUI->CNRegexTextEdit;
-    }
-
-    return pResult;
-}
-
-QPushButton* Form::getCNOpenButton()
-{
-    QPushButton* pResult = nullptr;
-
-    if(mpUI)
-    {
-        pResult = mpUI->CNOpen;
     }
 
     return pResult;

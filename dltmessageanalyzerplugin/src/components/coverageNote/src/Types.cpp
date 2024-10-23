@@ -24,8 +24,8 @@ namespace
 {
     const char* KEY_MESSAGE                = "message";
     const char* KEY_USERNAME               = "userName";
-    const char* KEY_TIME                   = "time";
-    const char* KEY_MOTE_MESSAGE           = "noteMessage";
+    const char* KEY_DATE_TIME              = "dateTime";
+    const char* KEY_MOTE_COMMENT           = "comment";
     const char* KEY_REGEX                  = "regex";
     const char* KEY_COVERAGE_NOTE_ITEM_VEC = "coverageNoteItemVec";
 }
@@ -66,7 +66,7 @@ static inline void from_json(const nlohmann::json & j, QDateTime& value)
     if (j.is_string())
     {
         QString str;
-        value.fromString(QString::fromStdString(j.get<std::string>()));
+        value = QDateTime::fromString(QString::fromStdString(j.get<std::string>()));
     }
 }
 
@@ -74,8 +74,8 @@ static inline void to_json(nlohmann::json & j, const tCoverageNoteItem& value)
 {
     TO_JSON(j, KEY_MESSAGE, value.message);
     TO_JSON(j, KEY_USERNAME, value.userName);
-    TO_JSON(j, KEY_TIME, value.time);
-    TO_JSON(j, KEY_MOTE_MESSAGE, value.noteMessage);
+    TO_JSON(j, KEY_DATE_TIME, value.dateTime);
+    TO_JSON(j, KEY_MOTE_COMMENT, value.comment);
     TO_JSON(j, KEY_REGEX, value.regex);
 }
 
@@ -83,8 +83,8 @@ static inline void from_json(const nlohmann::json & j, tCoverageNoteItem& value)
 {
     value.message  = j.at(KEY_MESSAGE);
     value.userName = j.at(KEY_USERNAME);
-    value.time     = j.at(KEY_TIME);
-    value.noteMessage = j.at(KEY_MOTE_MESSAGE);
+    value.dateTime = j.at(KEY_DATE_TIME);
+    value.comment = j.at(KEY_MOTE_COMMENT);
     value.regex = j.at(KEY_REGEX);
 }
 
@@ -112,12 +112,12 @@ static inline void from_json(const nlohmann::json & j, tCoverageNoteItemPtr& val
     }
 }
 
-static inline void to_json(nlohmann::json & j, const tCoverageNote& value)
+void to_json(nlohmann::json & j, const tCoverageNote& value)
 {
     TO_JSON(j, KEY_COVERAGE_NOTE_ITEM_VEC, value.coverageNoteItemVec);
 }
 
-static inline void from_json(const nlohmann::json & j, tCoverageNote& value)
+void from_json(const nlohmann::json & j, tCoverageNote& value)
 {
     value.coverageNoteItemVec  = j.at(KEY_COVERAGE_NOTE_ITEM_VEC);
 }
@@ -143,3 +143,160 @@ nlohmann::json tCoverageNote::serializeCoverageNote()
     nlohmann::json doc = coverageNoteItemVec;
     return doc;
 }
+
+tCoverageNoteItemId tCoverageNote::addCoverageNoteItem()
+{
+    coverageNoteItemVec.push_back(std::make_shared<tCoverageNoteItem>());
+    return coverageNoteItemVec.size() - 1;
+}
+
+void tCoverageNote::clear()
+{
+    coverageNoteItemVec.clear();
+}
+
+void tCoverageNote::removeCoverageNoteItem(const tCoverageNoteItemId&id)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec.erase(coverageNoteItemVec.begin() + id);
+    }
+}
+
+std::size_t tCoverageNote::size() const
+{
+    return coverageNoteItemVec.size();
+}
+
+bool tCoverageNote::empty() const
+{
+    return coverageNoteItemVec.empty();
+}
+
+void tCoverageNote::setMessage(const tCoverageNoteItemId& id, const QString& val)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec[id]->message.pString = std::make_shared<QString>(val);
+        setModified(true);
+    }
+}
+
+tQStringPtr tCoverageNote::getMessage(const tCoverageNoteItemId& id) const
+{
+    tQStringPtr pResult = nullptr;
+
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        pResult = coverageNoteItemVec[id]->message.pString;
+    }
+
+    return pResult;
+}
+
+void tCoverageNote::setUsername(const tCoverageNoteItemId& id, const QString& val)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec[id]->userName.pString = std::make_shared<QString>(val);
+        setModified(true);
+    }
+}
+
+tQStringPtr tCoverageNote::getUsername(const tCoverageNoteItemId& id) const
+{
+    tQStringPtr pResult = nullptr;
+
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        pResult = coverageNoteItemVec[id]->userName.pString;
+    }
+
+    return pResult;
+}
+
+void tCoverageNote::setDateTime(const tCoverageNoteItemId& id, const QDateTime& val)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec[id]->dateTime = val;
+        setModified(true);
+    }
+}
+
+const QDateTime& tCoverageNote::getDateTime(const tCoverageNoteItemId& id) const
+{
+    const static QDateTime sEmptyDateTime;
+
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        return coverageNoteItemVec[id]->dateTime;
+    }
+
+    return sEmptyDateTime;
+}
+
+void tCoverageNote::setComment(const tCoverageNoteItemId& id, const QString& val)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec[id]->comment.pString = std::make_shared<QString>(val);
+        setModified(true);
+    }
+}
+
+tQStringPtr tCoverageNote::getComment(const tCoverageNoteItemId& id) const
+{
+    tQStringPtr pResult = nullptr;
+
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        pResult = coverageNoteItemVec[id]->comment.pString;
+    }
+
+    return pResult;
+}
+
+void tCoverageNote::setRegex(const tCoverageNoteItemId& id, const QString& val)
+{
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        coverageNoteItemVec[id]->regex.pString = std::make_shared<QString>(val);
+        setModified(true);
+    }
+}
+
+tQStringPtr tCoverageNote::getRegex(const tCoverageNoteItemId& id) const
+{
+    tQStringPtr pResult = nullptr;
+
+    if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
+    {
+        pResult = coverageNoteItemVec[id]->regex.pString;
+    }
+
+    return pResult;
+}
+
+void tCoverageNote::resetModified()
+{
+    mbModified = false;
+}
+
+bool tCoverageNote::isModified() const
+{
+    return mbModified;
+}
+
+void tCoverageNote::setModified(bool val)
+{
+    mbModified = val;
+}
+
+tCoverageNoteItem::tCoverageNoteItem():
+message(std::make_shared<QString>()),
+userName(std::make_shared<QString>()),
+dateTime(),
+comment(std::make_shared<QString>()),
+regex(std::make_shared<QString>())
+{}

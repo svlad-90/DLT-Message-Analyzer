@@ -952,6 +952,20 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
         return false;
     }
 
+    if(mpMainTabWidget)
+    {
+        bool jumpToSearchView = false;
+
+        if(mpMainTabWidget->currentIndex() > (static_cast<int>(eTabIndexes::GROUPED_VIEW) - !getSettingsManager()->getGroupedViewFeatureActive()))
+        {
+            jumpToSearchView = true;
+        }
+
+        if(jumpToSearchView)
+        {
+            mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::SEARCH_VIEW));
+        }
+    }
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
         if(nullptr != mpMessageDecoder && false == mpDLTLogsWrapperCreator.expired())

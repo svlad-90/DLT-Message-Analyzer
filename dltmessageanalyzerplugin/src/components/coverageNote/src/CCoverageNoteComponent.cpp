@@ -7,12 +7,10 @@
 
 #include "dma/base/ForceLink.hpp"
 
-CCoverageNoteComponent::CCoverageNoteComponent(QTabWidget* pMainTabWidget,
-                                               const tSettingsManagerPtr& pSettingsManager,
+CCoverageNoteComponent::CCoverageNoteComponent(const tSettingsManagerPtr& pSettingsManager,
                                                QTextEdit* commentTextEdit,
                                                QTableView* itemsTableView,
                                                QTextEdit* messagesTextEdit,
-                                               QPushButton* openButton,
                                                QTextEdit* regexTextEdit,
                                                QPushButton* useRegexButton):
     mpCoverageNoteProviderPtr(nullptr),
@@ -20,10 +18,8 @@ CCoverageNoteComponent::CCoverageNoteComponent(QTabWidget* pMainTabWidget,
     mpCommentTextEdit(commentTextEdit),
     mpItemsTableView(itemsTableView),
     mpMessagesTextEdit(messagesTextEdit),
-    mpOpenButton(openButton),
     mpRegexTextEdit(regexTextEdit),
-    mpUseRegexButton(useRegexButton),
-    mpMainTabWidget(pMainTabWidget)
+    mpUseRegexButton(useRegexButton)
 {
     // force linkage references in order to have consistent diagrams
     DMA_FORCE_LINK_REFERENCE(IRegexHistoryProvider)
@@ -40,12 +36,10 @@ DMA::tSyncInitOperationResult CCoverageNoteComponent::init()
 
     try
     {
-        mpCoverageNoteProviderPtr = std::make_shared<CCoverageNoteProvider>(mpMainTabWidget,
-                                                                            mpSettingsManager,
+        mpCoverageNoteProviderPtr = std::make_shared<CCoverageNoteProvider>(mpSettingsManager,
                                                                             mpCommentTextEdit,
                                                                             mpItemsTableView,
                                                                             mpMessagesTextEdit,
-                                                                            mpOpenButton,
                                                                             mpRegexTextEdit,
                                                                             mpUseRegexButton);
         result.bIsOperationSuccessful = true;

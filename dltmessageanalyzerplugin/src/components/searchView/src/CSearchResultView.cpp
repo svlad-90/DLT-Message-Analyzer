@@ -1080,7 +1080,7 @@ void CSearchResultView::addComment()
     {
         auto coverageNoteId = mpCoverageNoteProvider->addCoverageNoteItem();
         mpCoverageNoteProvider->setCoverageNoteItemRegex(coverageNoteId, mUsedRegex);
-        mpCoverageNoteProvider->setCoverageNoteMessage(coverageNoteId, getSelectionAsString(true, false));
+        mpCoverageNoteProvider->setCoverageNoteItemMessage(coverageNoteId, getSelectionAsString(true, false));
 
         if(mpMainTabWidget)
         {

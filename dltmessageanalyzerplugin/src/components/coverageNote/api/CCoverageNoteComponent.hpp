@@ -16,12 +16,10 @@ class CCoverageNoteComponent : public DMA::IComponent
 {
 public:
 
-    CCoverageNoteComponent(QTabWidget* pMainTabWidget,
-                           const tSettingsManagerPtr& pSettingsManager,
+    CCoverageNoteComponent(const tSettingsManagerPtr& pSettingsManager,
                            QTextEdit* commentTextEdit,
                            QTableView* itemsTableView,
                            QTextEdit* messagesTextEdit,
-                           QPushButton* openButton,
                            QTextEdit* regexTextEdit,
                            QPushButton* useRegexButton);
     virtual const char* getName() const override;
@@ -38,8 +36,6 @@ private:
     QTextEdit* mpCommentTextEdit;
     QTableView* mpItemsTableView;
     QTextEdit* mpMessagesTextEdit;
-    QPushButton* mpOpenButton;
     QTextEdit* mpRegexTextEdit;
     QPushButton* mpUseRegexButton;
-    QTabWidget* mpMainTabWidget;
 };

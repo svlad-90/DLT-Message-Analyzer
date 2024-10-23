@@ -222,7 +222,7 @@
            <enum>QTabWidget::South</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>4</number>
           </property>
           <property name="iconSize">
            <size>
@@ -532,7 +532,7 @@ QPushButton:hover:!pressed{
                  <x>0</x>
                  <y>0</y>
                  <width>739</width>
-                 <height>303</height>
+                 <height>299</height>
                 </rect>
                </property>
                <property name="sizePolicy">
@@ -587,86 +587,26 @@ QPushButton:hover:!pressed{
            </layout>
           </widget>
           <widget class="QWidget" name="coverageNoteTab">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <attribute name="title">
             <string>Coverage note view</string>
            </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <layout class="QVBoxLayout" name="CNItemsLayout">
-              <property name="sizeConstraint">
-               <enum>QLayout::SetMinimumSize</enum>
-              </property>
-              <item>
-               <widget class="QPushButton" name="CNOpen">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QPushButton {
-    border: 2px solid #8f8f91;
-    border-radius: 2px;
-    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
-    min-width: 80px;
-    color: rgb(255, 255, 255);
-}
-
-QPushButton:pressed {
-    border: 2px solid #8f8f91;
-    background-color: qlineargradient(spread:pad, x1:0.169461, y1:0.181, x2:0, y2:0.954182, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
-    color: rgb(255, 255, 255);
-}
-
-QPushButton:hover:!pressed{
-    border: 2px solid #9ccfdd;
-    background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
-    color: rgb(255, 255, 255);
-}</string>
-                </property>
-                <property name="text">
-                 <string>Open</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QTableView" name="CNItems">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="contextMenuPolicy">
-                 <enum>Qt::CustomContextMenu</enum>
-                </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::SingleSelection</enum>
-                </property>
-                <property name="selectionBehavior">
-                 <enum>QAbstractItemView::SelectRows</enum>
-                </property>
-                <attribute name="horizontalHeaderStretchLastSection">
-                 <bool>true</bool>
-                </attribute>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QSplitter" name="splitter">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QSplitter" name="CNSplitter_1">
               <property name="orientation">
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
-              <widget class="QWidget" name="verticalLayoutWidget_4">
-               <layout class="QVBoxLayout" name="CNMessagesLeyout">
+              <widget class="QWidget" name="verticalLayoutWidget_7">
+               <layout class="QVBoxLayout" name="CNItemsLayout" stretch="0">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetDefaultConstraint</enum>
+                </property>
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
@@ -674,131 +614,183 @@ QPushButton:hover:!pressed{
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="CNLabelMessages">
+                 <widget class="QTableView" name="CNItems">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>10</horstretch>
+                    <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="font">
-                   <font>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::CustomContextMenu</enum>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-    border: 1px solid #8f8f91;
-    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
-    min-width: 80px;
-	color: rgb(255, 255, 255);
-}</string>
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::SingleSelection</enum>
                   </property>
-                  <property name="text">
-                   <string>Messages</string>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
                   </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
                  </widget>
-                </item>
-                <item>
-                 <widget class="QTextEdit" name="CNMessagesTextEdit"/>
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="verticalLayoutWidget_5">
-               <layout class="QVBoxLayout" name="CNCommentLayout">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="CNLabelComment">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>10</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
+              <widget class="QSplitter" name="CNSplitter_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <widget class="QWidget" name="verticalLayoutWidget_4">
+                <layout class="QVBoxLayout" name="CNMessagesLeyout" stretch="0,0">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="CNLabelMessages">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>10</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel {
     border: 1px solid #8f8f91;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
     min-width: 80px;
 	color: rgb(255, 255, 255);
 }</string>
-                  </property>
-                  <property name="text">
-                   <string>Comment</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTextEdit" name="CNCommentTextEdit"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="verticalLayoutWidget_6">
-               <layout class="QVBoxLayout" name="CNRegexLayout">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="CNLabelRegex">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                    <horstretch>10</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
+                   </property>
+                   <property name="text">
+                    <string>Messages</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTextEdit" name="CNMessagesTextEdit">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>10</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_5">
+                <layout class="QVBoxLayout" name="CNCommentLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="CNLabelComment">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>10</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel {
     border: 1px solid #8f8f91;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
     min-width: 80px;
 	color: rgb(255, 255, 255);
 }</string>
-                  </property>
-                  <property name="text">
-                   <string>Used regex</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTextEdit" name="CNRegexTextEdit"/>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="CNUseRegexButton">
-                  <property name="font">
-                   <font>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QPushButton {
+                   </property>
+                   <property name="text">
+                    <string>Comment</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTextEdit" name="CNCommentTextEdit"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="verticalLayoutWidget_6">
+                <layout class="QVBoxLayout" name="CNRegexLayout">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="CNLabelRegex">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>10</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel {
+    border: 1px solid #8f8f91;
+    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+    min-width: 80px;
+	color: rgb(255, 255, 255);
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Used regex</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTextEdit" name="CNRegexTextEdit"/>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="CNUseRegexButton">
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
     border: 2px solid #8f8f91;
     border-radius: 2px;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
@@ -817,13 +809,14 @@ QPushButton:hover:!pressed{
     background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
     color: rgb(255, 255, 255);
 }</string>
-                  </property>
-                  <property name="text">
-                   <string>Apply regex</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+                   </property>
+                   <property name="text">
+                    <string>Apply regex</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
               </widget>
              </widget>
             </item>

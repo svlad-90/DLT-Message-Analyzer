@@ -88,10 +88,9 @@ public:
     QPushButton* getCreatePlotButton();
     QPlainTextEdit* getUMLTextEditor();
     QTableView* getCNItemsTableView();
-    QTextEdit* getCNMessagesTextEdit();
+    QTextEdit* getCNMessageTextEdit();
     QTextEdit* getCNCommentTextEdit();
     QTextEdit* getCNRegexTextEdit();
-    QPushButton* getCNOpenButton();
     QPushButton* getCNUseRegexButton();
 
 private slots:
