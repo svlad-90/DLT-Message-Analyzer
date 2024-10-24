@@ -603,7 +603,7 @@ QPushButton:hover:!pressed{
                <enum>Qt::Horizontal</enum>
               </property>
               <widget class="QWidget" name="verticalLayoutWidget_7">
-               <layout class="QVBoxLayout" name="CNItemsLayout" stretch="0">
+               <layout class="QVBoxLayout" name="CNItemsLayout" stretch="0,0">
                 <property name="sizeConstraint">
                  <enum>QLayout::SetDefaultConstraint</enum>
                 </property>
@@ -618,7 +618,7 @@ QPushButton:hover:!pressed{
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                     <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
+                    <verstretch>5</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="contextMenuPolicy">
@@ -634,6 +634,40 @@ QPushButton:hover:!pressed{
                    <bool>true</bool>
                   </attribute>
                  </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="CNCurrentFileLayout">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="CNCurrentFileLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLabel {
+    border: 1px solid #8f8f91;
+    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+    min-width: 80px;
+	color: rgb(255, 255, 255);
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Current file:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="CNCurrentFileLineEdit"/>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </widget>

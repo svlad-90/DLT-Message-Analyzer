@@ -45,7 +45,8 @@ CSearchResultView::CSearchResultView(QWidget *parent):
     mpSpecificModel(nullptr),
     mContentSizeMap(),
     mpCoverageNoteProvider(nullptr),
-    mpMainTabWidget(nullptr)
+    mpMainTabWidget(nullptr),
+    mpMainTableView(nullptr)
 {
     connect(this, &QTableView::clicked, [this](const QModelIndex &index)
     {
@@ -79,6 +80,11 @@ void CSearchResultView::newSearchStarted(const QString& regex)
     mContentSizeMap.clear();
     mbIsViewFull = false;
     mbUserManuallyAdjustedLastVisibleColumnWidth = false;
+}
+
+void CSearchResultView::setMainTableView(QTableView* pMainTableView)
+{
+    mpMainTableView = pMainTableView;
 }
 
 void CSearchResultView::getUserSearchRange()
@@ -520,6 +526,56 @@ bool CSearchResultView::isVerticalScrollBarVisible() const
     return IsVisible;
 }
 
+QString CSearchResultView::getMainTableSelectionAsString() const
+{
+    QString result;
+
+    if(mpMainTableView)
+    {
+        auto* pSelectionModel = mpMainTableView->selectionModel();
+        auto* pModel = mpMainTableView->model();
+        auto* pHeader = mpMainTableView->horizontalHeader();
+
+        if(pSelectionModel && pModel && pHeader)
+        {
+            auto selectedRows = pSelectionModel->selectedRows();
+
+            QMap<int, QModelIndex> sortedSelectedRows;
+
+            for(const auto& index : selectedRows)
+            {
+                sortedSelectedRows.insert(index.row(), index);
+            }
+
+            auto columnsNumber = pModel->columnCount();
+
+            for(const auto& index : sortedSelectedRows)
+            {
+                for(int columId = 0; columId < columnsNumber; ++columId )
+                {
+                    if(!pHeader->isSectionHidden(columId))
+                    {
+                        auto columnIndex = index.sibling(index.row(), columId);
+
+                        result += columnIndex.data().toString().toHtmlEscaped();
+
+                        if(columId < columnsNumber - 1)
+                        {
+                            result += " ";
+                        }
+                        else
+                        {
+                            result += "<br/>";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 QString CSearchResultView::getSelectionAsString( bool copyAsHTML, bool copyOnlyPayload ) const
 {
     QString result;
@@ -615,7 +671,17 @@ QString CSearchResultView::getSelectionAsString( bool copyAsHTML, bool copyOnlyP
             eSearchResultColumn field = static_cast<eSearchResultColumn>(columnId);
             QString columnStr = column.data().value<QString>();
 
-            auto attachText = [this, &copyItems, &finalRichStringSize, &finalStringSize, &columnStr, &i, &copyPasteColumnsSize, &field](const tIntRange& range, const QColor& color, bool isHighlighted)
+            auto attachText = [this,
+                    &copyItems,
+                    &finalRichStringSize,
+                    &finalStringSize,
+                    &columnStr,
+                    &i,
+                    &copyPasteColumnsSize,
+                    &field]
+                    (const tIntRange& range,
+                    const QColor& color,
+                    bool isHighlighted)
             {
                 bool isHighlightedExtended = ( isHighlighted ||
                                                ( eSearchResultColumn::Timestamp == field
@@ -733,7 +799,7 @@ QString CSearchResultView::getSelectionAsString( bool copyAsHTML, bool copyOnlyP
             }
         }
 
-        static const QString newLine("<br>");
+        static const QString newLine("<br/>");
         copyItems.push_back(tCopyItem("\n",newLine));
         finalStringSize+=newLine.size();
     }
@@ -902,7 +968,22 @@ void CSearchResultView::keyPressEvent ( QKeyEvent * event )
             (event->modifiers() & Qt::AltModifier) != 0 &&
             (event->key() == Qt::Key::Key_A))
     {
-        addComment();
+        if(selectionModel() &&
+           !selectionModel()->selectedRows().empty())
+        {
+            addComment();
+        }
+    }
+    else if((event->modifiers() & Qt::ControlModifier) != 0 &&
+            (event->modifiers() & Qt::AltModifier) != 0 &&
+            (event->key() == Qt::Key::Key_M))
+    {
+        if(mpMainTableView &&
+           mpMainTableView->selectionModel() &&
+           !mpMainTableView->selectionModel()->selectedRows().empty())
+        {
+            addCommentFromMainTable();
+        }
     }
     else
     {
@@ -1080,7 +1161,28 @@ void CSearchResultView::addComment()
     {
         auto coverageNoteId = mpCoverageNoteProvider->addCoverageNoteItem();
         mpCoverageNoteProvider->setCoverageNoteItemRegex(coverageNoteId, mUsedRegex);
-        mpCoverageNoteProvider->setCoverageNoteItemMessage(coverageNoteId, getSelectionAsString(true, false));
+        mpCoverageNoteProvider->setCoverageNoteItemMessage(coverageNoteId,
+            QString("From the search result<br/><br/>") + getSelectionAsString(true, false));
+
+        if(mpMainTabWidget)
+        {
+            auto bGroupedViewFeatureActive = getSettingsManager()->getGroupedViewFeatureActive();
+            auto bUML_FeatureActive = getSettingsManager()->getUML_FeatureActive();
+            mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::COVERAGE_NOTE_VIEW)
+                                             - !bGroupedViewFeatureActive - !bUML_FeatureActive);
+        }
+
+        mpCoverageNoteProvider->scrollToLastCoveageNoteItem();
+    }
+}
+
+void CSearchResultView::addCommentFromMainTable()
+{
+    if(mpCoverageNoteProvider)
+    {
+        auto coverageNoteId = mpCoverageNoteProvider->addCoverageNoteItem();
+        mpCoverageNoteProvider->setCoverageNoteItemMessage(coverageNoteId,
+            QString("From the main table<br/><br/>") + getMainTableSelectionAsString());
 
         if(mpMainTabWidget)
         {
@@ -1113,6 +1215,23 @@ void CSearchResultView::handleSettingsManagerChange()
             });
 
             if(true == selectionModel()->selectedRows().empty())
+            {
+                pAction->setEnabled(false);
+            }
+
+            contextMenu.addAction(pAction);
+        }
+
+        if(mpMainTableView && mpMainTableView->selectionModel())
+        {
+            QAction* pAction = new QAction("Add comment from main table", this);
+            pAction->setShortcut(QKeySequence(tr("Ctrl+Alt+M")));
+            connect(pAction, &QAction::triggered, this, [this]()
+            {
+                addCommentFromMainTable();
+            });
+
+            if(true == mpMainTableView->selectionModel()->selectedRows().empty())
             {
                 pAction->setEnabled(false);
             }

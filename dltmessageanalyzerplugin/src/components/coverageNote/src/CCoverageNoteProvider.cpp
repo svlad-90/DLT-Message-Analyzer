@@ -6,6 +6,7 @@
 #include "QMessageBox"
 #include "QFileDialog"
 #include "QHeaderView"
+#include "QLineEdit"
 
 #include "components/log/api/CLog.hpp"
 
@@ -131,6 +132,7 @@ QVariant CoverageNoteTableModel::headerData(int section, Qt::Orientation orienta
 ////////////////////////////////////////////////////////////////////////////
 
 static const int INVALID_INDEX = -1;
+static const char* EMPTY_JSON_FILE_NAME = "none";
 
 CCoverageNoteProvider::CCoverageNoteProvider(const tSettingsManagerPtr& pSettingsManager,
                                              QTextEdit* commentTextEdit,
@@ -138,6 +140,7 @@ CCoverageNoteProvider::CCoverageNoteProvider(const tSettingsManagerPtr& pSetting
                                              QTextEdit* messagesTextEdit,
                                              QTextEdit* regexTextEdit,
                                              QPushButton* useRegexButton,
+                                             QLineEdit* pCurrentFileLineEdit,
                                              QObject *parent):
 ICoverageNoteProvider(parent),
 CSettingsManagerClient(pSettingsManager),
@@ -147,8 +150,16 @@ mpMessagesTextEdit(messagesTextEdit),
 mpRegexTextEdit(regexTextEdit),
 mpUseRegexButton(useRegexButton),
 mpCoverageNoteTableModel(std::make_shared<CoverageNoteTableModel>(mCoverageNote)),
-mLoadedJsonFilePath()
+mLoadedJsonFilePath(),
+mpCurrentFileLineEdit(pCurrentFileLineEdit)
 {
+    if(mpCurrentFileLineEdit)
+    {
+        mpCurrentFileLineEdit->setReadOnly(true);
+    }
+
+    setLoadedJsonFile("");
+
     if(mpMessagesTextEdit)
     {
         mpMessagesTextEdit->setReadOnly(true);
@@ -252,6 +263,18 @@ mLoadedJsonFilePath()
                         {
                             static_cast<void>(clearCoverageNote());
                         });
+                        contextMenu.addAction(pAction);
+                }
+
+                {
+                    QAction* pAction = new QAction("Export to HTML...", mpItemsTableView);
+                        pAction->setShortcut(QKeySequence("Ctrl+E"));
+
+                        connect(pAction, &QAction::triggered, [this]()
+                        {
+                            exportCoverageNoteAsHTML();
+                        });
+                        pAction->setEnabled(!mCoverageNote.empty());
                         contextMenu.addAction(pAction);
                 }
             }
@@ -391,11 +414,33 @@ void CCoverageNoteProvider::removeSelectedCoverageNote()
     }
 }
 
+void CCoverageNoteProvider::setLoadedJsonFile(const QString& filePath)
+{
+    mLoadedJsonFilePath = filePath;
+
+    if(mpCurrentFileLineEdit)
+    {
+        if(!filePath.isEmpty())
+        {
+            mpCurrentFileLineEdit->setText(filePath);
+        }
+        else
+        {
+            mpCurrentFileLineEdit->setText(EMPTY_JSON_FILE_NAME);
+        }
+    }
+}
+
+const QString& CCoverageNoteProvider::getLoadedJsonFile() const
+{
+    return mLoadedJsonFilePath;
+}
+
 void CCoverageNoteProvider::saveCoverageNote(bool saveAsMode)
 {
     QString filePath;
 
-    if(mLoadedJsonFilePath.isEmpty() || saveAsMode)
+    if(getLoadedJsonFile().isEmpty() || saveAsMode)
     {
         filePath = QFileDialog::getSaveFileName(
             nullptr,
@@ -404,7 +449,8 @@ void CCoverageNoteProvider::saveCoverageNote(bool saveAsMode)
             "JSON Files (*.json)"         // Filter to only show JSON files
         );
 
-        if (filePath.isEmpty()) {
+        if (filePath.isEmpty())
+        {
             SEND_WRN(QString("No File Selected. Please select or specify a valid file."));
             return;  // If no file is selected, exit the function
         }
@@ -416,13 +462,15 @@ void CCoverageNoteProvider::saveCoverageNote(bool saveAsMode)
     }
     else
     {
-        filePath = mLoadedJsonFilePath;
+        filePath = getLoadedJsonFile();
     }
 
     if(saveCoverageNoteFile(filePath))
     {
         mCoverageNote.resetModified();
     }
+
+    setLoadedJsonFile(filePath);
 }
 
 void CCoverageNoteProvider::loadCoverageNote()
@@ -434,7 +482,8 @@ void CCoverageNoteProvider::loadCoverageNote()
         "JSON Files (*.json)"         // Filter to only show JSON files
     );
 
-    if (filePath.isEmpty()) {
+    if (filePath.isEmpty())
+    {
         SEND_WRN(QString("No File Selected. Please select or specify a valid file."));
         return;  // If no file is selected, exit the function
     }
@@ -446,12 +495,38 @@ void CCoverageNoteProvider::loadCoverageNote()
 
     if(loadCoverageNoteFile(filePath))
     {
-        mLoadedJsonFilePath = filePath;
+        setLoadedJsonFile(filePath);
         mCoverageNote.resetModified();
+    }
+
+    scrollToFirstCoveageNoteItem();
+}
+
+void CCoverageNoteProvider::fetchTextEfitorDataToModel()
+{
+    if(mpItemsTableView &&
+       mpCommentTextEdit)
+    {
+        auto pSelectionModel = mpItemsTableView->selectionModel();
+
+        if(pSelectionModel)
+        {
+            auto selectedRows = pSelectionModel->selectedRows();
+
+            if(selectedRows.size() == 1)
+            {
+                auto rowId = selectedRows[0].row();
+
+                if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.size()))
+                {
+                    mCoverageNote.setComment(rowId, mpCommentTextEdit->toPlainText());
+                }
+            }
+        }
     }
 }
 
-#define HANDLE_FOCUS_OUT_EVENT(TEXT_EDIT, TABLE_VIEW, FIELD_NAME) \
+#define FETCH_TEXT_EDITOR_DATA_TO_MODEL(TEXT_EDIT, TABLE_VIEW, FIELD_NAME) \
 if(TEXT_EDIT && TABLE_VIEW) \
 { \
     auto pSelectionModel = TABLE_VIEW->selectionModel(); \
@@ -466,7 +541,7 @@ if(TEXT_EDIT && TABLE_VIEW) \
  \
             if(rowId >= 0 && rowId < static_cast<int>(mCoverageNote.size())) \
             { \
-                mCoverageNote.set##FIELD_NAME(rowId, TEXT_EDIT->toHtml()); \
+                mCoverageNote.set##FIELD_NAME(rowId, TEXT_EDIT->toPlainText()); \
             } \
         } \
     } \
@@ -507,7 +582,10 @@ bool CCoverageNoteProvider::eventFilter(QObject *obj, QEvent *event)
             if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
             (keyEvent->key() == Qt::Key::Key_S))
             {
-                saveCoverageNote();
+                if(!mCoverageNote.empty())
+                {
+                    saveCoverageNote();
+                }
                 event->accept();
                 bResult = true;
             }
@@ -522,6 +600,16 @@ bool CCoverageNoteProvider::eventFilter(QObject *obj, QEvent *event)
             (keyEvent->key() == Qt::Key::Key_N))
             {
                 static_cast<void>(clearCoverageNote());
+                event->accept();
+                bResult = true;  // Key event handled, stop propagation
+            }
+            else if((keyEvent->modifiers() & Qt::ControlModifier) != 0 &&
+            (keyEvent->key() == Qt::Key::Key_E))
+            {
+                if(!mCoverageNote.empty())
+                {
+                    exportCoverageNoteAsHTML();
+                }
                 event->accept();
                 bResult = true;  // Key event handled, stop propagation
             }
@@ -546,15 +634,8 @@ bool CCoverageNoteProvider::eventFilter(QObject *obj, QEvent *event)
     {
         if(obj == mpCommentTextEdit)
         {
-            HANDLE_FOCUS_OUT_EVENT(mpCommentTextEdit, mpItemsTableView, Comment)
-        }
-        else if(obj == mpMessagesTextEdit)
-        {
-            HANDLE_FOCUS_OUT_EVENT(mpMessagesTextEdit, mpItemsTableView, Message)
-        }
-        else if(obj == mpRegexTextEdit)
-        {
-            HANDLE_FOCUS_OUT_EVENT(mpRegexTextEdit, mpItemsTableView, Regex)
+            FETCH_TEXT_EDITOR_DATA_TO_MODEL(mpCommentTextEdit, mpItemsTableView, Comment)
+            bResult = true;
         }
         else
         {
@@ -674,20 +755,28 @@ bool CCoverageNoteProvider::clearCoverageNote()
         mpCoverageNoteTableModel->beginRemoveRows(QModelIndex(), 0, mCoverageNote.size() - 1);
         mCoverageNote.clear();
         mpCoverageNoteTableModel->endRemoveRows();
-        mLoadedJsonFilePath.clear();
+        setLoadedJsonFile("");
     };
 
-    if(mCoverageNote.isModified() && !mLoadedJsonFilePath.isEmpty())
+    fetchTextEfitorDataToModel();
+
+    if(mCoverageNote.isModified())
     {
+        QString printFileName = !getLoadedJsonFile().isEmpty() ? getLoadedJsonFile() : EMPTY_JSON_FILE_NAME;
+
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(nullptr, "Save Confirmation",
-            QString("The '%1' coverage note was changed. Save it or abort the operation?").arg(mLoadedJsonFilePath),
-            QMessageBox::Abort | QMessageBox::Yes, QMessageBox::Abort);
+            QString("The '%1' coverage note was changed. Save it, continue without saving, or abort the operation?").arg(printFileName),
+            QMessageBox::Abort | QMessageBox::Yes | QMessageBox::No, QMessageBox::Abort);
 
         // Check user response
         if (reply == QMessageBox::Yes)
         {
             saveCoverageNote();
+            handle_clear();
+        }
+        if (reply == QMessageBox::No)
+        {
             handle_clear();
         }
         else
@@ -703,23 +792,160 @@ bool CCoverageNoteProvider::clearCoverageNote()
     return bResult;
 }
 
-bool CCoverageNoteProvider::exportCoverageNoteAsHTML(const QString& /*targetPath*/)
+void CCoverageNoteProvider::exportCoverageNoteAsHTML()
 {
-    // TODO
-    return true;
+    QString filePath = QFileDialog::getSaveFileName(
+        nullptr,
+        "Save coverage note",         // Dialog title
+        QDir::homePath(),             // Default directory (home directory)
+        "HTML Files (*.html)"         // Filter to only show HTML files
+    );
+
+    if (filePath.isEmpty())
+    {
+        SEND_WRN(QString("No File Selected. Please select or specify a valid file."));
+        return;  // If no file is selected, exit the function
+    }
+
+    if (!filePath.endsWith(".html", Qt::CaseInsensitive)) {
+        filePath += ".html";
+    }
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        SEND_ERR(QString("Failed to open the target file for the HTML export. File path - '%1'").arg(filePath));
+        return; // Failed to open the file
+    }
+
+    QTextStream out(&file);
+
+    out << "<!DOCTYPE html>\n";
+    out << "<html lang=\"en\">\n";
+    out << "<head>\n";
+    out << "<meta charset=\"UTF-8\">\n";
+    out << "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+    out << "<title>Coverage Note</title>\n";
+    out << "<style>\n"
+        << "table { width: 100%; border-collapse: collapse; }\n"
+        << "th, td { border: 1px solid black; padding: 8px; text-align: left; }\n"
+        << "th { background-color: #f2f2f2; }\n"
+        << "#details-container { display: flex; }\n"
+        << "#general-info { width: 30%; border-right: 1px solid black; padding: 10px; }\n"
+        << "#detailed-info { width: 70%; padding: 10px; }\n"
+        << "tr.selected { background-color: orange; }\n"
+        << "</style>\n";
+    out << "</head>\n";
+    out << "<body>\n";
+    out << "<h2>Coverage Note</h2>\n";
+
+    out << "<div id=\"details-container\">\n";
+
+    out << "<div id=\"general-info\">\n";
+    out << "<table id=\"coverage-table\">\n";
+    out << "<tr>\n"
+        << "<th>Index</th>\n"
+        << "<th>Time</th>\n"
+        << "<th>Username</th>\n"
+        << "</tr>\n";
+
+    int index = 0;
+    for (const auto& item : mCoverageNote.getCoverageNoteItemVec())
+    {
+        out << "<tr onclick=\"selectRow(this, " << index << "); showDetails(" << index << ")\" id=\"row-" << index << "\">\n";
+        out << "<td>" << index++ << "</td>\n";
+        out << "<td>" << item->dateTime.toString("yyyy/MM/dd hh:mm:ss AP") << "</td>\n";
+        out << "<td>" << (item->userName.pString ? item->userName.pString->toHtmlEscaped() : "") << "</td>\n";
+        out << "</tr>\n";
+    }
+
+    out << "</table>\n";
+    out << "</div>\n";
+
+    out << "<div id=\"detailed-info\">\n";
+    out << "<h3>Details</h3>\n";
+    out << "<div id=\"details-content\"></div>\n";
+    out << "</div>\n";
+
+    out << "</div>\n";
+
+    out << "<script>\n"
+        << "const data = [\n";
+
+    for (const auto& item : mCoverageNote.getCoverageNoteItemVec())
+    {
+        out << "{\n"
+            << "  messages: '" << (item->message.pString ? item->message.pString->toHtmlEscaped().replace("'", "\'") : "") << "',\n"
+            << "  comment: '" << (item->comment.pString ? item->comment.pString->toHtmlEscaped().replace("'", "\'") : "") << "',\n"
+            << "  regex: '" << (item->regex.pString ? item->regex.pString->toHtmlEscaped().replace("'", "\'") : "") << "'\n"
+            << "},\n";
+    }
+    out << "];\n"
+        << "function unescapeHTML(html) {\n"
+        << "  var doc = new DOMParser().parseFromString(html, 'text/html');\n"
+        << "  return doc.documentElement.textContent;\n"
+        << "}\n"
+        << "function showDetails(index) {\n"
+        << "  const details = data[index];\n"
+        << "  document.getElementById('details-content').innerHTML = `<p><strong>Messages:</strong> ${unescapeHTML(details.messages)}</p>` +\n"
+        << "    `<p><strong>Comment:</strong> ${unescapeHTML(details.comment)}</p>` +\n"
+        << "    `<p><strong>Used Regex:</strong> ${unescapeHTML(details.regex)}</p>`;\n"
+        << "}\n"
+        << "function selectRow(row, index) {\n"
+        << "  const rows = document.querySelectorAll('#coverage-table tr');\n"
+        << "  rows.forEach(r => r.classList.remove('selected'));\n"
+        << "  row.classList.add('selected');\n"
+        << "}\n"
+        << "document.addEventListener('DOMContentLoaded', (event) => {\n"
+        << "  const firstRow = document.getElementById('row-0');\n"
+        << "  if (firstRow) {\n"
+        << "    firstRow.classList.add('selected');\n"
+        << "    showDetails(0);\n"
+        << "  }\n"
+        << "});\n"
+        << "</script>\n";
+
+    out << "</body>\n";
+    out << "</html>\n";
+
+    file.close();
 }
+
 
 void CCoverageNoteProvider::scrollToLastCoveageNoteItem()
 {
     if(mpItemsTableView)
     {
-        auto pSelectionModel = mpItemsTableView->selectionModel();
-
-        if(pSelectionModel)
+        if(mCoverageNote.size() > 0)
         {
-            pSelectionModel->clearSelection();
-            pSelectionModel->select(mpCoverageNoteTableModel->index(mCoverageNote.size() - 1,
-                static_cast<int>(CoverageNoteTableModel::eColumn::USERNAME)), QItemSelectionModel::ClearAndSelect);
+            auto pSelectionModel = mpItemsTableView->selectionModel();
+
+            if(pSelectionModel)
+            {
+                pSelectionModel->clearSelection();
+                pSelectionModel->select(mpCoverageNoteTableModel->index(mCoverageNote.size() - 1,
+                    static_cast<int>(CoverageNoteTableModel::eColumn::USERNAME)),
+                                        QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            }
+        }
+    }
+}
+
+void CCoverageNoteProvider::scrollToFirstCoveageNoteItem()
+{
+    if(mpItemsTableView)
+    {
+        if(mCoverageNote.size() > 0)
+        {
+            auto pSelectionModel = mpItemsTableView->selectionModel();
+
+            if(pSelectionModel)
+            {
+                pSelectionModel->clearSelection();
+                pSelectionModel->select(mpCoverageNoteTableModel->index(0,
+                    static_cast<int>(CoverageNoteTableModel::eColumn::USERNAME)),
+                                        QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            }
         }
     }
 }
@@ -781,6 +1007,5 @@ void CCoverageNoteProvider::addGeneralComment()
 {
     auto itemId = addCoverageNoteItem();
     setCoverageNoteItemMessage(itemId, "General comment");
-    mCoverageNote.setRegex(itemId, "----");
     scrollToLastCoveageNoteItem();
 }

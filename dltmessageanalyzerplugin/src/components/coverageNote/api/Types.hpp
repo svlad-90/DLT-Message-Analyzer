@@ -46,6 +46,8 @@ public:
     void setRegex(const tCoverageNoteItemId& id, const QString& val);
     tQStringPtr getRegex(const tCoverageNoteItemId& id) const;
 
+    const tCoverageNoteItemVec& getCoverageNoteItemVec();
+
     void resetModified();
     bool isModified() const;
 

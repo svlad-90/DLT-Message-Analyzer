@@ -207,7 +207,8 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                mpForm->getCNItemsTableView(),
                                                                                mpForm->getCNMessageTextEdit(),
                                                                                mpForm->getCNRegexTextEdit(),
-                                                                               mpForm->getCNUseRegexButton());
+                                                                               mpForm->getCNUseRegexButton(),
+                                                                               mpForm->getCNCurrentFileLineEdit());
         mpCoverageNoteComponent = pCoverageNoteComponent;
 
         auto initResult = pCoverageNoteComponent->startInit();
@@ -495,6 +496,11 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
     if(nullptr != mpDLTMessageAnalyzer)
     {
         mpDLTMessageAnalyzer->setMainTableView(mpMainTableView);
+    }
+
+    if(nullptr != mpForm->getSearchResultTableView())
+    {
+        mpForm->getSearchResultTableView()->setMainTableView(mpMainTableView);
     }
 #endif
 

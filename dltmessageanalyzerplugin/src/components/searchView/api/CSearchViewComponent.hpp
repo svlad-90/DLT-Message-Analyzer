@@ -4,6 +4,7 @@
 
 #include "QObject"
 #include "QTabWidget"
+#include "QTableView"
 
 #include "common/Definitions.hpp"
 #include "dma/component/IComponent.hpp"
@@ -33,6 +34,7 @@ public:
     virtual const char* getName() const override;
 
     std::shared_ptr<ISearchResultModel> getSearchResultModel();
+    void setMainTableView(QTableView* pMainTableView);
 
 protected:
     virtual DMA::tSyncInitOperationResult init() override;

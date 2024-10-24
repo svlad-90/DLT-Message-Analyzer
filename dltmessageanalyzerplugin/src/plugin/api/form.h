@@ -92,6 +92,7 @@ public:
     QTextEdit* getCNCommentTextEdit();
     QTextEdit* getCNRegexTextEdit();
     QPushButton* getCNUseRegexButton();
+    QLineEdit* getCNCurrentFileLineEdit();
 
 private slots:
     void on_analyze_clicked();

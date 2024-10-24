@@ -30,6 +30,7 @@ public:
     void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) override;
     void setCoverageNoteProvider(const tCoverageNoteProviderPtr& pCoverageNoteProvider);
     void setMainTabWidget(QTabWidget* pTabWidget);
+    void setMainTableView(QTableView* pMainTableView);
 
 signals:
     void searchRangeChanged( const tIntRangeProperty& searchRange, bool bReset );
@@ -45,6 +46,7 @@ protected:
 
     void handleSettingsManagerChange() override;
     QString getSelectionAsString( bool copyAsHTML, bool copyOnlyPayload ) const;
+    QString getMainTableSelectionAsString() const;
 
 private:
     bool isVerticalScrollBarVisible() const;
@@ -55,6 +57,7 @@ private:
     void selectAllCheckboxItems(bool select, int column);
     void updateWidthLogic(const int& rowFrom, const int& rowTo);
     void addComment();
+    void addCommentFromMainTable();
 
     typedef std::set<eSearchResultColumn> tUpdateWidthSet;
 
@@ -86,4 +89,5 @@ private:
     tCoverageNoteProviderPtr mpCoverageNoteProvider;
     QTabWidget* mpMainTabWidget;
     QString mUsedRegex;
+    QTableView* mpMainTableView;
 };

@@ -50,22 +50,17 @@ public:
                           QTextEdit* messagesTextEdit,
                           QTextEdit* regexTextEdit,
                           QPushButton* useRegexButton,
+                          QLineEdit* pCurrentFileLineEdit,
                           QObject *parent = nullptr);
-
-    // file level API
-    bool exportCoverageNoteAsHTML(const QString& targetPath) override;
-
-    // coverage note item methods
     tCoverageNoteItemId addCoverageNoteItem() override;
-
     void setCoverageNoteItemRegex(const tCoverageNoteItemId& id, const QString& regex) override;
     void setCoverageNoteItemMessage(const tCoverageNoteItemId& id,
                             const QString& comment) override;
     void scrollToLastCoveageNoteItem() override;
-
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
+    void scrollToFirstCoveageNoteItem();
     void removeSelectedCoverageNote();
     void removeCoverageNoteItem(const tCoverageNoteItemId& id);
     bool loadCoverageNoteFile(const QString& filePath);
@@ -75,6 +70,10 @@ private:
     void addGeneralComment();
     void normalizeColumnsSize();
     bool clearCoverageNote();
+    void fetchTextEfitorDataToModel();
+    void exportCoverageNoteAsHTML();
+    void setLoadedJsonFile(const QString& filePath);
+    const QString& getLoadedJsonFile() const;
 
 private:
     tCoverageNote mCoverageNote;
@@ -85,4 +84,5 @@ private:
     QPushButton* mpUseRegexButton;
     std::shared_ptr<CoverageNoteTableModel> mpCoverageNoteTableModel;
     QString mLoadedJsonFilePath;
+    QLineEdit* mpCurrentFileLineEdit;
 };

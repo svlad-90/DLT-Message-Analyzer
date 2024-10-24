@@ -12,14 +12,16 @@ CCoverageNoteComponent::CCoverageNoteComponent(const tSettingsManagerPtr& pSetti
                                                QTableView* itemsTableView,
                                                QTextEdit* messagesTextEdit,
                                                QTextEdit* regexTextEdit,
-                                               QPushButton* useRegexButton):
+                                               QPushButton* useRegexButton,
+                                               QLineEdit* pCurrentFileLineEdit):
     mpCoverageNoteProviderPtr(nullptr),
     mpSettingsManager(pSettingsManager),
     mpCommentTextEdit(commentTextEdit),
     mpItemsTableView(itemsTableView),
     mpMessagesTextEdit(messagesTextEdit),
     mpRegexTextEdit(regexTextEdit),
-    mpUseRegexButton(useRegexButton)
+    mpUseRegexButton(useRegexButton),
+    mpCurrentFileLineEdit(pCurrentFileLineEdit)
 {
     // force linkage references in order to have consistent diagrams
     DMA_FORCE_LINK_REFERENCE(IRegexHistoryProvider)
@@ -41,7 +43,8 @@ DMA::tSyncInitOperationResult CCoverageNoteComponent::init()
                                                                             mpItemsTableView,
                                                                             mpMessagesTextEdit,
                                                                             mpRegexTextEdit,
-                                                                            mpUseRegexButton);
+                                                                            mpUseRegexButton,
+                                                                            mpCurrentFileLineEdit);
         result.bIsOperationSuccessful = true;
         result.returnCode = 0;
     }
@@ -85,6 +88,7 @@ PUML_PACKAGE_BEGIN(DMA_CoverageNote_API)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QTextEdit, 1, 2, passes to nested entities)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QTableView, 1, 1, passes to nested entities)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QPushButton, 1, 3, passes to nested entities)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTabWidget, 1, 3, passes to nested entities)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QTabWidget, 1, 1, passes to nested entities)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(QLineEdit, 1, 1, passes to nested entities)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

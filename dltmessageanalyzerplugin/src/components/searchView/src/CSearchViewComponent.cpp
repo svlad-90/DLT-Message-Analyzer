@@ -34,6 +34,14 @@ const char* CSearchViewComponent::getName() const
     return "CSearchViewComponent";
 }
 
+void CSearchViewComponent::setMainTableView(QTableView* pMainTableView)
+{
+    if(mpSearchResultView)
+    {
+        mpSearchResultView->setMainTableView(pMainTableView);
+    }
+}
+
 DMA::tSyncInitOperationResult CSearchViewComponent::init()
 {
     DMA::tSyncInitOperationResult result;

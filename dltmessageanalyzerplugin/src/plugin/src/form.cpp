@@ -1089,6 +1089,18 @@ QPushButton* Form::getCNUseRegexButton()
     return pResult;
 }
 
+QLineEdit* Form::getCNCurrentFileLineEdit()
+{
+    QLineEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNCurrentFileLineEdit;
+    }
+
+    return pResult;
+}
+
 PUML_PACKAGE_BEGIN(DMA_Plugin_API)
     PUML_CLASS_BEGIN_CHECKED(Form)
         PUML_INHERITANCE_CHECKED(QWidget, extends)

@@ -12,8 +12,6 @@ public:
     ICoverageNoteProvider(QObject *parent = nullptr): QObject(parent)
     {};
     virtual ~ICoverageNoteProvider() = default;
-
-    virtual bool exportCoverageNoteAsHTML(const QString& targetPath) = 0;
     virtual tCoverageNoteItemId addCoverageNoteItem() = 0;
     virtual void setCoverageNoteItemRegex(const tCoverageNoteItemId& id, const QString& regex) = 0;
     virtual void setCoverageNoteItemMessage(const tCoverageNoteItemId& id,

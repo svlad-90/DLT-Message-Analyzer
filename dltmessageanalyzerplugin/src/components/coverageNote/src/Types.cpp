@@ -153,6 +153,7 @@ tCoverageNoteItemId tCoverageNote::addCoverageNoteItem()
 void tCoverageNote::clear()
 {
     coverageNoteItemVec.clear();
+    resetModified();
 }
 
 void tCoverageNote::removeCoverageNoteItem(const tCoverageNoteItemId&id)
@@ -177,8 +178,11 @@ void tCoverageNote::setMessage(const tCoverageNoteItemId& id, const QString& val
 {
     if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
     {
-        coverageNoteItemVec[id]->message.pString = std::make_shared<QString>(val);
-        setModified(true);
+        if(coverageNoteItemVec[id]->message.pString && *coverageNoteItemVec[id]->message.pString != val)
+        {
+            coverageNoteItemVec[id]->message.pString = std::make_shared<QString>(val);
+            setModified(true);
+        }
     }
 }
 
@@ -198,8 +202,11 @@ void tCoverageNote::setUsername(const tCoverageNoteItemId& id, const QString& va
 {
     if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
     {
-        coverageNoteItemVec[id]->userName.pString = std::make_shared<QString>(val);
-        setModified(true);
+        if(coverageNoteItemVec[id]->userName.pString && *coverageNoteItemVec[id]->userName.pString != val)
+        {
+            coverageNoteItemVec[id]->userName.pString = std::make_shared<QString>(val);
+            setModified(true);
+        }
     }
 }
 
@@ -219,8 +226,11 @@ void tCoverageNote::setDateTime(const tCoverageNoteItemId& id, const QDateTime& 
 {
     if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
     {
-        coverageNoteItemVec[id]->dateTime = val;
-        setModified(true);
+        if(coverageNoteItemVec[id]->dateTime != val)
+        {
+            coverageNoteItemVec[id]->dateTime = val;
+            setModified(true);
+        }
     }
 }
 
@@ -240,8 +250,11 @@ void tCoverageNote::setComment(const tCoverageNoteItemId& id, const QString& val
 {
     if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
     {
-        coverageNoteItemVec[id]->comment.pString = std::make_shared<QString>(val);
-        setModified(true);
+        if(coverageNoteItemVec[id]->comment.pString && *coverageNoteItemVec[id]->comment.pString != val)
+        {
+            coverageNoteItemVec[id]->comment.pString = std::make_shared<QString>(val);
+            setModified(true);
+        }
     }
 }
 
@@ -261,8 +274,11 @@ void tCoverageNote::setRegex(const tCoverageNoteItemId& id, const QString& val)
 {
     if(id >= 0 && id < static_cast<int>(coverageNoteItemVec.size()))
     {
-        coverageNoteItemVec[id]->regex.pString = std::make_shared<QString>(val);
-        setModified(true);
+        if(coverageNoteItemVec[id]->regex.pString && *coverageNoteItemVec[id]->regex.pString != val)
+        {
+            coverageNoteItemVec[id]->regex.pString = std::make_shared<QString>(val);
+            setModified(true);
+        }
     }
 }
 
@@ -276,6 +292,11 @@ tQStringPtr tCoverageNote::getRegex(const tCoverageNoteItemId& id) const
     }
 
     return pResult;
+}
+
+const tCoverageNoteItemVec& tCoverageNote::getCoverageNoteItemVec()
+{
+    return coverageNoteItemVec;
 }
 
 void tCoverageNote::resetModified()
