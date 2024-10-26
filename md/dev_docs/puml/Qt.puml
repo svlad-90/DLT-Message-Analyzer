@@ -52,6 +52,32 @@ class "CTableMemoryJumper"
 
 }
 
+package "DMA_CoverageNote" #DDDDDD
+{
+
+class "CCoverageNoteProvider"
+{
+}
+
+class "CoverageNoteTableModel"
+{
+}
+
+}
+
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "CCoverageNoteComponent"
+{
+}
+
+class "ICoverageNoteProvider"
+{
+}
+
+}
+
 package "DMA_FiltersView" #DDDDDD
 {
 
@@ -245,6 +271,10 @@ class "CExtendedCompleter"
 {
 }
 
+class "CRegexHistoryProvider"
+{
+}
+
 }
 
 package "DMA_RegexHistory_API" #DDDDDD
@@ -326,6 +356,10 @@ class "QLineEdit"
 {
 }
 
+class "QListView"
+{
+}
+
 class "QObject"
 {
 }
@@ -351,6 +385,10 @@ class "QTabWidget"
 }
 
 class "QTableView"
+{
+}
+
+class "QTextEdit"
 {
 }
 
@@ -403,6 +441,8 @@ QObject <|-- IDLTMessageAnalyzerController : extends
 QObject <|-- IDLTMessageAnalyzerControllerConsumer : extends
 QObject <|-- CBGColorAnimation : extends
 QObject <|-- CRegexDirectoryMonitor : extends
+QAbstractTableModel <|-- CoverageNoteTableModel : implements
+QObject <|-- ICoverageNoteProvider : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
 QTreeView <|-- CFiltersView : implements
 QAbstractItemModel <|-- IFiltersModel : implements
@@ -439,6 +479,14 @@ CMTAnalyzer "1" *-- "*" QThread : contains
 CBGColorAnimation "1" o-- "1" QWidget : animation widget
 CRegexDirectoryMonitor "1" *-- "1" QFileSystemWatcher : contains
 CTableMemoryJumper "1" o-- "1" QTableView : contains
+CCoverageNoteProvider "1" o-- "1" QLineEdit : passes to nested entities
+CCoverageNoteProvider "1" o-- "1" QPushButton : passes to nested entities
+CCoverageNoteProvider "1" o-- "2" QTableView : passes to nested entities
+CCoverageNoteProvider "1" o-- "4" QTextEdit : passes to nested entities
+CCoverageNoteComponent "1" o-- "1" QLineEdit : passes to nested entities
+CCoverageNoteComponent "1" o-- "1" QPushButton : passes to nested entities
+CCoverageNoteComponent "1" o-- "2" QTableView : passes to nested entities
+CCoverageNoteComponent "1" o-- "4" QTextEdit : passes to nested entities
 CFilterItemDelegate "1" o-- "1" QCompleter : uses
 CFilterItemDelegate "1" o-- "1" QTreeView : parent view
 CFiltersView "1" o-- "1" QLineEdit : regex input field
@@ -451,5 +499,9 @@ CImageViewer "1" *-- "1" QImage : contains
 CUMLView "1" *-- "2" QProcess : contains
 CPlotViewComponent "1" o-- "1" QPushButton : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" QTimer : contains
+CRegexHistoryProvider "1" *-- "1" QListView : creates
+CSearchResultView "1" o-- "1" QTabWidget : uses main tab widget
+CSearchResultView "1" o-- "1" QTableView : uses dlt-viewer main table view
+CSearchViewComponent "1" o-- "1" QTabWidget : uses
 
 @enduml

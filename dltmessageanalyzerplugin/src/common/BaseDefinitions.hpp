@@ -23,6 +23,7 @@ struct tQStringPtrWrapper
     tQStringPtrWrapper();
     tQStringPtrWrapper(const tQStringPtr& pString_);
     bool operator== ( const tQStringPtrWrapper& rVal ) const;
+    bool operator!= ( const tQStringPtrWrapper& rVal ) const;
     bool operator< ( const tQStringPtrWrapper& rVal ) const;
     tQStringPtr pString = nullptr;
 };

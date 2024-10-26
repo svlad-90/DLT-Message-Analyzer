@@ -1,0 +1,150 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_CoverageNote" #DDDDDD
+{
+
+class "CCoverageNoteProvider"
+{
+}
+
+class "CoverageNoteTableModel"
+{
+}
+
+}
+
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "CCoverageNoteComponent"
+{
+}
+
+class "ICoverageNoteProvider"
+{
+}
+
+class "tCoverageNote"
+{
+}
+
+class "tCoverageNoteItem"
+{
+    + QDateTime dateTime
+    + tQStringPtrWrapper comment
+    + tQStringPtrWrapper message
+    + tQStringPtrWrapper regex
+    + tQStringPtrWrapper userName
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "DMA_Plugin" #DDDDDD
+{
+
+class "DLTMessageAnalyzerPlugin"
+{
+}
+
+}
+
+package "DMA_Plugin_API" #DDDDDD
+{
+
+class "CDLTMessageAnalyzer"
+{
+}
+
+}
+
+package "DMA_SearchView_API" #DDDDDD
+{
+
+class "CSearchResultView"
+{
+}
+
+class "CSearchViewComponent"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "ISettingsManager"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QLineEdit"
+{
+}
+
+class "QObject"
+{
+}
+
+class "QPushButton"
+{
+}
+
+class "QTableView"
+{
+}
+
+class "QTextEdit"
+{
+}
+
+}
+
+package "nlohmann_json" #DDDDDD
+{
+
+class "nlohmann::json"
+{
+}
+
+}
+
+'====================Inheritance section====================
+ICoverageNoteProvider <|-- CCoverageNoteProvider : implements
+DMA::IComponent <|-- CCoverageNoteComponent : implements
+QObject <|-- ICoverageNoteProvider : extends
+
+'====================Dependencies section====================
+CCoverageNoteProvider "1" *-- "1" tCoverageNote : contains
+CoverageNoteTableModel "1" o-- "1" tCoverageNote : uses
+CCoverageNoteComponent "1" *-- "1" ICoverageNoteProvider : contains
+CCoverageNoteComponent "1" --> "1" ISettingsManager : passes to nested entities
+CCoverageNoteComponent "1" o-- "1" QLineEdit : passes to nested entities
+CCoverageNoteComponent "1" o-- "1" QPushButton : passes to nested entities
+CCoverageNoteComponent "1" o-- "2" QTableView : passes to nested entities
+CCoverageNoteComponent "1" o-- "4" QTextEdit : passes to nested entities
+tCoverageNote "1" --> "1" nlohmann::json : uses
+tCoverageNote "1" *-- "*" tCoverageNoteItem : contains
+tCoverageNoteItem "1" --> "1" nlohmann::json : uses
+DLTMessageAnalyzerPlugin "1" *-- "1" CCoverageNoteComponent : contains
+CDLTMessageAnalyzer "1" o-- "1" ICoverageNoteProvider : uses
+CSearchResultView "1" o-- "1" ICoverageNoteProvider : uses
+CSearchViewComponent "1" o-- "1" ICoverageNoteProvider : uses
+
+@enduml

@@ -12,6 +12,15 @@ class "CTableMemoryJumper"
 
 }
 
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "ICoverageNoteProvider"
+{
+}
+
+}
+
 package "DMA_Framework_Component" #DDDDDD
 {
 
@@ -141,6 +150,10 @@ class "QObject"
 {
 }
 
+class "QTabWidget"
+{
+}
+
 class "QTableView"
 {
 }
@@ -162,10 +175,15 @@ CDLTMessageAnalyzer "1" o-- "1" ISearchResultModel : gets and uses
 Ui::Form "1" *-- "1" CSearchResultView : contains
 CSearchResultHighlightingDelegate "1" *-- "1" ISearchResultModel : uses
 CSearchResultView "1" o-- "1" CSearchResultModel : uses
+CSearchResultView "1" o-- "1" ICoverageNoteProvider : uses
 CSearchResultView "1" o-- "1" IFileWrapper : uses
+CSearchResultView "1" o-- "1" QTabWidget : uses main tab widget
+CSearchResultView "1" o-- "1" QTableView : uses dlt-viewer main table view
 CSearchViewComponent "1" --> "1" CSearchResultModel : using to create ISearchResultModel
 CSearchViewComponent "1" o-- "1" CSearchResultView : uses
 CSearchViewComponent "1" *-- "1" CTableMemoryJumper : contains
+CSearchViewComponent "1" o-- "1" ICoverageNoteProvider : uses
 CSearchViewComponent "1" *-- "1" ISearchResultModel : contains
+CSearchViewComponent "1" o-- "1" QTabWidget : uses
 
 @enduml

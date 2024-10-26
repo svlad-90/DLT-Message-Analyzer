@@ -54,6 +54,28 @@ function (DMA_sync_q_custom_plot)
 endfunction(DMA_sync_q_custom_plot)
 ################### QCUSTOMPLOT ( END ) ###################
 
+################### NLOHMANN_JSON #########################
+# function - sync_qcustomplot
+# Syncs QCustomPlot, implementation, which is used for
+# the creation of plots
+function (DMA_sync_nlohmann_json)
+    include(FetchContent)
+    FetchContent_Declare(
+      nlohmannjson
+      GIT_REPOSITORY https://github.com/nlohmann/json.git
+      GIT_TAG        v3.11.3
+    )
+
+    FetchContent_GetProperties(nlohmannjson)
+    if(NOT nlohmannjson_POPULATED)
+        FetchContent_Populate(nlohmannjson)
+        add_subdirectory(${nlohmannjson_SOURCE_DIR} ${nlohmannjson_BINARY_DIR})
+    endif()
+
+    include_directories(${nlohmannjson_SOURCE_DIR}/include)
+endfunction(DMA_sync_nlohmann_json)
+################### QCUSTOMPLOT ( END ) ###################
+
 ################### COMMON_DEPS ###########################
 include(FetchContent)
 FetchContent_Declare(
@@ -83,6 +105,7 @@ DMA_sync_g_test_framework()
 DMA_sync_plantuml()
 DMA_sync_framework()
 DMA_sync_q_custom_plot()
+DMA_sync_nlohmann_json()
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     install(TARGETS qcustomplot LIBRARY DESTINATION ${DLT_LIBRARY_INSTALLATION_PATH} )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")

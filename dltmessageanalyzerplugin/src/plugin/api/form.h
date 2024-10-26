@@ -87,6 +87,12 @@ public:
     QPushButton* getUMLCreateDiagramFromTextButton();
     QPushButton* getCreatePlotButton();
     QPlainTextEdit* getUMLTextEditor();
+    QTableView* getCNItemsTableView();
+    QTextEdit* getCNMessageTextEdit();
+    QTextEdit* getCNCommentTextEdit();
+    QTextEdit* getCNRegexTextEdit();
+    QPushButton* getCNUseRegexButton();
+    QLineEdit* getCNCurrentFileLineEdit();
 
 private slots:
     void on_analyze_clicked();

@@ -1,0 +1,44 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_CoverageNote" #DDDDDD
+{
+
+class "CCoverageNoteProvider"
+{
+}
+
+class "CoverageNoteTableModel"
+{
+}
+
+}
+
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "ICoverageNoteProvider"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractTableModel"
+{
+}
+
+}
+
+'====================Inheritance section====================
+ICoverageNoteProvider <|-- CCoverageNoteProvider : implements
+QAbstractTableModel <|-- CoverageNoteTableModel : implements
+
+'====================Dependencies section====================
+CCoverageNoteProvider "1" o-- "1" CoverageNoteTableModel : uses
+
+@enduml

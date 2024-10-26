@@ -3,15 +3,6 @@
 
 skinparam backgroundColor #FEFEFE
 skinparam wrapWidth 600
-package "DLT" #DDDDDD
-{
-
-class "QListView"
-{
-}
-
-}
-
 package "DMA_Analyzer_API" #DDDDDD
 {
 
@@ -81,6 +72,10 @@ package "Qt" #DDDDDD
 {
 
 class "QCompleter"
+{
+}
+
+class "QListView"
 {
 }
 

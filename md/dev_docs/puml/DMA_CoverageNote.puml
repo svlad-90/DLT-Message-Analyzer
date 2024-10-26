@@ -1,0 +1,90 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_CoverageNote" #DDDDDD
+{
+
+class "CCoverageNoteProvider"
+{
+}
+
+class "CoverageNoteTableModel"
+{
+}
+
+}
+
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "ICoverageNoteProvider"
+{
+}
+
+class "tCoverageNote"
+{
+}
+
+}
+
+package "DMA_Settings_API" #DDDDDD
+{
+
+class "ISettingsManager"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+abstract class "QAbstractTableModel"
+{
+}
+
+class "QLineEdit"
+{
+}
+
+class "QPushButton"
+{
+}
+
+class "QTableView"
+{
+}
+
+class "QTextEdit"
+{
+}
+
+}
+
+package "nlohmann_json" #DDDDDD
+{
+
+class "nlohmann::json"
+{
+}
+
+}
+
+'====================Inheritance section====================
+ICoverageNoteProvider <|-- CCoverageNoteProvider : implements
+QAbstractTableModel <|-- CoverageNoteTableModel : implements
+
+'====================Dependencies section====================
+CCoverageNoteProvider "1" o-- "1" CoverageNoteTableModel : uses
+CCoverageNoteProvider "1" --> "1" ISettingsManager : uses
+CCoverageNoteProvider "1" o-- "1" QLineEdit : passes to nested entities
+CCoverageNoteProvider "1" o-- "1" QPushButton : passes to nested entities
+CCoverageNoteProvider "1" o-- "2" QTableView : passes to nested entities
+CCoverageNoteProvider "1" o-- "4" QTextEdit : passes to nested entities
+CCoverageNoteProvider "1" --> "1" nlohmann::json : uses
+CCoverageNoteProvider "1" *-- "1" tCoverageNote : contains
+CoverageNoteTableModel "1" o-- "1" tCoverageNote : uses
+
+@enduml

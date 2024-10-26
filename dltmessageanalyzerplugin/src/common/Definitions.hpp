@@ -768,4 +768,54 @@ tQStringPtr getDataStrFromMsg(const tMsgId& msgId, const tMsgWrapperPtr &pMsg, e
  */
 QColor getChartColor();
 
+/**
+ * @enum eTabIndexes
+ * @brief This enumeration defines the indexes of different views
+ *        used as tab positions in the QTabWidget.
+ */
+enum class eTabIndexes
+{
+    /**
+     * @brief Index for the search view tab.
+     * @details Represents the position of the Search View in the QTabWidget.
+     */
+    SEARCH_VIEW = 0,
+
+    /**
+     * @brief Index for the grouped view tab.
+     * @details Represents the position of the Grouped View in the QTabWidget.
+     */
+    GROUPED_VIEW = 1,
+
+    /**
+     * @brief Index for the UML view tab.
+     * @details Represents the position of the UML View in the QTabWidget.
+     */
+    UML_VIEW = 2,
+
+    /**
+     * @brief Index for the plot view tab.
+     * @details Represents the position of the Plot View in the QTabWidget.
+     */
+    PLOT_VIEW = 3,
+
+    /**
+     * @brief Index for the coverage note view tab.
+     * @details Represents the position of the Coverage Note View in the QTabWidget.
+     */
+    COVERAGE_NOTE_VIEW = 4,
+
+    /**
+     * @brief Index for the files view tab.
+     * @details Represents the position of the Files View in the QTabWidget.
+     */
+    FILES_VIEW = 5,
+
+    /**
+     * @brief Index for the console view tab.
+     * @details Represents the position of the Console View in the QTabWidget.
+     */
+    CONSOLE_VIEW = 6
+};
+
 #endif // DEFINITIONS_HPP

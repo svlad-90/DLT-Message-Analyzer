@@ -130,6 +130,28 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         mpUI->groupedView->header()->setVisible(true);
     }
 
+    if(mpUI->CNSplitter_1)
+    {
+        QList<int> sizes;
+        sizes.push_back(100);
+        sizes.push_back(300);
+        mpUI->CNSplitter_1->setSizes(sizes);
+    }
+
+    if(mpUI->CNSplitter_2)
+    {
+        QList<int> sizes;
+        sizes.push_back(300);
+        sizes.push_back(50);
+        sizes.push_back(50);
+        mpUI->CNSplitter_2->setSizes(sizes);
+    }
+
+    if(mpUI->CNItems)
+    {
+        mpUI->CNItems->resizeColumnsToContents();
+    }
+
     auto showContextMenu = [this](const QPoint &pos)
     {
         QMenu contextMenu("Context menu", this);
@@ -275,6 +297,61 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
             contextMenu.addAction(pAction);
         }
 
+        contextMenu.addSeparator();
+
+        {
+            QAction* pAction = new QAction("Set username ...", this);
+            connect(pAction, &QAction::triggered, this, [this](bool)
+            {
+                QDialog dialog(this);
+                // Use a layout allowing to have a label next to each field
+                QFormLayout form(&dialog);
+
+                // Add some text above the fields
+                form.addRow(new QLabel("Set username"));
+
+                // Add the lineEdits with their respective labels
+                QList<QLineEdit *> fields;
+
+                QLineEdit* usernameLineEdit = new QLineEdit(&dialog);
+
+                {
+                    usernameLineEdit->setText( getSettingsManager()->getUsername() );
+                    QString label("Username:");
+                    form.addRow(label, usernameLineEdit);
+                    fields << usernameLineEdit;
+                }
+
+                dialog.resize(400, dialog.height());
+
+                // Add some standard buttons (Cancel/Ok) at the bottom of the dialog
+                QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                           Qt::Horizontal, &dialog);
+                form.addRow(&buttonBox);
+
+                auto accept_handler = [this, &usernameLineEdit, &dialog]()
+                {
+                    if(usernameLineEdit)
+                    {
+                        getSettingsManager()->setUserName(usernameLineEdit->text());
+                    }
+                    dialog.accept();
+                };
+
+                auto reject_handler = [&dialog]()
+                {
+                    dialog.reject();
+                };
+
+                QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, accept_handler);
+                QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, reject_handler);
+
+                // Show the dialog as modal
+                dialog.exec();
+            });
+            contextMenu.addAction(pAction);
+        }
+
         contextMenu.exec(this->mapToGlobal(pos));
     };
 
@@ -324,7 +401,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                             }
                             else
                             {
-                                mpUI->tabWidget->insertTab(2, pGroupedViewWidget, "Grouped view");
+                                mpUI->tabWidget->insertTab(static_cast<int>(eTabIndexes::GROUPED_VIEW), pGroupedViewWidget, "Grouped view");
                             }
                         }
                     }
@@ -357,7 +434,10 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                             }
                             else
                             {
-                                mpUI->tabWidget->insertTab(true == getSettingsManager()->getGroupedViewFeatureActive() ? 3 : 2, pUMLWidget, "UML View");
+                                mpUI->tabWidget->insertTab(true == getSettingsManager()->getGroupedViewFeatureActive() ?
+                                                           static_cast<int>(eTabIndexes::UML_VIEW) :
+                                                           static_cast<int>(eTabIndexes::UML_VIEW) - 1,
+                                                           pUMLWidget, "UML View");
                             }
                         }
                     }
@@ -392,25 +472,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
                             {
                                 auto bGroupedViewFeatureActive = getSettingsManager()->getGroupedViewFeatureActive();
                                 auto bUML_FeatureActive = getSettingsManager()->getUML_FeatureActive();
-                                int tabIndex = 0;
-
-                                if(true == bGroupedViewFeatureActive &&
-                                   true == bUML_FeatureActive)
-                                {
-                                    tabIndex = 4;
-                                }
-                                else if((true == bGroupedViewFeatureActive &&
-                                        false == bUML_FeatureActive) ||
-                                        (false == bGroupedViewFeatureActive &&
-                                        true == bUML_FeatureActive))
-                                {
-                                    tabIndex = 3;
-                                }
-                                else
-                                {
-                                    tabIndex = 2;
-                                }
-
+                                int tabIndex = static_cast<int>(eTabIndexes::PLOT_VIEW) - !bGroupedViewFeatureActive - !bUML_FeatureActive;
                                 mpUI->tabWidget->insertTab(tabIndex, pPlotViewWidget, "Plot view");
                             }
                         }
@@ -965,6 +1027,78 @@ void Form::on_createSequenceDiagram_clicked()
             mpUI->PNG_UML_View->cancelDiagramGeneration();
         }
     }
+}
+
+QTableView* Form::getCNItemsTableView()
+{
+    QTableView* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNItems;
+    }
+
+    return pResult;
+}
+
+QTextEdit* Form::getCNMessageTextEdit()
+{
+    QTextEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNMessagesTextEdit;
+    }
+
+    return pResult;
+}
+
+QTextEdit* Form::getCNCommentTextEdit()
+{
+    QTextEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNCommentTextEdit;
+    }
+
+    return pResult;
+}
+
+QTextEdit* Form::getCNRegexTextEdit()
+{
+    QTextEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNRegexTextEdit;
+    }
+
+    return pResult;
+}
+
+QPushButton* Form::getCNUseRegexButton()
+{
+    QPushButton* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNUseRegexButton;
+    }
+
+    return pResult;
+}
+
+QLineEdit* Form::getCNCurrentFileLineEdit()
+{
+    QLineEdit* pResult = nullptr;
+
+    if(mpUI)
+    {
+        pResult = mpUI->CNCurrentFileLineEdit;
+    }
+
+    return pResult;
 }
 
 PUML_PACKAGE_BEGIN(DMA_Plugin_API)

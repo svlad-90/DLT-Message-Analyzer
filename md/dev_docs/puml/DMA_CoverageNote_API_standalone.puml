@@ -1,0 +1,58 @@
+
+@startuml
+
+skinparam backgroundColor #FEFEFE
+skinparam wrapWidth 600
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "CCoverageNoteComponent"
+{
+}
+
+class "ICoverageNoteProvider"
+{
+}
+
+class "tCoverageNote"
+{
+}
+
+class "tCoverageNoteItem"
+{
+    + QDateTime dateTime
+    + tQStringPtrWrapper comment
+    + tQStringPtrWrapper message
+    + tQStringPtrWrapper regex
+    + tQStringPtrWrapper userName
+}
+
+}
+
+package "DMA_Framework_Component" #DDDDDD
+{
+
+class "DMA::IComponent"
+{
+}
+
+}
+
+package "Qt" #DDDDDD
+{
+
+class "QObject"
+{
+}
+
+}
+
+'====================Inheritance section====================
+DMA::IComponent <|-- CCoverageNoteComponent : implements
+QObject <|-- ICoverageNoteProvider : extends
+
+'====================Dependencies section====================
+CCoverageNoteComponent "1" *-- "1" ICoverageNoteProvider : contains
+tCoverageNote "1" *-- "*" tCoverageNoteItem : contains
+
+@enduml

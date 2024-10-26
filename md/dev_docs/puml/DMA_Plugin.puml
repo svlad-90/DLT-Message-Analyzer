@@ -29,6 +29,15 @@ class "CAnalyzerComponent"
 
 }
 
+package "DMA_CoverageNote_API" #DDDDDD
+{
+
+class "CCoverageNoteComponent"
+{
+}
+
+}
+
 package "DMA_FiltersView_API" #DDDDDD
 {
 
@@ -162,6 +171,7 @@ QObject <|-- DLTMessageAnalyzerPlugin : extends
 
 '====================Dependencies section====================
 DLTMessageAnalyzerPlugin "1" *-- "1" CAnalyzerComponent : contains
+DLTMessageAnalyzerPlugin "1" *-- "1" CCoverageNoteComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CDLTMessageAnalyzer : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CFiltersViewComponent : contains
 DLTMessageAnalyzerPlugin "1" *-- "1" CGroupedViewComponent : contains

@@ -461,7 +461,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         {
             printAppClassDiagram();
         }
-    }, "[-p=<packageName> // case sensitive name of the package. Can be empty or contain special \"all\" value.]"
+    }, "[-p=<packageName> // case sensitive name of the package. Can contain special \"all\" value.]"
        "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
        "- prints class diagram of the whole application or of the dedicated package(s) to the console. "
        "In case if no parameters provided - the whole application's diagram will be dumped.");
@@ -542,7 +542,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
             SEND_ERR("Command [uml-export-class-diagram]: required parameter \"d\" not found!");
         }
     }, "[-d=<directory> // mandatory! Directory, to which store the the diagrams]"
-       "[-p=<packageName> // case sensitive name of the package. Can be empty or contain special \"all\" value.]"
+       "[-p=<packageName> // case sensitive name of the package. Can contain special \"all\" value.]"
        "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
        "- exports class diagram of the whole application or of the dedicated package(s) to the file-system. "
        "In case if no optional parameters provided - the whole application's diagram will be exported.");
