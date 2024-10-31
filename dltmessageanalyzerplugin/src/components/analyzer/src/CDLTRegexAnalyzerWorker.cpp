@@ -110,11 +110,9 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
 
                 for (int i = 0; i <= match.lastCapturedIndex(); ++i)
                 {
-                    const auto& matchItem = match.captured(i);
-
                     if(i>0)
                     {
-                        if(0 != matchItem.size())
+                        if(0 != match.capturedLength(i))
                         {
                             ++foundMatchesVecCapacity;
                         }
@@ -125,12 +123,11 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
 
                 for (int i = 0; i <= match.lastCapturedIndex(); ++i)
                 {
-                    const auto& matchItem = match.captured(i);
-
                     if(i>0)
                     {
-                        if(0 != matchItem.size())
+                        if(0 != match.capturedLength(i))
                         {
+                            const auto& matchItem = match.captured(i);
                             foundMatches.foundMatchesVec.push_back( tFoundMatch( std::make_shared<QString>(matchItem),
                                                                  tIntRange( match.capturedStart(i), match.capturedEnd(i) - 1 ),
                                                                  i)  );

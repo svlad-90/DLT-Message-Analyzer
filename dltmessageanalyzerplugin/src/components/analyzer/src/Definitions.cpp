@@ -40,7 +40,8 @@ requestId(INVALID_REQUEST_ID),
 requestState(eRequestState::ERROR_STATE),
 progress(0),
 processedMatches(),
-bUML_Req_Res_Ev_DuplicateFound(false)
+bUML_Req_Res_Ev_DuplicateFound(false),
+groupedViewIndices()
 {
 }
 
@@ -49,11 +50,13 @@ const tRequestId& requestId_,
 const eRequestState& requestState_,
 const int8_t& progress_,
 const tFoundMatchesPack& processedMatches_,
-bool bUML_Req_Res_Ev_DuplicateFound_):
+bool bUML_Req_Res_Ev_DuplicateFound_,
+const tGroupedViewIndices& groupedViewIndices_):
 requestId(requestId_),
 requestState(requestState_),
 progress(progress_),
 processedMatches(processedMatches_),
-bUML_Req_Res_Ev_DuplicateFound(bUML_Req_Res_Ev_DuplicateFound_)
+bUML_Req_Res_Ev_DuplicateFound(bUML_Req_Res_Ev_DuplicateFound_),
+groupedViewIndices(groupedViewIndices_)
 {
 }

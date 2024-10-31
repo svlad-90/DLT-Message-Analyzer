@@ -39,7 +39,8 @@ tRequestId IDLTMessageAnalyzerControllerConsumer::requestAnalyze( const tRequest
 
         bool bParseResult = regexMetadata.parse(requestParameters.regex,
                                                 bUMLFeatureActive,
-                                                bPlotViewFeatureActive);
+                                                bPlotViewFeatureActive,
+                                                bGroupedViewFeatureActive);
 
         if(false == bParseResult)
         {

@@ -954,14 +954,7 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
 
     if(mpMainTabWidget)
     {
-        bool jumpToSearchView = false;
-
-        if(mpMainTabWidget->currentIndex() > (static_cast<int>(eTabIndexes::GROUPED_VIEW) - !getSettingsManager()->getGroupedViewFeatureActive()))
-        {
-            jumpToSearchView = true;
-        }
-
-        if(jumpToSearchView)
+        if(mpMainTabWidget->currentIndex() > (static_cast<int>(eTabIndexes::SEARCH_VIEW)))
         {
             mpMainTabWidget->setCurrentIndex(static_cast<int>(eTabIndexes::SEARCH_VIEW));
         }
@@ -1257,7 +1250,9 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                         auto endIt = progressNotificationData.processedMatches.matchedItemVec.end();
                         if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
                         {
-                            mpGroupedViewModel->addMatches((*foundMatchesIt)->getFoundMatches(), foundMatchesIt == --(endIt));
+                            mpGroupedViewModel->addMatches( progressNotificationData.groupedViewIndices,
+                                                            (*foundMatchesIt)->getFoundMatches(),
+                                                            foundMatchesIt == --(endIt));
                         }
 
                         mpFiltersModel->addCompletionData((*foundMatchesIt)->getFoundMatches());
@@ -1307,7 +1302,9 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
 
                         if(true == isGroupedViewFeatureActiveForCurrentAnalysis())
                         {
-                            mpGroupedViewModel->addMatches((*foundMatchesIt)->getFoundMatches(), foundMatchesIt == --(endIt));
+                            mpGroupedViewModel->addMatches(progressNotificationData.groupedViewIndices,
+                                                           (*foundMatchesIt)->getFoundMatches(),
+                                                           foundMatchesIt == --(endIt));
                         }
 
                         mpFiltersModel->addCompletionData((*foundMatchesIt)->getFoundMatches());

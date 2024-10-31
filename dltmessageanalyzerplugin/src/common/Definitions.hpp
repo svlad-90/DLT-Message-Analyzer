@@ -320,7 +320,6 @@ QString getName(eRegexFiltersRowType val);
 
 //////////////////////FILTERS VIEW DEFINITIONS END//////////////////
 
-
 struct tHighlightingGradient
 {
     tHighlightingGradient();
@@ -355,7 +354,7 @@ struct tFoundMatch
 
     tQStringPtr pMatchStr;
     tIntRange range;
-    std::int16_t idx;
+    int idx;
 };
 
 Q_DECLARE_METATYPE( const tFoundMatch* )
@@ -421,6 +420,12 @@ struct tOptional_UML_ID
     tOptional_UML_IDMap optional_UML_IDMap;
 };
 
+///////////////////////////GROUPED VIEW DATA////////////////////////////////////////
+typedef int tGroupedViewIdx;
+typedef std::map<int /*regex group index*/, tGroupedViewIdx /*specified grouped view ordering*/> tGroupedViewIndices;
+
+///////////////////////////GROUPED VIEW DATA (END)//////////////////////////////////
+
 ///////////////////////////REGEX_SCRIPTING_METADATA/////////////////////////////////
 
 /**
@@ -460,7 +465,8 @@ struct tRegexScriptingMetadata
     typedef std::pair<bool /*status*/, QString /*status description*/> tStatusPair;
     bool parse(const QRegularExpression& regex,
                bool bParseUMLData,
-               bool bParsePlotViewData);
+               bool bParsePlotViewData,
+               bool bParseGroupedViewData);
     const tRegexScriptingMetadataItemPtrVec& getItemsVec() const;
     typedef std::set<int> tCheckIDs;
     tStatusPair doesContainConsistentUMLData(bool fillInStringMsg) const;
@@ -469,6 +475,7 @@ struct tRegexScriptingMetadata
     tStatusPair doesContainConsistentPlotViewData(bool fillInStringMsg, bool checkParameters) const;
     tStatusPair doesContainConsistentPlotViewData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool checkParameters) const;
     bool doesContainAnyPlotViewGroup() const;
+    const tGroupedViewIndices& getGroupedViewIndices() const;
 
 private:
     tStatusPair doesContainConsistentUMLData(bool fillInStringMsg, const tCheckIDs& checkIDs, bool bCheckAll) const;
@@ -479,12 +486,16 @@ private:
 
 private:
     tRegexScriptingMetadataItemPtrVec mItemsVec;
+    tGroupedViewIndices mGroupedViewIndexes;
 };
 Q_DECLARE_METATYPE(tRegexScriptingMetadata)
 
 tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                                                     bool bParseUMLData,
-                                                    bool bParsePlotViewData );
+                                                    bool bParsePlotViewData,
+                                                    bool bParseGroupedViewData );
+
+tGroupedViewIdx parseRegexGroupedViewIndices( const QString& groupName );
 
 ////////////////////////////////////////////////////////////
 
