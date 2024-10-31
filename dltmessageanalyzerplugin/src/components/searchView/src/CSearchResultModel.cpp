@@ -1600,9 +1600,9 @@ ISearchResultModel::tPlotContent CSearchResultModel::createPlotContent() const
                     it != itemMetadata.pPlotViewInfo->plotViewDataMap.end() && false == skipRowFlag;
                     ++it)
                 {
-                    const auto& plotViewDataMap = *it;
-                    const auto& plotViewID = plotViewDataMap.first;
-                    const auto& plotViewDataItemVec = plotViewDataMap.second;
+                    const auto& plotViewDataMapPair = *it;
+                    const auto& plotViewID = plotViewDataMapPair.first;
+                    const auto& plotViewDataItemVec = plotViewDataMapPair.second;
 
                     skipRowFlag = !detail::processPlotViewDataItemVec(*this,
                                                plotViewID,

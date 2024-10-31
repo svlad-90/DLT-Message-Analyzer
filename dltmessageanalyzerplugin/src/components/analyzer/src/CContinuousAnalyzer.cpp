@@ -111,7 +111,8 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
                             progressNotificationData.requestState,
                             injectedProgress,
                             progressNotificationData.processedMatches,
-                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound,
+                            progressNotificationData.groupedViewIndices);
 
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
                                                       Q_ARG(tProgressNotificationData, resultProgressNotificationData));
@@ -127,7 +128,8 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
                             progressNotificationData.requestState,
                             progressNotificationData.progress,
                             progressNotificationData.processedMatches,
-                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound,
+                            progressNotificationData.groupedViewIndices);
 
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
                                                       Q_ARG(tProgressNotificationData, resultProgressNotificationData));
@@ -148,7 +150,8 @@ void CContinuousAnalyzer::progressNotification( const tProgressNotificationData&
                             eRequestState::PROGRESS,
                             100,
                             progressNotificationData.processedMatches,
-                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound);
+                            progressNotificationData.bUML_Req_Res_Ev_DuplicateFound,
+                            progressNotificationData.groupedViewIndices);
 
                             QMetaObject::invokeMethod(foundRequest.value().pClient.lock().get(), "progressNotification", Qt::QueuedConnection,
                                                       Q_ARG(tProgressNotificationData, resultProgressNotificationData));
@@ -294,7 +297,8 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
                             eRequestState::ERROR_STATE,
                             0,
                             tFoundMatchesPack(),
-                            false
+                            false,
+                            tGroupedViewIndices()
                         );
 
                         inputIt.value().pClient.lock()->progressNotification(progressNotificationData);
@@ -329,7 +333,8 @@ void CContinuousAnalyzer::triggerContinuousAnalysisIteration(const tRequestDataM
                     eRequestState::ERROR_STATE,
                     0,
                     tFoundMatchesPack(),
-                    false
+                    false,
+                    tGroupedViewIndices()
                 );
 
                 inputIt.value().pClient.lock()->progressNotification(progressNotificationData);

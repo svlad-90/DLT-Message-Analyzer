@@ -12,6 +12,15 @@ New features in release v.1.0.29:
 - [Grouped view highlighting](./md/grouped_view/grouped_view.md#highlighting-the-group-in-the-search-view)
 - [Regex history](.//md/search/search.md#regex-history)
 
+## Implemented features targeted for release v1.0.30:
+
+<span style="color:red">Use the HEAD revision to try out the following features:</span>
+
+- [Grouped view default application is disabled](./md/grouped_view/grouped_view.md#backward-compatibility-note)
+- [Groups nesting ordering](./md/grouped_view/grouped_view.md#groups-nesting-ordering)
+
+----
+
 ----
 
 ![DLT Message Analyzer logo](./md/DLTMessageAnalyzer_logo.png)

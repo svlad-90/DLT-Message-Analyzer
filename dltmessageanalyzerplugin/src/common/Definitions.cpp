@@ -41,6 +41,7 @@ const QString sDefaultRegexFileName = "Regex_Default.json";
 const QString sRegexScriptingDelimiter = "_and_";
 const QString sRGBPrefix = "RGB_";
 const QString sVARPrefix = "VAR_";
+const QString sGroupedViewPrefix = "GV";
 
 //////// UML_IDENTIFIERS ////////
 const QString s_UML_SEQUENCE_ID = "USID"; // - optional
@@ -54,6 +55,10 @@ const QString s_UML_ARGUMENTS = "UA"; // - optional
 const QString s_UML_TIMESTAMP = "UTS"; // - optional
 const QString s_UML_ALIAS_DELIMITER = "_";
 const QString s_Regex_options = "(?J)";
+
+//////// OTHER CONSTANTS ////////
+static const tGroupedViewIdx sInvalidGroupedViewIdx = -1;
+static const tGroupedViewIdx sMaxGroupedViewIdx = std::numeric_limits<int>::max();
 
 static tUML_IDs_Map createUMLIDsMap()
 {
@@ -1843,7 +1848,8 @@ bool tHighlightingGradient::operator!=(const tHighlightingGradient& rhs) const
 
 tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                                                     bool bParseUMLData,
-                                                    bool bParsePlotViewData )
+                                                    bool bParsePlotViewData,
+                                                    bool /* bParseGroupedViewData */ )
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
     QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
@@ -1994,7 +2000,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
 
             if(varMatch.hasMatch())
             {
-                bool scriptedVarFound = varMatch.lastCapturedIndex() == 1;           // if 1 group found
+                bool scriptedVarFound = varMatch.lastCapturedIndex() == 1; // if 1 group found
 
                 if(true == scriptedVarFound)
                 {
@@ -2038,7 +2044,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
 
             if(varMatch.hasMatch())
             {
-                bool b_UML_ID_Found = varMatch.lastCapturedIndex() >= 1;               // if 1 or more groups found
+                bool b_UML_ID_Found = varMatch.lastCapturedIndex() >= 1; // if 1 or more groups found
 
                 if(true == b_UML_ID_Found)
                 {
@@ -2053,7 +2059,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                         if(varMatch.lastCapturedIndex() == 2) // if 2 groups found
                         {
                             QString capturedString = varMatch.captured(2);
-                            bool b_UML_Custom_Value_Found = false == capturedString.isEmpty();     // if 2 groups found
+                            bool b_UML_Custom_Value_Found = false == capturedString.isEmpty(); // if 2 groups found
 
                             if(true == b_UML_Custom_Value_Found)
                             {
@@ -2067,6 +2073,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
 
         if(true == bParsePlotViewData)
         {
+            // parse plot data
             static const QRegularExpression plotViewRegex = createPlotViewRegex();
 
             QRegularExpressionMatch varMatch = plotViewRegex.match(groupNamePart);
@@ -2088,7 +2095,7 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
                         if(varMatch.lastCapturedIndex() == 2) // if 2 groups found
                         {
                             QString parameters = varMatch.captured(2);
-                            bool b_PlotView_Parameters_Found = false == parameters.isEmpty();     // if 2 groups found
+                            bool b_PlotView_Parameters_Found = false == parameters.isEmpty(); // if 2 groups found
 
                             if(true == b_PlotView_Parameters_Found)
                             {
@@ -2119,10 +2126,69 @@ tRegexScriptingMetadataItemPtr parseRegexGroupName( const QString& groupName,
     return pItem;
 }
 
+tGroupedViewIdx parseRegexGroupedViewIndices( const QString& groupName,
+                                              bool bParseGroupedViewData )
+{
+    tGroupedViewIdx result = sInvalidGroupedViewIdx;
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
+                                                 QString::SplitBehavior::SkipEmptyParts,
+                                                 Qt::CaseInsensitive);
+#else
+    QStringList splitGroupName = groupName.split(sRegexScriptingDelimiter,
+                                                 Qt::SkipEmptyParts,
+                                                 Qt::CaseInsensitive);
+#endif
+
+    static const QString groupedViewIdxStr( QString("^%1_([\\d]+)$").arg(sGroupedViewPrefix) );
+    static const QRegularExpression groupedViewIdxRegex(groupedViewIdxStr, QRegularExpression::CaseInsensitiveOption);
+    static const QString groupedViewStr( QString("^%1$").arg(sGroupedViewPrefix) );
+    static const QRegularExpression groupedViewRegex(groupedViewStr, QRegularExpression::CaseInsensitiveOption);
+
+    if(bParseGroupedViewData)
+    {
+        for( const auto& groupNamePart : splitGroupName )
+        {
+            // parse grouped view data
+            QRegularExpressionMatch groupedViewIdxMatch = groupedViewIdxRegex.match(groupNamePart);
+
+            if(groupedViewIdxMatch.hasMatch())
+            {
+                bool groupedViewIdxFound = groupedViewIdxMatch.lastCapturedIndex() == 1; // if 1 group found
+
+                if(true == groupedViewIdxFound)
+                {
+                    bool bGroupIdxParsed = false;
+                    int groupIdx = 0;
+                    groupIdx = groupedViewIdxMatch.captured(1).toInt(&bGroupIdxParsed);
+
+                    if(bGroupIdxParsed)
+                    {
+                        result = groupIdx;
+                    }
+                }
+            }
+            else
+            {
+                QRegularExpressionMatch groupedViewMatch = groupedViewRegex.match(groupNamePart);
+
+                if(groupedViewMatch.hasMatch())
+                {
+                    result = sMaxGroupedViewIdx;
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 //tRegexScriptingMetadata
 bool tRegexScriptingMetadata::parse(const QRegularExpression& regex,
                                     bool bParseUMLData,
-                                    bool bParsePlotViewData )
+                                    bool bParsePlotViewData,
+                                    bool bParseGroupedViewData)
 {
     bool bResult = true;
 
@@ -2130,11 +2196,36 @@ bool tRegexScriptingMetadata::parse(const QRegularExpression& regex,
     {
         auto groupNames = regex.namedCaptureGroups();
 
-        for(const auto& groupName : groupNames)
+        int groupCounter = 0;
+        typedef std::multimap<tGroupedViewIdx /*specified grouped view ordering*/, int /*regex group index*/> tSortingMap;
+        tSortingMap sortingMap;
+
+        for(auto it = groupNames.begin(); it != groupNames.end(); ++it)
         {
+            const auto& groupName = *it;
+
             mItemsVec.push_back(parseRegexGroupName(groupName,
                                                     bParseUMLData,
-                                                    bParsePlotViewData));
+                                                    bParsePlotViewData,
+                                                    bParseGroupedViewData));
+
+            auto parsedIndex = parseRegexGroupedViewIndices(groupName, bParseGroupedViewData);
+
+            if(parsedIndex != sInvalidGroupedViewIdx)
+            {
+                sortingMap.insert(std::make_pair(parsedIndex, groupCounter));
+            }
+
+            ++groupCounter;
+        }
+
+        mGroupedViewIndexes.clear();
+
+        groupCounter = 0;
+        for(const auto& pair : sortingMap)
+        {
+            mGroupedViewIndexes.insert(std::make_pair(pair.second, groupCounter));
+            ++groupCounter;
         }
     }
     else
@@ -2544,6 +2635,11 @@ bool tRegexScriptingMetadata::doesContainAnyPlotViewGroup() const
     }
 
     return bResult;
+}
+
+const tGroupedViewIndices& tRegexScriptingMetadata::getGroupedViewIndices() const
+{
+    return mGroupedViewIndexes;
 }
 
 std::set<ePlotViewAxisType> sAllAxisTypes =

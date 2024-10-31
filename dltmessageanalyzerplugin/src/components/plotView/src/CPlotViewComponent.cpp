@@ -418,6 +418,8 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
             pTextLabel->position->setParentAnchor(pItemTracer->position);
             pTextLabel->position->setAxisRect(pAxisRect);
             pTextLabel->position->setAxes(pGanttRow->valueAxis(), pGanttRow->keyAxis());
+            pTextLabel->setPen(QPen(QColor(230, 230, 230, 220)));  // Red with 50% transparency
+            pTextLabel->setBrush(QBrush(QColor(230, 230, 230, 220)));  // Red with 50% transparency
 
             pPlotViewComponent->connect(pGanttRow, static_cast<void (QCPAbstractPlottable::*)(const QCPDataSelection &)>(&QCPAbstractPlottable::selectionChanged),
             pPlotViewComponent, [pPlotViewComponent, pPlot, pAxisRect, pGanttRow, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)

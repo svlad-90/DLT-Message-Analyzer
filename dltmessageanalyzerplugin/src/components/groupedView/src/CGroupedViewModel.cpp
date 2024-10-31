@@ -459,76 +459,100 @@ QVariant CGroupedViewModel::headerData(int section, Qt::Orientation orientation,
     return QVariant();
 }
 
-void CGroupedViewModel::addMatches( const tFoundMatches& matches, bool update )
+void CGroupedViewModel::addMatches( const tGroupedViewIndices& groupedViewIndices,
+                                    const tFoundMatches& matches,
+                                    bool update )
 {
-    if(mpRootItem)
-    {   
-        if(false == matches.foundMatchesVec.empty())
+    if(!groupedViewIndices.empty())
+    {
+        if(mpRootItem)
         {
-            tTreeItem::tDataVec dataVec;
-            dataVec.reserve(matches.foundMatchesVec.size() + 1);
-
+            if(false == matches.foundMatchesVec.empty())
             {
-                CTreeItem::tData data;
-                data.reserve(9);
-                data.push_back( tQStringPtrWrapper(sRootItemName) ); /*SubString*/
-                data.push_back(tDataItem(1)); /*Messages*/
-                data.push_back(tDataItem(0)); /*MessagesPercantage*/
-                data.push_back(tDataItem(0)); /*MessagesPerSecond*/
-                data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
-                data.push_back(tDataItem(0)); /*PayloadPercantage*/
-                data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
-                data.push_back(tDataItem()); /*AfterLastVisible*/
-                data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
-                dataVec.push_back( data );
+                tTreeItem::tDataVec dataVec;
+                dataVec.reserve(matches.foundMatchesVec.size() + 1);
 
-                mAnalyzedValues.analyzedMessages += 1;
-                mAnalyzedValues.analyzedPayload += matches.msgSizeBytes;
-            }
-
-            for(const auto& match : matches.foundMatchesVec)
-            {
-                CTreeItem::tData data;
-                data.reserve(9);
-                data.push_back( tQStringPtrWrapper(match.pMatchStr) ); /*SubString*/
-                data.push_back(tDataItem(1)); /*Messages*/
-                data.push_back(tDataItem(0)); /*MessagesPercantage*/
-                data.push_back(tDataItem(0)); /*MessagesPerSecond*/
-                data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
-                data.push_back(tDataItem(0)); /*PayloadPercantage*/
-                data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
-                data.push_back(tDataItem()); /*AfterLastVisible*/
-                data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
-                dataVec.push_back( data );
-            }
-
-            auto afterAppendFunction = [](CTreeItem* pItem)
-            {
-                // if it is a leaf node
-                if(nullptr != pItem && 0 == pItem->childCount())
                 {
-                    // we should overtake its msgId into the relatedMsgIds.
-                    const auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
-                    auto& existingMetadata = pItem->getWriteableData(metadataColumn).get<tGroupedViewMetadata>();
+                    CTreeItem::tData data;
+                    data.reserve(9);
+                    data.push_back( tQStringPtrWrapper(sRootItemName) ); /*SubString*/
+                    data.push_back(tDataItem(1)); /*Messages*/
+                    data.push_back(tDataItem(0)); /*MessagesPercantage*/
+                    data.push_back(tDataItem(0)); /*MessagesPerSecond*/
+                    data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
+                    data.push_back(tDataItem(0)); /*PayloadPercantage*/
+                    data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
+                    data.push_back(tDataItem()); /*AfterLastVisible*/
+                    data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
+                    dataVec.push_back(data);
 
-                    if(existingMetadata.relatedMsgIds.index() == existingMetadata.relatedMsgIds.index_of<tMsgIdSet>())
+                    mAnalyzedValues.analyzedMessages += 1;
+                    mAnalyzedValues.analyzedPayload += matches.msgSizeBytes;
+                }
+
+                auto createData = [&matches](const tFoundMatch& match) -> CTreeItem::tData
+                {
+                    CTreeItem::tData data;
+                    data.reserve(9);
+                    data.push_back( tQStringPtrWrapper(match.pMatchStr) ); /*SubString*/
+                    data.push_back(tDataItem(1)); /*Messages*/
+                    data.push_back(tDataItem(0)); /*MessagesPercantage*/
+                    data.push_back(tDataItem(0)); /*MessagesPerSecond*/
+                    data.push_back(tDataItem(static_cast<int>(matches.msgSizeBytes))); /*Payload*/
+                    data.push_back(tDataItem(0)); /*PayloadPercantage*/
+                    data.push_back(tDataItem(0)); /*PayloadPerSecondAverage*/
+                    data.push_back(tDataItem()); /*AfterLastVisible*/
+                    data.push_back(tDataItem(tGroupedViewMetadata(matches.timeStamp, matches.msgId))); /*Metadata*/
+                    return data;
+                };
+
+                std::map<tGroupedViewIdx, CTreeItem::tData> sortingMap;
+
+                for(const auto& match : matches.foundMatchesVec)
+                {
+                    auto data = createData(match);
+
+                    auto foundIndex = groupedViewIndices.find(match.idx);
+
+                    if(foundIndex != groupedViewIndices.end())
                     {
-                        existingMetadata.relatedMsgIds.get<tMsgIdSet>().insert(existingMetadata.msgId);
-                    }
-                    else
-                    {
-                        tMsgIdSet msgIdSet;
-                        msgIdSet.insert(existingMetadata.msgId);
-                        existingMetadata.relatedMsgIds = msgIdSet;
+                        sortingMap.insert(std::make_pair(foundIndex->second, std::move(data)));
                     }
                 }
-            };
 
-            mpRootItem->addData( dataVec, afterAppendFunction );
+                for(auto& pair : sortingMap)
+                {
+                    dataVec.emplace_back(std::move(pair.second));
+                }
 
-            if(true == update)
-            {
-                updateView();
+                auto afterAppendFunction = [](CTreeItem* pItem)
+                {
+                    // if it is a leaf node
+                    if(nullptr != pItem && 0 == pItem->childCount())
+                    {
+                        // we should overtake its msgId into the relatedMsgIds.
+                        const auto metadataColumn = static_cast<int>(eGroupedViewColumn::Metadata);
+                        auto& existingMetadata = pItem->getWriteableData(metadataColumn).get<tGroupedViewMetadata>();
+
+                        if(existingMetadata.relatedMsgIds.index() == existingMetadata.relatedMsgIds.index_of<tMsgIdSet>())
+                        {
+                            existingMetadata.relatedMsgIds.get<tMsgIdSet>().insert(existingMetadata.msgId);
+                        }
+                        else
+                        {
+                            tMsgIdSet msgIdSet;
+                            msgIdSet.insert(existingMetadata.msgId);
+                            existingMetadata.relatedMsgIds = msgIdSet;
+                        }
+                    }
+                };
+
+                mpRootItem->addData( dataVec, afterAppendFunction );
+
+                if(true == update)
+                {
+                    updateView();
+                }
             }
         }
     }

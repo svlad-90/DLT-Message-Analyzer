@@ -64,13 +64,16 @@ struct tProgressNotificationData
     const eRequestState& requestState_,
     const int8_t& progress_,
     const tFoundMatchesPack& processedMatches_,
-    bool bUML_Req_Res_Ev_DuplicateFound_);
+    bool bUML_Req_Res_Ev_DuplicateFound_,
+    const tGroupedViewIndices& groupedViewIndices_
+    );
 
     tRequestId requestId;
     eRequestState requestState;
     int8_t progress;
     tFoundMatchesPack processedMatches;
     bool bUML_Req_Res_Ev_DuplicateFound;
+    tGroupedViewIndices groupedViewIndices;
 };
 
 Q_DECLARE_METATYPE(tProgressNotificationData)

@@ -140,6 +140,7 @@ public:
 
                     auto pRegexMetadataItem = parseRegexGroupName(QString::fromStdString(text),
                                                                   false,
+                                                                  false,
                                                                   false);
 
                     if(nullptr != pRegexMetadataItem)

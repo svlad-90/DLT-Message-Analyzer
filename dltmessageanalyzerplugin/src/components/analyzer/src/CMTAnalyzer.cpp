@@ -377,7 +377,8 @@ void CMTAnalyzer::portionRegexAnalysisFinished( const tPortionRegexAnalysisFinis
                                   requestStatus,
                                   progress,
                                   it->foundMatchesPack,
-                                  portionRegexAnalysisFinishedData.bUML_Req_Res_Ev_DuplicateFound );
+                                  portionRegexAnalysisFinishedData.bUML_Req_Res_Ev_DuplicateFound,
+                                  requestIt->regexScriptingMetadata.getGroupedViewIndices() );
 
                                 QMetaObject::invokeMethod(pClient_, "progressNotification", Qt::QueuedConnection,
                                                           Q_ARG(tProgressNotificationData, progressNotificationData));
