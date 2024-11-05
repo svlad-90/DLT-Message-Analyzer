@@ -21,6 +21,7 @@
       + [Horizontal zoom](#horizontal-zoom)
       + [Vertical zoom and drag](#vertical-zoom-and-drag)
       + [Filtering the graph](#filtering-the-graph)
+      + [Legend scrolling](#legend-scrolling)
    * [Gantt charts](#gantt-charts)
 
 ----
@@ -104,7 +105,7 @@ Use the following dlt [file](./cpu_load_plot_example.dlt). It contains generated
 
 Apply search with the following regex:
 
-> <pre>(?&lt;PXU_CPUC_milliseconds&gt;(?&lt;PYU_CPUC_percents&gt;(?&lt;PARType_CPUC_LINEAR&gt;(?&lt;PXN_CPUC_Timestamp&gt;(?&lt;PYN_CPUC_CPUConsumption&gt; ))))).*?(?&lt;PXT_4yw2Mw2dw2Hw2mw2sw3f&gt;(?&lt;PXData_CPUC_1&gt;[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}[\.]*[\d]{0,3})).*?,(?&lt;PGN_CPUC_1&gt;(?&lt;PGMD_CPUC_1_AppName&gt;.*?)),(?&lt;PYData_CPUC_1&gt;.*)</pre>
+> <pre>(?&lt;PXU_CPUC_milliseconds&gt;(?&lt;PYU_CPUC_percents&gt;(?&lt;PARType_CPUC_LINEAR&gt;(?&lt;PXN_CPUC_Timestamp&gt;(?&lt;PYN_CPUC_CPUConsumption&gt; ))))).\*?(?&lt;PXT_4yw2Mw2dw2Hw2mw2sw3f&gt;(?&lt;PXData_CPUC_1&gt;[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}[\.]\*[\d]{0,3})).\*?,(?&lt;PGN_CPUC_1&gt;(?&lt;PGMD_CPUC_1_AppName&gt;.\*?)),(?&lt;PYData_CPUC_1&gt;.\*)</pre>
 
 You should see messages with the enabled 'Plot' checkbox:
 
@@ -207,6 +208,12 @@ There are at least 2 ways to filter out a graph on the axis rectangle:
 - Select a point on the graph and press the "F" button to turn on and off filtering of the selected graph:
 
   ![Plot view filtering out the selected graph](./filter_out_selected_graph.gif)
+
+### Legend scrolling
+
+- Place the mouse cursor on the legend and use the scroll wheel to scroll through the legend items:
+
+  ![Legend scrolling](./legend_scrolling.gif)
 
 ## Gantt charts
 

@@ -6,6 +6,10 @@ skinparam wrapWidth 600
 package "DMA_PlotView" #DDDDDD
 {
 
+class "CScrollableLegend"
+{
+}
+
 class "QCPGanttRow"
 {
 }
@@ -64,6 +68,7 @@ class "QCustomPlot"
 }
 
 '====================Inheritance section====================
+QCPLegend <|-- CScrollableLegend : extends
 QCustomPlot <|-- CCustomPlotExtended : extends
 QCPLayerable <|-- QCPAxis : extends
 QObject <|-- QCPAxisRect : extends
@@ -76,6 +81,5 @@ QWidget <|-- QCustomPlot : extends
 QCPGanttRow "1" o-- "2" QCPAxis : uses
 CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
 CCustomPlotExtended "1" *-- "*" QCPGraph : uses
-CCustomPlotExtended "1" o-- "*" QCPLegend : uses
 
 @enduml

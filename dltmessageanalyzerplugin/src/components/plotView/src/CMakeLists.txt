@@ -8,6 +8,7 @@ add_library(DMA_plotView STATIC
     CPlotViewComponent.cpp
     CCustomPlotExtended.cpp
     QCPGantt.cpp
+    CScrollableLegend.cpp
     ${PROCESSED_MOCS})
 
 find_package(${QT_PREFIX} REQUIRED COMPONENTS Svg)

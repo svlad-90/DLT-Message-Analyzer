@@ -15,6 +15,10 @@ class "DMA::IComponent"
 package "DMA_PlotView" #DDDDDD
 {
 
+class "CScrollableLegend"
+{
+}
+
 class "QCPGanttRow"
 {
 }
@@ -88,10 +92,6 @@ class "QCPGraph"
 {
 }
 
-class "QCPLegend"
-{
-}
-
 class "QCustomPlot"
 {
 }
@@ -104,10 +104,11 @@ CSettingsManagerClient <|-- CPlotViewComponent : extends
 DMA::IComponent <|-- CPlotViewComponent : implements
 
 '====================Dependencies section====================
+CCustomPlotExtended "1" --> "*" CScrollableLegend : uses
 CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
 CCustomPlotExtended "1" *-- "*" QCPGraph : uses
-CCustomPlotExtended "1" o-- "*" QCPLegend : uses
 CPlotViewComponent "1" o-- "1" CCustomPlotExtended : uses
+CPlotViewComponent "1" --> "*" CScrollableLegend : uses
 CPlotViewComponent "1" o-- "1" ISearchResultModel : uses
 CPlotViewComponent "1" o-- "many" QCPGanttRow : uses
 CPlotViewComponent "1" o-- "1" QPushButton : uses
