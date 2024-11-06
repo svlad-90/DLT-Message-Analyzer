@@ -6,6 +6,10 @@ skinparam wrapWidth 600
 package "DMA_PlotView" #DDDDDD
 {
 
+class "CScrollableLegend"
+{
+}
+
 class "QCPGanttBarsData"
 {
 }
@@ -16,7 +20,17 @@ class "QCPGanttRow"
 
 }
 
+package "qcustomplot" #DDDDDD
+{
+
+class "QCPLegend"
+{
+}
+
+}
+
 '====================Inheritance section====================
+QCPLegend <|-- CScrollableLegend : extends
 QCPAbstractPlottable1D_QCPGanttBarsData_ <|-- QCPGanttRow : extends
 
 '====================Dependencies section====================

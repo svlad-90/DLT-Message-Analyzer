@@ -9,6 +9,7 @@
 #include "common/Definitions.hpp"
 
 #include "components/log/api/CLog.hpp"
+#include "CScrollableLegend.hpp"
 
 #include "../api/CCustomPlotExtended.hpp"
 
@@ -34,6 +35,13 @@ CCustomPlotExtended::CCustomPlotExtended(QWidget *pParent):
     setInteraction(QCP::iRangeZoom, true);
 
     addLayer("axis_rect_label", nullptr);
+
+    QCPLayer *legendLayer = layer("legend");
+
+    if (legendLayer)
+    {
+        legendLayer->setMode(QCPLayer::lmBuffered);
+    }
 
     connect(this, &QCustomPlot::legendClick, this, [&](QCPLegend*, QCPAbstractLegendItem* item, QMouseEvent* event)
     {
@@ -76,6 +84,12 @@ CCustomPlotExtended::CCustomPlotExtended(QWidget *pParent):
 
                 if(false == targetFilePath.isEmpty())
                 {
+                    // Ensure the file name has the correct ".svg" extension
+                    if (!targetFilePath.endsWith(".svg", Qt::CaseInsensitive))
+                    {
+                        targetFilePath += ".svg";
+                    }
+
                     QFileInfo fileInfo(targetFilePath);
 
                     // try to remove the file if it exists
@@ -124,7 +138,7 @@ void CCustomPlotExtended::changeLegendItemVisibility(QCPPlottableLegendItem* pIt
     if(true == targetVisibility)
     {
         pItem->plottable()->setVisible(targetVisibility);
-        pItem->setTextColor(QColor(0,0,0));
+        pItem->setTextColor(QColor(255,255,255));
     }
     else
     {
@@ -150,7 +164,7 @@ void CCustomPlotExtended::changeLegendItemVisibility(QCPPlottableLegendItem* pIt
         if(false == bIsSingleVisiblePlot)
         {
             pItem->plottable()->setVisible(targetVisibility);
-            pItem->setTextColor(QColor(200, 200, 200));
+            pItem->setTextColor(QColor(150, 150, 150));
         }
     }
 }
@@ -554,15 +568,16 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
         int numberOfVisibleGraphs = 0;
         int numberOfGraphs = 0;
 
-        const auto* pLegend = axisRectPair.second.pLegend;
+        auto* pLegend = axisRectPair.second.pLegend;
+        auto* pSpecificLegend = static_cast<CScrollableLegend*>(pLegend);
 
-        if(nullptr != pLegend)
+        if(nullptr != pSpecificLegend)
         {
-            numberOfGraphs = pLegend->itemCount();
+            numberOfGraphs = pSpecificLegend->itemCount();
 
             for (int i = 0; i < numberOfGraphs; ++i)
             {
-                QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pLegend->item(i));
+                QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pSpecificLegend->item(i));
                 if (nullptr != pItem)
                 {
                     if(true == pItem->plottable()->visible())
@@ -597,9 +612,9 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
             else if(numberOfGraphs > 1 && numberOfVisibleGraphs == 1 && nullptr != pSelectedLegendItem)
                 action = eAction::eRemoveFiltrer;
 
-            for (int i = 0; i < pLegend->itemCount(); ++i)
+            for (int i = 0; i < pSpecificLegend->itemCount(); ++i)
             {
-                QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pLegend->item(i));
+                QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pSpecificLegend->item(i));
 
                 if(nullptr != pItem)
                 {
@@ -610,6 +625,11 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
                         {
                             changeLegendItemVisibility(pItem);
                             bReplot = true;
+                        }
+
+                        if(pItem == pSelectedLegendItem)
+                        {
+                           pSpecificLegend->scrollToItem(i);
                         }
                         break;
                     case eAction::eRemoveFiltrer:
@@ -632,12 +652,13 @@ void CCustomPlotExtended::filterGraphBySelectedItem()
     {
         for(const auto& axisRectPair : mPlotAxisRectDataMap)
         {
-            const auto* pLegend = axisRectPair.second.pLegend;
-            if(nullptr != pLegend)
+            auto* pLegend = axisRectPair.second.pLegend;
+            auto* pSpecificLegend = static_cast<CScrollableLegend*>(pLegend);
+            if(nullptr != pSpecificLegend)
             {
-                for (int i = 0; i < pLegend->itemCount(); ++i)
+                for (int i = 0; i < pSpecificLegend->itemCount(); ++i)
                 {
-                    QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pLegend->item(i));
+                    QCPPlottableLegendItem* pItem = qobject_cast<QCPPlottableLegendItem*>(pSpecificLegend->item(i));
                     if (nullptr != pItem)
                     {
                         if(false == pItem->plottable()->visible())
@@ -686,8 +707,8 @@ bool CCustomPlotExtended::setLegendExtended(QCPAxisRect* pAxisRect,
 PUML_PACKAGE_BEGIN(DMA_PlotView_API)
     PUML_CLASS_BEGIN_CHECKED(CCustomPlotExtended)
         PUML_INHERITANCE_CHECKED(QCustomPlot, extends)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(QCPLegend, 1, *, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QCPAxisRect, 1, *, uses)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QCPGraph, 1, *, uses)
+        PUML_USE_DEPENDENCY_CHECKED(CScrollableLegend, 1, *, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

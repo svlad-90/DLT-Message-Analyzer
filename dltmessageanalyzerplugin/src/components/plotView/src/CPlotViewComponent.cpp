@@ -8,7 +8,10 @@
 #include "components/log/api/CLog.hpp"
 
 #include "../api/CPlotViewComponent.hpp"
+
 #include "QCPGantt.hpp"
+#include "CScrollableLegend.hpp"
+
 #include "components/searchView/api/ISearchResultModel.hpp"
 #include "components/plotView/api/CCustomPlotExtended.hpp"
 
@@ -136,10 +139,10 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
     pAxisRect->setMinimumSize(QSize(0, 200));
 
     // Set up legend
-    QCPLegend *pLegend = new QCPLegend;
+    CScrollableLegend *pLegend = new CScrollableLegend;
     pLegend->setVisible(true);
-    pLegend->setBorderPen(QPen(QColor(0,0,0,230)));
-    pLegend->setBrush(QBrush(QColor(255,255,255,230)));  // Background color
+    pLegend->setBorderPen(QPen(QColor(0,0,250,100)));
+    pLegend->setBrush(QBrush(QColor(0,0,0,210)));  // Background color
     pLegend->setSelectableParts(QCPLegend::spItems);     // Make legend items selectable
     pAxisRect->insetLayout()->addElement(pLegend, Qt::AlignRight|Qt::AlignTop);  // Adjust position as needed
     pLegend->setLayer(QLatin1String("legend"));
@@ -243,6 +246,8 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
 
         const auto& plotGraphItem = plotGraphItemPair.second;
 
+        auto graphCounter = 0;
+
         for(const auto& plotGraphSubItemPair : plotGraphItem.plotGraphSubItemMap)
         {
             const auto& plotGraphSubItem = plotGraphSubItemPair.second;
@@ -250,7 +255,7 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
             tGanttDataParsingState parsingState;
 
             QCPGanttRow* pGanttRow = new QCPGanttRow(pLeftAxis, pBottomAxis);
-            pGanttRow->addToLegend(pLegend);
+            pLegend->addToLegend(pGanttRow);
             pGanttRow->setName(plotGraphSubItemPair.first);
             pGanttRow->setKeyAxis(pAxisRect->axis(QCPAxis::atLeft));
             pGanttRow->setValueAxis(pAxisRect->axis(QCPAxis::atBottom));
@@ -418,12 +423,12 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
             pTextLabel->position->setParentAnchor(pItemTracer->position);
             pTextLabel->position->setAxisRect(pAxisRect);
             pTextLabel->position->setAxes(pGanttRow->valueAxis(), pGanttRow->keyAxis());
-            pTextLabel->setPen(QPen(QColor(230, 230, 230, 220)));  // Red with 50% transparency
-            pTextLabel->setBrush(QBrush(QColor(230, 230, 230, 220)));  // Red with 50% transparency
 
             pPlotViewComponent->connect(pGanttRow, static_cast<void (QCPAbstractPlottable::*)(const QCPDataSelection &)>(&QCPAbstractPlottable::selectionChanged),
-            pPlotViewComponent, [pPlotViewComponent, pPlot, pAxisRect, pGanttRow, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)
+            pPlotViewComponent, [graphCounter, pLegend, pPlotViewComponent, pPlot, pAxisRect, pGanttRow, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)
             {
+                auto* pSpecificLegend = static_cast<CScrollableLegend*>(pLegend);
+
                 if(false == selection.isEmpty())
                 {
                     QCPDataRange dataRange = selection.dataRange();
@@ -433,6 +438,12 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
 
                     if (index >= 0 && index < pGanttRow->data()->size()) // Check if index is valid
                     {
+                        if(pSpecificLegend)
+                        {
+                            pSpecificLegend->scrollToItem(graphCounter);
+                            pSpecificLegend->highlightItem(graphCounter);
+                        }
+
                         QCPGanttBarsDataContainer::const_iterator it = pGanttRow->data()->at(index);
                         double xStart = it->valueRange().lower;
                         double xEnd = it->valueRange().upper;
@@ -513,6 +524,11 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
                 }
                 else
                 {
+                    if(pSpecificLegend)
+                    {
+                        pSpecificLegend->highlightItem(-1);
+                    }
+
                     if(nullptr != pTextLabel)
                     {
                         pTextLabel->setVisible(false);
@@ -523,6 +539,7 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
             ganttParsingStateMap.insert(std::make_pair(yVal, parsingState));
 
             --yVal;
+            ++graphCounter;
         }
 
         for( const auto& pair : ganttParsingStateMap )
@@ -562,11 +579,12 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
     const auto& plotAxis = plotAxisPair.second;
     QCPAxisRect *pAxisRect = new QCPAxisRect(pPlot);
     pAxisRect->setMinimumSize(QSize(0, 200));
-    QCPLegend *pLegend = new QCPLegend;
+    CScrollableLegend *pLegend = new CScrollableLegend;
     pLegend->setVisible(true);
-    pLegend->setBorderPen(QPen(QColor(0,0,0,230)));
-    pLegend->setBrush(QBrush(QColor(255,255,255,230)));  // Background color
+    pLegend->setBorderPen(QPen(QColor(0,0,250,100)));
+    pLegend->setBrush(QBrush(QColor(0,0,0,210)));  // Background color
     pLegend->setSelectableParts(QCPLegend::spItems);     // Make legend items selectable
+
     pAxisRect->insetLayout()->addElement(pLegend, Qt::AlignRight|Qt::AlignTop);  // Adjust position as needed
     pLegend->setLayer(QLatin1String("legend"));
 
@@ -652,6 +670,8 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
     {
         const auto& plotGraphItem = plotGraphItemPair.second;
 
+        auto graphCounter = 0;
+
         for(const auto& plotGraphSubItemPair : plotGraphItem.plotGraphSubItemMap)
         {
             const auto& plotGraphSubItem = plotGraphSubItemPair.second;
@@ -661,7 +681,7 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
 
             auto* pGraph = pPlot->addGraph();
 
-            pGraph->addToLegend(pLegend);
+            pLegend->addToLegend(pGraph);
 
             pGraph->setName(plotGraphSubItemPair.first);
             graphOrder.prepend(pGraph);
@@ -768,8 +788,10 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
             pTextLabel->position->setAxes(pGraph->keyAxis(), pGraph->valueAxis());
 
             pPlotViewComponent->connect(pGraph, static_cast<void (QCPAbstractPlottable::*)(const QCPDataSelection &)>(&QCPAbstractPlottable::selectionChanged),
-            pPlotViewComponent, [pPlotViewComponent, pPlot, pAxisRect, pGraph, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)
+            pPlotViewComponent, [graphCounter, pLegend, pPlotViewComponent, pPlot, pAxisRect, pGraph, pxToMsgIdMap, pItemTracer, pTextLabel, pLeftAxis](const QCPDataSelection &selection)
             {
+                auto* pSpecificLegend = static_cast<CScrollableLegend*>(pLegend);
+
                 if(false == selection.isEmpty())
                 {
                     QCPDataRange dataRange = selection.dataRange();
@@ -779,6 +801,12 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
 
                     if (index >= 0 && index < pGraph->data()->size()) // Check if index is valid
                     {
+                        if(pSpecificLegend)
+                        {
+                            pSpecificLegend->scrollToItem(graphCounter);
+                            pSpecificLegend->highlightItem(graphCounter);
+                        }
+
                         QCPGraphDataContainer::const_iterator it = pGraph->data()->at(index);
                         double x = it->key;
                         double y = it->value;
@@ -855,12 +883,19 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
                 }
                 else
                 {
+                    if(pSpecificLegend)
+                    {
+                        pSpecificLegend->highlightItem(-1);
+                    }
+
                     if(nullptr != pTextLabel)
                     {
                         pTextLabel->setVisible(false);
                     }
                 }
             });
+
+            ++graphCounter;
         }
     }
 
@@ -943,5 +978,6 @@ PUML_PACKAGE_BEGIN(DMA_PlotView_API)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QCPGanttRow, 1, many, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISearchResultModel, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(QPushButton, 1, 1, uses)
+        PUML_USE_DEPENDENCY_CHECKED(CScrollableLegend, 1, *, uses)
     PUML_CLASS_END()
 PUML_PACKAGE_END()
