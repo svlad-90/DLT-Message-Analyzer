@@ -416,7 +416,7 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
             QCPItemText* pTextLabel = new QCPItemText(pPlot);
             pTextLabel->setVisible(false);
             pTextLabel->setLayer("overlay");
-            pTextLabel->setBrush(QColor(240,240,240));
+            pTextLabel->setBrush(QColor(240,240,240,220));
             pTextLabel->setPen(QColor(0,0,0));
             pTextLabel->setColor(QColor(0,0,0));
             pTextLabel->setClipAxisRect(pAxisRect);
@@ -455,9 +455,9 @@ void generateAxisRectGantt(const std::pair<ISearchResultModel::tPlotAxisName, IS
                         QString labelText;
 
                         labelText.append("Ev. name: " + pGanttRow->name() + "\n");
-                        labelText.append("Ev. start: " + QString::number(xStart, 'f', 4) + "\n");
-                        labelText.append("Ev. end: " + QString::number(xEnd, 'f', 4) + "\n");
-                        labelText.append("Ev. duration: " + QString::number(xEnd - xStart, 'f', 4));
+                        labelText.append("Ev. start: " + QString::number(xStart, 'f', 9) + "\n");
+                        labelText.append("Ev. end: " + QString::number(xEnd, 'f', 9) + "\n");
+                        labelText.append("Ev. duration: " + QString::number(xEnd - xStart, 'f', 9));
 
                         auto metadata = pPlot->getMetadata(pAxisRect,
                                                            pGanttRow,
@@ -779,7 +779,7 @@ void generateAxisRect(const std::pair<ISearchResultModel::tPlotAxisName, ISearch
             QCPItemText* pTextLabel = new QCPItemText(pPlot);
             pTextLabel->setVisible(false);
             pTextLabel->setLayer("overlay");
-            pTextLabel->setBrush(QColor(240,240,240));
+            pTextLabel->setBrush(QColor(240,240,240,220));
             pTextLabel->setPen(QColor(0,0,0));
             pTextLabel->setColor(QColor(0,0,0));
             pTextLabel->setClipAxisRect(pAxisRect);

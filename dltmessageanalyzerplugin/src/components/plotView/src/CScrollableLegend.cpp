@@ -19,10 +19,10 @@ CScrollableLegend::CScrollableLegend()
 
 int CScrollableLegend::visibleItemCount() const
 {
-    QFontMetrics fontMetrics(this->font());
-    QRect myRect = rect();
-    int legendHeight = myRect.height() * sLegendHeightFactor; // Use only 80% of legend height for items
-    auto result = legendHeight / itemHeight();
+    QRect axisRectDimensions = parentPlot()->axisRect()->rect();
+    int legendHeight = axisRectDimensions.height() * sLegendHeightFactor - (sArrowHeight*2); // Use only 80% of legend height for items
+    auto itemHeightVal = itemHeight();
+    auto result = legendHeight / itemHeightVal;
     result = result ? result : 1;
     return result;
 }
@@ -55,13 +55,13 @@ void CScrollableLegend::draw(QCPPainter *painter)
         return;
 
     // Ensure the outer rect stays consistent to avoid the shifting effect
-    QRect axisRect = parentPlot()->axisRect()->rect();
+    QRect axisRectDimensions = parentPlot()->axisRect()->rect();
     QRect myRect = outerRect();
     int totalItems = itemCount();
     auto itemHeightVal = itemHeight();
     int totalItemsHeight = totalItems * itemHeightVal;
 
-    int legendHeight = axisRect.height() * sLegendHeightFactor;
+    int legendHeight = axisRectDimensions.height() * sLegendHeightFactor;
     if (legendHeight > totalItemsHeight)
     {
         legendHeight = totalItemsHeight;
@@ -81,7 +81,7 @@ void CScrollableLegend::draw(QCPPainter *painter)
     int endIndex = qMin(mScrollOffset + maxVisibleItems, totalItems);
 
     // Update positions and visibility for each item, leaving space at top and bottom for arrows
-    int arrowSpace = totalItems > maxVisibleItems ? sArrowHeight * 2.5 : 0; // Space for arrows
+    int arrowSpace = totalItems > maxVisibleItems ? sArrowHeight : 0; // Space for arrows
     for (int i = 0; i < totalItems; ++i)
     {
         QCPAbstractLegendItem* pLegendItem = this->item(i);
@@ -90,7 +90,7 @@ void CScrollableLegend::draw(QCPPainter *painter)
             if (i >= startIndex && i < endIndex)
             {
                 pLegendItem->setVisible(true);
-                QRect itemRect(myRect.x() + 5, myRect.y() + arrowSpace + (i - startIndex) * itemHeightVal, myRect.width() - 5, itemHeightVal);
+                QRect itemRect(myRect.x() + 5, myRect.y() + arrowSpace + ( (i - startIndex) * itemHeightVal ), myRect.width() - 5, itemHeightVal);
                 pLegendItem->setOuterRect(itemRect);
             }
             else
@@ -192,7 +192,8 @@ void CScrollableLegend::highlightItem(int itemIndex)
         mpSelectedItem->setTextColor(QColor(200,0,0));
     }
 
-    layer()->replot();
+    // Replot is called outside of this function for the whole plot.
+    // Thus, no replot call here.
 }
 
 PUML_PACKAGE_BEGIN(DMA_PlotView)

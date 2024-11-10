@@ -8,7 +8,8 @@
 4. [Case sensitive search](#case-sensitive-search)
 5. [Regex errors handling](#regex-errors-handling)
 6. [Regex history](#regex-history)
-7. [Used regex engine](#used-regex-engine)
+7. [Regex group name glosssary](#regex-group-name-glossary)
+8. [Used regex engine](#used-regex-engine)
 
 ----
 
@@ -122,6 +123,45 @@ The main aspects of this feature are:
   ![Screenshot of the regex history search strategy option](./regex_history_search_strategy.png)
 - The history is accounted for and stored per the regex patterns file. Activation of the other file will load the corresponding regex history
 - The JSON with regex usage statistics is stored within the '~/.DLT-Message-Analyzer/regex_usage_statistics/' folder 
+
+----
+
+## Regex group name glossary
+
+The DLT Message Analyzer plugin heavily uses the regular expression group names feature. The plugin interprets the regex group names to tokenize each regular expression group name and the text it contains and uses that data for feature-specific purposes. For example, it gets X and Y data for the plot points, method names for sequence diagram arrows, RGB codes for text highlighting, indexes for grouped view data nesting, etc.
+
+Too many features use this mechanism, making it hard for the user to remember all supported regular expression group names without continuously cross-checking the plugin's documentation. This feature adds a glossary within the plugin so that the user can reference supported group name templates on the fly.
+
+To use the feature:
+
+- ( Optional ) You can select the part of the regular expression query you want to enclose with a regular expression group containing a chosen name. If the selection is empty, the regular expression will be injected with the empty content in the current cursor position.
+- Make a right-click on the regular expression line edit UI element and choose the 'regex group name glossary' context menu item:
+
+  ![Screenshot of the regex group name glossary context menu features](./regex_group_name_glossary_context_menu_features.jpeg)
+
+- Then select one of the features from the list. You'll see a list of sub-items that represent different possible regular expression group names that the plugin can interpret:
+
+  ![Screenshot of the regex group name glossary context menu feature items](./regex_group_name_glossary_context_menu_feature_items.jpeg)
+
+  **Note!** If the feature requires multiple regex groups to be used, the list will include 'mandatory' and 'optional' elements.
+
+- Select any of the items to apply the selected regular expression group name:
+
+  ![Screenshot of the regex group name glossary context menu feature item selection](./regex_group_name_glossary_context_menu_feature_item_selection.jpeg)
+
+- The result would be the following:
+
+  ![Screenshot of the regex group name glossary context menu feature item selection result](./regex_group_name_glossary_selection_result.jpeg)
+
+**Note!** Some regular expression group names require the user to input the parameter values. E.g. for the color, the injected regular expression group name would be the following:
+
+```
+(?<RGB_[RED]_[GREEN]_[BLUE]>colored_text)
+```
+
+The user is given a hint to input values for the RED, GREEN, and BLUE color components. The parameter names are intentionally wrapped with the '[', ']' symbols to increase readability and provoke the error if the user doesn't fill them in:
+
+![Screenshot of the error caused by the non-filled-in parameter](./regex_group_name_glossary_empty_parameters.jpeg)
 
 ----
 

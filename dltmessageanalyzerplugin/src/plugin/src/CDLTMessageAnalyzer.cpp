@@ -297,6 +297,537 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 pContextMenu->addAction(pAction);
             }
 
+            pContextMenu->addSeparator();
+
+            auto wrapSelectedText = [this](const QString& addBefore, const QString& addAfter)
+            {
+                if (mpRegexLineEdit)
+                {
+                    // Get the selection range
+                    int start = mpRegexLineEdit->selectionStart();
+                    int length = mpRegexLineEdit->selectedText().length();
+
+                    if (start >= 0 && length > 0)
+                    {
+                        // If there is a selection, wrap the selected text
+                        QString selectedText = mpRegexLineEdit->selectedText();
+                        QString wrappedText = addBefore + selectedText + addAfter;
+
+                        // Replace the selected text directly in mpRegexLineEdit
+                        mpRegexLineEdit->setSelection(start, length);
+                        mpRegexLineEdit->insert(wrappedText);
+
+                        // Keep the selection that was originally selected
+                        mpRegexLineEdit->setSelection(start, wrappedText.length());
+                    }
+                    else
+                    {
+                        // If there is no selection, insert addBefore and addAfter at the cursor position
+                        int cursorPos = mpRegexLineEdit->cursorPosition();
+                        mpRegexLineEdit->insert(addBefore + addAfter);
+
+                        // Set the new cursor position between addBefore and addAfter
+                        mpRegexLineEdit->setCursorPosition(cursorPos + addBefore.length());
+                    }
+                }
+            };
+
+            {
+                QMenu* pSubMenu = new QMenu("Regex group name glossary", mpRegexLineEdit);
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Highlighting", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Color", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("RGB color", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<RGB_[RED]_[GREEN]_[BLUE]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("'Ok' status", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<OK>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("'Warning' status", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<WARNING>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("'Error' status", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<ERROR>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Grouped view", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Grouped view level", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<GV>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Ordered grouped view level", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<GV_[INDEX]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Sequence diagram", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Client name ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<UCL>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Service name ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<US>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Request ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<URT>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Response ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<URS>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Event ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<UEV>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Method ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<UM>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Arguments ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<UA>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Sequence id ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<USID>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Timestamp ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<UTS>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Plot", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGN_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_PLOT_GRAPH_NAME_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot Y-axis data ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGMD_[AXIS_RECT_NAME]_[GRAPH_ID]_[METADATA_KEY_STRING]_"
+                                             "[OPTIONAL_METADATA_VALUE_STRING_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Axis rect type ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PARType_[AXIS_RECT_NAME]_[AXIS_RECT_TYPE_LINEAR_OR_POINT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PARL_[AXIS_RECT_NAME]_[AXIS_RECT_LABEL]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[NAME]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[NAME]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[UNIT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[UNIT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Gantt chart", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Axis rect type ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PARType_[AXIS_RECT_NAME]_GANTT>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGN_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_PLOT_GRAPH_NAME_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Gantt chart event ( mandatory for Gantt charts )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGE_[AXIS_RECT_NAME]_[GRAPH_ID]_[EVENT_TYPE_start_OR_end]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Gantt chart event row identifier ( optional for Gantt charts )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGEID_[AXIS_RECT_NAME]_[GRAPH_ID]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PGMD_[AXIS_RECT_NAME]_[GRAPH_ID]_[METADATA_KEY_STRING]_"
+                                             "[OPTIONAL_METADATA_VALUE_STRING_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PARL_[AXIS_RECT_NAME]_[AXIS_RECT_LABEL]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[NAME]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[NAME]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[UNIT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[UNIT]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PXMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    {
+                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<PYMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                {
+                    QMenu* pSubSubMenu = new QMenu("Variables", mpRegexLineEdit);
+
+                    {
+                        QAction* pAction = new QAction("Variable", mpRegexLineEdit);
+                        connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
+                        {
+                            wrapSelectedText("(?<VAR_[VARIABLE_NAME]>", ")");
+                        });
+                        pSubSubMenu->addAction(pAction);
+                    }
+
+                    pSubMenu->addMenu(pSubSubMenu);
+                }
+
+                pContextMenu->addMenu(pSubMenu);
+            }
+
+            pContextMenu->addSeparator();
+
             {
                 QAction* pAction = new QAction("Activate regex history", mpRegexLineEdit);
                 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)

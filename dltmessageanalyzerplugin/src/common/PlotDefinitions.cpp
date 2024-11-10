@@ -140,7 +140,7 @@ static tPlotViewIDsMap createPlotIDsMap()
 
         item.description = QString("Plot axis rectangle type. %1. "
                                    "PARType_CPUC_LINEAR. Type of the specific plot axis rectangle. "
-                                   "Supported types are - GANTT, BAR, POINT, LINEAR. "
+                                   "Supported types are - GANTT, POINT, LINEAR. "
                                    "If not specified, the LINEAR value is used. "
                                    "If multiple values appear - the 'last win' strategy is applied.").arg(item.getParametersDescription());
 
@@ -545,7 +545,7 @@ static tPlotViewIDsMap createPlotIDsMap()
                                    "For conversion to date-time see PYT parameter. The graphId parameter should be "
                                    "convertible to an integer. If an optional 'value' "
                                    "parameter was spcified, the captured data would be ignored. The 'value' param will "
-                                   "be NOT considered as the 'time', even if the PYT data was provided."
+                                   "be NOT considered as the 'time', even if the PYT data was provided. "
                                    "Mandatory for plots in which 'PARType' is not equal to 'GANTT'.").arg(item.getParametersDescription());
         result.insert(std::make_pair(ePlotViewID::PLOT_Y_DATA, item));
     }

@@ -19,6 +19,7 @@ New features in release v.1.0.29:
 - [Grouped view default application is disabled](./md/grouped_view/grouped_view.md#backward-compatibility-note)
 - [Groups nesting ordering](./md/grouped_view/grouped_view.md#groups-nesting-ordering)
 - [Plot legend scrolling](./md/plot_view/plot_view.md#legend-scrolling)
+- [Regex group name glossary](./md/search/search.md#regex-group-name-glossary)
 
 ----
 

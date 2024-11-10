@@ -218,6 +218,7 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
             messageEscaped.replace("\n", "<br/>");
 
             QString HTMLMessage;
+            HTMLMessage.reserve(messageEscaped.size() + 50);
 
             HTMLMessage.append("<pre>");
 
