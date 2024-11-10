@@ -18,7 +18,7 @@
 
 #include "DMA_Plantuml.hpp"
 
-static const int sMaxCommandsHistorySize = 100;
+static const int sMaxCommandsHistorySize = 50;
 static const QString sHelpCommandName = "help";
 
 namespace NShortcuts
@@ -835,22 +835,39 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
             {
                 QString text = mpTargetLineEdit->text();
 
-                mHistory.push_front(text);
+                if(!text.isEmpty())
+                {
+                    auto foundHistoryItem = std::find_if( mHistory.begin(), mHistory.end(), [&text](const QString& historyItem)->bool
+                    {
+                        return historyItem == text;
+                    });
+
+                    if(foundHistoryItem == mHistory.end())
+                    {
+                        mHistory.push_front(text);
+
+                        if(mHistory.size() == 1)
+                        {
+                            mbBorderReached = eHistoryBorderStatus::Reached_Both;
+                        }
+                        else if(mHistory.size() > 1)
+                        {
+                            mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
+                        }
+
+                        if(mCurrentHistoryItem > sMaxCommandsHistorySize)
+                        {
+                            mHistory.resize(sMaxCommandsHistorySize);
+                        }
+                    }
+                    else
+                    {
+                        mHistory.erase(foundHistoryItem);
+                        mHistory.push_front(text);
+                    }
+                }
+
                 mCurrentHistoryItem = 0;
-
-                if(mHistory.size() == 1)
-                {
-                    mbBorderReached = eHistoryBorderStatus::Reached_Both;
-                }
-                else if(mHistory.size() > 1)
-                {
-                    mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
-                }
-
-                if(mCurrentHistoryItem > sMaxCommandsHistorySize)
-                {
-                    mHistory.resize(sMaxCommandsHistorySize);
-                }
 
                 mpTargetLineEdit->clear();
 
