@@ -8,7 +8,7 @@ class QDltPluginViewerInterface--><rect fill="#FEFECE" filter="url(#fqh9zizqrtsj
 link QDLTPluginInterface to QDltFile--><!--MD5=[1100dd162daa8d48dd0e18dbea79b8c0]
 link QDltFile to QDltMsg--><!--MD5=[a04f1beb58079be6c4417ee1016591c5]
 link QDLTPluginInterface to QDltPluginControlInterface--><!--MD5=[90e7f16bb35819f6395af7ac0c7693ba]
-link QDltPluginControlInterface to QDltPluginViewerInterface--><!--MD5=[5e6adc93201c53e384fac85b8c5557ea]
+link QDltPluginControlInterface to QDltPluginViewerInterface--><!--MD5=[0d3dacaeb6a5323ee14aed3c810907e8]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -44,7 +44,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

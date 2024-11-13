@@ -14,7 +14,7 @@ reverse link QObject to QCPAxisRect--><path d="M310.9,100.81 C268.27,114.25 210.
 reverse link QObject to QCPGraph--><path d="M329.11,120.59 C322.6,126.62 316.03,132.89 310,139 C288.12,161.15 264.8,188.11 249.02,206.91 " fill="none" id="QObject&lt;-QCPGraph" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="324.43,115.39,343.96,107.17,333.81,125.78,324.43,115.39" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="311" y="152.0669">extends</text><!--MD5=[f48c1b8db2fa720685168a96b47b67e0]
 reverse link QObject to QCPLayerable--><path d="M371,127.27 C371,153.39 371,185.65 371,206.97 " fill="none" id="QObject&lt;-QCPLayerable" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="364,127.13,371,107.13,378,127.13,364,127.13" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="372" y="152.0669">extends</text><!--MD5=[ec8f60c4e4ab95b3e60aa8062dcb9d95]
 reverse link QObject to QCPLegend--><path d="M412.57,120.55 C419.17,126.61 425.84,132.91 432,139 C454.48,161.22 478.84,187.92 495.51,206.64 " fill="none" id="QObject&lt;-QCPLegend" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="407.76,125.64,397.61,107.04,417.14,115.25,407.76,125.64" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="450" y="152.0669">extends</text><!--MD5=[7f28ea725549dfebe87bb314e5f6f0aa]
-reverse link QWidget to QCustomPlot--><path d="M532.87,120.03 C549.32,133.68 568.12,149.44 585,164 C601.3,178.05 619.32,194.12 633.5,206.88 " fill="none" id="QWidget&lt;-QCustomPlot" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="528.31,125.35,517.35,107.21,537.23,114.56,528.31,125.35" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="575" y="152.0669">extends</text><!--MD5=[ac7e98e3c2e8b248f2c054128b6f917d]
+reverse link QWidget to QCustomPlot--><path d="M532.87,120.03 C549.32,133.68 568.12,149.44 585,164 C601.3,178.05 619.32,194.12 633.5,206.88 " fill="none" id="QWidget&lt;-QCustomPlot" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="528.31,125.35,517.35,107.21,537.23,114.56,528.31,125.35" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="575" y="152.0669">extends</text><!--MD5=[8c65baf9e48949ed3086b1a815b37551]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -74,7 +74,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

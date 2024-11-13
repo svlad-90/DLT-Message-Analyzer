@@ -19,7 +19,7 @@ class "CRegexHistoryComponent"
 {
 }
 
-class "CRegexHistoryLineEdit"
+class "CRegexHistoryTextEdit"
 {
 }
 
@@ -29,14 +29,23 @@ class "IRegexHistoryProvider"
 
 }
 
-package "Qt" #DDDDDD
+package "DMA_Settings_API" #DDDDDD
 {
 
-class "QLineEdit"
+class "CSettingsManagerClient"
 {
 }
 
+}
+
+package "Qt" #DDDDDD
+{
+
 class "QObject"
+{
+}
+
+class "QTextEdit"
 {
 }
 
@@ -44,11 +53,12 @@ class "QObject"
 
 '====================Inheritance section====================
 DMA::IComponent <|-- CRegexHistoryComponent : implements
-QLineEdit <|-- CRegexHistoryLineEdit : extends
+CSettingsManagerClient <|-- CRegexHistoryTextEdit : extends
+QTextEdit <|-- CRegexHistoryTextEdit : extends
 QObject <|-- IRegexHistoryProvider : extends
 
 '====================Dependencies section====================
-CRegexHistoryComponent "1" --> "1" CRegexHistoryLineEdit : passes
-CRegexHistoryLineEdit "1" o-- "1" IRegexHistoryProvider : uses
+CRegexHistoryComponent "1" --> "1" CRegexHistoryTextEdit : passes
+CRegexHistoryTextEdit "1" o-- "1" IRegexHistoryProvider : uses
 
 @enduml

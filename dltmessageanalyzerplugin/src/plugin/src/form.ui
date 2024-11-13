@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>857</width>
-    <height>581</height>
+    <height>612</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -531,7 +531,7 @@ QPushButton:hover:!pressed{
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>739</width>
+                 <width>735</width>
                  <height>299</height>
                 </rect>
                </property>
@@ -1046,46 +1046,54 @@ QPushButton:hover:!pressed{
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="triggerButtonsLayout">
-         <property name="spacing">
-          <number>6</number>
+        <layout class="QVBoxLayout" name="verticalTriggerLayout">
+         <property name="leftMargin">
+          <number>0</number>
          </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
+         <property name="topMargin">
+          <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="hidePatterns">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <layout class="QHBoxLayout" name="horizontalTriggerLayout_1">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
+           <property name="topMargin">
+            <number>0</number>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <italic>false</italic>
-             <bold>true</bold>
-             <underline>false</underline>
-            </font>
-           </property>
-           <property name="contextMenuPolicy">
-            <enum>Qt::NoContextMenu</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
+           <item>
+            <widget class="QPushButton" name="hidePatterns">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <italic>false</italic>
+               <bold>true</bold>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::NoContextMenu</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
     border: 2px solid #8f8f91;
     border-radius: 2px;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
@@ -1103,37 +1111,93 @@ QPushButton:hover:!pressed{
     background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
 	color: rgb(255, 255, 255);
 }</string>
-           </property>
-           <property name="text">
-            <string>&lt;&lt;</string>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string>&lt;&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+    border: 1px solid #8f8f91;
+    background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+    min-width: 80px;
+	color: rgb(255, 255, 255);
+}</string>
+             </property>
+             <property name="text">
+              <string>Regex:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="CRegexHistoryTextEdit" name="regex">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>190</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
-          <widget class="QPushButton" name="analyze">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>10</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <layout class="QHBoxLayout" name="horizontalTriggerLayout_2">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetFixedSize</enum>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton {
+           <item>
+            <widget class="QPushButton" name="analyze">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>10</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
     border: 2px solid #8f8f91;
     border-radius: 2px;
     background-color: qlineargradient(spread:pad, x1:0.259, y1:0.720909, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
@@ -1152,83 +1216,66 @@ QPushButton:hover:!pressed{
     background-color: qlineargradient(spread:pad, x1:0.119, y1:0.561682, x2:0.034, y2:0.926, stop:0 rgba(67, 115, 118, 255), stop:1 rgba(171, 211, 205, 255));
 	color: rgb(255, 255, 255);
 }</string>
-           </property>
-           <property name="text">
-            <string>Analyze</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="CRegexHistoryLineEdit" name="regex">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>190</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="continuousAnalysis">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Cont. analysis</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="numberOfThreadsLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Number of threads:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="numberOfThreads">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string>Analyze</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="continuousAnalysis">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Cont. analysis</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="numberOfThreadsLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Number of threads:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="numberOfThreads">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -1435,9 +1482,9 @@ QPushButton:hover:!pressed{
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>CRegexHistoryLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>components/regexHistory/api/CRegexHistoryLineEdit.hpp</header>
+   <class>CRegexHistoryTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header>components/regexHistory/api/CRegexHistoryTextEdit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

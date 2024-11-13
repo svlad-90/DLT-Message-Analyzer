@@ -280,7 +280,7 @@ class "CRegexHistoryProvider"
 package "DMA_RegexHistory_API" #DDDDDD
 {
 
-class "CRegexHistoryLineEdit"
+class "CRegexHistoryTextEdit"
 {
 }
 
@@ -461,7 +461,7 @@ QWidget <|-- CUMLView : extends
 QObject <|-- DLTMessageAnalyzerPlugin : extends
 QWidget <|-- Form : extends
 QCompleter <|-- CExtendedCompleter : extends
-QLineEdit <|-- CRegexHistoryLineEdit : extends
+QTextEdit <|-- CRegexHistoryTextEdit : extends
 QObject <|-- IRegexHistoryProvider : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 QAbstractTableModel <|-- CSearchResultModel : implements
@@ -489,7 +489,6 @@ CCoverageNoteComponent "1" o-- "2" QTableView : passes to nested entities
 CCoverageNoteComponent "1" o-- "4" QTextEdit : passes to nested entities
 CFilterItemDelegate "1" o-- "1" QCompleter : uses
 CFilterItemDelegate "1" o-- "1" QTreeView : parent view
-CFiltersView "1" o-- "1" QLineEdit : regex input field
 CConsoleCtrl "1" o-- "1" QPlainTextEdit : console text edit
 CConsoleCtrl "1" o-- "1" QTabWidget : console view tab widget
 CConsoleCtrl "1" o-- "1" QWidget : console tab
@@ -500,6 +499,7 @@ CUMLView "1" *-- "2" QProcess : contains
 CPlotViewComponent "1" o-- "1" QPushButton : uses
 DLTMessageAnalyzerPlugin "1" *-- "1" QTimer : contains
 CRegexHistoryProvider "1" *-- "1" QListView : creates
+CRegexHistoryTextEdit "1" o-- "1" QCompleter : uses
 CSearchResultView "1" o-- "1" QTabWidget : uses main tab widget
 CSearchResultView "1" o-- "1" QTableView : uses dlt-viewer main table view
 CSearchViewComponent "1" o-- "1" QTabWidget : uses

@@ -8,6 +8,7 @@
 
 class CFiltersModel;
 class CFilterItemDelegate;
+class CRegexHistoryTextEdit;
 
 class CFiltersView : public QTreeView,
                      public CSettingsManagerClient
@@ -22,7 +23,7 @@ public:
 
     void setSpecificModel( CFiltersModel* pModel );
     void highlightInvalidRegex(const QModelIndex &index);
-    void setRegexInputField(QLineEdit* pRegexInputField);
+    void setRegexInputField(CRegexHistoryTextEdit* pRegexTextEdit);
 
 protected:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous) override;
@@ -51,6 +52,6 @@ private: // fields
     bool mbIsVerticalScrollBarVisible;
     bool mbResizeOnExpandCollapse;
     bool mbSkipFirstUpdateWidth;
-    QLineEdit* mpRegexInputField;
+    CRegexHistoryTextEdit* mpRegexTextEdit;
     CFilterItemDelegate* mpFilterItemDelegate;
 };

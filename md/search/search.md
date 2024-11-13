@@ -3,13 +3,14 @@
 ## Table of Contents
 
 1. [Search](#search)
-2. [How the search string is formed?](#how-the-search-string-is-formed)
-3. [Continuous search](#continuous-search)
-4. [Case sensitive search](#case-sensitive-search)
-5. [Regex errors handling](#regex-errors-handling)
-6. [Regex history](#regex-history)
-7. [Regex group name glosssary](#regex-group-name-glossary)
-8. [Used regex engine](#used-regex-engine)
+2. [Regex text editor](#regex-text-editor)
+3. [How the search string is formed?](#how-the-search-string-is-formed)
+4. [Continuous search](#continuous-search)
+5. [Case sensitive search](#case-sensitive-search)
+6. [Regex errors handling](#regex-errors-handling)
+7. [Regex history](#regex-history)
+8. [Regex group name glosssary](#regex-group-name-glossary)
+9. [Used regex engine](#used-regex-engine)
 
 ----
 
@@ -19,13 +20,27 @@ This chapter describes the general aspects of the plugin's search functionality.
 
 ----
 
+## Regex text editor
+
+To search within the opened dlt file, the user should provide his input into the regex text editor:
+
+![Screenshot of the regex text editor](./regex_text_editor.jpeg)
+
+A text editor adjusts its height based on the provided content. The editor's default maximum height is four lines of text. When reached, the scrollbar will appear to allow user navigation within the complex regular expression.
+
+The user can adjust the maximum height from 1 to 10 using the following context menu item:
+
+![Screenshot of the 'set regex text edit max-height' context menu item](./set_regex_text_edit_max_height.jpeg)
+
+----
+
 ## How the search string is formed?
 
-The default search string is formed in the following way:
+The default search string is formed based on the following columns:
 
 > **Apid + " " + Ctid + " " + Payload**
 
-But it is possible to adjust it. More information on this topic is located [here](../search_view/search_view.md#search-columns).
+But it is possible to adjust that. More information on this topic is located [here](../search_view/search_view.md#search-columns).
 
 ----
 
@@ -84,7 +99,7 @@ In case if the user makes a mistake in the provided regex, the plugin will give 
 
 ![Screenshot of the attempt to apply regex which contains the error](./regex_with_error.png)
 
-Notification message contains the col number, at which an error has occurred. In addition to that, the regex line edit will jump to the error location and will select the col number character, which contains an error. 
+Notification message contains the col number, at which an error has occurred. In addition to that, the regex text edit will jump to the error location and will select the col number character, which contains an error. 
 
 The same kind of error handling is also supported in the other menus, where user can enter the regexes, e.g. during the edit operation of the previously saved pattern: 
 
@@ -135,7 +150,7 @@ Too many features use this mechanism, making it hard for the user to remember al
 To use the feature:
 
 - ( Optional ) You can select the part of the regular expression query you want to enclose with a regular expression group containing a chosen name. If the selection is empty, the regular expression will be injected with the empty content in the current cursor position.
-- Make a right-click on the regular expression line edit UI element and choose the 'regex group name glossary' context menu item:
+- Make a right-click on the regular expression text edit UI element and choose the 'regex group name glossary' context menu item:
 
   ![Screenshot of the regex group name glossary context menu features](./regex_group_name_glossary_context_menu_features.jpeg)
 

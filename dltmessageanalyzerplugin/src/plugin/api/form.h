@@ -40,7 +40,7 @@ class CFiltersView;
 class CUMLView;
 class CLogo;
 class CCustomPlotExtended;
-class CRegexHistoryLineEdit;
+class CRegexHistoryTextEdit;
 
 namespace Ui {
     class Form;
@@ -60,7 +60,7 @@ public:
     CGroupedView* getGroupedResultView();
     QProgressBar* getProgresBar();
     QLabel* getProgresBarLabel();
-    CRegexHistoryLineEdit* getRegexLineEdit();
+    CRegexHistoryTextEdit* getRegexTextEdit();
     QLabel* getErrorLabel();
     CPatternsView* getPatternsTableView();
     QComboBox* getNumberOfThreadsComboBox();

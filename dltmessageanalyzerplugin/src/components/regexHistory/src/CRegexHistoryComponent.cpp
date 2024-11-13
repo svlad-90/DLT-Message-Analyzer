@@ -8,7 +8,7 @@
 #include "dma/base/ForceLink.hpp"
 
 CRegexHistoryComponent::CRegexHistoryComponent( const tSettingsManagerPtr& pSettingsManager,
-                                                CRegexHistoryLineEdit* pRegexHistoryLineEdit, CPatternsView* pPatternsView,
+                                                CRegexHistoryTextEdit* pRegexHistoryLineEdit, CPatternsView* pPatternsView,
                                                 const tDLTMessageAnalyzerControllerPtr& pDLTMessageAnalyzerController ):
 mpRegexHistoryProvider(std::make_shared<CRegexHistoryProvider>(pSettingsManager,
                                                                pRegexHistoryLineEdit,
@@ -21,6 +21,7 @@ mpRegexHistoryProvider(std::make_shared<CRegexHistoryProvider>(pSettingsManager,
     if(nullptr != pRegexHistoryLineEdit)
     {
         pRegexHistoryLineEdit->setRegexHistoryProvider(mpRegexHistoryProvider);
+        pRegexHistoryLineEdit->setSettingsManager(pSettingsManager);
     }
 }
 
@@ -76,7 +77,7 @@ PUML_PACKAGE_BEGIN(DMA_RegexHistory_API)
         PUML_INHERITANCE_CHECKED(DMA::IComponent, implements)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, passes)
-        PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, passes)
+        PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryTextEdit, 1, 1, passes)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, passes)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryProvider, 1, 1, creates)
     PUML_CLASS_END()

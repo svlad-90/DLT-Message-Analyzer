@@ -9,7 +9,7 @@
 #include "components/settings/api/ISettingsManager.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 #include "components/regexHistory/api/IRegexHistoryProvider.hpp"
-#include "components/regexHistory/api/CRegexHistoryLineEdit.hpp"
+#include "components/regexHistory/api/CRegexHistoryTextEdit.hpp"
 
 class CPatternsView;
 
@@ -36,7 +36,7 @@ public:
      * @param pDLTMessageAnalyzerController Shared pointer to the DLT message analyzer controller.
      */
     CRegexHistoryComponent( const tSettingsManagerPtr& pSettingsManager,
-                            CRegexHistoryLineEdit* pRegexHistoryLineEdit,
+                            CRegexHistoryTextEdit* pRegexHistoryLineEdit,
                             CPatternsView* pPatternsView,
                             const tDLTMessageAnalyzerControllerPtr& pDLTMessageAnalyzerController);
 
