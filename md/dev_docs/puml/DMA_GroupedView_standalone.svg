@@ -9,7 +9,7 @@ class CSettingsManagerClient--><rect fill="#FEFECE" filter="url(#f1unp9ak7mtvyr)
 class QAbstractItemModel--><rect fill="#FEFECE" filter="url(#f1unp9ak7mtvyr)" height="48" id="QAbstractItemModel" style="stroke: #A80036; stroke-width: 1.5;" width="157" x="792.5" y="91"/><ellipse cx="807.5" cy="107" fill="#A9DCDF" rx="11" ry="11" style="stroke: #A80036; stroke-width: 1.0;"/><path d="M807.6094,102.3438 L806.4531,107.4219 L808.7813,107.4219 L807.6094,102.3438 Z M806.125,100.1094 L809.1094,100.1094 L812.4688,112.5 L810.0156,112.5 L809.25,109.4375 L805.9688,109.4375 L805.2188,112.5 L802.7813,112.5 L806.125,100.1094 Z "/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="125" x="821.5" y="111.1543">QAbstractItemModel</text><line style="stroke: #A80036; stroke-width: 1.5;" x1="793.5" x2="948.5" y1="123" y2="123"/><line style="stroke: #A80036; stroke-width: 1.5;" x1="793.5" x2="948.5" y1="131" y2="131"/><!--MD5=[0544a447b3283184e5810749345c9448]
 reverse link CSettingsManagerClient to CGroupedViewModel--><path d="M645,159.64 C645,194.71 645,242.6 645,270.72 " fill="none" id="CSettingsManagerClient&lt;-CGroupedViewModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="638,159.27,645,139.27,652,159.27,638,159.27" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="646" y="216.0669">extends</text><!--MD5=[de1dbb663faebe86b90e2fae2ac4585e]
 reverse link IGroupedViewModel to CGroupedViewModel--><path d="M402.94,179.71 C470.26,211.49 547.51,247.97 596.28,271 " fill="none" id="IGroupedViewModel&lt;-CGroupedViewModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="399.8,185.97,384.7,171.1,405.78,173.31,399.8,185.97" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="480" y="216.0669">implements</text><!--MD5=[3afd9d25a38d2d2a204a85337db301a1]
-reverse link QAbstractItemModel to CGroupedViewModel--><path d="M825.72,151.67 C780.73,187.1 713.05,240.41 674.55,270.72 " fill="none" id="QAbstractItemModel&lt;-CGroupedViewModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="821.41,146.15,841.45,139.27,830.07,157.14,821.41,146.15" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="759" y="216.0669">implements</text><!--MD5=[bfb7c5d2af43ac2bb6cd6b8f93b6f73d]
+reverse link QAbstractItemModel to CGroupedViewModel--><path d="M825.72,151.67 C780.73,187.1 713.05,240.41 674.55,270.72 " fill="none" id="QAbstractItemModel&lt;-CGroupedViewModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="821.41,146.15,841.45,139.27,830.07,157.14,821.41,146.15" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="759" y="216.0669">implements</text><!--MD5=[a5c642ee1d2e28c061f347c0abda029a]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -65,7 +65,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

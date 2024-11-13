@@ -30,6 +30,7 @@ static const QString sSettingsManagerVersionKey = "settingsManagerVersion";
 static const QString sAliasesKey = "aliases";
 static const QString sRegexUsageStatisticsKey = "regexUsageStatistics";
 static const QString sUsernameKey = "username";
+static const QString sRegexInputFieldHeight = "regexInputFieldHeight";
 static const QString sAliasKey = "alias";
 static const QString sRegexKey = "regex";
 static const QString sIsDefaultKey = "isDefault";
@@ -545,6 +546,11 @@ CSettingsManager::CSettingsManager():
             // this data is not critical and is stored to file ONLY during exit.
         },
         getCurrentUserName())),
+    mSetting_RegexInputFieldHeight(createArithmeticSettingsItem<int>(sRegexInputFieldHeight,
+        [this](const int&,
+               const int& data){ regexInputFieldHeightChanged(data); },
+        [this](){tryStoreSettingsConfig();},
+        4)),
     mRootSettingItemPtrVec(),
     mUserSettingItemPtrVec(),
     mPatternsSettingItemPtrVec(),
@@ -604,6 +610,7 @@ CSettingsManager::CSettingsManager():
     mUserSettingItemPtrVec.push_back(&mSetting_JavaCustomPath);
     mUserSettingItemPtrVec.push_back(&mSetting_GroupedViewFeatureActive);
     mUserSettingItemPtrVec.push_back(&mSetting_Username);
+    mUserSettingItemPtrVec.push_back(&mSetting_RegexInputFieldHeight);
 
     /////////////// PATTERNS SETTINGS ///////////////
     mPatternsSettingItemPtrVec.push_back(&mSetting_Aliases);
@@ -1894,6 +1901,11 @@ void CSettingsManager::setUserName(const QString& val)
     mSetting_Username.setData(val);
 }
 
+void CSettingsManager::setRegexInputFieldHeight(const int& linesNumber)
+{
+    mSetting_RegexInputFieldHeight.setData(linesNumber);
+}
+
 void CSettingsManager::setSearchViewLastColumnWidthStrategy(const int& val)
 {
     mSetting_SearchViewLastColumnWidthStrategy.setData(val);
@@ -2160,6 +2172,11 @@ const bool& CSettingsManager::getRegexCompletion_SearchPolicy() const
 const QString& CSettingsManager::getUsername() const
 {
     return mSetting_Username.getData();
+}
+
+const int& CSettingsManager::getRegexInputFieldHeight() const
+{
+    return mSetting_RegexInputFieldHeight.getData();
 }
 
 const int& CSettingsManager::getSearchViewLastColumnWidthStrategy() const

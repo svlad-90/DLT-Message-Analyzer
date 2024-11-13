@@ -13,7 +13,7 @@ reverse link CSettingsManagerClient to CSearchResultHighlightingDelegate--><path
 reverse link QStyledItemDelegate to CSearchResultHighlightingDelegate--><path d="M1200.19,173.13 C1162.37,213.41 1103.97,275.59 1072.63,308.96 " fill="none" id="QStyledItemDelegate&lt;-CSearchResultHighlightingDelegate" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="1195.26,168.16,1214.05,158.37,1205.46,177.74,1195.26,168.16" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="1133" y="254.0669">extends</text><!--MD5=[e2c825c7d1e98818b94647631a776c89]
 reverse link CSettingsManagerClient to CSearchResultModel--><path d="M809,178.6 C809,218.85 809,277.07 809,308.96 " fill="none" id="CSettingsManagerClient&lt;-CSearchResultModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="802,178.37,809,158.37,816,178.37,802,178.37" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="810" y="254.0669">extends</text><!--MD5=[cd4f5f5782c9d99a9c4c71c44e3ef82a]
 reverse link ISearchResultModel to CSearchResultModel--><path d="M541.1,217.02 C618.81,250.37 702.56,286.32 755.35,308.97 " fill="none" id="ISearchResultModel&lt;-CSearchResultModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="538.17,223.38,522.55,209.06,543.69,210.51,538.17,223.38" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="635" y="254.0669">implements</text><!--MD5=[2d9c20e87d5744f03c8a645e7a43c975]
-reverse link QAbstractTableModel to CSearchResultModel--><path d="M1030.48,178.18 C1023.34,205.57 1009.7,239.25 984,258 C970.1,268.14 923.17,260.13 907,266 C880.58,275.59 854.37,293.81 835.72,308.69 " fill="none" id="QAbstractTableModel&lt;-CSearchResultModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="1023.7,176.43,1034.84,158.4,1037.37,179.44,1023.7,176.43" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="1000" y="254.0669">implements</text><!--MD5=[3e4ff57c0a1bbc063a5ea7743059057c]
+reverse link QAbstractTableModel to CSearchResultModel--><path d="M1030.48,178.18 C1023.34,205.57 1009.7,239.25 984,258 C970.1,268.14 923.17,260.13 907,266 C880.58,275.59 854.37,293.81 835.72,308.69 " fill="none" id="QAbstractTableModel&lt;-CSearchResultModel" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="1023.7,176.43,1034.84,158.4,1037.37,179.44,1023.7,176.43" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="1000" y="254.0669">implements</text><!--MD5=[a26e0455571bcd8ac4e524eb847b7e5f]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -81,7 +81,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

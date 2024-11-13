@@ -69,6 +69,15 @@ class "Ui::Form"
 
 }
 
+package "DMA_RegexHistory_API" #DDDDDD
+{
+
+class "CRegexHistoryTextEdit"
+{
+}
+
+}
+
 package "DMA_Settings_API" #DDDDDD
 {
 
@@ -82,10 +91,6 @@ package "Qt" #DDDDDD
 {
 
 abstract class "QAbstractItemModel"
-{
-}
-
-class "QLineEdit"
 {
 }
 
@@ -106,7 +111,7 @@ QAbstractItemModel <|-- IFiltersModel : implements
 '====================Dependencies section====================
 CFiltersView "1" *-- "1" CFilterItemDelegate : contains
 CFiltersView "1" o-- "1" CFiltersModel : uses
-CFiltersView "1" o-- "1" QLineEdit : regex input field
+CFiltersView "1" o-- "1" CRegexHistoryTextEdit : regex input field
 CFiltersViewComponent "1" --> "1" CFiltersModel : using to create IFiltersModel
 CFiltersViewComponent "1" o-- "1" CFiltersView : uses
 CFiltersViewComponent "1" *-- "1" IFiltersModel : contains

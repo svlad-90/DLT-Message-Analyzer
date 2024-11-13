@@ -10,7 +10,7 @@ class QObject--><rect fill="#FEFECE" filter="url(#f1vi7gltmxhcy4)" height="48" i
 reverse link QDLTPluginInterface to DLTMessageAnalyzerPlugin--><path d="M181.83,115.91 C192.54,121.04 203.55,126.22 214,131 C273.11,158.02 341.62,187.25 388.39,206.89 " fill="none" id="QDLTPluginInterface&lt;-DLTMessageAnalyzerPlugin" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="178.63,122.14,163.67,107.14,184.72,109.53,178.63,122.14" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="265" y="152.0669">implements</text><!--MD5=[f0ff2f0474dd99fc054b52f1236d73d4]
 reverse link QDltPluginControlInterface to DLTMessageAnalyzerPlugin--><path d="M359.73,123.01 C380.84,149.81 408.15,184.48 425.86,206.97 " fill="none" id="QDltPluginControlInterface&lt;-DLTMessageAnalyzerPlugin" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="354.1,127.18,347.22,107.13,365.1,118.51,354.1,127.18" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="384" y="152.0669">implements</text><!--MD5=[e9d369d4885a664211b1d5dc2b6a9a2a]
 reverse link QDltPluginViewerInterface to DLTMessageAnalyzerPlugin--><path d="M528.27,123.01 C507.16,149.81 479.85,184.48 462.14,206.97 " fill="none" id="QDltPluginViewerInterface&lt;-DLTMessageAnalyzerPlugin" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="522.9,118.51,540.78,107.13,533.9,127.18,522.9,118.51" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="76" x="516" y="152.0669">implements</text><!--MD5=[b62331c49b10f0459bb42812a075c5f0]
-reverse link QObject to DLTMessageAnalyzerPlugin--><path d="M697.7,117.22 C689.18,122.01 680.42,126.75 672,131 C615.38,159.6 548.6,188 502.01,206.99 " fill="none" id="QObject&lt;-DLTMessageAnalyzerPlugin" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="694.36,111.07,715.18,107.16,701.34,123.2,694.36,111.07" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="654" y="152.0669">extends</text><!--MD5=[9d4b97fb8b765b0a9536588f5a217f0a]
+reverse link QObject to DLTMessageAnalyzerPlugin--><path d="M697.7,117.22 C689.18,122.01 680.42,126.75 672,131 C615.38,159.6 548.6,188 502.01,206.99 " fill="none" id="QObject&lt;-DLTMessageAnalyzerPlugin" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="none" points="694.36,111.07,715.18,107.16,701.34,123.2,694.36,111.07" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="51" x="654" y="152.0669">extends</text><!--MD5=[12d213d76c87151cddca3449d673ae57]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -61,7 +61,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

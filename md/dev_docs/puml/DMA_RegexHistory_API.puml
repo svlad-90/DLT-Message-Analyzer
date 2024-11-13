@@ -16,6 +16,15 @@ abstract class "IDLTMessageAnalyzerController"
 
 }
 
+package "DMA_FiltersView_API" #DDDDDD
+{
+
+class "CFiltersView"
+{
+}
+
+}
+
 package "DMA_Framework_Component" #DDDDDD
 {
 
@@ -72,7 +81,7 @@ class "CRegexHistoryComponent"
 {
 }
 
-class "CRegexHistoryLineEdit"
+class "CRegexHistoryTextEdit"
 {
 }
 
@@ -85,6 +94,10 @@ class "IRegexHistoryProvider"
 package "DMA_Settings_API" #DDDDDD
 {
 
+class "CSettingsManagerClient"
+{
+}
+
 class "ISettingsManager"
 {
 }
@@ -94,11 +107,15 @@ class "ISettingsManager"
 package "Qt" #DDDDDD
 {
 
-class "QLineEdit"
+class "QCompleter"
 {
 }
 
 class "QObject"
+{
+}
+
+class "QTextEdit"
 {
 }
 
@@ -107,19 +124,22 @@ class "QObject"
 '====================Inheritance section====================
 IRegexHistoryProvider <|-- CRegexHistoryProvider : implements
 DMA::IComponent <|-- CRegexHistoryComponent : implements
-QLineEdit <|-- CRegexHistoryLineEdit : extends
+CSettingsManagerClient <|-- CRegexHistoryTextEdit : extends
+QTextEdit <|-- CRegexHistoryTextEdit : extends
 QObject <|-- IRegexHistoryProvider : extends
 
 '====================Dependencies section====================
+CFiltersView "1" o-- "1" CRegexHistoryTextEdit : regex input field
 DLTMessageAnalyzerPlugin "1" *-- "1" CRegexHistoryComponent : contains
-CDLTMessageAnalyzer "1" --> "1" CRegexHistoryLineEdit : uses and passes
-Ui::Form "1" *-- "1" CRegexHistoryLineEdit : contains
-CRegexHistoryProvider "1" o-- "1" CRegexHistoryLineEdit : uses
+CDLTMessageAnalyzer "1" --> "1" CRegexHistoryTextEdit : uses and passes
+Ui::Form "1" *-- "1" CRegexHistoryTextEdit : contains
+CRegexHistoryProvider "1" o-- "1" CRegexHistoryTextEdit : uses
 CRegexHistoryComponent "1" o-- "1" CPatternsView : uses
-CRegexHistoryComponent "1" --> "1" CRegexHistoryLineEdit : passes
 CRegexHistoryComponent "1" *-- "1" CRegexHistoryProvider : creates
+CRegexHistoryComponent "1" --> "1" CRegexHistoryTextEdit : passes
 CRegexHistoryComponent "1" --> "1" IDLTMessageAnalyzerController : passes
 CRegexHistoryComponent "1" --> "1" ISettingsManager : passes
-CRegexHistoryLineEdit "1" o-- "1" IRegexHistoryProvider : uses
+CRegexHistoryTextEdit "1" o-- "1" IRegexHistoryProvider : uses
+CRegexHistoryTextEdit "1" o-- "1" QCompleter : uses
 
 @enduml

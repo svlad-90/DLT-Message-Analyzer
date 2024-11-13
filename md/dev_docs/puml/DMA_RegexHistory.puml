@@ -45,7 +45,7 @@ class "CRegexHistoryComponent"
 {
 }
 
-class "CRegexHistoryLineEdit"
+class "CRegexHistoryTextEdit"
 {
 }
 
@@ -89,7 +89,7 @@ IRegexHistoryProvider <|-- CRegexHistoryProvider : implements
 '====================Dependencies section====================
 CRegexHistoryProvider "1" *-- "1" CExtendedCompleter : creates
 CRegexHistoryProvider "1" o-- "1" CPatternsView : uses
-CRegexHistoryProvider "1" o-- "1" CRegexHistoryLineEdit : uses
+CRegexHistoryProvider "1" o-- "1" CRegexHistoryTextEdit : uses
 CRegexHistoryProvider "1" o-- "1" IDLTMessageAnalyzerController : uses
 CRegexHistoryProvider "1" o-- "1" ISettingsManager : uses
 CRegexHistoryProvider "1" *-- "1" QListView : creates

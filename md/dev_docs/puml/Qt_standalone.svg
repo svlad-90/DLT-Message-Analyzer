@@ -38,7 +38,7 @@ link QProcess to QTextEdit--><!--MD5=[7febee8aaffd79ac4fc20e8874b5feff]
 link QTextEdit to QThread--><!--MD5=[1b9443128a859a2736361f25f0186995]
 link QThread to QTimer--><!--MD5=[c04b6f7b7b2bf8db395fbcbe30b92152]
 link QTimer to QTreeView--><!--MD5=[e3bb70f0883feece5d34584e26d084df]
-link QTreeView to QWidget--><!--MD5=[6b12dd4fc7e7a51345f534c04b294f66]
+link QTreeView to QWidget--><!--MD5=[47408c5d46a4ca23dbbfacdd545318f2]
 @startuml
 
 skinparam backgroundColor #FEFEFE
@@ -134,7 +134,7 @@ PlantUML version 1.2020.02(Sun Mar 01 12:22:07 EET 2020)
 (GPL source distribution)
 Java Runtime: OpenJDK Runtime Environment
 JVM: OpenJDK 64-Bit Server VM
-Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Java Version: 11.0.25+9-post-Ubuntu-1ubuntu122.04
 Operating System: Linux
 Default Encoding: UTF-8
 Language: en

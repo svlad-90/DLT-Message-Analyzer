@@ -574,9 +574,9 @@ QLabel* Form::getProgresBarLabel()
     return pResult;
 }
 
-CRegexHistoryLineEdit* Form::getRegexLineEdit()
+CRegexHistoryTextEdit* Form::getRegexTextEdit()
 {
-    CRegexHistoryLineEdit* pResult = nullptr;
+    CRegexHistoryTextEdit* pResult = nullptr;
 
     if(mpUI)
     {
@@ -1117,6 +1117,6 @@ PUML_PACKAGE_BEGIN(DMA_Plugin_API)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CSearchResultView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CUMLView, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CLogo, 1, 1, contains)
-        PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, contains)
+        PUML_COMPOSITION_DEPENDENCY_CHECKED(CRegexHistoryTextEdit, 1, 1, contains)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

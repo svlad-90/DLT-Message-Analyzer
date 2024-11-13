@@ -108,6 +108,7 @@ public:
     void setRegexCompletion_CaseSensitive(const bool& val) override;
     void setRegexCompletion_SearchPolicy(const bool& val) override;
     void setUserName(const QString& val) override;
+    void setRegexInputFieldHeight(const int& linesNumber) override;
 
     void setSelectedRegexFile(const QString& val) override;
 
@@ -174,6 +175,7 @@ public:
     const bool& getRegexCompletion_CaseSensitive() const override;
     const bool& getRegexCompletion_SearchPolicy() const override;
     const QString& getUsername() const override;
+    const int& getRegexInputFieldHeight() const override;
 
     // allowed ranges
     const TRangedSettingItem<int>::tOptionalAllowedRange& getSetting_NumberOfThreads_AllowedRange() const override;
@@ -516,6 +518,7 @@ private: // fields
     TSettingItem<tRegexUsageStatisticsItemMap> mSetting_RegexUsageStatistics;
 
     TSettingItem<QString> mSetting_Username;
+    TSettingItem<int> mSetting_RegexInputFieldHeight;
 
     typedef ISettingItem* tSettingItemPtr;
     typedef std::vector<tSettingItemPtr> tSettingItemsPtrVec;

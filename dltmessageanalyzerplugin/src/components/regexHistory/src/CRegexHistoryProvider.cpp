@@ -11,7 +11,7 @@
 
 #include "CRegexHistoryProvider.hpp"
 #include "components/settings/api/ISettingsManager.hpp"
-#include "components/regexHistory/api/CRegexHistoryLineEdit.hpp"
+#include "components/regexHistory/api/CRegexHistoryTextEdit.hpp"
 
 #include "components/log/api/CLog.hpp"
 
@@ -24,10 +24,10 @@ const static int sSuggestionTypeRole = 123;
 // CExtendedCompleter implementation
 
 CExtendedCompleter::CExtendedCompleter(QObject* parent,
-                                     CRegexHistoryLineEdit* pRegexLineEdit):
+                                     CRegexHistoryTextEdit* pRegexTextEdit):
 QCompleter(parent),
 mbStartProcessEventFilter(false),
-mpRegexLineEdit(pRegexLineEdit)
+mpRegexTextEdit(pRegexTextEdit)
 {}
 
 void CExtendedCompleter::initFinished()
@@ -54,9 +54,9 @@ bool CExtendedCompleter::eventFilter(QObject *o, QEvent *e)
             // Handle the key press, prevent further propagation
             if (popup()->isVisible())
             {
-                mpRegexLineEdit->setIgnoreReturnKeyEvent(true);
+                mpRegexTextEdit->setIgnoreReturnKeyEvent(true);
                 bool bResult = QCompleter::eventFilter(o, e);
-                mpRegexLineEdit->setIgnoreReturnKeyEvent(false);
+                mpRegexTextEdit->setIgnoreReturnKeyEvent(false);
                 return bResult;
             }
         }
@@ -175,23 +175,23 @@ static void deleteNonRelevantElements(ISettingsManager::tRegexUsageStatisticsIte
 }
 
 CRegexHistoryProvider::CRegexHistoryProvider(const tSettingsManagerPtr& pSettingsManager,
-                      CRegexHistoryLineEdit* pRegexLineEdit, CPatternsView* pPatternsView,
+                      CRegexHistoryTextEdit* pRegexTextEdit, CPatternsView* pPatternsView,
                       const tDLTMessageAnalyzerControllerPtr& pDLTMessageAnalyzerController):
 CSettingsManagerClient(pSettingsManager),
-mpRegexLineEdit(pRegexLineEdit),
+mpRegexTextEdit(pRegexTextEdit),
 mpPatternsView(pPatternsView),
 mpDLTMessageAnalyzerController(pDLTMessageAnalyzerController),
 mbSuggestionActive(false)
 {
-    if(nullptr != mpRegexLineEdit)
+    if(nullptr != mpRegexTextEdit)
     {
-        CExtendedCompleter* pCompleter = new CExtendedCompleter(this, mpRegexLineEdit);
+        CExtendedCompleter* pCompleter = new CExtendedCompleter(this, mpRegexTextEdit);
 
         QStandardItemModel* pModel = new QStandardItemModel(pCompleter);
         pCompleter->setModel(pModel);
         pCompleter->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
         mCompletionData.pCompleter = pCompleter;
-        auto* pExtendedListView = new QListView(mpRegexLineEdit);
+        auto* pExtendedListView = new QListView(mpRegexTextEdit);
 
         mCompletionData.pPopUp = pExtendedListView;
         mCompletionData.pPopUp->setIconSize(QSize(50, 50));
@@ -201,7 +201,7 @@ mbSuggestionActive(false)
         mCompletionData.pPopUp->setSelectionMode(QAbstractItemView::SingleSelection);
         mCompletionData.pCompleter->setPopup(mCompletionData.pPopUp);
 
-        mpRegexLineEdit->setCompleter(mCompletionData.pCompleter);
+        mpRegexTextEdit->setCompleter(mCompletionData.pCompleter);
 
         connect(pCompleter, &CExtendedCompleter::loseFocus,
                 this, [this]()
@@ -256,19 +256,19 @@ mbSuggestionActive(false)
 
             auto insertText = [this](const QString& text)
             {
-                auto* pCompleter = mpRegexLineEdit->completer();
+                auto* pCompleter = mpRegexTextEdit->completer();
 
                 if(nullptr != pCompleter)
                 {
                     clearSuggestions();
-                    mpRegexLineEdit->selectAll();
-                    mpRegexLineEdit->insert(text);
+                    mpRegexTextEdit->selectAll();
+                    mpRegexTextEdit->insertPlainText(text);
                 }
             };
 
             if(true == mCompletionData.bAppendMode)
             {
-                QString previousText = mpRegexLineEdit->text();
+                QString previousText = mpRegexTextEdit->toPlainText();
 
                 if(true == sFindLastPipeRegex.isValid())
                 {
@@ -396,7 +396,7 @@ int CRegexHistoryProvider::updateSuggestions(const QString& input)
     int result = 0;
 
     if(nullptr != mCompletionData.pCompleter
-       && nullptr != mpRegexLineEdit)
+       && nullptr != mpRegexTextEdit)
     {
         QStandardItemModel* pModel = static_cast<QStandardItemModel*>(mCompletionData.pCompleter->model());
         pModel->clear();
@@ -536,7 +536,7 @@ PUML_PACKAGE_BEGIN(DMA_RegexHistory)
     PUML_CLASS_BEGIN_CHECKED(CRegexHistoryProvider)
         PUML_INHERITANCE_CHECKED(IRegexHistoryProvider, implements)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
-        PUML_AGGREGATION_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, uses)
+        PUML_AGGREGATION_DEPENDENCY_CHECKED(CRegexHistoryTextEdit, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(CPatternsView, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, uses)

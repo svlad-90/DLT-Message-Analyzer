@@ -52,7 +52,7 @@
 
 #include "components/logsWrapper/api/IDLTLogsWrapperCreator.hpp"
 
-#include "components/regexHistory/api/CRegexHistoryLineEdit.hpp"
+#include "components/regexHistory/api/CRegexHistoryTextEdit.hpp"
 
 #include "DMA_Plantuml.hpp"
 
@@ -67,7 +67,7 @@ namespace NShortcuts
 //CDLTMessageAnalyzer
 CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                                          const tGroupedViewModelPtr& pGroupedViewModel,
-                                         QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryLineEdit* pRegexLineEdit,
+                                         QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryTextEdit* pRegexLineEdit,
                                          QLabel* pLabel, CPatternsView* pPatternsTableView,  const tPatternsModelPtr& pPatternsModel,
                                          QComboBox* pNumberOfThreadsCombobBox,
                                          QCheckBox* pContinuousSearchCheckBox,
@@ -88,7 +88,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
     // default widgets
     mpProgressBarLabel(pProgressBarLabel),
     mpProgressBar(pProgressBar),
-    mpRegexLineEdit(pRegexLineEdit),
+    mpRegexTextEdit(pRegexLineEdit),
     mpLabel(pLabel),
     mpNumberOfThreadsCombobBox(pNumberOfThreadsCombobBox),
     mpMainTableView(nullptr),
@@ -158,11 +158,11 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
     if(nullptr != mpFiltersModel)
     {
-        if(nullptr != mpRegexLineEdit)
+        if(nullptr != mpRegexTextEdit)
         {
-            connect( mpRegexLineEdit, &QLineEdit::textChanged, this, [this](const QString& regex)
+            connect( mpRegexTextEdit, &QTextEdit::textChanged, this, [this]()
             {
-                mpFiltersModel->setUsedRegex(regex);
+                mpFiltersModel->setUsedRegex(mpRegexTextEdit->toPlainText());
             });
         }
     }
@@ -190,8 +190,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
         connect ( mpPatternsTreeView, &CPatternsView::patternSelected, [this](const QString& regexCandidate, const QStringList& selectedAliases )
         {
-            mpRegexLineEdit->selectAll();
-            mpRegexLineEdit->insert( regexCandidate );
+            mpRegexTextEdit->selectAll();
+            mpRegexTextEdit->insertPlainText( regexCandidate );
             static_cast<void>(analyze(&selectedAliases));
 
             if(nullptr != mpFiltersSearchInput)
@@ -202,8 +202,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
         connect ( mpFiltersModel.get(), &IFiltersModel::regexUpdatedByUser, this, [this](const QString& regex)
         {
-            mpRegexLineEdit->selectAll();
-            mpRegexLineEdit->insert( regex );
+            mpRegexTextEdit->selectAll();
+            mpRegexTextEdit->insertPlainText( regex );
             static_cast<void>(analyze());
         });
 
@@ -211,8 +211,8 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         {
             connect ( mpCoverageNoteProvider.get(), &ICoverageNoteProvider::regexApplicationRequested, this, [this](const QString& regex)
             {
-                mpRegexLineEdit->selectAll();
-                mpRegexLineEdit->insert( regex );
+                mpRegexTextEdit->selectAll();
+                mpRegexTextEdit->insertPlainText( regex );
                 static_cast<void>(analyze());
             });
         }
@@ -261,16 +261,16 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         });
     }
 
-    if(nullptr != mpRegexLineEdit)
+    if(nullptr != mpRegexTextEdit)
     {
         auto showContextMenu = [this](const QPoint &pos)
         {
-            QMenu* pContextMenu = mpRegexLineEdit->createStandardContextMenu();
+            QMenu* pContextMenu = mpRegexTextEdit->createStandardContextMenu();
 
             pContextMenu->addSeparator();
 
             {
-                QAction* pAction = new QAction("Case sensitive search", mpRegexLineEdit);
+                QAction* pAction = new QAction("Case sensitive search", mpRegexTextEdit);
                 connect(pAction, &QAction::triggered, this, [this](bool checked)
                 {
                     getSettingsManager()->setCaseSensitiveRegex(checked);
@@ -283,7 +283,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             pContextMenu->addSeparator();
 
             {
-                QAction* pAction = new QAction("Save ...", mpRegexLineEdit);
+                QAction* pAction = new QAction("Save ...", mpRegexTextEdit);
                 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 pAction->setShortcut(Qt::CTRL + Qt::Key_S);
                 #else
@@ -291,7 +291,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 #endif
                 connect(pAction, &QAction::triggered, this, [this]()
                 {
-                    addPattern( mpRegexLineEdit->text() );
+                    addPattern( mpRegexTextEdit->toPlainText() );
                 });
 
                 pContextMenu->addAction(pAction);
@@ -301,45 +301,45 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
 
             auto wrapSelectedText = [this](const QString& addBefore, const QString& addAfter)
             {
-                if (mpRegexLineEdit)
+                if (mpRegexTextEdit)
                 {
                     // Get the selection range
-                    int start = mpRegexLineEdit->selectionStart();
-                    int length = mpRegexLineEdit->selectedText().length();
+                    int start = mpRegexTextEdit->textCursor().selectionStart();
+                    int length = mpRegexTextEdit->textCursor().selectedText().length();
 
                     if (start >= 0 && length > 0)
                     {
                         // If there is a selection, wrap the selected text
-                        QString selectedText = mpRegexLineEdit->selectedText();
+                        QString selectedText = mpRegexTextEdit->textCursor().selectedText();
                         QString wrappedText = addBefore + selectedText + addAfter;
 
-                        // Replace the selected text directly in mpRegexLineEdit
-                        mpRegexLineEdit->setSelection(start, length);
-                        mpRegexLineEdit->insert(wrappedText);
+                        // Replace the selected text directly in mpRegexTextEdit
+                        mpRegexTextEdit->setSelection(start, length);
+                        mpRegexTextEdit->insertPlainText(wrappedText);
 
                         // Keep the selection that was originally selected
-                        mpRegexLineEdit->setSelection(start, wrappedText.length());
+                        mpRegexTextEdit->setSelection(start, wrappedText.length());
                     }
                     else
                     {
                         // If there is no selection, insert addBefore and addAfter at the cursor position
-                        int cursorPos = mpRegexLineEdit->cursorPosition();
-                        mpRegexLineEdit->insert(addBefore + addAfter);
+                        int cursorPos = mpRegexTextEdit->textCursor().position();
+                        mpRegexTextEdit->insertPlainText(addBefore + addAfter);
 
                         // Set the new cursor position between addBefore and addAfter
-                        mpRegexLineEdit->setCursorPosition(cursorPos + addBefore.length());
+                        mpRegexTextEdit->textCursor().setPosition(cursorPos + addBefore.length());
                     }
                 }
             };
 
             {
-                QMenu* pSubMenu = new QMenu("Regex group name glossary", mpRegexLineEdit);
+                QMenu* pSubMenu = new QMenu("Regex group name glossary", mpRegexTextEdit);
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Highlighting", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Highlighting", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Color", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Color", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(", ")");
@@ -348,7 +348,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("RGB color", mpRegexLineEdit);
+                        QAction* pAction = new QAction("RGB color", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<RGB_[RED]_[GREEN]_[BLUE]>", ")");
@@ -357,7 +357,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("'Ok' status", mpRegexLineEdit);
+                        QAction* pAction = new QAction("'Ok' status", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<OK>", ")");
@@ -366,7 +366,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("'Warning' status", mpRegexLineEdit);
+                        QAction* pAction = new QAction("'Warning' status", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<WARNING>", ")");
@@ -375,7 +375,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("'Error' status", mpRegexLineEdit);
+                        QAction* pAction = new QAction("'Error' status", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<ERROR>", ")");
@@ -387,10 +387,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Grouped view", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Grouped view", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Grouped view level", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Grouped view level", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<GV>", ")");
@@ -399,7 +399,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Ordered grouped view level", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Ordered grouped view level", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<GV_[INDEX]>", ")");
@@ -411,10 +411,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Sequence diagram", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Sequence diagram", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Client name ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Client name ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<UCL>", ")");
@@ -423,7 +423,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Service name ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Service name ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<US>", ")");
@@ -432,7 +432,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Request ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Request ( at least one of interaction types is mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<URT>", ")");
@@ -441,7 +441,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Response ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Response ( at least one of interaction types is mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<URS>", ")");
@@ -450,7 +450,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Event ( at least one of interaction types is mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Event ( at least one of interaction types is mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<UEV>", ")");
@@ -459,7 +459,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Method ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Method ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<UM>", ")");
@@ -468,7 +468,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Arguments ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Arguments ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<UA>", ")");
@@ -477,7 +477,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Sequence id ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Sequence id ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<USID>", ")");
@@ -486,7 +486,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Timestamp ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Timestamp ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<UTS>", ")");
@@ -498,10 +498,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Plot", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Plot", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGN_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_PLOT_GRAPH_NAME_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
@@ -510,7 +510,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot Y-axis data ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot Y-axis data ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
@@ -519,7 +519,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
@@ -528,7 +528,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGMD_[AXIS_RECT_NAME]_[GRAPH_ID]_[METADATA_KEY_STRING]_"
@@ -538,7 +538,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Axis rect type ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Axis rect type ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PARType_[AXIS_RECT_NAME]_[AXIS_RECT_TYPE_LINEAR_OR_POINT]>", ")");
@@ -547,7 +547,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PARL_[AXIS_RECT_NAME]_[AXIS_RECT_LABEL]>", ")");
@@ -556,7 +556,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[NAME]>", ")");
@@ -565,7 +565,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[NAME]>", ")");
@@ -574,7 +574,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[UNIT]>", ")");
@@ -583,7 +583,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[UNIT]>", ")");
@@ -592,7 +592,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
@@ -601,7 +601,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
@@ -610,7 +610,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -619,7 +619,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -628,7 +628,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -637,7 +637,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -649,10 +649,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Gantt chart", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Gantt chart", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Axis rect type ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Axis rect type ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PARType_[AXIS_RECT_NAME]_GANTT>", ")");
@@ -661,7 +661,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot graph name ( mandatory )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGN_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_PLOT_GRAPH_NAME_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
@@ -670,7 +670,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Gantt chart event ( mandatory for Gantt charts )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Gantt chart event ( mandatory for Gantt charts )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGE_[AXIS_RECT_NAME]_[GRAPH_ID]_[EVENT_TYPE_start_OR_end]>", ")");
@@ -679,7 +679,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Gantt chart event row identifier ( optional for Gantt charts )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Gantt chart event row identifier ( optional for Gantt charts )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGEID_[AXIS_RECT_NAME]_[GRAPH_ID]>", ")");
@@ -688,7 +688,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot X-axis data ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXData_[AXIS_RECT_NAME]_[GRAPH_ID]_[OPTIONAL_VALUE_IF_IT_SHOULD_NOT_BE_GRABBED_FROM_THE_CAPTURED_CONTENT]>", ")");
@@ -697,7 +697,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot graph metadata ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PGMD_[AXIS_RECT_NAME]_[GRAPH_ID]_[METADATA_KEY_STRING]_"
@@ -707,7 +707,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Axis rect. label ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PARL_[AXIS_RECT_NAME]_[AXIS_RECT_LABEL]>", ")");
@@ -716,7 +716,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis name ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[NAME]>", ")");
@@ -725,7 +725,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis name ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[NAME]>", ")");
@@ -734,7 +734,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis unit ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXN_[AXIS_RECT_NAME]_[UNIT]>", ")");
@@ -743,7 +743,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis unit ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYN_[AXIS_RECT_NAME]_[UNIT]>", ")");
@@ -752,7 +752,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot X-axis time format ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
@@ -761,7 +761,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Plot Y-axis time format ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYT_[TIME_FORMAT_FOR_EXAMPLE_4y2Mw2dw2Hw2mw2sw3f]>", ")");
@@ -770,7 +770,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis data max ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -779,7 +779,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("X-axis data min ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PXMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -788,7 +788,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis data max ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYMx_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -797,7 +797,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Y-axis data min ( optional )", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<PYMn_[AXIS_RECT_NAME]_[INTEGER_PART_VALUE]_[REAL_PART_VALUE]_[OPTIONAL_neg]>", ")");
@@ -809,10 +809,10 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Variables", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Variables", mpRegexTextEdit);
 
                     {
-                        QAction* pAction = new QAction("Variable", mpRegexLineEdit);
+                        QAction* pAction = new QAction("Variable", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [wrapSelectedText](bool)
                         {
                             wrapSelectedText("(?<VAR_[VARIABLE_NAME]>", ")");
@@ -829,7 +829,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
             pContextMenu->addSeparator();
 
             {
-                QAction* pAction = new QAction("Activate regex history", mpRegexLineEdit);
+                QAction* pAction = new QAction("Activate regex history", mpRegexTextEdit);
                 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 pAction->setShortcut(Qt::CTRL + Qt::Key_Space);
                 #else
@@ -837,17 +837,17 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 #endif
                 connect(pAction, &QAction::triggered, this, [this]()
                 {
-                    mpRegexLineEdit->activateRegexHistory();
+                    mpRegexTextEdit->activateRegexHistory();
                 });
 
                 pContextMenu->addAction(pAction);
             }
 
             {
-                QMenu* pSubMenu = new QMenu("Completion settings", mpRegexLineEdit);
+                QMenu* pSubMenu = new QMenu("Completion settings", mpRegexTextEdit);
 
                 {
-                    QAction* pAction = new QAction("Case sensitive", mpRegexLineEdit);
+                    QAction* pAction = new QAction("Case sensitive", mpRegexTextEdit);
                     connect(pAction, &QAction::triggered, this, [this](bool checked)
                     {
                         getSettingsManager()->setRegexCompletion_CaseSensitive(checked);
@@ -858,13 +858,13 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 }
 
                 {
-                    QMenu* pSubSubMenu = new QMenu("Search policy", mpRegexLineEdit);
+                    QMenu* pSubSubMenu = new QMenu("Search policy", mpRegexTextEdit);
 
-                    QActionGroup* pActionGroup = new QActionGroup(mpRegexLineEdit);
+                    QActionGroup* pActionGroup = new QActionGroup(mpRegexTextEdit);
                     pActionGroup->setExclusive(true);
 
                     {
-                        QAction* pAction = new QAction("\"Starts with\"", mpRegexLineEdit);
+                        QAction* pAction = new QAction("\"Starts with\"", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [this]()
                         {
                             getSettingsManager()->setRegexCompletion_SearchPolicy(false);
@@ -877,7 +877,7 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                     }
 
                     {
-                        QAction* pAction = new QAction("\"Contains\"", mpRegexLineEdit);
+                        QAction* pAction = new QAction("\"Contains\"", mpRegexTextEdit);
                         connect(pAction, &QAction::triggered, this, [this]()
                         {
                             getSettingsManager()->setRegexCompletion_SearchPolicy(true);
@@ -895,10 +895,67 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
                 pContextMenu->addMenu(pSubMenu);
             }
 
-            pContextMenu->exec(mpRegexLineEdit->mapToGlobal(pos));
+            pContextMenu->addSeparator();
+
+            {
+                QAction* pAction = new QAction("Set regex text edit max height ...", mpRegexTextEdit);
+                connect(pAction, &QAction::triggered, this, [this](bool)
+                {
+                    QDialog dialog(mpRegexTextEdit);
+                    QFormLayout form(&dialog);
+
+                    form.addRow(new QLabel("Set regex text edit max height ( number of lines from 1 to 10 ):"));
+                    QList<QLineEdit *> fields;
+
+                    QLineEdit* pLineEdit = new QLineEdit(&dialog);
+
+                    {
+                        pLineEdit->setText( QString::number( getSettingsManager()->getRegexInputFieldHeight() ) );
+                        QString label("Regex text edit max height:");
+                        form.addRow(label, pLineEdit);
+                        fields << pLineEdit;
+                    }
+
+                    dialog.resize(400, dialog.height());
+
+                    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                               Qt::Horizontal, &dialog);
+                    form.addRow(&buttonBox);
+
+                    auto accept_handler = [this, &pLineEdit, &dialog]()
+                    {
+                        if(pLineEdit)
+                        {
+                            bool ok = false;
+                            auto maxHeight = pLineEdit->text().toInt(&ok);
+
+                            if(ok && ( maxHeight > 0 && maxHeight <= 10) )
+                            {
+                                getSettingsManager()->setRegexInputFieldHeight(maxHeight);
+                                dialog.accept();
+                            }
+                        }
+                    };
+
+                    auto reject_handler = [&dialog]()
+                    {
+                        dialog.reject();
+                    };
+
+                    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, accept_handler);
+                    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, reject_handler);
+
+                    // Show the dialog as modal
+                    dialog.exec();
+                });
+
+                pContextMenu->addAction(pAction);
+            }
+
+            pContextMenu->exec(mpRegexTextEdit->mapToGlobal(pos));
         };
 
-        connect( mpRegexLineEdit, &QWidget::customContextMenuRequested, this, showContextMenu );
+        connect( mpRegexTextEdit, &QWidget::customContextMenuRequested, this, showContextMenu );
     }
 
     if(nullptr != mpNumberOfThreadsCombobBox &&
@@ -1132,9 +1189,9 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
         createSequenceDiagram();
     });
 
-    if(nullptr != mpRegexLineEdit)
+    if(nullptr != mpRegexTextEdit)
     {
-        mpRegexLineEdit->installEventFilter(this);
+        mpRegexTextEdit->installEventFilter(this);
     }
 
     handleLoadedConfig();
@@ -1164,13 +1221,13 @@ bool CDLTMessageAnalyzer::eventFilter(QObject* pObj, QEvent* pEvent)
     if (pEvent->type() == QEvent::ShortcutOverride )
     {
         QKeyEvent *pKeyEvent = static_cast<QKeyEvent *>(pEvent);
-        if(nullptr != mpRegexLineEdit
-           && pObj == mpRegexLineEdit
-           && true == mpRegexLineEdit->hasFocus() )
+        if(nullptr != mpRegexTextEdit
+           && pObj == mpRegexTextEdit
+           && true == mpRegexTextEdit->hasFocus() )
         {
             if( true == NShortcuts::isSaveRegexPatternShortcut( pKeyEvent ) )
             {
-                addPattern( mpRegexLineEdit->text() );
+                addPattern( mpRegexTextEdit->toPlainText() );
                 pEvent->accept();
                 bResult = true;
             }
@@ -1323,6 +1380,57 @@ std::shared_ptr<QRegularExpression> CDLTMessageAnalyzer::createRegex( const QStr
                 pRegexLineEdit->setFocus();
                 auto errorColumn = getRegexErrorColumn(*pResult);
                 pRegexLineEdit->setSelection(errorColumn, 1);
+            }
+
+            if(nullptr != pErrorAnimationWidget)
+            {
+                animateError(pErrorAnimationWidget);
+            }
+        }
+    }
+
+    return pResult;
+}
+
+std::shared_ptr<QRegularExpression> CDLTMessageAnalyzer::createRegex( const QString& regex,
+                                                                      const QString& onSuccessMessages,
+                                                                      const QString& onFailureMessages,
+                                                                      bool appendRegexError,
+                                                                      CRegexHistoryTextEdit* pRegexTextEdit,
+                                                                      QWidget* pErrorAnimationWidget
+                                                                      )
+{
+    QString regex_ = addRegexOptions( regex );
+
+    auto caseSensitiveOption = getSettingsManager()->getCaseSensitiveRegex() ?
+                QRegularExpression::NoPatternOption:
+                QRegularExpression::CaseInsensitiveOption;
+
+    std::shared_ptr<QRegularExpression> pResult = std::make_shared<QRegularExpression>(regex_, caseSensitiveOption);
+
+    if(0 != regex_.size())
+    {
+        if(true == pResult->isValid())
+        {
+            updateStatusLabel( onSuccessMessages, false );
+            mpGroupedViewModel->setUsedRegex(regex_);
+        }
+        else
+        {
+            QString error(onFailureMessages);
+
+            if(true == appendRegexError)
+            {
+                error.append(getFormattedRegexError(*pResult));
+            }
+
+            updateStatusLabel( error, true );
+
+            if( nullptr != pRegexTextEdit)
+            {
+                pRegexTextEdit->setFocus();
+                auto errorColumn = getRegexErrorColumn(*pResult);
+                pRegexTextEdit->setSelection(errorColumn, 1);
             }
 
             if(nullptr != pErrorAnimationWidget)
@@ -1518,9 +1626,9 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
 
     QString regex;
 
-    if( nullptr != mpRegexLineEdit )
+    if( nullptr != mpRegexTextEdit )
     {
-        regex = mpRegexLineEdit->text();
+        regex = mpRegexTextEdit->toPlainText();
     }
 
     if(nullptr != mpSearchResultView)
@@ -1530,7 +1638,7 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
 
     if(0 != regex.size())
     {
-        auto pRegex = createRegex( regex, sDefaultStatusText, "Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
+        auto pRegex = createRegex( regex, sDefaultStatusText, "Regex error: ", true, mpRegexTextEdit, mpRegexTextEdit );
 
         if(nullptr == pRegex || false == pRegex->isValid())
         {
@@ -1686,7 +1794,7 @@ void CDLTMessageAnalyzer::animateError( QWidget* pAnimationWidget )
         return;
     }
 
-    if(nullptr != mpRegexLineEdit)
+    if(nullptr != mpRegexTextEdit)
     {
         CBGColorAnimation* pAnimationProxy = new CBGColorAnimation(pAnimationWidget, QPalette::Base);
 
@@ -1962,7 +2070,7 @@ void CDLTMessageAnalyzer::addPattern(const QString& pattern)
 
     bool ok;
 
-    auto pRegex = createRegex( pattern, sDefaultStatusText, "Pattern not saved. Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
+    auto pRegex = createRegex( pattern, sDefaultStatusText, "Pattern not saved. Regex error: ", true, mpRegexTextEdit, mpRegexTextEdit );
 
     if(true == pRegex->isValid())
     {
@@ -2216,7 +2324,7 @@ void CDLTMessageAnalyzer::overwritePattern()
 {
     if( nullptr == mpPatternsModel ||
             nullptr == mpPatternsTreeView ||
-            nullptr == mpRegexLineEdit )
+            nullptr == mpRegexTextEdit )
     {
         return;
     }
@@ -2228,8 +2336,8 @@ void CDLTMessageAnalyzer::overwritePattern()
         const auto& selectedRow = selectedRows[0];
 
         QString alias = selectedRow.data().value<QString>();
-        QString regex = mpRegexLineEdit->text();
-        auto pParsedRegex = createRegex( regex, sDefaultStatusText, "Pattern not updated. Regex error: ", true, mpRegexLineEdit, mpRegexLineEdit );
+        QString regex = mpRegexTextEdit->toPlainText();
+        auto pParsedRegex = createRegex( regex, sDefaultStatusText, "Pattern not updated. Regex error: ", true, mpRegexTextEdit, mpRegexTextEdit );
 
         if(nullptr != pParsedRegex && true == pParsedRegex->isValid())
         {
@@ -2513,6 +2621,6 @@ PUML_PACKAGE_BEGIN(DMA_Plugin_API)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ISettingsManager, 1, 1, gets and uses)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(ICoverageNoteProvider, 1, 1, uses)
         PUML_USE_DEPENDENCY_CHECKED(IDLTMessageAnalyzerController, 1, 1, gets and feeds to IDLTMessageAnalyzerControllerConsumer)
-        PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryLineEdit, 1, 1, uses and passes)
+        PUML_USE_DEPENDENCY_CHECKED(CRegexHistoryTextEdit, 1, 1, uses and passes)
     PUML_CLASS_END()
 PUML_PACKAGE_END()

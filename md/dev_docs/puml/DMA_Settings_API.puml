@@ -173,6 +173,10 @@ class "CRegexHistoryComponent"
 {
 }
 
+class "CRegexHistoryTextEdit"
+{
+}
+
 }
 
 package "DMA_SearchView" #DDDDDD
@@ -252,6 +256,7 @@ CSettingsManagerClient <|-- CPlotViewComponent : extends
 CSettingsManagerClient <|-- CDLTMessageAnalyzer : extends
 CSettingsManagerClient <|-- Form : extends
 CSettingsManagerClient <|-- CRegexHistoryProvider : extends
+CSettingsManagerClient <|-- CRegexHistoryTextEdit : extends
 CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
 CSettingsManagerClient <|-- CSearchResultModel : extends
 CSettingsManagerClient <|-- CSearchViewComponent : extends

@@ -358,7 +358,7 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     {
         auto pRegexHistoryComponent = std::make_shared<CRegexHistoryComponent>(mpSettingsComponent->getSettingsManager(),
-                                                                               mpForm->getRegexLineEdit(),
+                                                                               mpForm->getRegexTextEdit(),
                                                                                mpPatternsViewComponent->getPatternsView(),
                                                                                mpAnalyzerComponent->getAnalyzerController());
         mpRegexHistoryComponent = pRegexHistoryComponent;
@@ -448,14 +448,14 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
 
     if(nullptr != mpForm->getFiltersView())
     {
-        mpForm->getFiltersView()->setRegexInputField(mpForm->getRegexLineEdit());
+        mpForm->getFiltersView()->setRegexInputField(mpForm->getRegexTextEdit());
     }
 
     mpDLTMessageAnalyzer = IDLTMessageAnalyzerControllerConsumer::createInstance<CDLTMessageAnalyzer>(pAnalyzerController,
                                                                                                       mpGroupedViewComponent->getGroupedViewModel(),
                                                                                                       mpForm->getProgresBarLabel(),
                                                                                                       mpForm->getProgresBar(),
-                                                                                                      mpForm->getRegexLineEdit(),
+                                                                                                      mpForm->getRegexTextEdit(),
                                                                                                       mpForm->getErrorLabel(),
                                                                                                       mpPatternsViewComponent->getPatternsView(),
                                                                                                       mpPatternsViewComponent->getPatternsModel(),
@@ -477,14 +477,14 @@ QWidget* DLTMessageAnalyzerPlugin::initViewer()
                                                                                                       mpPlotViewComponent->getPlot(),
                                                                                                       mpCoverageNoteComponent->getCoverageNoteProviderPtr());
 
-    connect(mpForm->getRegexLineEdit(), &QLineEdit::returnPressed,
+    connect(mpForm->getRegexTextEdit(), &CRegexHistoryTextEdit::returnPressed,
             this, [this]()
     {
         if(nullptr != mpDLTMessageAnalyzer)
         {
             if(nullptr != mpForm)
             {
-                auto pRegexLineEdit = mpForm->getRegexLineEdit();
+                auto pRegexLineEdit = mpForm->getRegexTextEdit();
                 if(nullptr != pRegexLineEdit && false == pRegexLineEdit->getIgnoreReturnKeyEvent() )
                 {
                     mpDLTMessageAnalyzer->analyze();
@@ -801,7 +801,7 @@ void DLTMessageAnalyzerPlugin::analyze()
 {
     if( mpDLTMessageAnalyzer && mpForm )
     {
-        if( false == mpForm->getRegexLineEdit()->text().isEmpty() ) // if search string is non-empty
+        if( false == mpForm->getRegexTextEdit()->toPlainText().isEmpty() ) // if search string is non-empty
         {
             bool bRunning = mpDLTMessageAnalyzer->analyze();
 

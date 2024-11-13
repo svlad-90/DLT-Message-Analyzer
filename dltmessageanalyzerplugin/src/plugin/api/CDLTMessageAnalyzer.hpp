@@ -45,7 +45,7 @@ class CSearchResultView;
 class ISearchResultModel;
 class CTableMemoryJumper;
 class CCustomPlotExtended;
-class CRegexHistoryLineEdit;
+class CRegexHistoryTextEdit;
 
 /**
  * @brief The CDLTMessageAnalyzer class - used as a main controller of the plugin.
@@ -60,7 +60,7 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
 
         CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzerController>& pController,
                             const tGroupedViewModelPtr& pGroupedViewModel,
-                            QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryLineEdit* pRegexLineEdit,
+                            QLabel* pProgressBarLabel, QProgressBar* pProgressBar, CRegexHistoryTextEdit* pRegexLineEdit,
                             QLabel* pLabel, CPatternsView* pPatternsTableView, const tPatternsModelPtr& pPatternsModel,
                             QComboBox* pNumberOfThreadsCombobBox,
                             QCheckBox* pContinuousSearchCheckBox,
@@ -250,6 +250,13 @@ signals:
                                                          QLineEdit* pRegexLineEdit,
                                                          QWidget* pErrorAnimationWidget = nullptr);
 
+        std::shared_ptr<QRegularExpression> createRegex( const QString& regex,
+                                                         const QString& onSuccessMessages,
+                                                         const QString& onFailureMessages,
+                                                         bool appendRegexError,
+                                                         CRegexHistoryTextEdit* pRegexTextEdit,
+                                                         QWidget* pErrorAnimationWidget = nullptr);
+
         void updateStatusLabel( const QString& text, bool isError = false );
         void processOverwritePattern(const QString& alias, const QString checkedRegex, const QModelIndex editItem = QModelIndex());
 
@@ -273,7 +280,7 @@ signals:
         // default widgets
         QLabel* mpProgressBarLabel;
         QProgressBar* mpProgressBar;
-        CRegexHistoryLineEdit* mpRegexLineEdit;
+        CRegexHistoryTextEdit* mpRegexTextEdit;
         QLabel* mpLabel;
         QComboBox* mpNumberOfThreadsCombobBox;
         QTableView* mpMainTableView;

@@ -12,14 +12,14 @@
 #include "components/patternsView/api/CPatternsView.hpp"
 #include "components/analyzer/api/IDLTMessageAnalyzerController.hpp"
 
-class CRegexHistoryLineEdit;
+class CRegexHistoryTextEdit;
 
 class CExtendedCompleter : public QCompleter
 {
     Q_OBJECT
 public:
     CExtendedCompleter(QObject *parent,
-                      CRegexHistoryLineEdit* pRegexLineEdit);
+                      CRegexHistoryTextEdit* pRegexTextEdit);
     void initFinished();
 
 signals:
@@ -30,7 +30,7 @@ protected:
 
 private:
     bool mbStartProcessEventFilter;
-    CRegexHistoryLineEdit* mpRegexLineEdit;
+    CRegexHistoryTextEdit* mpRegexTextEdit;
 };
 
 class CRegexHistoryProvider : public IRegexHistoryProvider,
@@ -47,7 +47,7 @@ public:
      * @param pLineEdit - instance of the taraget line edit
      */
     CRegexHistoryProvider(const tSettingsManagerPtr& pSettingsManager,
-                          CRegexHistoryLineEdit* pRegexLineEdit, CPatternsView* pPatternsView,
+                          CRegexHistoryTextEdit* pRegexTextEdit, CPatternsView* pPatternsView,
                           const tDLTMessageAnalyzerControllerPtr& pDLTMessageAnalyzerController);
 
     ~CRegexHistoryProvider();
@@ -98,7 +98,7 @@ private:
 
     tCompletionData mCompletionData;
 
-    CRegexHistoryLineEdit* mpRegexLineEdit;
+    CRegexHistoryTextEdit* mpRegexTextEdit;
     CPatternsView* mpPatternsView;
     tDLTMessageAnalyzerControllerPtr mpDLTMessageAnalyzerController;
     bool mbSuggestionActive;
