@@ -494,7 +494,7 @@ void CGroupedViewModel::addMatches( const tGroupedViewIndices& groupedViewIndice
                 {
                     CTreeItem::tData data;
                     data.reserve(9);
-                    data.push_back( tQStringPtrWrapper(match.pMatchStr) ); /*SubString*/
+                    data.push_back(match.matchStr); /*SubString*/
                     data.push_back(tDataItem(1)); /*Messages*/
                     data.push_back(tDataItem(0)); /*MessagesPercantage*/
                     data.push_back(tDataItem(0)); /*MessagesPerSecond*/

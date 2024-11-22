@@ -155,17 +155,8 @@ struct tRange
     tRangeItem to;
 };
 
-typedef tRange<int> tIntRange;
+typedef tRange<int32_t> tIntRange;
 Q_DECLARE_METATYPE(tIntRange)
-
-struct tIntRangePtrWrapper
-{
-    bool operator== ( const tIntRangePtrWrapper& rVal ) const;
-    bool operator< ( const tIntRangePtrWrapper& rVal ) const;
-    const tIntRange* pRange = nullptr;
-};
-
-Q_DECLARE_METATYPE(tIntRangePtrWrapper)
 
 typedef QVector<tIntRange> tIntRangeList;
 typedef std::set<tIntRange> tIntRangeSet;
@@ -340,7 +331,7 @@ typedef QMap<eSearchResultColumn, tIntRange> tFieldRanges;
 struct tFoundMatch
 {
     tFoundMatch();
-    tFoundMatch( const tQStringPtr& pMatchStr_,
+    tFoundMatch( const QString& matchStr_,
                  const tIntRange& range_,
                  const int& idx_ );
 
@@ -352,7 +343,7 @@ struct tFoundMatch
      */
     bool operator< (const tFoundMatch& rhs) const;
 
-    tQStringPtr pMatchStr;
+    QString matchStr;
     tIntRange range;
     int idx;
 };
@@ -377,10 +368,9 @@ typedef nonstd::variant<QString,
                         int,
                         double,
                         tGroupedViewMetadata,
-                        tIntRangePtrWrapper,
+                        tIntRange,
                         const tFoundMatch*,
                         tColorWrapper,
-                        tIntRange,
                         eRegexFiltersRowType> tTreeDataItem;
 typedef tTreeDataItem tDataItem; // just to refactor less code
 QVariant toQVariant(const tDataItem& item);
@@ -828,5 +818,51 @@ enum class eTabIndexes
      */
     CONSOLE_VIEW = 6
 };
+
+/**
+ * @brief Releases unused memory back to the operating system.
+ *
+ * This function ensures that unused memory managed by the allocator is returned
+ * to the operating system to free up resources. It supports different memory
+ * management systems:
+ *
+ * - If `DMA_TC_MALLOC_OPTIMIZATION_ENABLED` is defined, it uses TCMalloc's
+ *   `ReleaseFreeMemory` method to release unused memory.
+ * - If `DMA_GLIBC_MALLOC_OPTIMIZATION_ENABLED` is defined, it uses glibc's
+ *   `malloc_trim(0)` function to achieve the same effect.
+ *
+ * Use this function after memory-intensive operations to optimize memory usage.
+ */
+void releaseMemoryToOS();
+
+#ifdef DMA_TC_MALLOC_PROFILING_ENABLED
+/**
+ * @brief Dumps detailed memory allocation statistics.
+ *
+ * This function retrieves and outputs memory usage statistics when TCMalloc
+ * profiling is enabled (`DMA_TC_MALLOC_PROFILING_ENABLED`). The statistics
+ * provide insights into memory allocation patterns, freelist usage, and
+ * overall memory consumption managed by TCMalloc.
+ *
+ * The output includes a formatted summary of TCMalloc's memory state,
+ * surrounded by clearly marked start and end tags for easier parsing or
+ * debugging.
+ *
+ * **Example Output:**
+ * ```
+ * ----------------------------------------------------|
+ * ---------------TC_MALLOC_OUTPUT_START---------------|
+ * ----------------------------------------------------|
+ * MALLOC: <details>
+ * ----------------------------------------------------|
+ * ----------------TC_MALLOC_OUTPUT_END----------------|
+ * ----------------------------------------------------|
+ * ```
+ *
+ * This method is useful for debugging and profiling memory usage in
+ * applications relying on TCMalloc.
+ */
+void dumpMemoryStatistics();
+#endif
 
 #endif // DEFINITIONS_HPP

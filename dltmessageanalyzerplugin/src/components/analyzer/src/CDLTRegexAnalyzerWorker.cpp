@@ -128,7 +128,7 @@ void CDLTRegexAnalyzerWorker::analyzePortion(  const tAnalyzePortionData& analyz
                         if(0 != match.capturedLength(i))
                         {
                             const auto& matchItem = match.captured(i);
-                            foundMatches.foundMatchesVec.push_back( tFoundMatch( std::make_shared<QString>(matchItem),
+                            foundMatches.foundMatchesVec.emplace_back( tFoundMatch( matchItem,
                                                                  tIntRange( match.capturedStart(i), match.capturedEnd(i) - 1 ),
                                                                  i)  );
                         }

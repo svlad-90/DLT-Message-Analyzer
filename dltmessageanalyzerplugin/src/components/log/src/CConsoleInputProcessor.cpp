@@ -675,6 +675,11 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
     "[-tf=<target file> // mandatory! Target file, into which we should save the content]"
     "[-v=<version> // optional! Version of the dlt protocol. Supported values are 'v1' and 'v2'. Default value is 'v2']");
 
+#ifdef DMA_TC_MALLOC_PROFILING_ENABLED
+    result["dump-memory-stats"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){dumpMemoryStatistics();}
+                              , "- prints tcmalloc memory stats");
+#endif
+
     return result;
 }
 
@@ -718,13 +723,13 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
                     }
                     else
                     {
-                        if(mCurrentHistoryItem < static_cast<int>(mHistory.size() - 1))
+                        if(mCurrentHistoryItem > 0)
                         {
                             QString text = mpTargetLineEdit->text();
 
                             if(false == text.isEmpty())
                             {
-                                ++mCurrentHistoryItem;
+                                --mCurrentHistoryItem;
                             }
 
                             mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
@@ -754,13 +759,13 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
                     }
                     else
                     {
-                        if(mCurrentHistoryItem > 0)
+                        if(mCurrentHistoryItem < static_cast<int>(mHistory.size() - 1))
                         {
                             QString text = mpTargetLineEdit->text();
 
                             if(false == text.isEmpty())
                             {
-                                --mCurrentHistoryItem;
+                                ++mCurrentHistoryItem;
                             }
 
                             mpTargetLineEdit->setText(mHistory[static_cast<std::size_t>(mCurrentHistoryItem)]);
@@ -844,7 +849,7 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                     if(foundHistoryItem == mHistory.end())
                     {
-                        mHistory.push_front(text);
+                        mHistory.push_back(text);
 
                         if(mHistory.size() == 1)
                         {
@@ -855,7 +860,7 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
                             mbBorderReached = eHistoryBorderStatus::Not_Near_Border;
                         }
 
-                        if(mCurrentHistoryItem > sMaxCommandsHistorySize)
+                        if(mHistory.size() > sMaxCommandsHistorySize)
                         {
                             mHistory.resize(sMaxCommandsHistorySize);
                         }
@@ -863,11 +868,12 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
                     else
                     {
                         mHistory.erase(foundHistoryItem);
-                        mHistory.push_front(text);
+                        mHistory.push_back(text);
                     }
                 }
 
-                mCurrentHistoryItem = 0;
+                mCurrentHistoryItem = mHistory.size() - 1;
+                mbBorderReached = eHistoryBorderStatus::Reached_Last;
 
                 mpTargetLineEdit->clear();
 

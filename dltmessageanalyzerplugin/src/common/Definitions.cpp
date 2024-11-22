@@ -11,6 +11,12 @@
 #include <atomic>
 #include <random>
 
+#ifdef DMA_TC_MALLOC_OPTIMIZATION_ENABLED
+#include <gperftools/malloc_extension.h>
+#elif DMA_GLIBC_MALLOC_OPTIMIZATION_ENABLED
+#include <malloc.h>
+#endif
+
 #include <QDateTime>
 
 #include <QElapsedTimer>
@@ -471,56 +477,6 @@ bool tHighlightingRange::operator< ( const tHighlightingRange& rVal ) const
     return bResult;
 }
 
-/////////////////////////////tIntRangePtrWrapper/////////////////////////////
-bool tIntRangePtrWrapper::operator< ( const tIntRangePtrWrapper& rVal ) const
-{
-    bool bResult = false;
-
-    if(pRange == nullptr && rVal.pRange != nullptr)
-        bResult = true;
-    else if(pRange != nullptr && rVal.pRange == nullptr)
-        bResult = false;
-    else if(pRange == nullptr && rVal.pRange == nullptr)
-        bResult = true;
-    else
-    {
-        if( pRange->from < rVal.pRange->from )
-        {
-            bResult = true;
-        }
-        else if( pRange->from > rVal.pRange->from )
-        {
-            bResult = false;
-        }
-        else // if from == rVal.from
-        {
-            if( pRange->to < rVal.pRange->to )
-            {
-                bResult = true;
-            }
-            else
-            {
-                bResult = false;
-            }
-        }
-    }
-
-    return bResult;
-}
-
-bool tIntRangePtrWrapper::operator== ( const tIntRangePtrWrapper& rVal ) const
-{
-    if(pRange == nullptr && rVal.pRange != nullptr)
-        return false;
-    else if(pRange != nullptr && rVal.pRange == nullptr)
-        return false;
-    else if(pRange == nullptr && rVal.pRange == nullptr)
-        return true;
-
-    return ( pRange->from == rVal.pRange->from && pRange->to == rVal.pRange->to );
-}
-//////////////////////////////////////////////////////////////////////////
-
 /////////////////////////////tQStringPtrWrapper///////////////////////////
 tQStringPtrWrapper::tQStringPtrWrapper(): pString(nullptr)
 {}
@@ -664,9 +620,8 @@ tTreeItemSharedPtr getMatchesTree( const tFoundMatches& foundMatches )
 
             assert(false == data.empty());
 
-            tIntRangePtrWrapper rangePtrWrapper;
-            rangePtrWrapper.pRange = &match.range;
-            tDataItem rangeVariant( rangePtrWrapper );
+            tIntRange range = match.range;
+            tDataItem rangeVariant( range );
             auto* pAddedChild = pCurrentItem->appendChild(rangeVariant, data);
             pCurrentItem = pAddedChild;
 
@@ -756,7 +711,7 @@ tCalcRangesCoverageMulticolorResult calcRangesCoverageMulticolor( const tTreeIte
         //         .arg(match.idx)
         //         .arg(match.range.from)
         //         .arg(match.range.to)
-        //         .arg(*match.pMatchStr));
+        //         .arg(match.matchStr));
 
         if( ( match.range.from < inputRange.from && match.range.to < inputRange.from ) ||
             ( match.range.from > inputRange.to && match.range.to > inputRange.to ) )
@@ -1024,7 +979,7 @@ tTreeItemSharedPtr tItemMetadata::updateHighlightingInfo( const tFoundMatches& f
 
         for(const auto& match : sortedMatches)
         {
-            if(nullptr != match.second->pMatchStr && false == match.second->pMatchStr->isEmpty())
+            if(false == match.second->matchStr.isEmpty())
             {
                 result.insert(std::make_pair( match.second->idx, gradientColorsCounter % maxGradientColorsSize ));
                 ++gradientColorsCounter;
@@ -1336,16 +1291,17 @@ tItemMetadata::updatePlotViewInfo(const tFoundMatches& foundMatches,
 }
 
 //tFoundMatch
+
 tFoundMatch::tFoundMatch():
-pMatchStr(std::make_shared<QString>()),
+matchStr(),
 range(0,0),
 idx(0)
 {}
 
-tFoundMatch::tFoundMatch( const tQStringPtr& pMatchStr_,
+tFoundMatch::tFoundMatch( const QString& matchStr_,
                           const tIntRange& range_,
                           const int& idx_):
-pMatchStr((nullptr!=pMatchStr_)?pMatchStr_:std::make_shared<QString>()),
+matchStr(matchStr_),
 range(range_),
 idx(idx_)
 {}
@@ -1380,7 +1336,7 @@ tFoundMatchesPackItem::tFoundMatchesPackItem()
 tFoundMatchesPackItem::tFoundMatchesPackItem( tItemMetadata&& itemMetadata_,
                                               tFoundMatches&& foundMatches_ ):
   mItemMetadata(std::move(itemMetadata_)),
-  mFoundMatches(foundMatches_)
+  mFoundMatches(std::move(foundMatches_))
 {
 }
 
@@ -2730,9 +2686,9 @@ QVariant toQVariant(const tDataItem& item)
     {
         result.setValue(item.get<tGroupedViewMetadata>());
     }
-    else if(item.index() == tDataItem::index_of<tIntRangePtrWrapper>())
+    else if(item.index() == tDataItem::index_of<tIntRange>())
     {
-        result.setValue(item.get<tIntRangePtrWrapper>());
+        result.setValue(item.get<tIntRange>());
     }
     else if(item.index() == tDataItem::index_of<tFoundMatch*>())
     {
@@ -3676,6 +3632,43 @@ QColor getChartColor()
     static std::atomic<int> sColorsCounter(0);
     return sColors[sColorsCounter++ % sColorsSize];
 }
+
+void releaseMemoryToOS()
+{
+#ifdef DMA_TC_MALLOC_OPTIMIZATION_ENABLED
+    MallocExtension::instance()->ReleaseFreeMemory();
+#elif DMA_GLIBC_MALLOC_OPTIMIZATION_ENABLED
+    malloc_trim(0);
+#endif
+}
+
+#ifdef DMA_TC_MALLOC_PROFILING_ENABLED
+void dumpMemoryStatistics()
+{
+    SEND_MSG("");
+    SEND_MSG("----------------------------------------------------|");
+    SEND_MSG("---------------TC_MALLOC_OUTPUT_START---------------|");
+    SEND_MSG("----------------------------------------------------|");
+    SEND_MSG("");
+
+    const int bufferSize = 100000;
+    char stats[bufferSize];
+    MallocExtension::instance()->GetStats(stats, bufferSize);
+    QString str(stats);
+    auto strVec = str.split("\n");
+
+    for(const auto& str : strVec)
+    {
+        SEND_MSG(QString("%1").arg(str));
+    }
+
+    SEND_MSG("");
+    SEND_MSG("----------------------------------------------------|");
+    SEND_MSG("----------------TC_MALLOC_OUTPUT_END----------------|");
+    SEND_MSG("----------------------------------------------------|");
+    SEND_MSG("");
+}
+#endif
 
 PUML_PACKAGE_BEGIN(Qt)
     PUML_CLASS_BEGIN(QThread)

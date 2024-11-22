@@ -4,6 +4,7 @@
 
 #include "QPlainTextEdit"
 #include "QTabWidget"
+#include "QTimer"
 
 namespace NDLTMessageAnalyzer
 {
@@ -105,6 +106,8 @@ private slots:
             typedef QMap<eMessageType, unsigned int> tMessageCounters;
             tMessageCounters mMessageCounters;
             eMessageType mCountedMessageType;
+            QStringList mBufferedMessages;
+            QTimer mFlushBufferedMessagsTimer;
         };
     }
 }

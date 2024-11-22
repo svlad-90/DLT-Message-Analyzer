@@ -2,6 +2,15 @@
 
 ----
 
+# Table of Contents
+
+1. [Instance of dlt-viewer has an old-fashion styling](#instance-of-dlt-viewer-has-an-old-fashion-styling)
+2. [When I try to perform a search within the DLT-Message-Analyzer plugin, I get the "Initial enabling error!" message](#when-i-try-to-perform-a-search-within-the-dlt-message-analyzer-plugin-i-get-the-initial-enabling-error-message)
+3. [Settings collisions during simultaneous usage of the multiple plugin's instances](#settings-collisions-during-simultaneous-usage-of-the-multiple-plugins-instances)
+4. [High level of the memory consumption](#high-level-of-the-memory-consumption)
+
+----
+
 # Troubleshooting
 
 ## Instance of dlt-viewer has an old-fashion styling
@@ -25,7 +34,7 @@ You can select one of the available styles using the "-style" command-line optio
 In case if "windowsvista" style is missing in the above list, you can add it to the final deployment of the dlt-viewer in the following way:
 > Take it from: "&lt;Qt_ROOT&gt;\\&lt;Qt_version&gt;\\&lt;Qt_toolchain&gt;\plugins\styles\qwindowsvistastyle.dll" // or *.so, depending on the used OS.
 >
-> Place it to: ".\dlt-viewer\styles\qwindowsvistastyle.dll" // or *.so, depending on the used OS.
+> Place it to: ".\dlt-viewer\styles\qwindowsvistastyle.dll" // or \*.so, depending on the used OS.
 
 Then reboot the dlt-viewer. The additional style should become available.
 </details>
@@ -63,7 +72,7 @@ Another proof of that would be an empty "Files view" of the plugin:
 
 ----
 
-#### 1. You have disabled "Plugins enabled" option on dlt-viewer's "Filter" tab and restarted the dlt-viewer:
+1. You have disabled "Plugins enabled" option on dlt-viewer's "Filter" tab and restarted the dlt-viewer:
 
 ![Screenshot of the "plugins enabled" dlt-viewer's option](./troubleshooting_plugins_enabled_option.png)
 
@@ -73,7 +82,7 @@ The possible measures of avoidance in this case are:
 
 ----
 
-#### 2. You have compiled a newer version of the dlt-viewer, which has a settings format incompatible with the previously used version.
+2. You have compiled a newer version of the dlt-viewer, which has a settings format incompatible with the previously used version.
 
 There are possible measures of avoidance for this issue.
 
@@ -133,7 +142,65 @@ Once again, sooner or later such inconsistent behavior will be eliminated. But u
 
 ----
 
-If the above instructions didn't help you - create a new issue [here](https://github.com/svlad-90/DLT-Message-Analyzer/issues) 
+## High level of the memory consumption
+
+<details>
+
+<summary>Click for more details!</summary>
+
+The plugin's functionality is related to:
+
+- frequent reallocation within the internal collections related to the data that is fetched as search results
+- long living usage session of the plugin within the dlt-viewer
+- work with the big data sets. E.g., 6000000 of results is a normal thing
+- usage of many nested structures, such as a vector of maps of maps, etc.
+- metadata collection with the amount of collected metadata depending on the search query ( controlled by the user )
+
+Depending on the search query, all this can cause a high level of memory consumption.
+
+E.g., the query "(F)requency:" which finds 6000000 search results can add ~1.5 Gb of RAM consumption. And the query "(F)(r)(e)(q)(u)(e)(n)(c)(y)(:)" can add 6-7 GB.
+
+The issue is not even the high RAM consumption. However, returning RAM to the OS after releasing the plugin's resources is way too relaxed for the Linux OS. The plugin still occupies released memory for an infinite amount of time while no leaks are found.
+
+In version v.1.0.30, the optimization was added for Linux OS to release the memory back to the OS in the following cases:
+
+- the start of the search
+- the finish of the search
+- the cancellation of the search
+- the clearance of the dlt file cache
+
+That makes RAM consumption more predictable with no constant high consumption level.
+
+**In cases that are not enough for your case, the DMA_TC_MALLOC_OPTIMIZATION CMake option was added.**
+
+By default, it is turned off. If enabled, this option switches the allocator to tcmalloc. That will allow you to:
+
+- Minimize RAM consumption. For the above case with "(F)(r)(e)(q)(u)(e)(n)(c)(y)(:)" request RAM consumption with tcmalloc is ~3-4 Gb less
+- Minimize search processing time. E.g., for the "(F)requency:" query with 6000000 messages, the processing time with tcmalloc was ~9 seconds without the tcmalloc but ~6 seconds with the tcmalloc.
+
+To use this feature, you will need to:
+
+- install tcmalloc on your machine:
+  ```
+  sudo apt-get install google-perftools
+  ```
+- turn on the feature:
+  ```
+  option(DMA_TC_MALLOC_OPTIMIZATION "[
+        This option enables tcmalloc RAM usage optimization.
+        You will need to link dlt-viewer against tcmalloc to use this feature.
+        ]" ON)
+  ```
+- link dlt-viewer against tcmalloc to use this feature. Add the following line at the end of the root CMakeLists.txt of the dlt-viewer project:
+  ```
+  target_link_libraries(dlt-viewer tcmalloc)
+  ```
+- Clean build the dlt-viewer to ensure that changes in CMake settings were considered
+</details>
+
+----
+
+If the above instructions didn't help you - create a new issue [here](https://github.com/svlad-90/DLT-Message-Analyzer/issues).
 
 ----
 
