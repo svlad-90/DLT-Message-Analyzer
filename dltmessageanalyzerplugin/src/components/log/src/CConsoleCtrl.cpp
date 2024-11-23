@@ -146,7 +146,9 @@ void CConsoleCtrl::sendMessage( const QString& message,
 CConsoleCtrl::CConsoleCtrl( const tConsoleConfig& consoleConfig ):
 mConsoleConfig(consoleConfig),
 mMessageCounters(),
-mCountedMessageType(eMessageType::eMsg)
+mCountedMessageType(eMessageType::eMsg),
+mBufferedMessages(),
+mFlushBufferedMessagsTimer()
 {
     if(nullptr != mConsoleConfig.pConsoleTextEdit)
     {
@@ -187,6 +189,37 @@ mCountedMessageType(eMessageType::eMsg)
             });
         }
     }
+
+    connect(&mFlushBufferedMessagsTimer, &QTimer::timeout, this, [this]()
+    {
+        if(mConsoleConfig.pConsoleTextEdit)
+        {
+            if(!mBufferedMessages.empty())
+            {
+                QString finalMessage;
+
+                auto sizeCounter = 0;
+
+                for(const auto& message : mBufferedMessages)
+                {
+                    sizeCounter += message.size();
+                }
+
+                finalMessage.reserve(sizeCounter);
+
+                for(const auto& message : mBufferedMessages)
+                {
+                    finalMessage.push_back(message);
+                }
+
+                mConsoleConfig.pConsoleTextEdit->appendHtml(finalMessage);
+
+                mBufferedMessages.clear();
+            }
+        }
+
+        mFlushBufferedMessagsTimer.stop();
+    });
 }
 
 void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& messageSettings )
@@ -256,7 +289,8 @@ void CConsoleCtrl::addMessage( const QString& message, const tMessageSettings& m
 
             HTMLMessage.append("</pre>");
 
-            mConsoleConfig.pConsoleTextEdit->appendHtml(HTMLMessage);
+            mBufferedMessages.push_back(HTMLMessage);
+            mFlushBufferedMessagsTimer.start(100);
         }
 
         if(nullptr != mConsoleConfig.pTabWidget && nullptr != mConsoleConfig.pConsoleTab)

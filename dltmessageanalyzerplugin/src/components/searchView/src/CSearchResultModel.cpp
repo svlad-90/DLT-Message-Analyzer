@@ -36,7 +36,7 @@ void CSearchResultModel::updateView(const int& fromRow)
 void CSearchResultModel::resetData()
 {
     beginResetModel();
-    mFoundMatchesPack.matchedItemVec.clear();
+    tFoundMatchesPackItemVec().swap(mFoundMatchesPack.matchedItemVec);
     mHighlightMessages.clear();
     endResetModel();
     updateView();
@@ -57,8 +57,8 @@ const tFoundMatchesPackItem& CSearchResultModel::getFoundMatchesItemPack( const 
     if ( ( modelIndex.row() < 0 || modelIndex.row() >= static_cast<int>(mFoundMatchesPack.matchedItemVec.size()) ) ||
          ( modelIndex.column() < 0 || modelIndex.column() >= static_cast<int>(eSearchResultColumn::Last) ) )
     {
-        static const tFoundMatchesPackItemPtr spDummyValue = std::make_shared<tFoundMatchesPackItem>();
-        return *spDummyValue;
+        static const tFoundMatchesPackItem sDummyValue;
+        return sDummyValue;
     }
 
     return *mFoundMatchesPack.matchedItemVec[ static_cast<std::size_t>(modelIndex.row()) ];

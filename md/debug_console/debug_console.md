@@ -42,6 +42,7 @@ The current set of the supported commands contains:
 | clear | No params | clear debug view |
 | color-aliases | No params | prints all supported color aliases |
 | convert-txt-to-dlt-file | [-sf=<source_file> // mandatory! Source file which we should convert to the dlt format][-tf=<target file> // mandatory! Target file, into which we should save the content][-v=<version> // optional! Version of the dlt protocol. Supported values are 'v1' and 'v2'. Default value is 'v2'] | converts specified file with '\n' separated set of strings to the dlt format
+| dump-memory-stats | No params | Prints tcmalloc memory stats. Available only if the 'DMA_TC_MALLOC_PROFILING' feature is activated. |
 | help | [-c=&lt;command-name&gt;] | show this help. If no "c" parameter is provided - help regarding all available commands will be dumped. Be aware, that [&lt;command-name&gt; &lt;help&gt;] syntax can also be used to get the help output regarding a single command. Such syntax is easier to use, considering the limited auto-complete functionality of this console. E.g. "help -help" (ha-ha). |
 | plantuml-settings | No params | prints information about the currently used plantuml settings |
 | styles | No params | prints information about QT styles supported on target OS |
@@ -52,6 +53,8 @@ The current set of the supported commands contains:
 | uml-sequence-ids | No params | prints information about regex names scripting in area of the UML sequence diagrams |
 | version | No params | prints version of the plugin |
 | web-link | No params | prints URL with the location of the plugin on the Git hub |
+
+**Note!** The set of available commands might differ depending on the selected CMake options.
 
 ----
 

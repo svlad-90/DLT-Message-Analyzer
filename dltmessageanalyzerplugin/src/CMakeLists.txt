@@ -3,6 +3,31 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ################### CPP ( END ) ###########################
 
+########## OPTIONS ############
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    option(DMA_TC_MALLOC_OPTIMIZATION "[
+        This option enables tcmalloc RAM usage optimization.
+        You will need to link dlt-viewer against tcmalloc to use this feature.
+        ]" OFF)
+    option(DMA_TC_MALLOC_PROFILING "[
+        This option enables tcmalloc profiling. Adds 'dump-memory-stats' command to the console view.
+        You will need to link dlt-viewer against tcmalloc to use this feature.
+        ]" OFF)
+
+    if(DMA_TC_MALLOC_OPTIMIZATION)
+        add_compile_definitions(DMA_TC_MALLOC_OPTIMIZATION_ENABLED)
+        message(STATUS "DMA_TC_MALLOC_OPTIMIZATION enabled")
+    else()
+        add_compile_definitions(DMA_GLIBC_MALLOC_OPTIMIZATION_ENABLED)
+    endif()
+
+    if(DMA_TC_MALLOC_PROFILING)
+        add_compile_definitions(DMA_TC_MALLOC_PROFILING_ENABLED)
+        message(STATUS "DMA_TC_MALLOC_PROFILING enabled")
+    endif()
+endif()
+########## OPTIONS ( END ) ####
+
 ################### QT_SPECIFIC ###########################
 if(${QT_PREFIX}Core_VERSION VERSION_LESS "5.15.0")
     message("DMA_QT5_COMPATIBILITY_MODE is set")

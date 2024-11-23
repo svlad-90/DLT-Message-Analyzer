@@ -67,8 +67,8 @@ private:
     CTreeItem::tSortingFunction mSortingHandler;
     QString mFilter;
 
-    typedef std::set<tQStringPtrWrapper> tStringPtrWrapperSet;
-    typedef std::map<int /*group id*/, tStringPtrWrapperSet> tCompletionCache;
+    typedef std::set<QString> tStringSet;
+    typedef std::map<int /*group id*/, tStringSet> tCompletionCache;
     tCompletionCache mCompletionCache;
 
     typedef std::set<int /*group id*/> tVarGroupsMap;

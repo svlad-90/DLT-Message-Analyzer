@@ -750,7 +750,7 @@ void CFiltersModel::addCompletionData( const tFoundMatches& foundMatches )
 
             if(foundVarGroup != mVarGroupsMap.end())
             {
-                mCompletionCache[foundMatch.idx].insert( tQStringPtrWrapper( foundMatch.pMatchStr ) );
+                mCompletionCache[foundMatch.idx].insert( foundMatch.matchStr );
             }
         }
     }
@@ -784,16 +784,16 @@ QStringList CFiltersModel::getCompletionData( const int& groupIndex,
 
             if(false == getSettingsManager()->getFiltersCompletion_SearchPolicy())
             {
-                bStringFound = completionItem.pString->startsWith(input, caseSensitiveOption);
+                bStringFound = completionItem.startsWith(input, caseSensitiveOption);
             }
             else
             {
-                bStringFound = completionItem.pString->contains(input, caseSensitiveOption);
+                bStringFound = completionItem.contains(input, caseSensitiveOption);
             }
 
-            if(completionItem.pString && bStringFound)
+            if(bStringFound)
             {
-                result.push_back(completionItem.pString->mid(0, maxLengthOfSuggestions));
+                result.push_back(completionItem.mid(0, maxLengthOfSuggestions));
                 ++numberOfSuggestions;
             }
 

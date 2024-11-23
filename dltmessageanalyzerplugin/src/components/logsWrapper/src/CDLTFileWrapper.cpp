@@ -391,6 +391,8 @@ void CDLTFileWrapper::resetCache()
     loadChanged(0);
 
     handleCacheFull(false);
+
+    releaseMemoryToOS();
 }
 
 void CDLTFileWrapper::setMessageDecoder( const tMsgDecoderPtr& pMessageDecoder )

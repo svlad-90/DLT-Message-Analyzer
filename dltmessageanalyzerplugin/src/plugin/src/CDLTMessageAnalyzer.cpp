@@ -129,7 +129,6 @@ CDLTMessageAnalyzer::CDLTMessageAnalyzer(const std::weak_ptr<IDLTMessageAnalyzer
   , mpCoverageNoteProvider(pCoverageNoteProvider)
 {
     //////////////METATYPES_REGISTRATION/////////////////////
-    qRegisterMetaType<tIntRangePtrWrapper>("tIntRangePtrWrapper");
     qRegisterMetaType<tQStringPtrWrapper>("tQStringPtrWrapper");
     qRegisterMetaType<tIntRange>("tIntRange");
     qRegisterMetaType<const tFoundMatch*>("const tFoundMatch*");
@@ -1678,6 +1677,8 @@ bool CDLTMessageAnalyzer::analyze(const QStringList* pSelectedAliases)
             nullptr != pSelectedAliases ? *pSelectedAliases : QStringList()
         );
 
+        releaseMemoryToOS();
+
         auto requestId = requestAnalyze( requestParameters,
                                          getSettingsManager()->getUML_FeatureActive(),
                                          getSettingsManager()->getPlotViewFeatureActive(),
@@ -1742,6 +1743,8 @@ void CDLTMessageAnalyzer::cancel()
     updateStatusLabel(sDefaultStatusText, false);
 
     tryStop();
+
+    releaseMemoryToOS();
 }
 
 void CDLTMessageAnalyzer::setReuqestId( const tRequestId& val )
@@ -1913,6 +1916,8 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                              .arg(progressNotificationData.requestId)
                              .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
 
+                    releaseMemoryToOS();
+
                     mMeasurementRequestTimer.restart();
                 }
             }
@@ -1962,6 +1967,8 @@ void CDLTMessageAnalyzer::progressNotification(const tProgressNotificationData& 
                     SEND_MSG(QString("CDLTMessageAnalyzer::progressNotification: request id - %1; overall processing took - %2 ms")
                              .arg(progressNotificationData.requestId)
                              .arg(QLocale().toString(mMeasurementRequestTimer.elapsed()), 4));
+
+                    releaseMemoryToOS();
                 }
 
                 break;
