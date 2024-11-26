@@ -677,7 +677,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
 
 #ifdef DMA_TC_MALLOC_PROFILING_ENABLED
     result["dump-memory-stats"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){dumpMemoryStatistics();}
-                              , "- prints tcmalloc memory stats");
+                              , "- prints tcmalloc memory stats.");
 #endif
 
     return result;

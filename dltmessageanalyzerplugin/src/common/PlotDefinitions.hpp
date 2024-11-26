@@ -23,7 +23,7 @@
 typedef double tPlotData;
 typedef std::vector<tPlotData> tPlotDataVec;
 
-typedef int tEventId;
+typedef int64_t tEventId;
 
 typedef tQStringPtrWrapper tPlotGraphMetadataKey;
 typedef tQStringPtrWrapper tPlotGraphMetadataValue;

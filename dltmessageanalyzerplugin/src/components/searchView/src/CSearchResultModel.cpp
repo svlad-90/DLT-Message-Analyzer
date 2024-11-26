@@ -604,6 +604,7 @@ namespace detail
     struct tGraphMetadataItem
     {
         TOptional<QString> graphName;
+        tMsgId usedMsgId = -1;
     };
 
     typedef std::map<tGraphId, tGraphMetadataItem> tGraphIdMetadataMap;
@@ -1349,7 +1350,12 @@ namespace detail
                         auto& axisRectNameMap = axisNameMetadataMap[parsingResult.axisRectName].graphIdMetadataMap;
                         auto& metadataItem = axisRectNameMap[parsingResult.graphId];
 
-                        metadataItem.graphName.setValue("");
+                        if(!metadataItem.graphName.isSet() || (metadataItem.graphName.isSet() &&
+                           !metadataItem.graphName.getValue().isEmpty() && metadataItem.usedMsgId != msgId ))
+                        {
+                            metadataItem.graphName.setValue("");
+                            metadataItem.usedMsgId = msgId;
+                        }
 
                         if(true == parsingResult.graphName.isSet() &&
                            false == parsingResult.graphName.getValue().isEmpty())
@@ -1541,7 +1547,7 @@ namespace detail
                                 auto valueStr = getValueFromStringCoverageMap();
 
                                 bool bValueResolved = false;
-                                auto valueInt = valueStr.toInt(&bValueResolved);
+                                auto valueInt = valueStr.toLongLong(&bValueResolved);
 
                                 if(false == bValueResolved)
                                 {
