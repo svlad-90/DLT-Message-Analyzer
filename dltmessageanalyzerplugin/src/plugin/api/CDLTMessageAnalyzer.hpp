@@ -205,6 +205,12 @@ class CDLTMessageAnalyzer : public IDLTMessageAnalyzerControllerConsumer,
         void connectionChanged(bool connected);
 
         /**
+        * @brief autoscrollStateChanged - notifies this controller, that autoscroll state has changed.
+        * @param state - autoscroll state.
+        */
+        void autoscrollStateChanged(bool state);
+
+        /**
          * @brief decodeMsg - allows to decode the message.
          * @param msg - message to be decoded.
          */

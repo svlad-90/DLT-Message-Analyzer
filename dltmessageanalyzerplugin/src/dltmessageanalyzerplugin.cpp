@@ -749,6 +749,15 @@ bool DLTMessageAnalyzerPlugin::stateChanged(int, QDltConnection::QDltConnectionS
     return true;
 }
 
+bool DLTMessageAnalyzerPlugin::autoscrollStateChanged(bool autoScoll)
+{
+    if( mpDLTMessageAnalyzer )
+    {
+       mpDLTMessageAnalyzer->autoscrollStateChanged(autoScoll);
+    }
+    return true;
+}
+
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
 void DLTMessageAnalyzerPlugin::initMainTableView(QTableView* pMainTableView)
 {
