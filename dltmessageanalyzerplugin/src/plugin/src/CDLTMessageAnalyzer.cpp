@@ -2536,6 +2536,15 @@ void CDLTMessageAnalyzer::connectionChanged(bool connected)
     mbIsConnected = connected;
 }
 
+void CDLTMessageAnalyzer::autoscrollStateChanged(bool state)
+{
+    mpSearchResultView->setAutoScroll(state);
+    if(state)
+    {
+       mpSearchResultView->scrollToBottom();
+    }
+}
+
 void CDLTMessageAnalyzer::triggerContinuousAnalysis(bool checked)
 {
     if(false == checked)

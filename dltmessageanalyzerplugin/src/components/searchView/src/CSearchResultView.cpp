@@ -352,6 +352,11 @@ void CSearchResultView::dataChanged(const QModelIndex &topLeft, const QModelInde
             mbIsVerticalScrollBarVisible = isVerticalScrollBarVisible_;
         }
     }
+
+    if(hasAutoScroll())
+    {
+        scrollToBottom();
+    }
 }
 
 void CSearchResultView::currentChanged(const QModelIndex &current,

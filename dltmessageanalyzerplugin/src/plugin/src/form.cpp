@@ -128,6 +128,7 @@ Form::Form(DLTMessageAnalyzerPlugin* pDLTMessageAnalyzerPlugin,
         mpUI->patternsTreeView->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
         mpUI->searchView->horizontalHeader()->setVisible(true);
         mpUI->groupedView->header()->setVisible(true);
+        mpUI->searchView->setAutoScroll(true);
     }
 
     if(mpUI->CNSplitter_1)

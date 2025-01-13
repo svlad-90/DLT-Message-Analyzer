@@ -96,7 +96,7 @@ private: // methods
     bool initConnections(QStringList) final override { return true; }
     bool controlMsg(int, QDltMsg &) final override { return true; }
     bool stateChanged(int index, QDltConnection::QDltConnectionState connectionState,QString hostname) final override;
-    bool autoscrollStateChanged(bool) final override { return true; }
+    bool autoscrollStateChanged(bool) final override;
 
 #ifndef PLUGIN_API_COMPATIBILITY_MODE_1_0_0
     void initMainTableView(QTableView* pMainTableView) override;
