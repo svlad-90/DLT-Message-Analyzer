@@ -283,6 +283,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
                                                extension,
                                                getSettingsManager()->getUML_MaxNumberOfRowsInDiagram());
 
+        // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
         connect(pSubProcess.get(),
                 static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 [callback, pSubProcessWeak](int exitCode, QProcess::ExitStatus exitStatus)
@@ -314,6 +315,7 @@ void CUMLView::generateUMLDiagramInternal(const QString& diagramContent,
 
             callback(0, QProcess::NormalExit);
         });
+        // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 
         pSubProcess->start(resCommand.first, resCommand.second);
 

@@ -44,12 +44,12 @@ jobs:
       with:
         cmake-version: 'v3.24.x'
 
-    # Checkout dlt-viewer's revision v2.25.0
+    # Checkout dlt-viewer's revision 2.27.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v3
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.25.0
+        ref: 2.27.0
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
