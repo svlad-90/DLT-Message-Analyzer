@@ -841,7 +841,6 @@ bool CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::updateIndex()
             int counter_header = 0;
             quint16 message_length = 0;
             qint64 file_size = mInfile.size();
-            qint64 errors_in_file  = 0;
 
             while(true)
             {
@@ -932,11 +931,6 @@ bool CDLTFileWrapper::CSubFilesHandler::CDLTFileItem::updateIndex()
                                 storageLength = 16;
                             else
                                 storageLength = 13;
-                            if(current_message_pos!=0)
-                            {
-                                // first messages not at beginning or error occured before
-                                errors_in_file++;
-                            }
                             // speed up move directly to message length, if inside current buffer
                             if(num+9<cbuf_sz)
                             {

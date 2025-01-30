@@ -151,27 +151,45 @@ const unsigned int& CDLTMsgWrapper::getSessionid() const
 
 QString CDLTMsgWrapper::getTypeString() const
 {
-    return QString((mType>=static_cast<QDltMsg::DltTypeDef>(0) && mType<=static_cast<QDltMsg::DltTypeDef>(7))?qDltMessageType[mType]:"");
+    return QString((mType>=QDltMsg::DltTypeLog && mType <= QDltMsg::DltTypeControl)?qDltMessageType[mType]:"");
 }
 
 QString CDLTMsgWrapper::getSubtypeString() const
 {
     switch(mType)
     {
-    case QDltMsg::DltTypeLog:
-        return QString((mSubtype>=0 && mSubtype<=7)?qDltLogInfo[mSubtype]:"");
+        case QDltMsg::DltTypeLog:
+        {
+            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltLogDef>(mSubtype)>=QDltMsg::DltLogDefault
+                                             && static_cast<QDltMsg::DltLogDef>(mSubtype)<=QDltMsg::DltLogVerbose);
+            return QString(bSubtypeValidationPassed ? qDltLogInfo[mSubtype] : "");
+        }
         break;
-    case QDltMsg::DltTypeAppTrace:
-        return QString((mSubtype>=0 && mSubtype<=7)?qDltTraceType[mSubtype]:"");
+        case QDltMsg::DltTypeAppTrace:
+        {
+            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltTraceDef>(mSubtype)>=QDltMsg::DltTraceVariable
+                                             && static_cast<QDltMsg::DltTraceDef>(mSubtype)<=QDltMsg::DltTraceVfb);
+            return QString(bSubtypeValidationPassed ? qDltTraceType[mSubtype] : "");
+        }
         break;
-    case QDltMsg::DltTypeNwTrace:
-        return QString((mSubtype>=0 && mSubtype<=7)?qDltNwTraceType[mSubtype]:"");
+        case QDltMsg::DltTypeNwTrace:
+        {
+            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltNetworkTraceDef>(mSubtype)>=QDltMsg::DltNetworkTraceIpc
+                                             && static_cast<QDltMsg::DltNetworkTraceDef>(mSubtype)<=QDltMsg::DltNetworkTraceMost);
+            return QString(bSubtypeValidationPassed ? qDltNwTraceType[mSubtype] : "");
+        }
         break;
-    case QDltMsg::DltTypeControl:
-        return QString((mSubtype>=0 && mSubtype<=7)?qDltControlType[mSubtype]:"");
+        case QDltMsg::DltTypeControl:
+        {
+            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltControlDef>(mSubtype)>=QDltMsg::DltControlRequest
+                                             && static_cast<QDltMsg::DltControlDef>(mSubtype)<=QDltMsg::DltControlTime);
+            return QString(bSubtypeValidationPassed ? qDltControlType[mSubtype] : "");
+        }
         break;
-    default:
-        return QString("");
+        default:
+        {
+            return QString("");
+        }
     }
 }
 

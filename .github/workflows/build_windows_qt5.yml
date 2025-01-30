@@ -11,6 +11,11 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
+      collect_artifacts:
+        description: 'Collect build artifacts'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build_windows:
@@ -21,17 +26,13 @@ jobs:
 
     - uses: ilammy/msvc-dev-cmd@v1
 
-    # Creation of the ..\downloads directory
-    - name: Creation of the "..\downloads" directory
-      run: mkdir ..\downloads
+    # Creation of the "..\downloads", "..\build", "..\tools" directories
+    - name: Creation of the "..\downloads", "..\build", "..\tools" directories
+      run: |
+        mkdir ..\build
+        mkdir ..\downloads
+        mkdir ..\tools
       shell: cmd
-      working-directory: .\
-
-    # Creation of the ..\tools directory
-    - name: Creation of the "..\tools" directory
-      run: mkdir ..\tools
-      shell: cmd
-      working-directory: .\
 
     # Installation of jom
     - name: Installation of the jom
@@ -59,12 +60,12 @@ jobs:
       with:
         cmake-version: 'v3.24.x'
 
-    # Checkout dlt-viewer's revision v2.25.0
+    # Checkout dlt-viewer's revision 2.27.0
     - name: Checkout of the dlt-viewer
       uses: actions/checkout@v3
       with:
         repository: GENIVI/dlt-viewer
-        ref: v2.25.0
+        ref: 2.27.0
 
     # Checkout project's revision, which is pushed
     - name: Checkout of the project
@@ -90,12 +91,6 @@ jobs:
          dir: ${{ github.workspace }}\Qt5
          cache: true
 
-    # Create build directory
-    - name: Creation of the ".\build" directory
-      run: mkdir ..\build
-      shell: cmd
-      working-directory: .\
-
     #CMake for dlt-viewer, including the DLT-Message_analyzer plugin
     - name: CMake
       run: |
@@ -106,9 +101,10 @@ jobs:
     #List files in build folder
     - name: List files in build folder
       run: |
-        dir
+        dir ..\build
+        dir .\
       shell: cmd
-      working-directory: ..\build
+      working-directory: .\
 
     # Build of the project
     - name: Jom
@@ -116,3 +112,51 @@ jobs:
         jom.exe -j8
       shell: cmd
       working-directory: ..\build
+
+    # Collect required artifacts
+    - name: Collect required artifacts
+      if: ${{ github.event.inputs.collect_artifacts == 'true' }}
+      run: |
+        mkdir .\release_win_qt5_X86_64
+        mkdir .\release_win_qt5_X86_64\plugins
+        mkdir .\release_win_qt5_X86_64\platforms
+        cp ..\build\bin\dlt-viewer.exe .\release_win_qt5_X86_64\dlt-viewer.exe
+        cp ..\build\version.txt .\release_win_qt5_X86_64\version.txt
+        cp ..\build\bin\plugins\DLT-Message-Analyzer.dll .\release_win_qt5_X86_64\plugins\DLT-Message-Analyzer.dll
+        cp ..\build\bin\plugins\dltdbusplugin.dll .\release_win_qt5_X86_64\plugins\dltdbusplugin.dll
+        cp ..\build\bin\plugins\dltlogstorageplugin.dll .\release_win_qt5_X86_64\plugins\dltlogstorageplugin.dll
+        cp ..\build\bin\plugins\dltsegmentationplugin.dll .\release_win_qt5_X86_64\plugins\dltsegmentationplugin.dll
+        cp ..\build\bin\plugins\dltsystemviewerplugin.dll .\release_win_qt5_X86_64\plugins\dltsystemviewerplugin.dll
+        cp ..\build\bin\plugins\dlttestrobotplugin.dll .\release_win_qt5_X86_64\plugins\dlttestrobotplugin.dll
+        cp ..\build\bin\plugins\dltviewerplugin.dll .\release_win_qt5_X86_64\plugins\dltviewerplugin.dll
+        cp ..\build\bin\plugins\filetransferplugin.dll .\release_win_qt5_X86_64\plugins\filetransferplugin.dll
+        cp ..\build\bin\plugins\nonverboseplugin.dll .\release_win_qt5_X86_64\plugins\nonverboseplugin.dll
+        cp ..\build\bin\plugins\plantuml.jar .\release_win_qt5_X86_64\plugins\plantuml.jar
+        cp ..\build\qdlt\qdlt.dll .\release_win_qt5_X86_64\qdlt.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qdirect2d.dll .\release_win_qt5_X86_64\platforms\qdirect2d.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qdirect2dd.dll .\release_win_qt5_X86_64\platforms\qdirect2dd.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qminimal.dll .\release_win_qt5_X86_64\platforms\qminimal.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qminimald.dll .\release_win_qt5_X86_64\platforms\qminimald.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qoffscreen.dll .\release_win_qt5_X86_64\platforms\qoffscreen.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qoffscreend.dll .\release_win_qt5_X86_64\platforms\qoffscreend.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qwindows.dll .\release_win_qt5_X86_64\platforms\qwindows.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\plugins\platforms\qwindowsd.dll .\release_win_qt5_X86_64\platforms\qwindowsd.dll
+        cp .\build\output\amd64\Release\bin\qcustomplot.dll .\release_win_qt5_X86_64\qcustomplot.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Core.dll .\release_win_qt5_X86_64\Qt5Core.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Gui.dll .\release_win_qt5_X86_64\Qt5Gui.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Network.dll .\release_win_qt5_X86_64\Qt5Network.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5PrintSupport.dll .\release_win_qt5_X86_64\Qt5PrintSupport.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5SerialPort.dll .\release_win_qt5_X86_64\Qt5SerialPort.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Sql.dll .\release_win_qt5_X86_64\Qt5Sql.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Svg.dll .\release_win_qt5_X86_64\Qt5Svg.dll
+        cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Widgets.dll .\release_win_qt5_X86_64\Qt5Widgets.dll
+      shell: cmd
+      working-directory: .\
+
+    - name: Upload artifacts
+      if: ${{ success() && github.event.inputs.collect_artifacts == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: release_win_qt5_X86_64
+        path: |
+          release_win_qt5_X86_64

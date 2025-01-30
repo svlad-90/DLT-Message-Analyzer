@@ -4,23 +4,16 @@
 
 ----
 
-## <span style="color:red">v.1.0.29 released!</span>
+## <span style="color:red">v.1.0.30 released!</span>
 
-New features in release v.1.0.29:
-
-- [Coverage note](./md/coverage_note/coverage_note.md)
-- [Grouped view highlighting](./md/grouped_view/grouped_view.md#highlighting-the-group-in-the-search-view)
-- [Regex history](.//md/search/search.md#regex-history)
-
-## Implemented features targeted for release v1.0.30:
-
-<span style="color:red">Use the HEAD revision to try out the following features:</span>
+New features in release v.1.0.30:
 
 - [Grouped view default application is disabled](./md/grouped_view/grouped_view.md#backward-compatibility-note)
 - [Groups nesting ordering](./md/grouped_view/grouped_view.md#groups-nesting-ordering)
 - [Plot legend scrolling](./md/plot_view/plot_view.md#legend-scrolling)
 - [Regex group name glossary](./md/search/search.md#regex-group-name-glossary)
 - [Regex text editor with the automatic height adjustment](./md/search/search.md#regex-text-editor)
+- [The search view inherits the auto-scroll option from the dlt-viewer settings][https://github.com/svlad-90/DLT-Message-Analyzer/issues/19]
 
 ----
 
@@ -58,6 +51,8 @@ There are the following schemas of deployment:
 ## Installation guide
 
 ### [Read it here](./md/installation_guide/installation_guide.md)
+
+**Important note!** As an alternative to 'building from source', you can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [packages](https://github.com/svlad-90?tab=packages&repo_name=DLT-Message-Analyzer) section. Currently, it is supported only for the Windows OS.
 
 ----
 

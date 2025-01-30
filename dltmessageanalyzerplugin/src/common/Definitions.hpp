@@ -6,6 +6,8 @@
 #ifndef DEFINITIONS_HPP
 #define DEFINITIONS_HPP
 
+#include <cstdint>
+
 #include <list>
 #include <set>
 
