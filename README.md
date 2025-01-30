@@ -13,7 +13,7 @@ New features in release v.1.0.30:
 - [Plot legend scrolling](./md/plot_view/plot_view.md#legend-scrolling)
 - [Regex group name glossary](./md/search/search.md#regex-group-name-glossary)
 - [Regex text editor with the automatic height adjustment](./md/search/search.md#regex-text-editor)
-- [The search view inherits the auto-scroll option from the dlt-viewer settings][https://github.com/svlad-90/DLT-Message-Analyzer/issues/19]
+- [The search view inherits the auto-scroll option from the dlt-viewer settings](https://github.com/svlad-90/DLT-Message-Analyzer/issues/19)
 
 ----
 
