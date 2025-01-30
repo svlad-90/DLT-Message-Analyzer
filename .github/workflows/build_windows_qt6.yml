@@ -11,11 +11,11 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
-    collect_artifacts:
-      description: 'Collect build artifacts'
-      required: false
-      default: 'false'
-      type: boolean
+      collect_artifacts:
+        description: 'Collect build artifacts'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build_windows:
