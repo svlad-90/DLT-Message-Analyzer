@@ -52,7 +52,7 @@ There are the following schemas of deployment:
 
 ### [Read it here](./md/installation_guide/installation_guide.md)
 
-**Important note!** As an alternative to 'building from source', you can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [packages](https://github.com/svlad-90?tab=packages&repo_name=DLT-Message-Analyzer) section. Currently, it is supported only for the Windows OS.
+**Important note!** As an alternative to 'building from source', you now can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [releases](https://github.com/svlad-90/DLT-Message-Analyzer/releases) section. Currently, it is supported only for the Windows OS.
 
 ----
 
