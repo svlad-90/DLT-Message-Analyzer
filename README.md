@@ -52,7 +52,16 @@ There are the following schemas of deployment:
 
 ### [Read it here](./md/installation_guide/installation_guide.md)
 
-**Important note!** As an alternative to 'building from source', you now can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [releases](https://github.com/svlad-90/DLT-Message-Analyzer/releases) section. Currently, it is supported only for the Windows OS.
+**Important note!** As an alternative to 'building from source', you now can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [releases](https://github.com/svlad-90/DLT-Message-Analyzer/releases) section.<br /> Currently, it is supported for the Windows and Linux OS.
+Please note: additional installation of libs for Linux OS might be required.<br />
+Please use these packages (if required):<br />
+```bash
+sudo apt install libxkbcommon-x11-0
+sudo apt install libxcb-cursor0
+sudo apt install libxcb-keysyms1
+sudo apt install libxcb-icccm4
+sudo apt-get install libxcb-xinerama0
+```
 
 ----
 
