@@ -11,11 +11,16 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
+      upload_artifacts:
+        description: 'Upload build artifacts'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build_linux:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
@@ -87,3 +92,89 @@ jobs:
       run: make -j8
       shell: bash
       working-directory: ../build
+
+    # Collect required files after build is finished
+    - name: Collect required files
+      if: ${{ success() && github.event.inputs.upload_artifacts == 'true' }}
+      run: |
+        mkdir ./release_linux_qt5
+        mkdir ./release_linux_qt5/platforms
+        cp -r ../build/bin/* ./release_linux_qt5/
+        cp ../build/full_version.txt ./release_linux_qt5/
+        cp ./build/output/amd64/Release/lib/libqcustomplot.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5Svg.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5Widgets.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5SerialPort.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5PrintSupport.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5Network.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5Gui.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5Core.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5DBus.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5XcbQpa.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5OpenGL.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libQt5WaylandClient.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libicui18n.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libicuuc.so ./release_linux_qt5/
+        cp ./Qt5/Qt/5.15.0/gcc_64/lib/libicudata.so ./release_linux_qt5/
+        cp -r ./Qt5/Qt/5.15.0/gcc_64/plugins/platforms/* ./release_linux_qt5/platforms/
+        touch ./release_linux_qt5/run_dlt.sh
+        echo "#! /bin/bash" > ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5Network.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5Network.so ./libQt5Network.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5Widgets.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5Widgets.so ./libQt5Widgets.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5SerialPort.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5SerialPort.so ./libQt5SerialPort.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5Gui.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5Gui.so ./libQt5Gui.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5Core.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5Core.so ./libQt5Core.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5PrintSupport.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5PrintSupport.so ./libQt5PrintSupport.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5DBus.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5DBus.so ./libQt5DBus.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5XcbQpa.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5XcbQpa.so ./libQt5XcbQpa.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5OpenGL.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5OpenGL.so ./libQt5OpenGL.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5Svg.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5Svg.so ./libQt5Svg.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libQt5WaylandClient.so.5\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libQt5WaylandClient.so ./libQt5WaylandClient.so.5" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libqcustomplot.so.2\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libqcustomplot.so ./libqcustomplot.so.2" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libicui18n.so.56\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libicui18n.so ./libicui18n.so.56" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libicuuc.so.56\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libicuuc.so ./libicuuc.so.56" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "if [ ! -f \"./libicudata.so.56\" ]; then" >> ./release_linux_qt5/run_dlt.sh
+        echo "ln -s ./libicudata.so ./libicudata.so.56" >> ./release_linux_qt5/run_dlt.sh
+        echo "fi" >> ./release_linux_qt5/run_dlt.sh
+        echo "DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" >/dev/null 2>&1 && pwd )\"" >> ./release_linux_qt5/run_dlt.sh
+        echo "echo \${DIR}" >> ./release_linux_qt5/run_dlt.sh
+        echo "cd \${DIR}; export LD_LIBRARY_PATH=\$DIR; export QT_DEBUG_PLUGINS=1;" >> ./release_linux_qt5/run_dlt.sh
+        echo "bash -c './dlt-viewer'" >> ./release_linux_qt5/run_dlt.sh
+      shell: bash
+      working-directory: ./
+
+    - name: Archive artifact
+      uses: actions/upload-artifact@v4
+      if: ${{ success() && github.event.inputs.upload_artifacts == 'true'}}
+      with:
+        name: release_linux_qt5
+        path: |
+          release_linux_qt5

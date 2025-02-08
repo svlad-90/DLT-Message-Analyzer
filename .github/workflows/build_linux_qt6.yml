@@ -11,11 +11,16 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
+      upload_artifacts:
+        description: 'Upload build artifacts'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build_linux:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
@@ -88,3 +93,91 @@ jobs:
       run: make -j8
       shell: bash
       working-directory: ../build
+    
+    # Collect required files after build is finished
+    - name: Collect required files
+      if: ${{ success() && github.event.inputs.upload_artifacts == 'true' }}
+      run: |
+        mkdir ./release_linux_qt6
+        mkdir ./release_linux_qt6/platforms
+        cp -r ../build/bin/* ./release_linux_qt6/
+        cp ../build/full_version.txt ./release_linux_qt6/
+        cp ./build/output/amd64/Release/lib/libqcustomplot.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6Svg.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6Widgets.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6SerialPort.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6PrintSupport.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6Network.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6Gui.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6Core.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6DBus.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6XcbQpa.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6OpenGL.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libQt6WaylandClient.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libicui18n.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libicuuc.so ./release_linux_qt6/
+        cp ./Qt6/Qt/6.5.0/gcc_64/lib/libicudata.so ./release_linux_qt6/
+        cp -r ./Qt6/Qt/6.5.0/gcc_64/plugins/platforms/* ./release_linux_qt6/platforms/
+        touch ./release_linux_qt6/run_dlt.sh
+        echo "#! /bin/bash" > ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6Network.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6Network.so ./libQt6Network.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6Widgets.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6Widgets.so ./libQt6Widgets.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6SerialPort.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6SerialPort.so ./libQt6SerialPort.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6Gui.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6Gui.so ./libQt6Gui.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6Core.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6Core.so ./libQt6Core.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6PrintSupport.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6PrintSupport.so ./libQt6PrintSupport.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6DBus.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6DBus.so ./libQt6DBus.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6XcbQpa.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6XcbQpa.so ./libQt6XcbQpa.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6OpenGL.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6OpenGL.so ./libQt6OpenGL.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6Svg.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6Svg.so ./libQt6Svg.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libQt6WaylandClient.so.6\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libQt6WaylandClient.so ./libQt6WaylandClient.so.6" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libqcustomplot.so.2\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libqcustomplot.so ./libqcustomplot.so.2" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libicui18n.so.56\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libicui18n.so ./libicui18n.so.56" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libicuuc.so.56\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libicuuc.so ./libicuuc.so.56" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "if [ ! -f \"./libicudata.so.56\" ]; then" >> ./release_linux_qt6/run_dlt.sh
+        echo "ln -s ./libicudata.so ./libicudata.so.56" >> ./release_linux_qt6/run_dlt.sh
+        echo "fi" >> ./release_linux_qt6/run_dlt.sh
+        echo "DIR=\"\$( cd \"\$( dirname \"\${BASH_SOURCE[0]}\" )\" >/dev/null 2>&1 && pwd )\"" >> ./release_linux_qt6/run_dlt.sh
+        echo "echo \${DIR}" >> ./release_linux_qt6/run_dlt.sh
+        echo "cd \${DIR}; export LD_LIBRARY_PATH=\$DIR; export QT_DEBUG_PLUGINS=1;" >> ./release_linux_qt6/run_dlt.sh
+        echo "bash -c './dlt-viewer'" >> ./release_linux_qt6/run_dlt.sh
+      shell: bash
+      working-directory: ./
+
+    - name: Archive artifact
+      uses: actions/upload-artifact@v4
+      if: ${{ success() && github.event.inputs.upload_artifacts == 'true'}}
+      with:
+        name: release_linux_qt6
+        path: |
+          release_linux_qt6
+
+
