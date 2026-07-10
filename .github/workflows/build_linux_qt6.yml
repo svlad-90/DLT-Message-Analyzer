@@ -11,11 +11,16 @@ on:
         description: 'Target branch'
         required: true
         default: 'master'
+      collect_artifacts:
+        description: 'Collect build artifacts'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   build_linux:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
@@ -79,7 +84,7 @@ jobs:
 
     # CMake execution
     - name: CMake
-      run: cmake ../${{ github.event.repository.name }}
+      run: cmake ../${{ github.event.repository.name }} -DCMAKE_BUILD_TYPE=Release
       shell: bash
       working-directory: ../build
 
@@ -88,3 +93,92 @@ jobs:
       run: make -j8
       shell: bash
       working-directory: ../build
+
+    # Collect required artifacts
+    - name: Collect required artifacts
+      if: ${{ success() && github.event.inputs.collect_artifacts == 'true' }}
+      run: |
+        set -euo pipefail
+
+        release_dir="./release_linux_qt6_X86_64"
+        qt_dir="${{ github.workspace }}/Qt6/Qt/6.5.0/gcc_64"
+        build_dir="$(realpath ../build)"
+        mkdir -p "${release_dir}/platforms"
+
+        cp -a ../build/bin/. "${release_dir}/"
+        cp -a ../build/version.txt "${release_dir}/"
+        cp -a ../build/full_version.txt "${release_dir}/"
+        cp -a "${qt_dir}/plugins/platforms/." "${release_dir}/platforms/"
+
+        copy_dependency() {
+          local lib="$1"
+          local allow_system="${2:-false}"
+          local real_lib
+          local soname
+
+          [ -f "${lib}" ] || return 0
+          real_lib="$(realpath "${lib}")"
+          case "${real_lib}" in
+            "${qt_dir}"/*|"${{ github.workspace }}"/*|"${build_dir}"/*) ;;
+            *)
+              if [ "${allow_system}" != "true" ]; then
+                return 0
+              fi
+              case "$(basename "${real_lib}")" in
+                libxcb*.so*|libxkbcommon*.so*|libX11*.so*|libXext*.so*) ;;
+                *) return 0 ;;
+              esac
+              ;;
+          esac
+
+          cp -a "${real_lib}" "${release_dir}/"
+          soname="$(objdump -p "${real_lib}" 2>/dev/null | awk '/SONAME/ && soname == "" {soname = $2} END {print soname}')"
+          if [ -n "${soname}" ] && [ ! -e "${release_dir}/${soname}" ] && [ ! -L "${release_dir}/${soname}" ]; then
+            ln -s "$(basename "${real_lib}")" "${release_dir}/${soname}"
+          fi
+        }
+
+        copy_dependencies_for() {
+          local binary="$1"
+          local allow_system="${2:-false}"
+          local lib
+
+          while read -r lib; do
+            copy_dependency "${lib}" "${allow_system}"
+          done < <(ldd "${binary}" 2>/dev/null | awk '/=>/ {print $(NF - 1)} /^[[:space:]]*\// {print $1}')
+        }
+
+        shopt -s nullglob
+        for lib in ./build/output/amd64/Release/lib/*.so*; do
+          copy_dependency "$(realpath "${lib}")"
+        done
+
+        while IFS= read -r binary; do
+          copy_dependencies_for "${binary}"
+        done < <(find "${release_dir}" -type f \( -perm -0100 -o -name '*.so*' \))
+
+        for plugin in "${release_dir}/platforms/"*.so; do
+          copy_dependencies_for "${plugin}" true
+        done
+
+        cat > "${release_dir}/run_dlt.sh" <<'EOF'
+        #!/usr/bin/env bash
+        set -e
+        DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+        cd "${DIR}"
+        export LD_LIBRARY_PATH="${DIR}:${LD_LIBRARY_PATH:-}"
+        export QT_PLUGIN_PATH="${DIR}"
+        export QT_QPA_PLATFORM_PLUGIN_PATH="${DIR}/platforms"
+        exec ./dlt-viewer "$@"
+        EOF
+        chmod +x "${release_dir}/run_dlt.sh"
+      shell: bash
+      working-directory: ./
+
+    - name: Upload artifacts
+      if: ${{ success() && github.event.inputs.collect_artifacts == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: release_linux_qt6_X86_64
+        path: |
+          release_linux_qt6_X86_64
