@@ -55,6 +55,38 @@ static const QRegularExpression sReplaceRegex("\n|\\x{0000}|\\x{0001}|\\x{0002}|
                                  "|\\x{0018}|\\x{0019}|\\x{001A}|\\x{001B}|\\x{001C}|\\x{001D}"
                                  "|\\x{001E}|\\x{001F}");
 
+namespace
+{
+constexpr const char* sDltMessageType[] = {"log", "app_trace", "nw_trace", "control", "", "", "", ""};
+constexpr const char* sDltLogInfo[] = {"", "fatal", "error", "warn", "info", "debug", "verbose", ""};
+constexpr const char* sDltTraceType[] = {"", "variable", "func_in", "func_out", "state", "vfb", "", ""};
+constexpr const char* sDltNwTraceType[] = {"", "ipc", "can", "flexray", "most", "vfb", "", ""};
+constexpr const char* sDltControlType[] = {"", "request", "response", "time", "", "", "", ""};
+constexpr const char* sDltMode[] = {"non-verbose", "verbose"};
+constexpr const char* sDltCtrlServiceId[] = {"", "set_log_level", "set_trace_status", "get_log_info",
+                                             "get_default_log_level", "store_config", "reset_to_factory_default",
+                                             "set_com_interface_status", "set_com_interface_max_bandwidth",
+                                             "set_verbose_mode", "set_message_filtering", "set_timing_packets",
+                                             "get_local_time", "use_ecu_id", "use_session_id", "use_timestamp",
+                                             "use_extended_header", "set_default_log_level",
+                                             "set_default_trace_status", "get_software_version",
+                                             "message_buffer_overflow"};
+constexpr const char* sDltCtrlReturnType[] = {"ok", "not_supported", "error", "3", "4", "5", "6", "7",
+                                              "no_matching_context_id"};
+
+template<std::size_t size>
+QString getDltLabel(const char* const (&labels)[size], const int index)
+{
+    if(index < 0 || index >= static_cast<int>(size))
+    {
+        return QString();
+    }
+
+    return QString::fromLatin1(labels[index]);
+}
+
+}
+
 CDLTMsgWrapper::CDLTMsgWrapper(const QDltMsg& msg):
 mMicroseconds(msg.getMicroseconds()),
 mTimestamp(msg.getTimestamp()),
@@ -151,7 +183,7 @@ const unsigned int& CDLTMsgWrapper::getSessionid() const
 
 QString CDLTMsgWrapper::getTypeString() const
 {
-    return QString((mType>=QDltMsg::DltTypeLog && mType <= QDltMsg::DltTypeControl)?qDltMessageType[mType]:"");
+    return getDltLabel(sDltMessageType, static_cast<int>(mType));
 }
 
 QString CDLTMsgWrapper::getSubtypeString() const
@@ -160,42 +192,30 @@ QString CDLTMsgWrapper::getSubtypeString() const
     {
         case QDltMsg::DltTypeLog:
         {
-            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltLogDef>(mSubtype)>=QDltMsg::DltLogDefault
-                                             && static_cast<QDltMsg::DltLogDef>(mSubtype)<=QDltMsg::DltLogVerbose);
-            return QString(bSubtypeValidationPassed ? qDltLogInfo[mSubtype] : "");
+            return getDltLabel(sDltLogInfo, mSubtype);
         }
-        break;
         case QDltMsg::DltTypeAppTrace:
         {
-            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltTraceDef>(mSubtype)>=QDltMsg::DltTraceVariable
-                                             && static_cast<QDltMsg::DltTraceDef>(mSubtype)<=QDltMsg::DltTraceVfb);
-            return QString(bSubtypeValidationPassed ? qDltTraceType[mSubtype] : "");
+            return getDltLabel(sDltTraceType, mSubtype);
         }
-        break;
         case QDltMsg::DltTypeNwTrace:
         {
-            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltNetworkTraceDef>(mSubtype)>=QDltMsg::DltNetworkTraceIpc
-                                             && static_cast<QDltMsg::DltNetworkTraceDef>(mSubtype)<=QDltMsg::DltNetworkTraceMost);
-            return QString(bSubtypeValidationPassed ? qDltNwTraceType[mSubtype] : "");
+            return getDltLabel(sDltNwTraceType, mSubtype);
         }
-        break;
         case QDltMsg::DltTypeControl:
         {
-            bool bSubtypeValidationPassed = (static_cast<QDltMsg::DltControlDef>(mSubtype)>=QDltMsg::DltControlRequest
-                                             && static_cast<QDltMsg::DltControlDef>(mSubtype)<=QDltMsg::DltControlTime);
-            return QString(bSubtypeValidationPassed ? qDltControlType[mSubtype] : "");
+            return getDltLabel(sDltControlType, mSubtype);
         }
-        break;
         default:
         {
-            return QString("");
+            return QString();
         }
     }
 }
 
 QString CDLTMsgWrapper::getModeString() const
 {
-    return QString((mMode>=static_cast<QDltMsg::DltModeDef>(0) && mMode<=static_cast<QDltMsg::DltModeDef>(1))?qDltMode[mMode]:"");
+    return getDltLabel(sDltMode, static_cast<int>(mMode));
 }
 
 const unsigned int& CDLTMsgWrapper::getNumberOfArguments() const
@@ -219,12 +239,12 @@ QString CDLTMsgWrapper::getCtrlServiceIdString() const
     else if(mCtrlServiceId == DLT_SERVICE_ID_MARKER)
         return QString("marker");
     else
-        return QString(( mCtrlServiceId<=20 )?qDltCtrlServiceId[mCtrlServiceId]:"");
+        return getDltLabel(sDltCtrlServiceId, static_cast<int>(mCtrlServiceId));
 }
 
 QString CDLTMsgWrapper::getCtrlReturnTypeString() const
 {
-    return QString(( mCtrlReturnType<=8 )?qDltCtrlReturnType[mCtrlReturnType]:"");
+    return getDltLabel(sDltCtrlReturnType, static_cast<int>(mCtrlReturnType));
 }
 
 unsigned int CDLTMsgWrapper::getInitialMessageSize() const
