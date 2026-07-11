@@ -4,16 +4,15 @@
 
 ----
 
-## <span style="color:red">v.1.0.30 released!</span>
+## <span style="color:red">v.1.0.31 released!</span>
 
-New features in release v.1.0.30:
+New features in release v.1.0.31:
 
-- [Grouped view default application is disabled](./md/grouped_view/grouped_view.md#backward-compatibility-note)
-- [Groups nesting ordering](./md/grouped_view/grouped_view.md#groups-nesting-ordering)
-- [Plot legend scrolling](./md/plot_view/plot_view.md#legend-scrolling)
-- [Regex group name glossary](./md/search/search.md#regex-group-name-glossary)
-- [Regex text editor with the automatic height adjustment](./md/search/search.md#regex-text-editor)
-- [The search view inherits the auto-scroll option from the dlt-viewer settings](https://github.com/svlad-90/DLT-Message-Analyzer/issues/19)
+- Prebuilt release artifacts are now available for Linux and Windows.
+- Release artifacts include `dlt-viewer`, DLT-Message-Analyzer, and the required runtime libraries.
+- Both Qt5 and Qt6 builds are published: `release_linux_qt5_X86_64.tar.gz`, `release_linux_qt6_X86_64.tar.gz`, `release_win_qt5_X86_64.zip`, and `release_win_qt6_X86_64.zip`.
+- Linux artifacts can be unpacked and started with `./run_dlt.sh`.
+- Building from source remains available as an alternative for systems where the prebuilt binaries do not run out of the box.
 
 ----
 
@@ -52,7 +51,7 @@ There are the following schemas of deployment:
 
 ### [Read it here](./md/installation_guide/installation_guide.md)
 
-**Important note!** As an alternative to 'building from source', you now can download the prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin in the [releases](https://github.com/svlad-90/DLT-Message-Analyzer/releases) section. Currently, it is supported only for the Windows OS.
+**Important note!** The recommended installation method is to download a prebuilt dlt-viewer with the integrated DLT-Message-Analyzer plugin from the [releases](https://github.com/svlad-90/DLT-Message-Analyzer/releases) section. Linux and Windows artifacts are available for both Qt5 and Qt6. Building from source is also available as an alternative for systems where the prebuilt binaries do not run out of the box.
 
 ----
 

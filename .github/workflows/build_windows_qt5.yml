@@ -157,6 +157,7 @@ jobs:
         cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Sql.dll .\release_win_qt5_X86_64\Qt5Sql.dll
         cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Svg.dll .\release_win_qt5_X86_64\Qt5Svg.dll
         cp .\Qt5\Qt\5.15.0\msvc2019_64\bin\Qt5Widgets.dll .\release_win_qt5_X86_64\Qt5Widgets.dll
+        powershell -NoProfile -Command "Compress-Archive -Path '.\release_win_qt5_X86_64\*' -DestinationPath '.\release_win_qt5_X86_64.zip' -Force"
       shell: cmd
       working-directory: .\
 
@@ -166,4 +167,4 @@ jobs:
       with:
         name: release_win_qt5_X86_64
         path: |
-          release_win_qt5_X86_64
+          release_win_qt5_X86_64.zip

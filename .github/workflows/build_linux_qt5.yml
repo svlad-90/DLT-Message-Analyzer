@@ -35,7 +35,7 @@ jobs:
     - name: Install uuid-dev
       run: |
            sudo apt update
-           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev
+           sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install uuid-dev libxcb-cursor0
       shell: bash
 
     # Install Java 11
@@ -166,6 +166,11 @@ jobs:
         for plugin in "${release_dir}/platforms/"*.so; do
           copy_dependencies_for "${plugin}" true
         done
+        LD_LIBRARY_PATH="${release_dir}:${LD_LIBRARY_PATH:-}" ldd "${release_dir}/platforms/libqxcb.so" | tee "${release_dir}/libqxcb.ldd"
+        if grep -q "not found" "${release_dir}/libqxcb.ldd"; then
+          exit 1
+        fi
+        rm "${release_dir}/libqxcb.ldd"
 
         cat > "${release_dir}/run_dlt.sh" <<'EOF'
         #!/usr/bin/env bash
@@ -174,10 +179,12 @@ jobs:
         cd "${DIR}"
         export LD_LIBRARY_PATH="${DIR}:${LD_LIBRARY_PATH:-}"
         export QT_PLUGIN_PATH="${DIR}"
+        export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-xcb}"
         export QT_QPA_PLATFORM_PLUGIN_PATH="${DIR}/platforms"
         exec ./dlt-viewer "$@"
         EOF
         chmod +x "${release_dir}/run_dlt.sh"
+        tar -czf "${release_dir}.tar.gz" "${release_dir}"
       shell: bash
       working-directory: ./
 
@@ -187,4 +194,4 @@ jobs:
       with:
         name: release_linux_qt5_X86_64
         path: |
-          release_linux_qt5_X86_64
+          release_linux_qt5_X86_64.tar.gz

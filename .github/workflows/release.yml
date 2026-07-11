@@ -55,16 +55,24 @@ jobs:
           package_zip() {
             local artifact="$1"
             test -d "release_artifacts/${artifact}"
-            (
-              cd "release_artifacts/${artifact}"
-              zip -r "../../packaged/${artifact}.zip" .
-            )
+            if [ -f "release_artifacts/${artifact}/${artifact}.zip" ]; then
+              cp -a "release_artifacts/${artifact}/${artifact}.zip" "packaged/${artifact}.zip"
+            else
+              (
+                cd "release_artifacts/${artifact}"
+                zip -r "../../packaged/${artifact}.zip" .
+              )
+            fi
           }
 
           package_tar() {
             local artifact="$1"
             test -d "release_artifacts/${artifact}"
-            tar -czf "packaged/${artifact}.tar.gz" -C "release_artifacts/${artifact}" .
+            if [ -f "release_artifacts/${artifact}/${artifact}.tar.gz" ]; then
+              cp -a "release_artifacts/${artifact}/${artifact}.tar.gz" "packaged/${artifact}.tar.gz"
+            else
+              tar -czf "packaged/${artifact}.tar.gz" -C "release_artifacts/${artifact}" .
+            fi
           }
 
           package_zip "release_win_qt5_X86_64"
@@ -75,5 +83,6 @@ jobs:
       - name: Upload artifacts to release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
-        run: gh release upload "${RELEASE_TAG}" packaged/* --clobber
+        run: gh release upload "${RELEASE_TAG}" packaged/* --repo "${GH_REPO}" --clobber

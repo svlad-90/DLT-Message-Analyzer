@@ -159,6 +159,7 @@ jobs:
         cp .\Qt6\Qt\6.5.0\msvc2019_64\bin\Qt6Sql.dll .\release_win_qt6_X86_64\Qt6Sql.dll
         cp .\Qt6\Qt\6.5.0\msvc2019_64\bin\Qt6Svg.dll .\release_win_qt6_X86_64\Qt6Svg.dll
         cp .\Qt6\Qt\6.5.0\msvc2019_64\bin\Qt6Widgets.dll .\release_win_qt6_X86_64\Qt6Widgets.dll
+        powershell -NoProfile -Command "Compress-Archive -Path '.\release_win_qt6_X86_64\*' -DestinationPath '.\release_win_qt6_X86_64.zip' -Force"
       shell: cmd
       working-directory: .\
 
@@ -168,4 +169,4 @@ jobs:
       with:
         name: release_win_qt6_X86_64
         path: |
-          release_win_qt6_X86_64
+          release_win_qt6_X86_64.zip

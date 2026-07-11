@@ -5,6 +5,7 @@
 Table of contents
 
 - [Installation guide](#installation-guide)
+  - [Install prebuilt release artifacts](#install-prebuilt-release-artifacts)
   - [Clone repositories](#clone-repositories)
   - [Linux console build](#linux-console-build)
   - [Qt Creator build](#qt-creator-build)
@@ -22,6 +23,45 @@ Table of contents
 ----
 
 # Installation guide
+
+## Install prebuilt release artifacts
+
+The recommended installation method is to download a prebuilt artifact from the
+[DLT-Message-Analyzer releases page](https://github.com/svlad-90/DLT-Message-Analyzer/releases).
+Release artifacts already contain `dlt-viewer`, the DLT-Message-Analyzer plugin,
+and the runtime libraries required by the selected Qt version.
+
+Choose the Linux artifact that matches your Qt version:
+
+- `release_linux_qt5_X86_64.tar.gz`
+- `release_linux_qt6_X86_64.tar.gz`
+
+Choose the Windows artifact that matches your Qt version:
+
+- `release_win_qt5_X86_64.zip`
+- `release_win_qt6_X86_64.zip`
+
+On Linux, unpack the archive and run:
+
+```
+./run_dlt.sh
+```
+
+On Windows, unpack the archive and run:
+
+```
+dlt-viewer.exe
+```
+
+Linux release artifacts are built for `x86_64` Linux systems with glibc and
+use the Qt `xcb` platform plugin by default, so an X11 or XWayland session is
+required. Windows release artifacts are built for 64-bit Windows.
+
+Building from source is also available and can serve as an alternative for
+systems where the prebuilt binary artifacts do not run out of the box. The
+sections below describe that alternative installation method.
+
+----
 
 ## Clone repositories
 
