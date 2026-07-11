@@ -69,7 +69,9 @@ Your target path to the plugin should look like **"./dlt-viewer/plugin/DLT-Messa
 
 - Run the following set of commands in it:
 
-  <pre># Install the 'libqt5svg5-dev' or 'libqt6svg6-dev' dependency
+  <pre># Install Java runtime required by ANTLR during the build
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install default-jre
+  # Install the 'libqt5svg5-dev' or 'libqt6svg6-dev' dependency
   sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install libqt5svg5-dev
   # create build directory
   mkdir build
@@ -182,6 +184,19 @@ As of now, they are Linux and Windows.
 > ```
 > sudo apt update
 > sudo apt-get install uuid-dev
+> ```
+>
+
+----
+
+> **Note!**
+>
+> The ANTLR generator requires a working Java runtime during the build
+> process. On Ubuntu you can install the default Java runtime with:
+>
+> ```
+> sudo apt update
+> sudo apt-get install default-jre
 > ```
 >
 
