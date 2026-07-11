@@ -811,7 +811,7 @@ void CUMLView::handleSettingsManagerChange()
 
 PUML_PACKAGE_BEGIN(DMA_PlantumlView_API)
     PUML_CLASS_BEGIN_CHECKED(CUMLView)
-        PUML_INHERITANCE_CHECKED(QWidget, extends)
+        PUML_INHERITANCE_CHECKED(QScrollArea, extends)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CImageViewer, 1, 1, contains)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(QProcess, 1, 2, contains)

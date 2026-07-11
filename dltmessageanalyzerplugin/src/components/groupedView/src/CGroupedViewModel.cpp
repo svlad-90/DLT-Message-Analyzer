@@ -866,7 +866,6 @@ void CGroupedViewModel::sortByCurrentSortingColumn()
 
 PUML_PACKAGE_BEGIN(DMA_GroupedView)
     PUML_CLASS_BEGIN_CHECKED(CGroupedViewModel)
-        PUML_INHERITANCE_CHECKED(QAbstractItemModel, implements)
         PUML_INHERITANCE_CHECKED(IGroupedViewModel, implements)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_COMPOSITION_DEPENDENCY_CHECKED(CTreeItem, 1, *, contains)

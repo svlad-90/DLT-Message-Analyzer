@@ -41,6 +41,10 @@ class "QWidget"
 package "qcustomplot" #DDDDDD
 {
 
+class "QCPAbstractPlottable"
+{
+}
+
 class "QCPAxis"
 {
 }
@@ -70,16 +74,17 @@ class "QCustomPlot"
 '====================Inheritance section====================
 QCPLegend <|-- CScrollableLegend : extends
 QCustomPlot <|-- CCustomPlotExtended : extends
+QCPLayerable <|-- QCPAbstractPlottable : extends
 QCPLayerable <|-- QCPAxis : extends
 QObject <|-- QCPAxisRect : extends
-QObject <|-- QCPGraph : extends
+QCPAbstractPlottable <|-- QCPGraph : extends
 QObject <|-- QCPLayerable : extends
 QObject <|-- QCPLegend : extends
 QWidget <|-- QCustomPlot : extends
 
 '====================Dependencies section====================
 QCPGanttRow "1" o-- "2" QCPAxis : uses
+CCustomPlotExtended "1" *-- "*" QCPAbstractPlottable : uses
 CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
-CCustomPlotExtended "1" *-- "*" QCPGraph : uses
 
 @enduml

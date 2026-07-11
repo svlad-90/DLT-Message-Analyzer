@@ -48,19 +48,9 @@ class "CSettingsManagerClient"
 
 }
 
-package "Qt" #DDDDDD
-{
-
-abstract class "QAbstractItemModel"
-{
-}
-
-}
-
 '====================Inheritance section====================
 CSettingsManagerClient <|-- CGroupedViewModel : extends
 IGroupedViewModel <|-- CGroupedViewModel : implements
-QAbstractItemModel <|-- CGroupedViewModel : implements
 
 '====================Dependencies section====================
 CGroupedViewModel "1" *-- "*" CTreeItem : contains

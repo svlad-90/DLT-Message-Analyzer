@@ -72,7 +72,7 @@ class "QProcess"
 {
 }
 
-class "QWidget"
+class "QScrollArea"
 {
 }
 
@@ -80,7 +80,7 @@ class "QWidget"
 
 '====================Inheritance section====================
 CSettingsManagerClient <|-- CUMLView : extends
-QWidget <|-- CUMLView : extends
+QScrollArea <|-- CUMLView : extends
 CSettingsManagerClient <|-- CUMLViewComponent : extends
 DMA::IComponent <|-- CUMLViewComponent : implements
 

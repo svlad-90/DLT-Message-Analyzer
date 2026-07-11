@@ -105,15 +105,6 @@ class "IFiltersModel"
 
 }
 
-package "DMA_GroupedView" #DDDDDD
-{
-
-class "CGroupedViewModel"
-{
-}
-
-}
-
 package "DMA_GroupedView_API" #DDDDDD
 {
 
@@ -297,10 +288,6 @@ class "CSearchResultHighlightingDelegate"
 {
 }
 
-class "CSearchResultModel"
-{
-}
-
 }
 
 package "DMA_SearchView_API" #DDDDDD
@@ -376,6 +363,10 @@ class "QPushButton"
 {
 }
 
+class "QScrollArea"
+{
+}
+
 class "QStyledItemDelegate"
 {
 }
@@ -417,10 +408,6 @@ class "QCPAxisRect"
 {
 }
 
-class "QCPGraph"
-{
-}
-
 class "QCPLayerable"
 {
 }
@@ -446,7 +433,6 @@ QObject <|-- ICoverageNoteProvider : extends
 QStyledItemDelegate <|-- CFilterItemDelegate : extends
 QTreeView <|-- CFiltersView : implements
 QAbstractItemModel <|-- IFiltersModel : implements
-QAbstractItemModel <|-- CGroupedViewModel : implements
 QTreeView <|-- CGroupedView : extends
 QObject <|-- CConsoleCtrl : extends
 QObject <|-- CConsoleInputProcessor : extends
@@ -457,19 +443,17 @@ QTreeView <|-- CPatternsView : extends
 QStyledItemDelegate <|-- CTreeRepresentationDelegate : extends
 QAbstractItemModel <|-- IPatternsModel : implements
 QWidget <|-- CImageViewer : extends
-QWidget <|-- CUMLView : extends
+QScrollArea <|-- CUMLView : extends
 QObject <|-- DLTMessageAnalyzerPlugin : extends
 QWidget <|-- Form : extends
 QCompleter <|-- CExtendedCompleter : extends
 QTextEdit <|-- CRegexHistoryTextEdit : extends
 QObject <|-- IRegexHistoryProvider : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
-QAbstractTableModel <|-- CSearchResultModel : implements
 QTableView <|-- CSearchResultView : extends
 QObject <|-- CSearchViewComponent : extends
 QObject <|-- ISettingsManager : extends
 QObject <|-- QCPAxisRect : extends
-QObject <|-- QCPGraph : extends
 QObject <|-- QCPLayerable : extends
 QObject <|-- QCPLegend : extends
 QWidget <|-- QCustomPlot : extends

@@ -19,6 +19,10 @@ class "QWidget"
 package "qcustomplot" #DDDDDD
 {
 
+class "QCPAbstractPlottable"
+{
+}
+
 class "QCPAxis"
 {
 }
@@ -46,9 +50,10 @@ class "QCustomPlot"
 }
 
 '====================Inheritance section====================
+QCPLayerable <|-- QCPAbstractPlottable : extends
 QCPLayerable <|-- QCPAxis : extends
 QObject <|-- QCPAxisRect : extends
-QObject <|-- QCPGraph : extends
+QCPAbstractPlottable <|-- QCPGraph : extends
 QObject <|-- QCPLayerable : extends
 QObject <|-- QCPLegend : extends
 QWidget <|-- QCustomPlot : extends
