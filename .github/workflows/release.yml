@@ -1,0 +1,79 @@
+name: Release artifacts
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to upload artifacts to'
+        required: true
+
+jobs:
+  build_windows_qt5:
+    uses: ./.github/workflows/build_windows_qt5.yml
+    with:
+      collect_artifacts: true
+
+  build_windows_qt6:
+    uses: ./.github/workflows/build_windows_qt6.yml
+    with:
+      collect_artifacts: true
+
+  build_linux_qt5:
+    uses: ./.github/workflows/build_linux_qt5.yml
+    with:
+      collect_artifacts: true
+
+  build_linux_qt6:
+    uses: ./.github/workflows/build_linux_qt6.yml
+    with:
+      collect_artifacts: true
+
+  publish:
+    needs:
+      - build_windows_qt5
+      - build_windows_qt6
+      - build_linux_qt5
+      - build_linux_qt6
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_artifacts
+
+      - name: Package artifacts
+        run: |
+          set -euo pipefail
+
+          mkdir -p packaged
+
+          package_zip() {
+            local artifact="$1"
+            test -d "release_artifacts/${artifact}"
+            (
+              cd "release_artifacts/${artifact}"
+              zip -r "../../packaged/${artifact}.zip" .
+            )
+          }
+
+          package_tar() {
+            local artifact="$1"
+            test -d "release_artifacts/${artifact}"
+            tar -czf "packaged/${artifact}.tar.gz" -C "release_artifacts/${artifact}" .
+          }
+
+          package_zip "release_win_qt5_X86_64"
+          package_zip "release_win_qt6_X86_64"
+          package_tar "release_linux_qt5_X86_64"
+          package_tar "release_linux_qt6_X86_64"
+
+      - name: Upload artifacts to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+        run: gh release upload "${RELEASE_TAG}" packaged/* --clobber

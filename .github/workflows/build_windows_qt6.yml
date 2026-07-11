@@ -16,6 +16,13 @@ on:
         required: false
         default: 'false'
         type: boolean
+  workflow_call:
+    inputs:
+      collect_artifacts:
+        description: 'Collect build artifacts'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build_windows:
@@ -117,7 +124,7 @@ jobs:
 
     # Collect required artifacts
     - name: Collect required artifacts
-      if: ${{ github.event.inputs.collect_artifacts == 'true' }}
+      if: ${{ inputs.collect_artifacts }}
       run: |
         mkdir .\release_win_qt6_X86_64
         mkdir .\release_win_qt6_X86_64\plugins
@@ -156,7 +163,7 @@ jobs:
       working-directory: .\
 
     - name: Upload artifacts
-      if: ${{ success() && github.event.inputs.collect_artifacts == 'true' }}
+      if: ${{ success() && inputs.collect_artifacts }}
       uses: actions/upload-artifact@v4
       with:
         name: release_win_qt6_X86_64
