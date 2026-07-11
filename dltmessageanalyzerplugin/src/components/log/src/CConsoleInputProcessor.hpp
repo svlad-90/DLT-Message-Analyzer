@@ -5,6 +5,7 @@
 #include "functional"
 #include "deque"
 
+#include <QList>
 #include <QLineEdit>
 
 #include "components/settings/api/CSettingsManagerClient.hpp"
@@ -22,7 +23,7 @@ public:
 
     typedef std::map<tParamName, tParamValue> tParamMap;
 
-    typedef std::function<void(const tParamMap&)> tScenarioHandler;
+    typedef std::function<bool(const tParamMap&)> tScenarioHandler;
 
     struct tScenarioData
     {
@@ -39,12 +40,14 @@ public:
                             const tSettingsManagerPtr& pSettingsManager );
     virtual ~CConsoleInputProcessor();
 
+    bool processCommand(const QString& command, const QList<QString>& params);
+
 protected:
     bool eventFilter(QObject* pObj, QEvent* pEvent) override;
 
 private:
     CConsoleInputProcessor::tScenariosMap createScenariosMap();
-    void printHelp(const QString& command);
+    bool printHelp(const QString& command);
 
 private:
 

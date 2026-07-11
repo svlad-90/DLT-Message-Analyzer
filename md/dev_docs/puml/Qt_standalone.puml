@@ -54,6 +54,10 @@ class "QPushButton"
 {
 }
 
+class "QScrollArea"
+{
+}
+
 class "QStyledItemDelegate"
 {
 }

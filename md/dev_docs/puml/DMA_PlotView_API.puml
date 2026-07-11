@@ -84,11 +84,11 @@ class "QPushButton"
 package "qcustomplot" #DDDDDD
 {
 
-class "QCPAxisRect"
+class "QCPAbstractPlottable"
 {
 }
 
-class "QCPGraph"
+class "QCPAxisRect"
 {
 }
 
@@ -105,8 +105,8 @@ DMA::IComponent <|-- CPlotViewComponent : implements
 
 '====================Dependencies section====================
 CCustomPlotExtended "1" --> "*" CScrollableLegend : uses
+CCustomPlotExtended "1" *-- "*" QCPAbstractPlottable : uses
 CCustomPlotExtended "1" *-- "*" QCPAxisRect : uses
-CCustomPlotExtended "1" *-- "*" QCPGraph : uses
 CPlotViewComponent "1" o-- "1" CCustomPlotExtended : uses
 CPlotViewComponent "1" --> "*" CScrollableLegend : uses
 CPlotViewComponent "1" o-- "1" ISearchResultModel : uses

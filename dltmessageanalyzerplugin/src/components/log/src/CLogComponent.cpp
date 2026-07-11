@@ -32,6 +32,16 @@ const char* CLogComponent::getName() const
     return "CLogComponent";
 }
 
+bool CLogComponent::processCommand(const QString& command, const QList<QString>& params)
+{
+    if(nullptr != mpConsoleInputProcessor)
+    {
+        return mpConsoleInputProcessor->processCommand(command, params);
+    }
+
+    return false;
+}
+
 DMA::tSyncInitOperationResult CLogComponent::init()
 {
     DMA::tSyncInitOperationResult result;

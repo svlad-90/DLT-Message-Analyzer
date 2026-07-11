@@ -88,10 +88,6 @@ class "CSettingsManagerClient"
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractTableModel"
-{
-}
-
 class "QStyledItemDelegate"
 {
 }
@@ -103,7 +99,6 @@ CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 CSettingsManagerClient <|-- CSearchResultModel : extends
 ISearchResultModel <|-- CSearchResultModel : implements
-QAbstractTableModel <|-- CSearchResultModel : implements
 
 '====================Dependencies section====================
 CSearchResultHighlightingDelegate "1" *-- "1" ISearchResultModel : uses

@@ -44,10 +44,6 @@ class "CSettingsManagerClient"
 package "Qt" #DDDDDD
 {
 
-abstract class "QAbstractTableModel"
-{
-}
-
 class "QStyledItemDelegate"
 {
 }
@@ -59,6 +55,5 @@ CSettingsManagerClient <|-- CSearchResultHighlightingDelegate : extends
 QStyledItemDelegate <|-- CSearchResultHighlightingDelegate : extends
 CSettingsManagerClient <|-- CSearchResultModel : extends
 ISearchResultModel <|-- CSearchResultModel : implements
-QAbstractTableModel <|-- CSearchResultModel : implements
 
 @enduml

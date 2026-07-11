@@ -2,27 +2,57 @@
 
 #include "CConsoleCtrl.hpp"
 
+#include <cstdio>
+
 namespace DMA_Log
 {
+    static void printToConsole(const QString& str, FILE* stream)
+    {
+        const QByteArray data = str.toLocal8Bit();
+        std::fprintf(stream, "%s\n", data.constData());
+        std::fflush(stream);
+    }
+
     void sendMessage(const QString& str)
     {
         NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;
         messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eMsg;
-        NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        if(NDLTMessageAnalyzer::NConsole::CConsoleCtrl::isExist())
+        {
+            NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        }
+        else
+        {
+            printToConsole(str, stdout);
+        }
     }
 
     void sendWarning(const QString& str)
     {
         NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;
         messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eWrn;
-        NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        if(NDLTMessageAnalyzer::NConsole::CConsoleCtrl::isExist())
+        {
+            NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        }
+        else
+        {
+            printToConsole(str, stderr);
+        }
     }
 
     void sendError(const QString& str)
     {
         NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;
         messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eErr;
-        NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        if(NDLTMessageAnalyzer::NConsole::CConsoleCtrl::isExist())
+        {
+            NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        }
+        else
+        {
+            printToConsole(str, stderr);
+        }
     }
 
     void sendMessageColored(const QString& str, const QColor& color)
@@ -31,14 +61,23 @@ namespace DMA_Log
         messageSettings.messageType = NDLTMessageAnalyzer::NConsole::eMessageType::eWrn;
         messageSettings.bCustomColor = true;
         messageSettings.color = color;
-        NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        if(NDLTMessageAnalyzer::NConsole::CConsoleCtrl::isExist())
+        {
+            NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage(str, messageSettings);
+        }
+        else
+        {
+            printToConsole(str, stdout);
+        }
     }
 
     void clearConsole()
     {
         NDLTMessageAnalyzer::NConsole::tMessageSettings messageSettings;
         messageSettings.clear = true;
-        NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage("", messageSettings);
+        if(NDLTMessageAnalyzer::NConsole::CConsoleCtrl::isExist())
+        {
+            NDLTMessageAnalyzer::NConsole::CConsoleCtrl::sendMessage("", messageSettings);
+        }
     }
 }
-

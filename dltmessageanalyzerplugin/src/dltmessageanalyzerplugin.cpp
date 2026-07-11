@@ -10,6 +10,7 @@
 #include "QLineEdit"
 #include "QApplication"
 
+#include "qdltoptmanager.h"
 #include "qcustomplot.h"
 
 #include "dltmessageanalyzerplugin.hpp"
@@ -23,6 +24,7 @@
 
 #include "components/analyzer/api/CAnalyzerComponent.hpp"
 #include "components/log/api/CLogComponent.hpp"
+#include "components/log/src/CConsoleInputProcessor.hpp"
 #include "components/searchView/api/CSearchViewComponent.hpp"
 #include "components/groupedView/api/CGroupedViewComponent.hpp"
 #include "components/patternsView/api/CPatternsViewComponent.hpp"
@@ -57,12 +59,15 @@ mLastAvailableNumberOfMsg(0),
 mConnecitonsMap(),
 mConnectionState(QDltConnection::QDltConnectionState::QDltConnectionOffline),
 mbAnalysisRunning(false),
+mErrorString(),
 mComponents(),
 mpSearchViewComponent(nullptr),
 mpGroupedViewComponent(nullptr),
 mpPatternsViewComponent(nullptr),
 mpFiltersViewComponent(nullptr),
 mpUMLViewComponent(nullptr),
+mpPlotViewComponent(nullptr),
+mpHeadlessConsoleInputProcessor(nullptr),
 mpLogoComponent(nullptr),
 mpLogsWrapperComponent(nullptr),
 mpRegexHistoryComponent(nullptr),
@@ -125,7 +130,7 @@ QString DLTMessageAnalyzerPlugin::description()
 
 QString DLTMessageAnalyzerPlugin::error()
 {
-    return QString();
+    return mErrorString;
 }
 
 bool DLTMessageAnalyzerPlugin::loadConfig(QString /*filename*/)
@@ -145,6 +150,16 @@ QStringList DLTMessageAnalyzerPlugin::infoConfig()
 
 QWidget* DLTMessageAnalyzerPlugin::initViewer()
 {    
+    if(QDltOptManager::getInstance()->isCommandlineMode())
+    {
+        return nullptr;
+    }
+
+    if(nullptr != mpForm)
+    {
+        return mpForm;
+    }
+
     {
         auto pSettingsComponent = std::make_shared<CSettingsComponent>();
         mpSettingsComponent = pSettingsComponent;
@@ -584,6 +599,45 @@ void DLTMessageAnalyzerPlugin::selectedIdxMsg(int, QDltMsg &/*msg*/) {
 
 void DLTMessageAnalyzerPlugin::selectedIdxMsgDecoded(int, QDltMsg &/*msg*/){
 
+}
+
+bool DLTMessageAnalyzerPlugin::command(QString command, QList<QString> params)
+{
+    mErrorString.clear();
+
+    if(nullptr == mpSettingsComponent)
+    {
+        auto pSettingsComponent = std::make_shared<CSettingsComponent>();
+        mpSettingsComponent = pSettingsComponent;
+
+        auto initResult = pSettingsComponent->startInit();
+
+        if(false == initResult.bIsOperationSuccessful)
+        {
+            mErrorString = QString("Failed to initialize %1").arg(pSettingsComponent->getName());
+            SEND_ERR(mErrorString);
+            return false;
+        }
+
+        mComponents.push_back(pSettingsComponent);
+    }
+
+    if(nullptr == mpHeadlessConsoleInputProcessor)
+    {
+        const auto pSettingsManager = nullptr != mpSettingsComponent
+                                    ? mpSettingsComponent->getSettingsManager()
+                                    : tSettingsManagerPtr();
+        mpHeadlessConsoleInputProcessor = std::make_shared<CConsoleInputProcessor>(nullptr,
+                                                                                   pSettingsManager);
+    }
+
+    if(false == mpHeadlessConsoleInputProcessor->processCommand(command, params))
+    {
+        mErrorString = QString("Command \"%1\" failed or is not supported").arg(command);
+        return false;
+    }
+
+    return true;
 }
 
 void DLTMessageAnalyzerPlugin::initFileStart(QDltFile *file)

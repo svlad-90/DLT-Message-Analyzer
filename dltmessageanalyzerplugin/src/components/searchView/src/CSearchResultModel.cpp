@@ -1690,7 +1690,6 @@ const tMsgIdSet& CSearchResultModel::getHighlightedRows() const
 
 PUML_PACKAGE_BEGIN(DMA_SearchView)
     PUML_CLASS_BEGIN_CHECKED(CSearchResultModel)
-        PUML_INHERITANCE_CHECKED(QAbstractTableModel, implements)
         PUML_INHERITANCE_CHECKED(ISearchResultModel, implements)
         PUML_INHERITANCE_CHECKED(CSettingsManagerClient, extends)
         PUML_AGGREGATION_DEPENDENCY_CHECKED(IFileWrapper, 1, 1, uses)
