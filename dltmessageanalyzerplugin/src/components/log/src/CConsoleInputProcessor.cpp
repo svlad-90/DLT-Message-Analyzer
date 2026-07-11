@@ -85,10 +85,12 @@ static void availableUMLPackages(const QString& packageName)
     }
 }
 
-static void printClassDiagram(const QString& packageName, bool excludeExternalDependencies)
+static bool printClassDiagram(const QString& packageName, bool excludeExternalDependencies)
 {
-    auto printPackage = [&excludeExternalDependencies](const QString& packageName_)
+    auto printPackage = [&excludeExternalDependencies](const QString& packageName_)->bool
     {
+        bool bResult = false;
+
         SEND_MSG(QString("Class diagram for package \"%1\":").arg(packageName_));
 
         auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram(packageName_.toStdString(),
@@ -97,14 +99,18 @@ static void printClassDiagram(const QString& packageName, bool excludeExternalDe
         if(true == diagramResult.bIsSuccessful)
         {
             SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+            bResult = true;
         }
         else
         {
             SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
         }
+
+        return bResult;
     };
 
     QString toLowerCandidate = packageName.toLower();
+    bool bResult = true;
 
     if(toLowerCandidate == "all")
     {
@@ -114,20 +120,24 @@ static void printClassDiagram(const QString& packageName, bool excludeExternalDe
         {
             if(nullptr != pPackageName)
             {
-                printPackage(QString::fromStdString(*pPackageName));
+                bResult = printPackage(QString::fromStdString(*pPackageName)) && bResult;
             }
         }
     }
     else
     {
-        printPackage(packageName);
+        bResult = printPackage(packageName);
     }
+
+    return bResult;
 }
 
-static void exportClassDiagram(const QString& dir, const QString& packageName, bool excludeExternalDependencies)
+static bool exportClassDiagram(const QString& dir, const QString& packageName, bool excludeExternalDependencies)
 {
-    auto exportPackage = [&dir, &excludeExternalDependencies](const QString& packageName_)
+    auto exportPackage = [&dir, &excludeExternalDependencies](const QString& packageName_)->bool
     {
+        bool bResult = false;
+
         auto diagramResult = DMA::PlantUML::Creator::getInstance().getPackageClassDiagram(packageName_.toStdString(),
                                                                                           excludeExternalDependencies);
         if(true == diagramResult.bIsSuccessful)
@@ -152,6 +162,7 @@ static void exportClassDiagram(const QString& dir, const QString& packageName, b
                 file.close();
 
                 SEND_MSG(QString("[exportClassDiagram] Diagram \"%1\" was successfully exported").arg(fileName));
+                bResult = true;
             }
             else
             {
@@ -162,9 +173,12 @@ static void exportClassDiagram(const QString& dir, const QString& packageName, b
         {
             SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
         }
+
+        return bResult;
     };
 
     QString toLowerCandidate = packageName.toLower();
+    bool bResult = true;
 
     if(toLowerCandidate == "all")
     {
@@ -174,18 +188,22 @@ static void exportClassDiagram(const QString& dir, const QString& packageName, b
         {
             if(nullptr != pPackageName)
             {
-                exportPackage(QString::fromStdString(*pPackageName));
+                bResult = exportPackage(QString::fromStdString(*pPackageName)) && bResult;
             }
         }
     }
     else
     {
-        exportPackage(packageName);
+        bResult = exportPackage(packageName);
     }
+
+    return bResult;
 }
 
-static void printAppClassDiagram()
+static bool printAppClassDiagram()
 {
+    bool bResult = false;
+
     SEND_MSG(QString("Class diagram of application:"));
 
     auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
@@ -193,15 +211,20 @@ static void printAppClassDiagram()
     if(true == diagramResult.bIsSuccessful)
     {
         SEND_MSG(QString::fromStdString(diagramResult.diagramContent));
+        bResult = true;
     }
     else
     {
         SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
     }
+
+    return bResult;
 }
 
-static void exportAppClassDiagram(const QString& dir)
+static bool exportAppClassDiagram(const QString& dir)
 {
+    bool bResult = false;
+
     auto diagramResult = DMA::PlantUML::Creator::getInstance().getClassDiagram();
 
     if(true == diagramResult.bIsSuccessful)
@@ -217,6 +240,7 @@ static void exportAppClassDiagram(const QString& dir)
             file.close();
 
             SEND_MSG(QString("[%1] Diagram \"DMA_Full.puml\" was successfully exported").arg(__FUNCTION__));
+            bResult = true;
         }
         else
         {
@@ -227,6 +251,8 @@ static void exportAppClassDiagram(const QString& dir)
     {
         SEND_ERR(QString("Error during producing UML diagram: %1").arg(QString::fromStdString(diagramResult.error)));
     }
+
+    return bResult;
 }
 
 static void version()
@@ -302,8 +328,10 @@ static void plot_operations()
     SEND_MSG("- Click on the graph point - jump to the corresponding message in the dlt-viewer's main table, and show the point details");
 }
 
-void CConsoleInputProcessor::printHelp(const QString& command)
+bool CConsoleInputProcessor::printHelp(const QString& command)
 {
+    bool bResult = false;
+
     static const auto scenarioMap = createScenariosMap();
 
     if(true == command.isEmpty())
@@ -319,6 +347,7 @@ void CConsoleInputProcessor::printHelp(const QString& command)
         }
 
         SEND_MSG("Note! Parameters should be mentioned in \"-param=value\" or \"--param=value\" format");
+        bResult = true;
     }
     else
     {
@@ -330,12 +359,15 @@ void CConsoleInputProcessor::printHelp(const QString& command)
                      .append(foundCommand->first)
                      .append(" ")
                      .append(foundCommand->second.comment));
+            bResult = true;
         }
         else
         {
             SEND_ERR(QString("Command with name \"%1\" was not found. Print \"help\" to see list of available commands").arg(command));
         }
     }
+
+    return bResult;
 }
 
 static bool strToBool( const QString& str, bool& val )
@@ -362,12 +394,25 @@ static bool strToBool( const QString& str, bool& val )
     return bResult;
 }
 
+static QString normalizeCommandParameter(QString paramCandidate)
+{
+    paramCandidate = paramCandidate.trimmed();
+
+    while(paramCandidate.startsWith("-"))
+    {
+        paramCandidate.remove(0, 1);
+    }
+
+    return paramCandidate;
+}
+
 CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap()
 {
     CConsoleInputProcessor::tScenariosMap result;
 
     result[sHelpCommandName] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap& params)
     {
+        bool bResult = false;
         auto foundCommandParam = params.find("c");
 
         QString command;
@@ -377,32 +422,81 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
             command = foundCommandParam->second;
         }
 
-        printHelp(command);
+        bResult = printHelp(command);
+
+        return bResult;
     }, "[-c=<command-name>] - show this help. If no \"c\" parameter is provided - "
        "help regarding all available commands will be dumped. "
        "Be aware, that [<command-name> <help>] syntax can also be used to get the help output regarding a single command. "
        "Such syntax is easier to use, considering limited auto-complete functionality of this console. E.g. \"help -help\" (ha-ha).");
 
-    result["clear"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){clear();},
+    result["clear"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        clear();
+        return bResult;
+    },
                       "- clears debug view");
-    result["color-aliases"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedColors();}
+    result["color-aliases"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        supportedColors();
+        return bResult;
+    }
                               , "- prints all supported color aliases");
-    result["plot-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_identifiers();}
+    result["plot-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        plot_identifiers();
+        return bResult;
+    }
                                   , "- prints information about regex names scripting in area of the plot diagrams.");
-    result["plot-operations"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){plot_operations();}
+    result["plot-operations"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        plot_operations();
+        return bResult;
+    }
                                   , "- prints information about regex names scripting in area of the plot diagrams.");
-    result["support"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){support();}
+    result["support"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        support();
+        return bResult;
+    }
                         , "- prints information regarding how to get support");
-    result["version"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){version();}
+    result["version"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        version();
+        return bResult;
+    }
                         , "- prints version of the plugin");
-    result["web-link"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){webLink();}
+    result["web-link"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        webLink();
+        return bResult;
+    }
                          , "- prints URL with location of the plugin on the Git hub");
-    result["uml-sequence-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){UML_sequence_identifiers();}
+    result["uml-sequence-ids"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        UML_sequence_identifiers();
+        return bResult;
+    }
                        , "- prints information about regex names scripting in area of the UML sequence diagrams");
-    result["styles"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){supportedStyles();}
+    result["styles"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        supportedStyles();
+        return bResult;
+    }
                        , "- prints information about QT styles supported on target OS");
     result["uml-packages"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
     {
+        bool bResult = false;
+
         if(false == params.empty())
         {
             auto foundParam = params.find("p");
@@ -410,6 +504,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
             if(foundParam != params.end())
             {
                 availableUMLPackages(foundParam->second);
+                bResult = true;
             }
             else
             {
@@ -419,13 +514,18 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         else
         {
             availableUMLPackages("");
+            bResult = true;
         }
+
+        return bResult;
     }, "[-p=<packageName> // part of case insensitive package name] - prints information about available UML packages. "
        "In case if \"package\" parameter is empty - will print info about all available packages. "
        "Obtained names can be used to build UML class diagrams using \"uml-print-class-diagram\" command");
 
     result["uml-print-class-diagram"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
     {
+        bool bResult = false;
+
         if(false == params.empty())
         {
             auto foundPackageParam = params.find("p");
@@ -440,7 +540,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                 {
                     if(strToBool(foundExcludeDepsParam->second, bExcludeDeps))
                     {
-                        printClassDiagram(foundPackageParam->second, bExcludeDeps);
+                        bResult = printClassDiagram(foundPackageParam->second, bExcludeDeps);
                     }
                     else
                     {
@@ -449,7 +549,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                 }
                 else
                 {
-                    printClassDiagram(foundPackageParam->second, bExcludeDeps);
+                    bResult = printClassDiagram(foundPackageParam->second, bExcludeDeps);
                 }
             }
             else
@@ -459,8 +559,10 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         }
         else
         {
-            printAppClassDiagram();
+            bResult = printAppClassDiagram();
         }
+
+        return bResult;
     }, "[-p=<packageName> // case sensitive name of the package. Can contain special \"all\" value.]"
        "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
        "- prints class diagram of the whole application or of the dedicated package(s) to the console. "
@@ -468,6 +570,8 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
 
     result["uml-export-class-diagram"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
     {
+        bool bResult = false;
+
         if(params.size() > 1)
         {
             auto foundPackageParam = params.find("p");
@@ -489,7 +593,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                         {
                             if(strToBool(foundExcludeDepsParam->second, bExcludeDeps))
                             {
-                                exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
+                                bResult = exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
                             }
                             else
                             {
@@ -498,7 +602,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                         }
                         else
                         {
-                            exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
+                            bResult = exportClassDiagram(foundDirParam->second, foundPackageParam->second, bExcludeDeps);
                         }
                     }
                     else
@@ -525,7 +629,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                 QFile file( foundDirParam->second );
                 if ( true == file.exists() )
                 {
-                    exportAppClassDiagram(foundDirParam->second);
+                    bResult = exportAppClassDiagram(foundDirParam->second);
                 }
                 else
                 {
@@ -541,6 +645,8 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         {
             SEND_ERR("Command [uml-export-class-diagram]: required parameter \"d\" not found!");
         }
+
+        return bResult;
     }, "[-d=<directory> // mandatory! Directory, to which store the the diagrams]"
        "[-p=<packageName> // case sensitive name of the package. Can contain special \"all\" value.]"
        "[-e=<exclude-external-dependencies> // whether to exclude external dependencies] "
@@ -549,6 +655,8 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
 
     result["plantuml-settings"] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap&)
     {
+        bool bResult = true;
+
         SEND_MSG( "Current plantuml settings:" );
         SEND_MSG( QString("Plantuml path mode: \"%1\"")
         .arg(getPathModeAsString( static_cast<ePathMode>(getSettingsManager()->getPlantumlPathMode()) ) ) );
@@ -574,11 +682,15 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         {
             SEND_MSG( QString("Plantuml path environment variable value: \"No such variable exist\""));
         }
+
+        return bResult;
     },
     "- prints information about the currently used plantuml settings");
 
     result["java-settings"] = CConsoleInputProcessor::tScenarioData([this](const CConsoleInputProcessor::tParamMap&)
     {
+        bool bResult = true;
+
         SEND_MSG( "Current java settings:" );
         SEND_MSG( QString("Java path mode: \"%1\"")
         .arg(getPathModeAsString( static_cast<ePathMode>(getSettingsManager()->getJavaPathMode()) ) ) );
@@ -604,11 +716,15 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         {
             SEND_MSG( QString("Java path environment variable value: \"No such variable exist\""));
         }
+
+        return bResult;
     },
     "- prints information about the currently used java settings");
 
     result["convert-txt-to-dlt-file"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap& params)
     {
+        bool bResult = false;
+
         if(false == params.empty())
         {
             auto foundSourceFileParam = params.find("sf");
@@ -619,7 +735,7 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
 
                 if(foundTargetFileParam != params.end())
                 {
-                    bool bConvertionResult = false;
+                    bool bConversionAttempted = false;
 
                     auto foundVersionParam = params.find("version");
 
@@ -627,11 +743,13 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                     {
                         if(foundVersionParam->second.toLower() == "v2")
                         {
-                            bConvertionResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                            bResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                            bConversionAttempted = true;
                         }
                         else if(foundVersionParam->second.toLower() == "v1")
                         {
-                            bConvertionResult = convertLogFileToDLTV1(foundSourceFileParam->second, foundTargetFileParam->second);
+                            bResult = convertLogFileToDLTV1(foundSourceFileParam->second, foundTargetFileParam->second);
+                            bConversionAttempted = true;
                         }
                         else
                         {
@@ -642,17 +760,21 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
                     }
                     else
                     {
-                        bConvertionResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                        bResult = convertLogFileToDLTV2(foundSourceFileParam->second, foundTargetFileParam->second);
+                        bConversionAttempted = true;
                     }
 
-                    if(false == bConvertionResult)
+                    if(true == bConversionAttempted)
                     {
-                        SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Failed to convert the \"%1\" file to dlt format!")
-                                     .arg(foundSourceFileParam->second));
-                    }
-                    else
-                    {
-                        SEND_MSG("Command [convert-txt-to-dlt-file]: Conversion successfully performed!");
+                        if(false == bResult)
+                        {
+                            SEND_ERR(QString("Command [convert-txt-to-dlt-file]: Failed to convert the \"%1\" file to dlt format!")
+                                         .arg(foundSourceFileParam->second));
+                        }
+                        else
+                        {
+                            SEND_MSG("Command [convert-txt-to-dlt-file]: Conversion successfully performed!");
+                        }
                     }
                 }
                 else
@@ -669,6 +791,8 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
         {
             SEND_ERR("Command [convert-txt-to-dlt-file]: required parameters \"sf\" and \"tf\" not found!");
         }
+
+        return bResult;
     },
     "- converts specified file with '\\n' separated set of strings to the dlt format"
     "[-sf=<source_file> // mandatory! Source file which we should convert to the dlt format]"
@@ -676,7 +800,12 @@ CConsoleInputProcessor::tScenariosMap CConsoleInputProcessor::createScenariosMap
     "[-v=<version> // optional! Version of the dlt protocol. Supported values are 'v1' and 'v2'. Default value is 'v2']");
 
 #ifdef DMA_TC_MALLOC_PROFILING_ENABLED
-    result["dump-memory-stats"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&){dumpMemoryStatistics();}
+    result["dump-memory-stats"] = CConsoleInputProcessor::tScenarioData([](const CConsoleInputProcessor::tParamMap&)
+    {
+        bool bResult = true;
+        dumpMemoryStatistics();
+        return bResult;
+    }
                               , "- prints tcmalloc memory stats.");
 #endif
 
@@ -700,6 +829,93 @@ CConsoleInputProcessor::CConsoleInputProcessor( QLineEdit* pTargetLineEdit,
 
 CConsoleInputProcessor::~CConsoleInputProcessor()
 {}
+
+bool CConsoleInputProcessor::processCommand(const QString& command, const QList<QString>& params)
+{
+    bool bResult = false;
+
+    const QString lowerCandidate = command.toLower().trimmed();
+
+    QString commandText = command;
+    for(const auto& param : params)
+    {
+        commandText.append(" ").append(param);
+    }
+
+    SEND_MSG("");
+    SEND_MSG("========================================");
+    SEND_MSG(QString("| ").append(commandText));
+
+    auto foundScenario = mScenariosMap.find(lowerCandidate);
+
+    if( foundScenario != mScenariosMap.end() )
+    {
+        tParamMap paramMap;
+
+        for(auto paramCandidate : params)
+        {
+            paramCandidate = normalizeCommandParameter(paramCandidate);
+
+            if(paramCandidate.isEmpty())
+            {
+                continue;
+            }
+
+            const int separatorIndex = paramCandidate.indexOf("=");
+
+            if(separatorIndex >= 0)
+            {
+                const QString paramName = paramCandidate.left(separatorIndex);
+                const QString paramValue = paramCandidate.mid(separatorIndex + 1).trimmed();
+                paramMap[paramName] = paramValue;
+            }
+            else
+            {
+                paramMap[paramCandidate] = "";
+            }
+        }
+
+        SEND_MSG("----------------------------------------");
+
+        auto foundHelpParameter = paramMap.find(sHelpCommandName);
+
+        if(foundHelpParameter == paramMap.end())
+        {
+            if(foundScenario->second.scenarioHandler)
+            {
+                bResult = foundScenario->second.scenarioHandler(paramMap);
+            }
+        }
+        else
+        {
+            auto foundHelpCommand = mScenariosMap.find(sHelpCommandName);
+
+            if(foundHelpCommand != mScenariosMap.end())
+            {
+                tParamMap helpParamMap;
+                helpParamMap["c"] = foundScenario->first;
+
+                if(foundHelpCommand->second.scenarioHandler)
+                {
+                    bResult = foundHelpCommand->second.scenarioHandler(helpParamMap);
+                }
+            }
+        }
+
+        if(lowerCandidate != "clear")
+        {
+            SEND_MSG("========================================");
+        }
+    }
+    else
+    {
+        SEND_MSG("----------------------------------------");
+        SEND_WRN(QString("Command \"%1\" not supported. Input \"help\" in order to get the list of supported commands.").arg(commandText));
+        SEND_MSG("========================================");
+    }
+
+    return bResult;
+}
 
 bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 {
@@ -877,10 +1093,6 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                 mpTargetLineEdit->clear();
 
-                SEND_MSG("");
-                SEND_MSG("========================================");
-                SEND_MSG(QString("| ").append(text));
-
                 // let's split input text into function name, and its parameters
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
@@ -893,73 +1105,16 @@ bool CConsoleInputProcessor::eventFilter(QObject* pObj, QEvent* pEvent)
 
                 if(false == stirngList.empty())
                 {
-                    QString lowerCandidate = stirngList[0].toLower();
+                    const QString command = stirngList[0];
                     stirngList.pop_front(); // erase name, as it is already copied
 
-                    auto foundScenario = mScenariosMap.find(lowerCandidate);
-
-                    if( foundScenario != mScenariosMap.end() )
+                    QList<QString> params;
+                    for(const auto& param : stirngList)
                     {
-                        // if command was found, let's parse paprameters
-
-                        tParamMap paramMap;
-
-                        for(const auto& paramCandidate : stirngList)
-                        {
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-                            QStringList parsedParam = paramCandidate.split("=", QString::SplitBehavior::SkipEmptyParts);
-#else
-                            QStringList parsedParam = paramCandidate.split("=", Qt::SkipEmptyParts);
-#endif
-
-                            if(parsedParam.size() == 2)
-                            {
-                                paramMap[parsedParam[0]] = parsedParam[1].trimmed();
-                            }
-                            else if(parsedParam.size() == 1)
-                            {
-                                paramMap[parsedParam[0]] = "";
-                            }
-                        }
-
-                        SEND_MSG("----------------------------------------");
-
-                        auto foundHelpParameter = paramMap.find(sHelpCommandName);
-
-                        if(foundHelpParameter == paramMap.end())
-                        {
-                            if(foundScenario->second.scenarioHandler)
-                            {
-                                foundScenario->second.scenarioHandler(paramMap);
-                            }
-                        }
-                        else
-                        {
-                            auto foundHelpCommand = mScenariosMap.find(sHelpCommandName);
-
-                            if(foundHelpCommand != mScenariosMap.end())
-                            {
-                                tParamMap helpParamMap;
-                                helpParamMap["c"] = foundScenario->first;
-
-                                if(foundHelpCommand->second.scenarioHandler)
-                                {
-                                    foundHelpCommand->second.scenarioHandler(helpParamMap);
-                                }
-                            }
-                        }
-
-                        if(lowerCandidate != "clear")
-                        {
-                            SEND_MSG("========================================");
-                        }
+                        params.push_back(param);
                     }
-                    else
-                    {
-                        SEND_MSG("----------------------------------------");
-                        SEND_WRN(QString("Command \"%1\" not supported. Input \"help\" in order to get the list of supported commands.").arg(text));
-                        SEND_MSG("========================================");
-                    }
+
+                    processCommand(command, params);
                 }
             }
 

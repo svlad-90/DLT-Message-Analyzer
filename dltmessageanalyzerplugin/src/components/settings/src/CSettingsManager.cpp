@@ -1549,17 +1549,31 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
     QString V0_SettingsFilePath(QCoreApplication::applicationDirPath() + QDir::separator() + sFileName);
     QFile V0_SettingsFile( V0_SettingsFilePath );
 
+    QString configDirPath = sSettingsManager_Directory;
     QString regexDirPath = getRegexDirectory();
+    QString rootSettingsFilePath = getRootSettingsFilepath();
+    QString userSettingsFilePath = getUserSettingsFilepath();
+    QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + sDefaultRegexFileName;
+
+    QDir configDir( configDirPath );
     QDir regexDir( regexDirPath );
+    QFile rootSettingsFile( rootSettingsFilePath );
+    QFile userSettingsFile( userSettingsFilePath );
+    QFile regexSettingsFile( regexSettingsFilePath );
+
+    const bool bLegacyMigrationRequired = false == configDir.exists() ||
+                                          false == regexDir.exists();
+    const bool bPartialRepairRequired = false == rootSettingsFile.exists() ||
+                                        false == userSettingsFile.exists() ||
+                                        false == regexSettingsFile.exists();
 
     // Let's check, whether we have V0.
     // That can be checked only indirectly, based on file-system-based conclusions
-    if(false == regexDir.exists()) // regex dir does not exist. Most probably we've faced old system
+    if(bLegacyMigrationRequired) // config directories do not exist. Most probably we've faced old system.
     {
         SEND_MSG(QString("[CSettingsManager] Performing setting manager update from V0 to V1"));
 
         QDir dir;
-        QString configDirPath = sSettingsManager_Directory;
 
         // let's create config dir
         if(true == dir.mkpath(configDirPath))
@@ -1616,7 +1630,6 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
 
                         if(true == result.bResult)
                         {
-                            QString regexSettingsFilePath = getRegexDirectory() + QDir::separator() + sDefaultRegexFileName;
                             result = storeRegexConfigCustomPath( regexSettingsFilePath );
                         }
                     }
@@ -1635,6 +1648,28 @@ CSettingsManager::tOperationResult CSettingsManager::backwardCompatibility_V0_V1
         }
 
         SEND_MSG(QString("[CSettingsManager] Setting manager update from V0 to V1 finished with result - %1").arg(true == result.bResult ? "SUCCESSFUL" : "FAILED"));
+    }
+    else if(bPartialRepairRequired)
+    {
+        SEND_MSG(QString("[CSettingsManager] Repairing incomplete setting manager V1 structure"));
+
+        if(false == rootSettingsFile.exists())
+        {
+            mSetting_SettingsManagerVersion.setDataSilent(1);
+            result = storeRootConfig();
+        }
+
+        if(true == result.bResult && false == userSettingsFile.exists())
+        {
+            result = storeSettingsConfig();
+        }
+
+        if(true == result.bResult && false == regexSettingsFile.exists())
+        {
+            result = storeRegexConfigCustomPath( regexSettingsFilePath );
+        }
+
+        SEND_MSG(QString("[CSettingsManager] Setting manager V1 repair finished with result - %1").arg(true == result.bResult ? "SUCCESSFUL" : "FAILED"));
     }
     else
     {

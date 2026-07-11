@@ -4,6 +4,8 @@
 #include "QTabWidget"
 #include "QPlainTextEdit"
 
+#include <QList>
+
 #include "memory"
 #include "dma/component/IComponent.hpp"
 
@@ -25,6 +27,8 @@ public:
     ~CLogComponent();
 
     virtual const char* getName() const override;
+
+    bool processCommand(const QString& command, const QList<QString>& params);
 
 protected:
     virtual DMA::tSyncInitOperationResult init() override;

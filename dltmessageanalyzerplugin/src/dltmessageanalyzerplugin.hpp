@@ -32,6 +32,7 @@ class CUMLViewComponent;
 class CPlotViewComponent;
 class CLogoComponent;
 class CLogsWrapperComponent;
+class CConsoleInputProcessor;
 class CRegexHistoryComponent;
 class CSettingsComponent;
 class CAnalyzerComponent;
@@ -43,12 +44,17 @@ namespace DMA
     class IComponent;
 }
 
-class DLTMessageAnalyzerPlugin : public QObject, QDLTPluginInterface, QDltPluginViewerInterface, QDltPluginControlInterface
+class DLTMessageAnalyzerPlugin : public QObject,
+                                 public QDLTPluginInterface,
+                                 public QDltPluginViewerInterface,
+                                 public QDltPluginControlInterface,
+                                 public QDltPluginCommandInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDLTPluginInterface)
     Q_INTERFACES(QDltPluginViewerInterface)
     Q_INTERFACES(QDltPluginControlInterface)
+    Q_INTERFACES(QDltPluginCommandInterface)
 #ifdef QT5
     Q_PLUGIN_METADATA(IID "org.genivi.DLT.DLTMessageAnalyzerPlugin")
 #endif
@@ -129,6 +135,9 @@ private: // methods
     void selectedIdxMsg(int index, QDltMsg &msg) final override;
     void selectedIdxMsgDecoded(int index, QDltMsg &msg) final override;
 
+    /* QDltPluginCommandInterface */
+    bool command(QString command, QList<QString> params) final override;
+
 private: // members
 
     /* internal variables */
@@ -139,6 +148,7 @@ private: // members
     QMap<QString, QDltConnection::QDltConnectionState> mConnecitonsMap;
     QDltConnection::QDltConnectionState mConnectionState;
     bool mbAnalysisRunning;
+    QString mErrorString;
 
     typedef std::shared_ptr<DMA::IComponent> tComponentPtr;
     typedef std::vector<tComponentPtr> tComponentPtrVec;
@@ -151,6 +161,7 @@ private: // members
     std::shared_ptr<CFiltersViewComponent> mpFiltersViewComponent;
     std::shared_ptr<CUMLViewComponent> mpUMLViewComponent;
     std::shared_ptr<CPlotViewComponent> mpPlotViewComponent;
+    std::shared_ptr<CConsoleInputProcessor> mpHeadlessConsoleInputProcessor;
     std::shared_ptr<CLogoComponent> mpLogoComponent;
     std::shared_ptr<CLogsWrapperComponent> mpLogsWrapperComponent;
     std::shared_ptr<CRegexHistoryComponent> mpRegexHistoryComponent;
